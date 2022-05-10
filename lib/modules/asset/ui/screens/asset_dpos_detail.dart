@@ -300,20 +300,6 @@ class _AssetDposDetail extends State<AssetDposDetail> {
                         child: Column(
                           children: [
                             RadioListTile(
-                                //投票地址
-                                value: 1,
-                                onChanged: (value) {
-                                  setState(() {
-                                    this.status = value;
-                                  });
-                                },
-                                groupValue: this.status,
-                                // title: Text("asset:lbl_vote_address"),
-                                title: Text(tr('asset:lbl_vote_address')),
-                                subtitle: Text(nodeAddress),
-                                selected: this.status == 1,
-                                activeColor: Colors.yellow),
-                            RadioListTile(
                                 //复利地址
                                 value: 0,
                                 onChanged: (value) {
