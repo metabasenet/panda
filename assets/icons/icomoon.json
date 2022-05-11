@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "name": "SugarApp",
+    "name": "MarsApp",
     "lastOpened": 0,
     "created": 1612249172586
   },
@@ -106,7 +106,7 @@
         {
           "order": 522,
           "id": 91,
-          "name": "sugar",
+          "name": "mars",
           "prevSize": 32,
           "code": 59664,
           "tempChar": ""
@@ -1154,7 +1154,7 @@
     "gridSize": 16,
     "showGrid": true,
     "quickUsageToken": {
-      "SugarApp": "ZDAxNjE3ZjY3ZTc2ZWEyMDIxOTg2N2RmMzU4ODIwZDUjMSMxNjAwMDU0NDE1IyMj"
+      "MarsApp": "ZDAxNjE3ZjY3ZTc2ZWEyMDIxOTg2N2RmMzU4ODIwZDUjMSMxNjAwMDU0NDE1IyMj"
     }
   },
   "uid": -1

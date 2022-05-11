@@ -767,7 +767,7 @@
   "community:create_develop_upload_logo_img_lbl": "Upload LOGO",
   "community:create_develop_ecology_lbl": "Ticket type",
   "community:create_sugar_develop_title": "Create a community",
-  "community:create_sugar_develop_name_lbl": "Create Sugar development community",
+  "community:create__develop_name_lbl": "Create Sugar development community",
   "community:create_sugar_develop_name_hint": "Input your Sugar development community name",
   "community:create_sugar_develop_name_req": "Community name can't be empty",
   "community:create_sugar_develop_desc_lbl": "Your community declaration",
