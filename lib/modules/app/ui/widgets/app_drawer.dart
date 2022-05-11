@@ -45,6 +45,10 @@ class AppDrawer extends StatelessWidget {
                 label: tr('user:menu_website'),
                 url: AppLinks.appWebsiteUrl,
               ),
+              AppDrawerMenuLink(
+                label: tr('user:menu_help'),
+                url: AppLinks.helpContactUrl(context.locale.languageCode),
+              ),
               // AppDrawerMenuTap(
               //   label: tr('user:menu_help'),
               //   onPress: () {
@@ -54,26 +58,7 @@ class AppDrawer extends StatelessWidget {
               AppDrawerMenuVersion(
                 label: tr('user:menu_version'),
                 hasNew: viewModel.hasNewVersion,
-                version: viewModel.appVersion,
-                onPressed: () {
-                  LoadingDialog.show(context);
-                  viewModel.doCheckForUpdates(false).then((data) {
-                    LoadingDialog.dismiss(context);
-                    if (data != null) {
-                      showUpdateAppDialog(
-                        context,
-                        downloadUrl: data.downloadUrl,
-                        description: data.description,
-                        version: data.version,
-                      );
-                    } else {
-                      Toast.show(tr('global:update_dialog_msg_last'));
-                    }
-                  }).catchError((error) {
-                    LoadingDialog.dismiss(context);
-                    Toast.showError(error);
-                  });
-                },
+                version: AppConstants.appVersion,
               ),
               AppDrawerMenuLanguage(
                 onSelected: (language) {
