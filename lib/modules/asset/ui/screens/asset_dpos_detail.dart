@@ -138,7 +138,7 @@ class _AssetDposDetail extends State<AssetDposDetail> {
     });
   }
 
-  //获取复利地址 Get compound interest address
+  //Get compound interest address
   void getCompoundInterestAddress() {
     final ret = getVote(widget.voteNodeItem['address'].toString(),
         widget.coinInfo.address.toString(), 0);
