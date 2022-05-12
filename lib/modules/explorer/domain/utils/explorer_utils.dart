@@ -3,42 +3,29 @@ part of explorer_domain_module;
 class ExplorerUtils {
   static const onlySearchAddress = [
     AppConstants.mnt_chain,
-    'TRX',
+    'BNB',
   ];
 
   static const explorerChains = [
     AppConstants.mnt_chain,
-    'ETH',
-    'BTC',
-    'TRX',
+    'BNB',
   ];
 
+  static const browserUrl = 'https://testnet.bscscan.com';
   static final explorerConfigs = [
     ExplorerConfig(
       chain: AppConstants.mnt_chain,
-      name: 'BigBang Core',
-      mainUrl: 'https://www.mntexplorer.com',
-      txUrl: 'https://www.mntexplorer.com/transaction-detail/%s',
-      addressUrl: 'https://www.mntexplorer.com/address-detail/%s',
+      name: 'Metabasenet',
+      mainUrl: browserUrl,
+      txUrl: 'http://124.221.253.93/tx?txid=',
+      addressUrl: 'http://124.221.253.93/address?hash=',
     ),
     ExplorerConfig(
-      chain: 'ETH',
-      name: 'Ethereum',
-      mainUrl: 'https://etherscan.io',
-      txUrl: 'https://cn.etherscan.com/search?f=0&q=%s',
-    ),
-    ExplorerConfig(
-      chain: 'BTC',
-      name: 'Bitcoin',
-      mainUrl: 'https://btc.com',
-      txUrl: 'https://btc.com/%s',
-    ),
-    ExplorerConfig(
-      chain: 'TRX',
-      name: 'Tron',
-      mainUrl: 'https://tronscan.org/#/',
-      txUrl: 'https://tronscan.org/#/transaction/%s',
-      addressUrl: 'https://tronscan.org/#/address/%s',
+      chain: 'BNB',
+      name: 'Binance Coin',
+      mainUrl: browserUrl,
+      txUrl: 'https://testnet.bscscan.com/tx/',
+      addressUrl: 'https://testnet.bscscan.com/address/',
     ),
   ];
 
@@ -47,9 +34,12 @@ class ExplorerUtils {
       (item) => item.chain == chain,
       orElse: () => null,
     );
-    return list != null
-        ? sprintf(list.txUrl, [txid])
-        : 'https://www.mntexplorer.com';
+
+    if (onlySearchAddress.contains(chain)) {
+      return list != null ? (list.txUrl + txid) : browserUrl;
+    }
+
+    return browserUrl;
   }
 
   static String getChainExplorerSearchUrl(String chain, String term) {
@@ -59,13 +49,9 @@ class ExplorerUtils {
     );
 
     if (onlySearchAddress.contains(chain)) {
-      return list != null
-          ? sprintf(list.addressUrl, [term])
-          : 'https://www.mntexplorer.com';
+      return list != null ? (list.addressUrl + term) : browserUrl;
     }
 
-    return list != null
-        ? sprintf(list.txUrl, [term])
-        : 'https://www.mntexplorer.com';
+    return browserUrl;
   }
 }
