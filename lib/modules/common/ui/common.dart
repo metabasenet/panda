@@ -31,6 +31,7 @@ import 'package:mars/routers/navigator.dart';
 import 'package:mars/themes/themes.dart';
 import 'package:mars/utils/utils.dart';
 import 'package:mars/widgets/widgets.dart';
+import 'package:mars/modules/app/app.dart';
 
 part 'dialogs/photo_view_dialog.dart';
 part 'screens/help_page.dart';

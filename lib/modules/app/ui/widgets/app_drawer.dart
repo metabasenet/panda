@@ -45,16 +45,16 @@ class AppDrawer extends StatelessWidget {
                 label: tr('user:menu_website'),
                 url: AppLinks.appWebsiteUrl,
               ),
-              AppDrawerMenuLink(
-                label: tr('user:menu_help'),
-                url: AppLinks.helpContactUrl(context.locale.languageCode),
-              ),
-              // AppDrawerMenuTap(
+              // AppDrawerMenuLink(
               //   label: tr('user:menu_help'),
-              //   onPress: () {
-              //     HelpCenterPage.open();
-              //   },
+              //   url: AppLinks.helpContactUrl(context.locale.languageCode),
               // ),
+              AppDrawerMenuTap(
+                label: tr('user:menu_help'),
+                onPress: () {
+                  HelpCenterPage.open();
+                },
+              ),
               AppDrawerMenuVersion(
                 label: tr('user:menu_version'),
                 hasNew: viewModel.hasNewVersion,
