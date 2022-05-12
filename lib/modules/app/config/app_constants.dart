@@ -6,6 +6,7 @@ class AppConstants {
   static const mnt_chain = '\u{0042}\u{0042}\u{0043}';
 
   static const codeVersion = 0;
+  static const appVersion = '1.0.1';
 
   // From env
   static bool isBeta = true;

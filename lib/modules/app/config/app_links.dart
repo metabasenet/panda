@@ -15,6 +15,12 @@ class AppLinks {
 
   static const appWebsiteUrl = 'https://metabasenet.club/';
 
+  static String helpContactUrl(String lang) {
+    String helpWebsiteUrl =
+        'http://124.221.253.93:7711/vote.html?language=' + lang;
+    return helpWebsiteUrl;
+  }
+
   static const appTwitter = '';
   static const appFacebook = '';
   static const appInstagram = '';
