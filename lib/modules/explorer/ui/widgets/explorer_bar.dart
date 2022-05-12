@@ -21,6 +21,7 @@ class ExplorerBar extends HookWidget {
       }
 
       String url = '';
+      //Judge whether it is txid by length(mnt 64,bnb 66)
       if (searchController.text.length == 64 ||
           searchController.text.length == 66) {
         url = ExplorerUtils.getChainExplorerTxUrl(

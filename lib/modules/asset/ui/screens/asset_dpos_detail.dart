@@ -138,7 +138,7 @@ class _AssetDposDetail extends State<AssetDposDetail> {
     });
   }
 
-  //获取复利地址
+  //获取复利地址 Get compound interest address
   void getCompoundInterestAddress() {
     final ret = getVote(widget.voteNodeItem['address'].toString(),
         widget.coinInfo.address.toString(), 0);
@@ -161,6 +161,7 @@ class _AssetDposDetail extends State<AssetDposDetail> {
 
   @override
   Widget build(BuildContext context) {
+    //final copied = useState('');
     final formKey = GlobalKey<FormState>();
     return CSScaffold(
       scrollable: true,
@@ -288,35 +289,32 @@ class _AssetDposDetail extends State<AssetDposDetail> {
                       }
                     },
                   ),
-//
-                  Center(
-                    child: Container(
-                        width: 390,
-                        decoration: new BoxDecoration(
-                          color: context.bgPrimaryColor,
-                          borderRadius:
-                              new BorderRadius.circular((12.0)), // 圆角度
-                        ),
-                        child: Column(
-                          children: [
-                            RadioListTile(
-                                //复利地址
-                                value: 0,
-                                onChanged: (value) {
-                                  setState(() {
-                                    this.status = value;
-                                  });
-                                },
-                                groupValue: this.status,
-                                title:
-                                    Text(tr('asset:compound_interest_address')),
-                                subtitle: Text(compoundInterestAddress),
-                                selected: this.status == 0,
-                                activeColor: Colors.yellow),
-                          ],
-                        )),
-                  ),
 
+                  FormBox(
+                    type: FormBoxType.inputText,
+                    title: tr('asset:compound_interest_address'),
+                    readOnly: true,
+                    hintText: tr(compoundInterestAddress),
+                    titleAction: Transform.translate(
+                      offset: Offset(context.edgeSize, 0),
+                      child: CSButtonIcon(
+                        size: 18,
+                        borderRadius: 4,
+                        icon: CSIcons.Copy,
+                        padding: EdgeInsets.all(0),
+                        containerSize: 20,
+                        margin: EdgeInsets.symmetric(horizontal: 20),
+                        onPressed: () {
+                          copyTextToClipboard(tr(compoundInterestAddress));
+                          Toast.show(tr('global:msg_copy_success'));
+                        },
+                      ),
+                    ),
+                    maxLines: null,
+                    onFocusChanged: (hasFocus) {
+                      if (!hasFocus) {}
+                    },
+                  ),
                   FormBox(
                     type: FormBoxType.inputNumber,
 //                    title: tr('asset:withdraw_lbl_amount'),
