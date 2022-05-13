@@ -19,10 +19,22 @@ class ExplorerBar extends HookWidget {
       if (searchController.text == '') {
         return Toast.show(tr('explorer:msg_blockchain_search'));
       }
-      final url = ExplorerUtils.getChainExplorerSearchUrl(
-        selected.value.config.chain,
-        searchController.text,
-      );
+
+      String url = '';
+      //Judge whether it is txid by length(mnt 64,bnb 66)
+      if (searchController.text.length == 64 ||
+          searchController.text.length == 66) {
+        url = ExplorerUtils.getChainExplorerTxUrl(
+          selected.value.config.chain,
+          searchController.text,
+        );
+      } else {
+        url = ExplorerUtils.getChainExplorerSearchUrl(
+          selected.value.config.chain,
+          searchController.text,
+        );
+      }
+
       WebViewPage.open(url);
     }
 
@@ -61,9 +73,7 @@ class ExplorerBar extends HookWidget {
             radius: 25,
             maxLength: 256,
             margin: context.edgeHorizontal,
-            hintText: onlyAddress
-                ? tr('explorer:hint_blockchain_search_address')
-                : tr('explorer:hint_blockchain_search_txid'),
+            hintText: tr('explorer:hint_blockchain_search_txid'),
             showSearchIcon: false,
             onChanged: (_) {},
             hintStyle: context.textSmall(),
