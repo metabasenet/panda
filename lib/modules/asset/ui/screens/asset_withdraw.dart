@@ -237,7 +237,7 @@ class AssetWithdrawPage extends HookWidget {
                       errorText: tr('asset:withdraw_req_address'),
                     ),
                     onPressIcon: () {
-                      //handleOpenAddressScan(viewModel);
+                      handleOpenAddressScan(viewModel);
                     },
                     controller: address,
                     hintText: tr('asset:withdraw_hint_address'),
