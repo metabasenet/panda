@@ -258,7 +258,7 @@ class _AssetDposDetail extends State<AssetDposDetail> {
                   FormBox(
                     type: FormBoxType.inputText,
 //                    title: tr('asset:withdraw_lbl_address'),
-                    title: tr('asset:amount_of_votes'), //投票金额
+                    title: tr('asset:amount_of_votes'), //Voting amount
                     // iconName: CSIcons.Scan,
                     // iconColor: context.bodyColor,
                     readOnly: true,
@@ -294,7 +294,7 @@ class _AssetDposDetail extends State<AssetDposDetail> {
                     type: FormBoxType.inputText,
                     title: tr('asset:compound_interest_address'),
                     readOnly: true,
-                    hintText: tr(compoundInterestAddress),
+                    hintText: tr(nodeAddress),
                     titleAction: Transform.translate(
                       offset: Offset(context.edgeSize, 0),
                       child: CSButtonIcon(
@@ -305,7 +305,7 @@ class _AssetDposDetail extends State<AssetDposDetail> {
                         containerSize: 20,
                         margin: EdgeInsets.symmetric(horizontal: 20),
                         onPressed: () {
-                          copyTextToClipboard(tr(compoundInterestAddress));
+                          copyTextToClipboard(tr(nodeAddress));
                           Toast.show(tr('global:msg_copy_success'));
                         },
                       ),
