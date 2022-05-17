@@ -180,14 +180,14 @@ class WalletActionETHTxBefore extends _BaseAction {
     this.completer,
   );
 
-  //final chain = AppConstants.mnt_chain;
+  //static const chain = AppConstants.mnt_chain;
 
   final WithdrawBeforeParams params;
   final Completer<WalletWithdrawData> completer;
 
   @override
   Future<AppState> reduce() async {
-    final chain = params.chain;
+    final chain = params.chain; //modify chain
     final symbol = params.symbol;
     final toAddress = params.toAddress;
     final fromAddress = params.fromAddress;
