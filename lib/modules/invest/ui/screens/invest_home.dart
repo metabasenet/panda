@@ -142,7 +142,8 @@ class InvestHomePage extends HookWidget {
                     holdValue: '',
                     invitationLbl: tr('invest:mining_record_lbl_invitation'),
                     //'Invitation Reward ($symbol)',
-                    invitationValue: viewModel.mintInfo?.promotionReward ?? '-',
+                    invitationValue:
+                        '', //viewModel.mintInfo?.promotionReward ?? '-',
                   ),
                 buildContent(
                   context,

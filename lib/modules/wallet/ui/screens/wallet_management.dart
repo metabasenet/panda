@@ -210,16 +210,16 @@ class WalletManagementPage extends HookWidget {
                       );
                     },
                   ),
-                  FormCell(
-                    label: tr('wallet:management_btn_invitation_list'),
-                    showBorderTop: true,
-                    onPress: () {
-                      handleInvitationMenuPress(
-                        viewModel,
-                        _InvitationMenu.invitationRecord,
-                      );
-                    },
-                  ),
+                  // FormCell(
+                  //   label: tr('wallet:management_btn_invitation_list'),
+                  //   showBorderTop: true,
+                  //   onPress: () {
+                  //     handleInvitationMenuPress(
+                  //       viewModel,
+                  //       _InvitationMenu.invitationRecord,
+                  //     );
+                  //   },
+                  // ),
                 ],
               ),
             ),

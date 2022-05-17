@@ -291,6 +291,7 @@ class WalletActionMNTTxSubmit extends _BaseAction {
       txData = '00';
     } else {
       txData = '010000a0${params.txData}';
+      params.withdrawData.fee.gasLimit *= 2;
     }
     final paramsRawTx = {
       'to': toAddress,

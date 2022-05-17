@@ -12,9 +12,9 @@ class AppLanguages {
   static const languages = [
     AppLanguage('English', Locale('en')),
     AppLanguage('中文', Locale('zh')),
-    AppLanguage('Pусский', Locale('ru')),
-    AppLanguage('日本語', Locale('ja')),
-    AppLanguage('한국어', Locale('ko')),
+    //AppLanguage('Pусский', Locale('ru')),
+    //AppLanguage('日本語', Locale('ja')),
+    //AppLanguage('한국어', Locale('ko')),
   ];
 
   static List<Locale> supportedLocales =
