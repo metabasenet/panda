@@ -21,10 +21,8 @@ class LoadingDialog {
           child: CSContainer(
             width: 150,
             height: 150,
-            child: RiveAnimation(
-              fileName: 'loading',
-              animation: 'Untitled 1',
-              width: 150,
+            child: Icon(
+              Icons.sync,
             ),
             // child: Row(
             //   mainAxisAlignment: MainAxisAlignment.center,

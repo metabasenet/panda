@@ -77,11 +77,8 @@ class _ListViewHeaderState extends RefreshIndicatorState<ListViewHeader>
           ),
         );
       } else {
-        child = RiveAnimation(
-          fileName: 'refreshing',
-          animation: 'Top Loading',
-          width: 100,
-          height: 60,
+        child = Icon(
+          Icons.sync,
         );
       }
     } else if (mode == RefreshStatus.failed) {

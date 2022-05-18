@@ -41,10 +41,8 @@ class CSEmpty extends HookWidget {
             width: width,
           ),
         if (isLoading == true)
-          RiveAnimation(
-            fileName: 'loading',
-            animation: 'Untitled 1',
-            width: 150,
+          Icon(
+            Icons.sync,
           ),
         SizedBox(height: 30),
         if (isLoading == false)
