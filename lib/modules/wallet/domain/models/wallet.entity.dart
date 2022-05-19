@@ -135,14 +135,21 @@ class Wallet extends HiveObject {
     final fiatPriceCubit = GetIt.I<FiatPriceCubit>();
     double total = 0.00;
     for (int i = 0; i < balances.length; i++) {
-      String strTotal = fiatPriceCubit.state.getSinglePrice(
-        coinPrice: getCoinItemPrice(balances[i].symbol),
-        amount: balances[i].balance,
-      );
+      String strTotal = getTotalPrice(balances[i].symbol, balances[i].balance);
       total += double.parse(strTotal);
     }
 
     return NumberUtil.truncateDecimal(total ?? 0, AppConstants.fiatPrecision);
+  }
+
+  String getTotalPrice(String symbol, double balance) {
+    final fiatPriceCubit = GetIt.I<FiatPriceCubit>();
+    String strTotal = fiatPriceCubit.state.getSinglePrice(
+      coinPrice: getCoinItemPrice(symbol),
+      amount: balance,
+    );
+
+    return strTotal;
   }
 
   AssetPrice getCoinItemPrice(String symbol) {
