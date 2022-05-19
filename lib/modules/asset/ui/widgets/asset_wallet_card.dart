@@ -113,7 +113,7 @@ class AssetWalletCard extends HookWidget {
               symbol: 'MNT/USDT',
               builder: (context, price, fiatCurrency, _) => PriceText(
                 wallet.getTotalValuation(fiatCurrency),
-                '\u{0024}',
+                AppConstants.currencySymbol,
                 TextSize.huge,
               ),
             ),
