@@ -133,21 +133,31 @@ class Wallet extends HiveObject {
 
   String getTotalValuation(String fiatCurrency) {
     final fiatPriceCubit = GetIt.I<FiatPriceCubit>();
-    final coinPriceCubit = GetIt.I<CoinPriceCubit>();
+    double total = 0.00;
+    for (int i = 0; i < balances.length; i++) {
+      String strTotal = fiatPriceCubit.state.getSinglePrice(
+        coinPrice: getCoinItemPrice(balances[i].symbol),
+        amount: balances[i].balance,
+      );
+      total += double.parse(strTotal);
+    }
 
-    final total = balances
-        .where((coin) => coin.balance > 0)
-        .map((balance) => fiatPriceCubit.state.getFiatPrice(
-              coinPrice: coinPriceCubit.state.getCoinPrice(
-                tradePairId: '${balance.symbol}/USDT',
-              ),
-              amount: balance.balance,
-            ))
-        .fold<double>(
-          0.0,
-          (prev, cur) => prev + NumberUtil.getDouble(cur),
-        );
     return NumberUtil.truncateDecimal(total ?? 0, AppConstants.fiatPrecision);
+  }
+
+  AssetPrice getCoinItemPrice(String symbol) {
+    if (symbol.toUpperCase() == 'USDT') {
+      return AssetPrice.fromPrice(
+        tradePairId: 'USDT/USDT',
+        precision: 0,
+        price: 1.00,
+        price24h: 0,
+      );
+    } else {
+      return HomePricesCard.homePrices
+          .where((item) => item.tradePairId == '${symbol}/USDT')
+          .toList()[0];
+    }
   }
 
   /// Get coin balance from this wallet cache
