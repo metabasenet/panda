@@ -35,6 +35,8 @@ class ExplorerBar extends HookWidget {
         );
       }
 
+      final settings = CommonRepository().getSettings();
+      url += '&language=' + settings.language;
       WebViewPage.open(url);
     }
 

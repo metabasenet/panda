@@ -138,13 +138,16 @@ class AssetDetailPage extends HookWidget {
                           Text(
                             tr(
                               'asset:detail_lbl_valuation',
-                              namedArgs: {'symbol': fiatCurrency},
+                              namedArgs: {
+                                'symbol': AppConstants.currencySymbol
+                              },
                             ),
                             style: context.textSecondary(),
                           ),
                           SizedBox(height: 10),
                           PriceText(
-                            price,
+                            Wallet().getTotalPrice(
+                                coinInfo.symbol, double.tryParse(balance) ?? 0),
                             '',
                             TextSize.medium,
                           ),

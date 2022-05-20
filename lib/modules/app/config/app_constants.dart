@@ -42,6 +42,7 @@ class AppConstants {
 
   static const defaultLanguage = 'en';
   static const defaultCurrency = 'USD';
+  static const currencySymbol = '\u{0024}'; //ASCII 16 Hexadecimal $
   static final supportedCurrency = ['CNY', 'USD'];
 
   static const defaultMarket = 'MNT';

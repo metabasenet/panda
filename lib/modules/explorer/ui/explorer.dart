@@ -17,6 +17,7 @@ import 'package:mars/routers/navigator.dart';
 import 'package:mars/themes/themes.dart';
 import 'package:mars/utils/utils.dart';
 import 'package:mars/widgets/widgets.dart';
+import 'package:mars/modules/common/domain/common.dart';
 
 part 'screens/explorer_home.dart';
 part 'widgets/explorer_bar.dart';

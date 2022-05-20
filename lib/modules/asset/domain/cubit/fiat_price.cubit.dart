@@ -44,6 +44,33 @@ class FiatPriceState {
     );
   }
 
+  // /// Get Coin Single Price
+  String getSinglePrice({
+    @required AssetPrice coinPrice,
+    double amount = 1,
+  }) {
+    if (prices == null) {
+      return '-';
+    }
+    final price = coinPrice.price;
+
+    if (price <= 0) {
+      return '-';
+    }
+
+    if (amount <= 0) {
+      return '0.0';
+    }
+
+    final total = price * amount;
+    final result = NumberUtil.truncateDecimal(
+      total,
+      AppConstants.fiatPrecision,
+    );
+
+    return result.toString();
+  }
+
   @override
   bool operator ==(Object o) {
     if (identical(this, o)) {

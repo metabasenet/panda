@@ -8,6 +8,7 @@ class HomePricesCard extends StatelessWidget {
   }) : assert(prices != null);
 
   final List<AssetPrice> prices;
+  static List<AssetPrice> homePrices;
   final List<TradePair> allTradePairs;
   final Future<void> Function(TradePair tradePair) doChangeTradePair;
   @override
@@ -15,6 +16,8 @@ class HomePricesCard extends StatelessWidget {
     if (prices.isEmpty) {
       return SizedBox();
     }
+
+    homePrices = prices;
 
     return CSContainer(
       margin: context.edgeAll.copyWith(top: 0),
