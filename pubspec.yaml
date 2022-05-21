@@ -98,7 +98,7 @@ dependencies:
   ## get_it: ^5.0.3
   get_it: ^7.2.0
   ## async_redux: ^6.0.3
-  async_redux: ^15.0.0
+  async_redux: ^13.3.1
   ## built_value: ^7.1.0
   built_value: ^8.3.0
   ## built_collection: ^4.3.2
