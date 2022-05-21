@@ -12,22 +12,22 @@ abstract class HomeBanner implements Built<HomeBanner, HomeBannerBuilder> {
     return deserialize<HomeBanner>(json);
   }
 
-  @nullable
+  //@nullable
   int get id;
 
-  @nullable
+  //@nullable
   String get type;
 
-  @nullable
+  //@nullable
   String get title;
 
-  @nullable
+  //@nullable
   String get content;
 
-  @nullable
+  //@nullable
   String get img;
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'bg_img')
   String get bgImg;
 

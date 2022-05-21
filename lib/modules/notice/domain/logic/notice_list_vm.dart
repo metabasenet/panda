@@ -7,10 +7,10 @@ abstract class NoticeListVM
   NoticeListVM._();
 
 // UI Fields
-  @nullable
+  //@nullable
   BuiltList<NoticeInfo> get noticeList;
 
-  @nullable
+  //@nullable
   BuiltList<NoticeInfo> get noticeLatest;
 
   @BuiltValueField(compare: false)

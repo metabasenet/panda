@@ -12,16 +12,16 @@ abstract class TradeHomeVM implements Built<TradeHomeVM, TradeHomeVMBuilder> {
   TradePair get tradePair;
   TradeSide get tradeSide;
   String get fiatCurrency;
-  @nullable
+  //@nullable
   String get activeWalletId;
 
-  @nullable
+  //@nullable
   AssetCoin get priceCoinInfo;
-  @nullable
+  //@nullable
   AssetCoin get tradeCoinInfo;
-  @nullable
+  //@nullable
   AssetCoin get sideCoinInfo;
-  @nullable
+  //@nullable
   TradeConfigCoin get sideCoinConfig;
 
   BuiltList<TradePair> get allTradePairs;
@@ -33,7 +33,7 @@ abstract class TradeHomeVM implements Built<TradeHomeVM, TradeHomeVMBuilder> {
   @BuiltValueField(compare: false)
   Future<double> Function(TradePair) get getApproveBalance;
 
-  @nullable
+  //@nullable
   @BuiltValueField(compare: false)
   Future<void> Function(TradeSide tradeSide) get doChangeTradeSide;
 

@@ -8,25 +8,25 @@ abstract class ModulePermissionVM
 
   ModulePermissionVM._();
 
-  @nullable
+  //@nullable
   int get configState;
 
-  @nullable
+  //@nullable
   int get tradeConfigState;
 
-  @nullable
+  //@nullable
   int get investConfigState;
 
-  @nullable
+  //@nullable
   int get swapConfigState;
 
-  @nullable
+  //@nullable
   int get communityConfigState;
 
-  @nullable
+  //@nullable
   ConfigUpdateData get newVersionData;
 
-  @nullable
+  //@nullable
   BuiltMap<String, String> get disabledModules;
 
   // Methods

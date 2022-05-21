@@ -21,16 +21,16 @@ abstract class MintChart implements Built<MintChart, MintChartBuilder> {
 // Fields
 
   /// 推广收益
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'balance')
   String get balance;
 
   /// 推广收益
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'reward')
   String get reward;
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'user_balance')
   bool get isBalance;
 }

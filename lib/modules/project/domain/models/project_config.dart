@@ -12,9 +12,9 @@ abstract class ProjectConfig
     return deserialize<ProjectConfig>(json);
   }
 
-  @nullable
+  //@nullable
   String get instructions;
 
-  @nullable
+  //@nullable
   double get id;
 }

@@ -8,22 +8,22 @@ abstract class ConfigOtc implements Built<ConfigOtc, ConfigOtcBuilder> {
   static Serializer<ConfigOtc> get serializer => _$configOtcSerializer;
 
 // Fields
-  @nullable
+  //@nullable
   bool get enable;
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'max_ads')
   int get maxAds;
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'trade_pair')
   BuiltMap<String, BuiltList<String>> get tradePairs;
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'deposit_fee')
   String get depositAmount;
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'deposit_currency')
   String get depositCurrency;
 
@@ -33,6 +33,6 @@ abstract class ConfigOtc implements Built<ConfigOtc, ConfigOtcBuilder> {
   @BuiltValueField(wireName: 'system_deposit_address')
   String get systemDepositAddress;
 
-  @nullable
+  //@nullable
   List<String> get tradeCoins => tradePairs.keys.toList();
 }

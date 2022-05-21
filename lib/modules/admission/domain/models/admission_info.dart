@@ -12,25 +12,25 @@ abstract class AdmissionInfo
     return deserialize<AdmissionInfo>(json);
   }
 
-// Fields
-  @nullable
+  // Fields
+  //@nullable
   int get id;
 
-  @nullable
+  //@nullable
   String get name;
 
-  @nullable
+  //@nullable
   String get describe;
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'end_time')
   int get endTime;
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'start_time')
   int get startTime;
 
-  @nullable
+  //@nullable
   BuiltList<AdmissionCondition> get condition;
 
   /// 第一个规则 现在只有一个
@@ -42,7 +42,7 @@ abstract class AdmissionInfo
 //     "fork": "123123123123",
 //     "currency": "MNT"
 // },
-  @nullable
+  //@nullable
   BuiltMap<String, String> get ecological;
 
   String get chain => ecological != null ? ecological['chain'] : '';

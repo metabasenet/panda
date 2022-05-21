@@ -7,9 +7,9 @@ abstract class HDKeyManagementVM
   HDKeyManagementVM._();
 
 // UI Fields
-  @nullable
+  //@nullable
   Wallet get activeWallet;
-  @nullable
+  //@nullable
   AssetCoin get invitationCoin;
 
   List<Wallet> get wallets;

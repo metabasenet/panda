@@ -6,10 +6,10 @@ abstract class CommunityCreateVM
       _$CommunityCreateVM;
   CommunityCreateVM._();
 
-  @nullable
+  //@nullable
   String get walletId;
 
-  @nullable
+  //@nullable
   BuiltList<AssetCoin> get coinList;
 
 // UI Actions、

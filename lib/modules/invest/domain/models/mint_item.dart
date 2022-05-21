@@ -11,7 +11,7 @@ abstract class MintItem implements Built<MintItem, MintItemBuilder> {
 
   int get id;
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'fork')
   String get forkId;
 
@@ -22,11 +22,11 @@ abstract class MintItem implements Built<MintItem, MintItemBuilder> {
   String get chain;
 
   /// 10-关闭，11-开启
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'mint_enable')
   int get mintEnable;
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'min_balance')
   double get minBalance;
 

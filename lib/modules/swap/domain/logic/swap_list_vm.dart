@@ -4,7 +4,7 @@ abstract class SwapListVM implements Built<SwapListVM, SwapListVMBuilder> {
   factory SwapListVM([void Function(SwapListVMBuilder) updates]) = _$SwapListVM;
   SwapListVM._();
 
-  @nullable
+  //@nullable
   BuiltList<Swap> get swapList;
 
 // Withdraw Methods

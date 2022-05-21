@@ -29,11 +29,11 @@ abstract class ProjectState
     ];
   }
 
-  @nullable
+  //@nullable
   ProjectCreateParams get lastProjectCreateParams;
 
   BuiltList<ProjectInfo> get projectList;
 
-  @nullable
+  //@nullable
   ProjectConfig get projectConfig;
 }

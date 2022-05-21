@@ -6,19 +6,19 @@ abstract class HomePageVM implements Built<HomePageVM, HomePageVMBuilder> {
 
 // Fields
 
-  @nullable
+  //@nullable
   BuiltList<AssetPrice> get homePrices;
-  @nullable
+  //@nullable
   BuiltList<HomeBanner> get homeBanners;
-  @nullable
+  //@nullable
   BuiltList<NoticeInfo> get homeNotices;
 
-  @nullable
+  //@nullable
   BuiltList<AdmissionInfo> get admissionList;
 
-  @nullable
+  //@nullable
   bool get hasNewVersion;
-  @nullable
+  //@nullable
   ConfigUpdateData get newVersionData;
 
   BuiltList<TradePair> get allTradePairs;
@@ -26,10 +26,10 @@ abstract class HomePageVM implements Built<HomePageVM, HomePageVMBuilder> {
 
   bool get hasWallet;
 
-  @nullable
+  //@nullable
   CommunityConfig get communityConfig;
 
-  @nullable
+  //@nullable
   int get communityConfigState;
 
 // Methods

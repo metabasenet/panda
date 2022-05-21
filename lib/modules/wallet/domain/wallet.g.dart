@@ -15,65 +15,54 @@ class _$WalletStateSerializer implements StructuredSerializer<WalletState> {
   final String wireName = 'WalletState';
 
   @override
-  Iterable<Object> serialize(Serializers serializers, WalletState object,
+  Iterable<Object?> serialize(Serializers serializers, WalletState object,
       {FullType specifiedType = FullType.unspecified}) {
-    final result = <Object>[];
-    if (object.wallets != null) {
-      result
-        ..add('wallets')
-        ..add(serializers.serialize(object.wallets,
-            specifiedType:
-                const FullType(List, const [const FullType(Wallet)])));
-    }
-    if (object.activeWallet != null) {
-      result
-        ..add('activeWallet')
-        ..add(serializers.serialize(object.activeWallet,
-            specifiedType: const FullType(Wallet)));
-    }
-    if (object.activeWalletId != null) {
-      result
-        ..add('activeWalletId')
-        ..add(serializers.serialize(object.activeWalletId,
-            specifiedType: const FullType(String)));
-    }
-    if (object.activeWalletStatus != null) {
-      result
-        ..add('activeWalletStatus')
-        ..add(serializers.serialize(object.activeWalletStatus,
-            specifiedType: const FullType(WalletStatus)));
-    }
+    final result = <Object?>[
+      'wallets',
+      serializers.serialize(object.wallets,
+          specifiedType: const FullType(List, const [const FullType(Wallet)])),
+      'activeWallet',
+      serializers.serialize(object.activeWallet,
+          specifiedType: const FullType(Wallet)),
+      'activeWalletId',
+      serializers.serialize(object.activeWalletId,
+          specifiedType: const FullType(String)),
+      'activeWalletStatus',
+      serializers.serialize(object.activeWalletStatus,
+          specifiedType: const FullType(WalletStatus)),
+    ];
+
     return result;
   }
 
   @override
-  WalletState deserialize(Serializers serializers, Iterable<Object> serialized,
+  WalletState deserialize(Serializers serializers, Iterable<Object?> serialized,
       {FullType specifiedType = FullType.unspecified}) {
     final result = new WalletStateBuilder();
 
     final iterator = serialized.iterator;
     while (iterator.moveNext()) {
-      final key = iterator.current as String;
+      final key = iterator.current! as String;
       iterator.moveNext();
-      final dynamic value = iterator.current;
+      final Object? value = iterator.current;
       switch (key) {
         case 'wallets':
           result.wallets = serializers.deserialize(value,
                   specifiedType:
-                      const FullType(List, const [const FullType(Wallet)]))
+                      const FullType(List, const [const FullType(Wallet)]))!
               as List<Wallet>;
           break;
         case 'activeWallet':
           result.activeWallet = serializers.deserialize(value,
-              specifiedType: const FullType(Wallet)) as Wallet;
+              specifiedType: const FullType(Wallet))! as Wallet;
           break;
         case 'activeWalletId':
           result.activeWalletId = serializers.deserialize(value,
-              specifiedType: const FullType(String)) as String;
+              specifiedType: const FullType(String))! as String;
           break;
         case 'activeWalletStatus':
           result.activeWalletStatus = serializers.deserialize(value,
-              specifiedType: const FullType(WalletStatus)) as WalletStatus;
+              specifiedType: const FullType(WalletStatus))! as WalletStatus;
           break;
       }
     }
@@ -86,13 +75,12 @@ class _$WalletBackupVM extends WalletBackupVM {
   @override
   final Future Function() backupSuccess;
 
-  factory _$WalletBackupVM([void Function(WalletBackupVMBuilder) updates]) =>
-      (new WalletBackupVMBuilder()..update(updates)).build();
+  factory _$WalletBackupVM([void Function(WalletBackupVMBuilder)? updates]) =>
+      (new WalletBackupVMBuilder()..update(updates))._build();
 
-  _$WalletBackupVM._({this.backupSuccess}) : super._() {
-    if (backupSuccess == null) {
-      throw new BuiltValueNullFieldError('WalletBackupVM', 'backupSuccess');
-    }
+  _$WalletBackupVM._({required this.backupSuccess}) : super._() {
+    BuiltValueNullFieldError.checkNotNull(
+        backupSuccess, 'WalletBackupVM', 'backupSuccess');
   }
 
   @override
@@ -124,18 +112,19 @@ class _$WalletBackupVM extends WalletBackupVM {
 
 class WalletBackupVMBuilder
     implements Builder<WalletBackupVM, WalletBackupVMBuilder> {
-  _$WalletBackupVM _$v;
+  _$WalletBackupVM? _$v;
 
-  Future Function() _backupSuccess;
-  Future Function() get backupSuccess => _$this._backupSuccess;
-  set backupSuccess(Future Function() backupSuccess) =>
+  Future Function()? _backupSuccess;
+  Future Function()? get backupSuccess => _$this._backupSuccess;
+  set backupSuccess(Future Function()? backupSuccess) =>
       _$this._backupSuccess = backupSuccess;
 
   WalletBackupVMBuilder();
 
   WalletBackupVMBuilder get _$this {
-    if (_$v != null) {
-      _backupSuccess = _$v.backupSuccess;
+    final $v = _$v;
+    if ($v != null) {
+      _backupSuccess = $v.backupSuccess;
       _$v = null;
     }
     return this;
@@ -143,21 +132,23 @@ class WalletBackupVMBuilder
 
   @override
   void replace(WalletBackupVM other) {
-    if (other == null) {
-      throw new ArgumentError.notNull('other');
-    }
+    ArgumentError.checkNotNull(other, 'other');
     _$v = other as _$WalletBackupVM;
   }
 
   @override
-  void update(void Function(WalletBackupVMBuilder) updates) {
+  void update(void Function(WalletBackupVMBuilder)? updates) {
     if (updates != null) updates(this);
   }
 
   @override
-  _$WalletBackupVM build() {
-    final _$result =
-        _$v ?? new _$WalletBackupVM._(backupSuccess: backupSuccess);
+  WalletBackupVM build() => _build();
+
+  _$WalletBackupVM _build() {
+    final _$result = _$v ??
+        new _$WalletBackupVM._(
+            backupSuccess: BuiltValueNullFieldError.checkNotNull(
+                backupSuccess, 'WalletBackupVM', 'backupSuccess'));
     replace(_$result);
     return _$result;
   }
@@ -181,39 +172,32 @@ class _$WalletManagementVM extends WalletManagementVM {
   final Future<void> Function(String mnemonic) validateMnemonic;
 
   factory _$WalletManagementVM(
-          [void Function(WalletManagementVMBuilder) updates]) =>
-      (new WalletManagementVMBuilder()..update(updates)).build();
+          [void Function(WalletManagementVMBuilder)? updates]) =>
+      (new WalletManagementVMBuilder()..update(updates))._build();
 
   _$WalletManagementVM._(
-      {this.activeWallet,
-      this.doUnlockWallet,
-      this.createWallet,
-      this.changePassword,
-      this.changeName,
-      this.deleteWallet,
-      this.validateMnemonic})
+      {required this.activeWallet,
+      required this.doUnlockWallet,
+      required this.createWallet,
+      required this.changePassword,
+      required this.changeName,
+      required this.deleteWallet,
+      required this.validateMnemonic})
       : super._() {
-    if (doUnlockWallet == null) {
-      throw new BuiltValueNullFieldError(
-          'WalletManagementVM', 'doUnlockWallet');
-    }
-    if (createWallet == null) {
-      throw new BuiltValueNullFieldError('WalletManagementVM', 'createWallet');
-    }
-    if (changePassword == null) {
-      throw new BuiltValueNullFieldError(
-          'WalletManagementVM', 'changePassword');
-    }
-    if (changeName == null) {
-      throw new BuiltValueNullFieldError('WalletManagementVM', 'changeName');
-    }
-    if (deleteWallet == null) {
-      throw new BuiltValueNullFieldError('WalletManagementVM', 'deleteWallet');
-    }
-    if (validateMnemonic == null) {
-      throw new BuiltValueNullFieldError(
-          'WalletManagementVM', 'validateMnemonic');
-    }
+    BuiltValueNullFieldError.checkNotNull(
+        activeWallet, 'WalletManagementVM', 'activeWallet');
+    BuiltValueNullFieldError.checkNotNull(
+        doUnlockWallet, 'WalletManagementVM', 'doUnlockWallet');
+    BuiltValueNullFieldError.checkNotNull(
+        createWallet, 'WalletManagementVM', 'createWallet');
+    BuiltValueNullFieldError.checkNotNull(
+        changePassword, 'WalletManagementVM', 'changePassword');
+    BuiltValueNullFieldError.checkNotNull(
+        changeName, 'WalletManagementVM', 'changeName');
+    BuiltValueNullFieldError.checkNotNull(
+        deleteWallet, 'WalletManagementVM', 'deleteWallet');
+    BuiltValueNullFieldError.checkNotNull(
+        validateMnemonic, 'WalletManagementVM', 'validateMnemonic');
   }
 
   @override
@@ -252,65 +236,68 @@ class _$WalletManagementVM extends WalletManagementVM {
 
 class WalletManagementVMBuilder
     implements Builder<WalletManagementVM, WalletManagementVMBuilder> {
-  _$WalletManagementVM _$v;
+  _$WalletManagementVM? _$v;
 
-  Wallet _activeWallet;
-  Wallet get activeWallet => _$this._activeWallet;
-  set activeWallet(Wallet activeWallet) => _$this._activeWallet = activeWallet;
+  Wallet? _activeWallet;
+  Wallet? get activeWallet => _$this._activeWallet;
+  set activeWallet(Wallet? activeWallet) => _$this._activeWallet = activeWallet;
 
-  Future<WalletPrivateData> Function(String password) _doUnlockWallet;
-  Future<WalletPrivateData> Function(String password) get doUnlockWallet =>
+  Future<WalletPrivateData> Function(String password)? _doUnlockWallet;
+  Future<WalletPrivateData> Function(String password)? get doUnlockWallet =>
       _$this._doUnlockWallet;
   set doUnlockWallet(
-          Future<WalletPrivateData> Function(String password) doUnlockWallet) =>
+          Future<WalletPrivateData> Function(String password)?
+              doUnlockWallet) =>
       _$this._doUnlockWallet = doUnlockWallet;
 
   Future<String> Function(String name, String password,
-      [String importMnemonic, WalletType type]) _createWallet;
+      [String importMnemonic, WalletType type])? _createWallet;
   Future<String> Function(String name, String password,
       [String importMnemonic,
-      WalletType type]) get createWallet => _$this._createWallet;
+      WalletType type])? get createWallet => _$this._createWallet;
   set createWallet(
           Future<String> Function(String name, String password,
-                  [String importMnemonic, WalletType type])
+                  [String importMnemonic, WalletType type])?
               createWallet) =>
       _$this._createWallet = createWallet;
 
-  Future<void> Function(String pwdOld, String pwdNew) _changePassword;
-  Future<void> Function(String pwdOld, String pwdNew) get changePassword =>
+  Future<void> Function(String pwdOld, String pwdNew)? _changePassword;
+  Future<void> Function(String pwdOld, String pwdNew)? get changePassword =>
       _$this._changePassword;
   set changePassword(
-          Future<void> Function(String pwdOld, String pwdNew) changePassword) =>
+          Future<void> Function(String pwdOld, String pwdNew)?
+              changePassword) =>
       _$this._changePassword = changePassword;
 
-  Future<void> Function(String name) _changeName;
-  Future<void> Function(String name) get changeName => _$this._changeName;
-  set changeName(Future<void> Function(String name) changeName) =>
+  Future<void> Function(String name)? _changeName;
+  Future<void> Function(String name)? get changeName => _$this._changeName;
+  set changeName(Future<void> Function(String name)? changeName) =>
       _$this._changeName = changeName;
 
-  Future<void> Function() _deleteWallet;
-  Future<void> Function() get deleteWallet => _$this._deleteWallet;
-  set deleteWallet(Future<void> Function() deleteWallet) =>
+  Future<void> Function()? _deleteWallet;
+  Future<void> Function()? get deleteWallet => _$this._deleteWallet;
+  set deleteWallet(Future<void> Function()? deleteWallet) =>
       _$this._deleteWallet = deleteWallet;
 
-  Future<void> Function(String mnemonic) _validateMnemonic;
-  Future<void> Function(String mnemonic) get validateMnemonic =>
+  Future<void> Function(String mnemonic)? _validateMnemonic;
+  Future<void> Function(String mnemonic)? get validateMnemonic =>
       _$this._validateMnemonic;
   set validateMnemonic(
-          Future<void> Function(String mnemonic) validateMnemonic) =>
+          Future<void> Function(String mnemonic)? validateMnemonic) =>
       _$this._validateMnemonic = validateMnemonic;
 
   WalletManagementVMBuilder();
 
   WalletManagementVMBuilder get _$this {
-    if (_$v != null) {
-      _activeWallet = _$v.activeWallet;
-      _doUnlockWallet = _$v.doUnlockWallet;
-      _createWallet = _$v.createWallet;
-      _changePassword = _$v.changePassword;
-      _changeName = _$v.changeName;
-      _deleteWallet = _$v.deleteWallet;
-      _validateMnemonic = _$v.validateMnemonic;
+    final $v = _$v;
+    if ($v != null) {
+      _activeWallet = $v.activeWallet;
+      _doUnlockWallet = $v.doUnlockWallet;
+      _createWallet = $v.createWallet;
+      _changePassword = $v.changePassword;
+      _changeName = $v.changeName;
+      _deleteWallet = $v.deleteWallet;
+      _validateMnemonic = $v.validateMnemonic;
       _$v = null;
     }
     return this;
@@ -318,28 +305,35 @@ class WalletManagementVMBuilder
 
   @override
   void replace(WalletManagementVM other) {
-    if (other == null) {
-      throw new ArgumentError.notNull('other');
-    }
+    ArgumentError.checkNotNull(other, 'other');
     _$v = other as _$WalletManagementVM;
   }
 
   @override
-  void update(void Function(WalletManagementVMBuilder) updates) {
+  void update(void Function(WalletManagementVMBuilder)? updates) {
     if (updates != null) updates(this);
   }
 
   @override
-  _$WalletManagementVM build() {
+  WalletManagementVM build() => _build();
+
+  _$WalletManagementVM _build() {
     final _$result = _$v ??
         new _$WalletManagementVM._(
-            activeWallet: activeWallet,
-            doUnlockWallet: doUnlockWallet,
-            createWallet: createWallet,
-            changePassword: changePassword,
-            changeName: changeName,
-            deleteWallet: deleteWallet,
-            validateMnemonic: validateMnemonic);
+            activeWallet: BuiltValueNullFieldError.checkNotNull(
+                activeWallet, 'WalletManagementVM', 'activeWallet'),
+            doUnlockWallet: BuiltValueNullFieldError.checkNotNull(
+                doUnlockWallet, 'WalletManagementVM', 'doUnlockWallet'),
+            createWallet: BuiltValueNullFieldError.checkNotNull(
+                createWallet, 'WalletManagementVM', 'createWallet'),
+            changePassword: BuiltValueNullFieldError.checkNotNull(
+                changePassword, 'WalletManagementVM', 'changePassword'),
+            changeName: BuiltValueNullFieldError.checkNotNull(
+                changeName, 'WalletManagementVM', 'changeName'),
+            deleteWallet: BuiltValueNullFieldError.checkNotNull(
+                deleteWallet, 'WalletManagementVM', 'deleteWallet'),
+            validateMnemonic: BuiltValueNullFieldError.checkNotNull(
+                validateMnemonic, 'WalletManagementVM', 'validateMnemonic'));
     replace(_$result);
     return _$result;
   }
@@ -355,15 +349,23 @@ class _$WalletState extends WalletState {
   @override
   final WalletStatus activeWalletStatus;
 
-  factory _$WalletState([void Function(WalletStateBuilder) updates]) =>
-      (new WalletStateBuilder()..update(updates)).build();
+  factory _$WalletState([void Function(WalletStateBuilder)? updates]) =>
+      (new WalletStateBuilder()..update(updates))._build();
 
   _$WalletState._(
-      {this.wallets,
-      this.activeWallet,
-      this.activeWalletId,
-      this.activeWalletStatus})
-      : super._();
+      {required this.wallets,
+      required this.activeWallet,
+      required this.activeWalletId,
+      required this.activeWalletStatus})
+      : super._() {
+    BuiltValueNullFieldError.checkNotNull(wallets, 'WalletState', 'wallets');
+    BuiltValueNullFieldError.checkNotNull(
+        activeWallet, 'WalletState', 'activeWallet');
+    BuiltValueNullFieldError.checkNotNull(
+        activeWalletId, 'WalletState', 'activeWalletId');
+    BuiltValueNullFieldError.checkNotNull(
+        activeWalletStatus, 'WalletState', 'activeWalletStatus');
+  }
 
   @override
   WalletState rebuild(void Function(WalletStateBuilder) updates) =>
@@ -402,34 +404,35 @@ class _$WalletState extends WalletState {
 }
 
 class WalletStateBuilder implements Builder<WalletState, WalletStateBuilder> {
-  _$WalletState _$v;
+  _$WalletState? _$v;
 
-  List<Wallet> _wallets;
-  List<Wallet> get wallets => _$this._wallets;
-  set wallets(List<Wallet> wallets) => _$this._wallets = wallets;
+  List<Wallet>? _wallets;
+  List<Wallet>? get wallets => _$this._wallets;
+  set wallets(List<Wallet>? wallets) => _$this._wallets = wallets;
 
-  Wallet _activeWallet;
-  Wallet get activeWallet => _$this._activeWallet;
-  set activeWallet(Wallet activeWallet) => _$this._activeWallet = activeWallet;
+  Wallet? _activeWallet;
+  Wallet? get activeWallet => _$this._activeWallet;
+  set activeWallet(Wallet? activeWallet) => _$this._activeWallet = activeWallet;
 
-  String _activeWalletId;
-  String get activeWalletId => _$this._activeWalletId;
-  set activeWalletId(String activeWalletId) =>
+  String? _activeWalletId;
+  String? get activeWalletId => _$this._activeWalletId;
+  set activeWalletId(String? activeWalletId) =>
       _$this._activeWalletId = activeWalletId;
 
-  WalletStatus _activeWalletStatus;
-  WalletStatus get activeWalletStatus => _$this._activeWalletStatus;
-  set activeWalletStatus(WalletStatus activeWalletStatus) =>
+  WalletStatus? _activeWalletStatus;
+  WalletStatus? get activeWalletStatus => _$this._activeWalletStatus;
+  set activeWalletStatus(WalletStatus? activeWalletStatus) =>
       _$this._activeWalletStatus = activeWalletStatus;
 
   WalletStateBuilder();
 
   WalletStateBuilder get _$this {
-    if (_$v != null) {
-      _wallets = _$v.wallets;
-      _activeWallet = _$v.activeWallet;
-      _activeWalletId = _$v.activeWalletId;
-      _activeWalletStatus = _$v.activeWalletStatus;
+    final $v = _$v;
+    if ($v != null) {
+      _wallets = $v.wallets;
+      _activeWallet = $v.activeWallet;
+      _activeWalletId = $v.activeWalletId;
+      _activeWalletStatus = $v.activeWalletStatus;
       _$v = null;
     }
     return this;
@@ -437,84 +440,39 @@ class WalletStateBuilder implements Builder<WalletState, WalletStateBuilder> {
 
   @override
   void replace(WalletState other) {
-    if (other == null) {
-      throw new ArgumentError.notNull('other');
-    }
+    ArgumentError.checkNotNull(other, 'other');
     _$v = other as _$WalletState;
   }
 
   @override
-  void update(void Function(WalletStateBuilder) updates) {
+  void update(void Function(WalletStateBuilder)? updates) {
     if (updates != null) updates(this);
   }
 
   @override
-  _$WalletState build() {
+  WalletState build() => _build();
+
+  _$WalletState _build() {
     final _$result = _$v ??
         new _$WalletState._(
-            wallets: wallets,
-            activeWallet: activeWallet,
-            activeWalletId: activeWalletId,
-            activeWalletStatus: activeWalletStatus);
+            wallets: BuiltValueNullFieldError.checkNotNull(
+                wallets, 'WalletState', 'wallets'),
+            activeWallet: BuiltValueNullFieldError.checkNotNull(
+                activeWallet, 'WalletState', 'activeWallet'),
+            activeWalletId: BuiltValueNullFieldError.checkNotNull(
+                activeWalletId, 'WalletState', 'activeWalletId'),
+            activeWalletStatus: BuiltValueNullFieldError.checkNotNull(
+                activeWalletStatus, 'WalletState', 'activeWalletStatus'));
     replace(_$result);
     return _$result;
   }
 }
 
-// ignore_for_file: always_put_control_body_on_new_line,always_specify_types,annotate_overrides,avoid_annotating_with_dynamic,avoid_as,avoid_catches_without_on_clauses,avoid_returning_this,lines_longer_than_80_chars,omit_local_variable_types,prefer_expression_function_bodies,sort_constructors_first,test_types_in_equals,unnecessary_const,unnecessary_new
+// ignore_for_file: always_put_control_body_on_new_line,always_specify_types,annotate_overrides,avoid_annotating_with_dynamic,avoid_as,avoid_catches_without_on_clauses,avoid_returning_this,deprecated_member_use_from_same_package,lines_longer_than_80_chars,no_leading_underscores_for_local_identifiers,omit_local_variable_types,prefer_expression_function_bodies,sort_constructors_first,test_types_in_equals,unnecessary_const,unnecessary_new
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
-
-class BroadcastTxTypeAdapter extends TypeAdapter<BroadcastTxType> {
-  @override
-  final int typeId = 50;
-
-  @override
-  BroadcastTxType read(BinaryReader reader) {
-    switch (reader.readByte()) {
-      case 0:
-        return BroadcastTxType.swap;
-      case 1:
-        return BroadcastTxType.pool;
-      case 2:
-        return BroadcastTxType.project;
-      case 3:
-        return BroadcastTxType.tradeFailOrder;
-      default:
-        return null;
-    }
-  }
-
-  @override
-  void write(BinaryWriter writer, BroadcastTxType obj) {
-    switch (obj) {
-      case BroadcastTxType.swap:
-        writer.writeByte(0);
-        break;
-      case BroadcastTxType.pool:
-        writer.writeByte(1);
-        break;
-      case BroadcastTxType.project:
-        writer.writeByte(2);
-        break;
-      case BroadcastTxType.tradeFailOrder:
-        writer.writeByte(3);
-        break;
-    }
-  }
-
-  @override
-  int get hashCode => typeId.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is BroadcastTxTypeAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
-}
 
 class BroadcastTxInfoAdapter extends TypeAdapter<BroadcastTxInfo> {
   @override
@@ -567,6 +525,55 @@ class BroadcastTxInfoAdapter extends TypeAdapter<BroadcastTxInfo> {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is BroadcastTxInfoAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class BroadcastTxTypeAdapter extends TypeAdapter<BroadcastTxType> {
+  @override
+  final int typeId = 50;
+
+  @override
+  BroadcastTxType read(BinaryReader reader) {
+    switch (reader.readByte()) {
+      case 0:
+        return BroadcastTxType.swap;
+      case 1:
+        return BroadcastTxType.pool;
+      case 2:
+        return BroadcastTxType.project;
+      case 3:
+        return BroadcastTxType.tradeFailOrder;
+      default:
+        return BroadcastTxType.swap;
+    }
+  }
+
+  @override
+  void write(BinaryWriter writer, BroadcastTxType obj) {
+    switch (obj) {
+      case BroadcastTxType.swap:
+        writer.writeByte(0);
+        break;
+      case BroadcastTxType.pool:
+        writer.writeByte(1);
+        break;
+      case BroadcastTxType.project:
+        writer.writeByte(2);
+        break;
+      case BroadcastTxType.tradeFailOrder:
+        writer.writeByte(3);
+        break;
+    }
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is BroadcastTxTypeAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
@@ -745,6 +752,67 @@ class CoinInfoAdapter extends TypeAdapter<CoinInfo> {
           typeId == other.typeId;
 }
 
+class WalletAdapter extends TypeAdapter<Wallet> {
+  @override
+  final int typeId = 10;
+
+  @override
+  Wallet read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return Wallet(
+      id: fields[0] as String,
+      type: fields[2] as WalletType,
+      name: fields[1] as String,
+      addresses: (fields[9] as List).cast<CoinAddress>(),
+      hasBackup: fields[4] as bool,
+      coins: (fields[7] as List).cast<CoinInfo>(),
+    )
+      ..status = fields[3] as WalletStatus
+      ..createdAt = fields[5] as DateTime
+      ..updatedAt = fields[6] as DateTime
+      ..balances = (fields[8] as List).cast<CoinBalance>();
+  }
+
+  @override
+  void write(BinaryWriter writer, Wallet obj) {
+    writer
+      ..writeByte(10)
+      ..writeByte(0)
+      ..write(obj.id)
+      ..writeByte(1)
+      ..write(obj.name)
+      ..writeByte(2)
+      ..write(obj.type)
+      ..writeByte(3)
+      ..write(obj.status)
+      ..writeByte(4)
+      ..write(obj.hasBackup)
+      ..writeByte(5)
+      ..write(obj.createdAt)
+      ..writeByte(6)
+      ..write(obj.updatedAt)
+      ..writeByte(7)
+      ..write(obj.coins)
+      ..writeByte(8)
+      ..write(obj.balances)
+      ..writeByte(9)
+      ..write(obj.addresses);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is WalletAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
 class WalletStatusAdapter extends TypeAdapter<WalletStatus> {
   @override
   final int typeId = 15;
@@ -761,7 +829,7 @@ class WalletStatusAdapter extends TypeAdapter<WalletStatus> {
       case 3:
         return WalletStatus.loading;
       default:
-        return null;
+        return WalletStatus.synced;
     }
   }
 
@@ -810,7 +878,7 @@ class WalletTypeAdapter extends TypeAdapter<WalletType> {
       case 3:
         return WalletType.device;
       default:
-        return null;
+        return WalletType.mnemonicBip44;
     }
   }
 
@@ -839,67 +907,6 @@ class WalletTypeAdapter extends TypeAdapter<WalletType> {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is WalletTypeAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
-}
-
-class WalletAdapter extends TypeAdapter<Wallet> {
-  @override
-  final int typeId = 10;
-
-  @override
-  Wallet read(BinaryReader reader) {
-    final numOfFields = reader.readByte();
-    final fields = <int, dynamic>{
-      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
-    };
-    return Wallet(
-      id: fields[0] as String,
-      type: fields[2] as WalletType,
-      name: fields[1] as String,
-      addresses: (fields[9] as List)?.cast<CoinAddress>(),
-      hasBackup: fields[4] as bool,
-      coins: (fields[7] as List)?.cast<CoinInfo>(),
-    )
-      ..status = fields[3] as WalletStatus
-      ..createdAt = fields[5] as DateTime
-      ..updatedAt = fields[6] as DateTime
-      ..balances = (fields[8] as List)?.cast<CoinBalance>();
-  }
-
-  @override
-  void write(BinaryWriter writer, Wallet obj) {
-    writer
-      ..writeByte(10)
-      ..writeByte(0)
-      ..write(obj.id)
-      ..writeByte(1)
-      ..write(obj.name)
-      ..writeByte(2)
-      ..write(obj.type)
-      ..writeByte(3)
-      ..write(obj.status)
-      ..writeByte(4)
-      ..write(obj.hasBackup)
-      ..writeByte(5)
-      ..write(obj.createdAt)
-      ..writeByte(6)
-      ..write(obj.updatedAt)
-      ..writeByte(7)
-      ..write(obj.coins)
-      ..writeByte(8)
-      ..write(obj.balances)
-      ..writeByte(9)
-      ..write(obj.addresses);
-  }
-
-  @override
-  int get hashCode => typeId.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is WalletAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

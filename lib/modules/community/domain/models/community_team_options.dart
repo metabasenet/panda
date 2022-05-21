@@ -11,30 +11,30 @@ abstract class CommunityTeamOptions
       _$communityTeamOptionsSerializer;
 
 // Fields
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'valid_address_count')
   int get addressCount;
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'valid_address_average_balance')
   BuiltMap<String, String> get addressAverageBalance;
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'business_info')
   BuiltList<String> get businessInfo;
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'telegram_account')
   String get telegramAccount;
 
-  @nullable
+  //@nullable
   String get icon;
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'join_apply_type')
   String get joinApplyType;
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'admin')
   BuiltMap<String, String> get admin;
 

@@ -30,14 +30,14 @@ abstract class AdmissionState
     }
   }
 
-// Config
-  @nullable
+  // Config
+  //@nullable
   AdmissionConfig get config;
 
-  @nullable
+  //@nullable
   int get configState;
 
-// Fields
-  @nullable
+  // Fields
+  //@nullable
   BuiltList<AdmissionInfo> get admissionList;
 }

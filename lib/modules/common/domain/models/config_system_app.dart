@@ -11,6 +11,6 @@ abstract class ConfigSystemApp
       _$configSystemAppSerializer;
 
 // Fields
-  @nullable
+  //@nullable
   bool get enable;
 }

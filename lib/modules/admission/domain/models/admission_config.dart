@@ -14,15 +14,15 @@ abstract class AdmissionConfig
     return deserialize<AdmissionConfig>(json);
   }
 
-// Fields
-  @nullable
+  // Fields
+  //@nullable
   String get fork;
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'home_list')
   BuiltList<int> get homeList;
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'ecological')
   BuiltList<AdmissionInfo> get projects;
 }

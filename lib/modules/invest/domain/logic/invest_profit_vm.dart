@@ -11,7 +11,7 @@ abstract class InvestProfitVM
 
   bool get hasWallet;
 
-  @nullable
+  //@nullable
   MintItem get activeMint;
 
   BuiltList<ProfitRecordItem> get profitRecordList;

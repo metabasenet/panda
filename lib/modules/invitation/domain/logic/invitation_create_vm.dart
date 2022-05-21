@@ -9,7 +9,7 @@ abstract class InvitationCreateVM
   InvitationCreateVM._();
 
 // Fields
-  @nullable
+  //@nullable
   String get walletId;
 
 // Withdraw Methods

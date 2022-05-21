@@ -14,7 +14,7 @@ abstract class SwapConfig implements Built<SwapConfig, SwapConfigBuilder> {
 
 // Fields
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'tradePairs')
   BuiltList<BuiltList<SwapConfigCoin>> get tradePairs;
 

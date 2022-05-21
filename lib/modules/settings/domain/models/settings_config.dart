@@ -21,19 +21,19 @@ abstract class SettingsConfig
 
 // Fields
 
-  @nullable
+  //@nullable
   String get apiBaseUrl;
 
-  @nullable
+  //@nullable
   String get apiAppVersion;
 
-  @nullable
+  //@nullable
   String get mqttUseTls;
 
-  @nullable
+  //@nullable
   String get mqttDisabled;
 
-  @nullable
+  //@nullable
   String get proxyUrl;
 
   bool get isMqttUseTls => mqttUseTls == 'true';

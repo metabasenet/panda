@@ -18,10 +18,10 @@ abstract class ProfitInvitationItem
   String get amount;
 
   //
-  @nullable
+  //@nullable
   String get height;
 
   //
-  @nullable
+  //@nullable
   String get time;
 }

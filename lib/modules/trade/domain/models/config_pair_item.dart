@@ -20,7 +20,7 @@ abstract class TradeConfigPairItem
   @BuiltValueField(wireName: 'deep_span')
   BuiltList<String> get spans;
 
-  @nullable
+  //@nullable
   String get status;
 
   @BuiltValueField(wireName: 'buy')

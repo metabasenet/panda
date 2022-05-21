@@ -42,10 +42,10 @@ abstract class HomeState implements Built<HomeState, HomeStateBuilder> {
   }
 
 // Fields
-  @nullable
+  //@nullable
   BuiltList<HomeBanner> get homeBanners;
 
-  @nullable
+  //@nullable
   BuiltList<AssetPrice> get homePrices;
 
   bool get isInitialized;

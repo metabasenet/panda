@@ -15,27 +15,27 @@ abstract class CommunityMember
   }
 
 // Fields
-  @nullable
+  //@nullable
   String get id;
 
-  @nullable
+  //@nullable
   int get status;
 
-  @nullable
+  //@nullable
   String get team;
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'mnt_address')
   String get mntAddress;
 
-  @nullable
+  //@nullable
   int get order;
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'is_mine')
   bool get isMine;
 
-  @nullable
+  //@nullable
   CommunityMemberInfo get info;
 
   /// 拒绝理由

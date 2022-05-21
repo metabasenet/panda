@@ -8,7 +8,7 @@ abstract class InvitationSelectVM
   InvitationSelectVM._();
 
 // Fields
-  @nullable
+  //@nullable
   String get walletId;
 
   BuiltList<InvitationCode> get invitationCodes;

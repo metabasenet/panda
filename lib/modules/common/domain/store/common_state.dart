@@ -12,27 +12,27 @@ abstract class CommonState implements Built<CommonState, CommonStateBuilder> {
   static Serializer<CommonState> get serializer => _$commonStateSerializer;
 
 // Fields
-  @nullable
+  //@nullable
   Config get config;
 
-  @nullable
+  //@nullable
   int get configState;
 
-  @nullable
+  //@nullable
   PackageInfo get appInfo;
 
-  @nullable
+  //@nullable
   String get deviceId;
 
-  @nullable
+  //@nullable
   String get language;
 
-  @nullable
+  //@nullable
   String get fiatCurrency;
 
   String get languageForApi => language == 'zh' ? 'zh-cn' : language;
 
-  @nullable
+  //@nullable
   ConfigUpdate get newVersion;
 
   BuiltMap<String, String> get disabledModules =>

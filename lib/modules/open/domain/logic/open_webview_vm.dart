@@ -9,7 +9,7 @@ abstract class OpenWebviewVM
 // Fields
   String get fiatCurrency;
   bool get hasWallet;
-  @nullable
+  //@nullable
   Wallet get activeWallet;
   String get activeWalletId;
   WalletStatus get activeWalletStatus;

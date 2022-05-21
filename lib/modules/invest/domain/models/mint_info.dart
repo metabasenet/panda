@@ -10,22 +10,22 @@ abstract class MintInfo implements Built<MintInfo, MintInfoBuilder> {
 // Fields
 
   /// 推广收益
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'promotion_reward')
   String get promotionReward;
 
   /// 持币收益
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'stake_reward')
   String get stakeReward;
 
   /// 当期持币
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'this_stake_reward')
   String get thisStakeReward;
 
   /// 当期收益
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'this_balance')
   String get thisBalance;
 

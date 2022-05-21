@@ -6,8 +6,8 @@ abstract class AssetAddressVM
       _$AssetAddressVM;
   AssetAddressVM._();
 
-// Fields
-  @nullable
+  // Fields
+  //@nullable
   BuiltList<AssetAddress> get addressList;
 // Methods
 

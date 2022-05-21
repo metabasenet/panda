@@ -13,55 +13,55 @@ abstract class CommunityTeam
   }
 
 // Fields
-  @nullable
+  //@nullable
   String get id;
 
   /// 10 缺省， 20 审核通过 , 30 拉黑， 40 拒绝通过
-  @nullable
+  //@nullable
   int get status;
 
-  @nullable
+  //@nullable
   String get fork;
 
-  @nullable
+  //@nullable
   int get type;
 
   CommunityTypes get teamType => CommunityUtils.mapCommunityType(type);
 
-  @nullable
+  //@nullable
   String get owner;
 
-  @nullable
+  //@nullable
   int get order;
 
-  @nullable
+  //@nullable
   bool get black;
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'is_mine')
   bool get isMine;
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'owner_wallet_hash')
   String get ownerWalletHash;
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'telegram_account')
   String get telegramAccount;
 
-  @nullable
+  //@nullable
   String get name;
 
-  @nullable
+  //@nullable
   CommunityTeamOptions get options;
 
-  @nullable
+  //@nullable
   String get describe;
 
-  @nullable
+  //@nullable
   String get chain;
 
-  @nullable
+  //@nullable
   String get symbol;
 
   bool get canJoin => options.joinApplyType == 'on';
@@ -81,7 +81,7 @@ abstract class CommunityTeam
   /// 没有提交过
   bool get statusDefault => status == null;
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'create_at')
   int get createAt;
 

@@ -66,7 +66,7 @@ abstract class AssetState implements Built<AssetState, AssetStateBuilder> {
   // asset address
   BuiltList<AssetAddress> get addressList;
 
-  @nullable
+  //@nullable
   String get addressRequestId;
 
 // Methods

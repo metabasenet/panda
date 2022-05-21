@@ -6,10 +6,10 @@ abstract class CommunityDetailVM
       _$CommunityDetailVM;
   CommunityDetailVM._();
 // UI Fields
-  @nullable
+  //@nullable
   BuiltList<CommunityTeam> get communityTeamList;
 
-  @nullable
+  //@nullable
   BuiltList<CommunityMember> get communityMemberList;
 
   bool get hasWallet;

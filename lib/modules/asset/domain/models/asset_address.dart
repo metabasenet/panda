@@ -34,23 +34,23 @@ abstract class AssetAddress
 
   static Serializer<AssetAddress> get serializer => _$assetAddressSerializer;
 
-// Fields
-  @nullable
+  // Fields
+  //@nullable
   String get id;
 
-  @nullable
+  //@nullable
   String get address;
 
-  @nullable
+  //@nullable
   String get chain;
 
-  @nullable
+  //@nullable
   String get comments;
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'currency')
   String get symbol;
 
-  @nullable
+  //@nullable
   bool get isLocal;
 }

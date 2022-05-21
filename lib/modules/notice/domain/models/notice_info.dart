@@ -12,22 +12,22 @@ abstract class NoticeInfo implements Built<NoticeInfo, NoticeInfoBuilder> {
   }
 
 // Fields
-  @nullable
+  //@nullable
   int get id;
 
-  @nullable
+  //@nullable
   String get title;
 
   @BuiltValueField(wireName: 'cover_img')
-  @nullable
+  //@nullable
   String get coverImg;
 
   @BuiltValueField(wireName: 'created_at')
-  @nullable
+  //@nullable
   int get createdAt;
 
   @BuiltValueField(wireName: 'share_img')
-  @nullable
+  //@nullable
   BuiltList<String> get shareImg;
 
   @memoized

@@ -7,10 +7,10 @@ abstract class ProjectApplyVM
   ProjectApplyVM._();
 
 // Fields
-  @nullable
+  //@nullable
   ProjectCreateParams get lastProjectCreateParams;
 
-  @nullable
+  //@nullable
   String get projectRules;
 
   //  Methods

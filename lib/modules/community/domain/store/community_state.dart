@@ -40,19 +40,19 @@ abstract class CommunityState
   }
 
 // Config
-  @nullable
+  //@nullable
   CommunityConfig get config;
 
-  @nullable
+  //@nullable
   int get configState;
 
 // Fields
-  @nullable
+  //@nullable
   BuiltList<CommunityTeam> get communityTeamList;
 
-  @nullable
+  //@nullable
   BuiltList<CommunityMember> get communityMemberList;
 
-  @nullable
+  //@nullable
   BuiltList<CommunityTeam> get communityBlacklist;
 }

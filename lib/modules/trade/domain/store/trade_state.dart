@@ -42,20 +42,20 @@ abstract class TradeState implements Built<TradeState, TradeStateBuilder> {
 
 // Fields
 
-  @nullable
+  //@nullable
   TradeConfig get config;
 
-  @nullable
+  //@nullable
   int get configState;
 
-  @nullable
+  //@nullable
   TradePair get tradePair;
 
   TradeSide get tradeSide;
 
   BuiltList<String> get hideSlowTradePairTip;
 
-  @nullable
+  //@nullable
   TradeOrderDetail get currentOrderDetail;
 
 // Methods

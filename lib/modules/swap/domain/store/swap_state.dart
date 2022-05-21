@@ -15,13 +15,13 @@ abstract class SwapState implements Built<SwapState, SwapStateBuilder> {
 
 // Fields
 
-  @nullable
+  //@nullable
   SwapConfig get config;
 
-  @nullable
+  //@nullable
   int get configState;
 
-  @nullable
+  //@nullable
   BuiltList<Swap> get swaps;
 
   SwapConfigCoin getCoinSwapConfig({

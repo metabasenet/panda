@@ -12,50 +12,50 @@ abstract class AssetCoin implements Built<AssetCoin, AssetCoinBuilder> {
 
   static Serializer<AssetCoin> get serializer => _$assetCoinSerializer;
 
-// Fields
-  @nullable
+  // Fields
+  //@nullable
   String get name;
 
-  @nullable
+  //@nullable
   String get fullName;
 
-  @nullable
+  //@nullable
   String get chain;
 
-  @nullable
+  //@nullable
   String get symbol;
 
-  @nullable
+  //@nullable
   String get address;
 
-  @nullable
+  //@nullable
   String get iconOnline;
 
-  @nullable
+  //@nullable
   String get iconLocal;
 
-  @nullable
+  //@nullable
   int get chainPrecision;
 
-  @nullable
+  //@nullable
   int get displayPrecision;
 
-  @nullable
+  //@nullable
   double get balance;
 
-  @nullable
+  //@nullable
   double get balanceUnconfirmed;
 
-  @nullable
+  //@nullable
   bool get balanceUpdateFailed;
 
-  @nullable
+  //@nullable
   bool get isEnabled;
 
-  @nullable
+  //@nullable
   bool get isFixed;
 
-  @nullable
+  //@nullable
   String get contract;
 
   String get id => '$chain:$symbol';

@@ -10,27 +10,27 @@ abstract class CommunityInfo
 
 // Fields
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'display_type')
   String get displayType;
 
   bool get isTeamList => displayType == 'TEAM_LIST';
 
-  @nullable
+  //@nullable
   String get id;
 
-  @nullable
+  //@nullable
   String get name;
 
-  @nullable
+  //@nullable
   int get type;
 
   CommunityTypes get teamType => CommunityUtils.mapCommunityType(type);
 
-  @nullable
+  //@nullable
   String get describe;
 
-  @nullable
+  //@nullable
   String get image;
 
   @BuiltValueField(wireName: 'join_type')
@@ -38,19 +38,19 @@ abstract class CommunityInfo
 
   bool get joinIsOnChain => joinType == 'on_chain';
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'create_type')
   String get createType;
 
   bool get canCreate => createType == 'on';
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'join_apply_type')
   String get joinApplyType;
 
   bool get canJoin => joinApplyType == 'on';
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'home_quick_start')
   String get homeQuickEntry;
 

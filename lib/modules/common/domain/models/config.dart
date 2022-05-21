@@ -18,7 +18,7 @@ abstract class Config implements Built<Config, ConfigBuilder> {
   @BuiltValueField(wireName: 'otc_on_chain')
   ConfigOtc get otc;
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'system_store')
   ConfigSystem get system;
 

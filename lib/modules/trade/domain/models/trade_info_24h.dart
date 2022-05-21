@@ -14,13 +14,13 @@ abstract class TradeInfo24h
 
   static Serializer<TradeInfo24h> get serializer => _$tradeInfo24hSerializer;
 
-  @nullable
+  //@nullable
   String get high;
 
-  @nullable
+  //@nullable
   String get low;
 
-  @nullable
+  //@nullable
   String get vol;
 
   String get displayHigh => high == null || high.isEmpty ? '-' : high;

@@ -12,83 +12,83 @@ abstract class ProjectInfo implements Built<ProjectInfo, ProjectInfoBuilder> {
   }
 
 // Fields
-  @nullable
+  //@nullable
   int get id;
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'currency')
   String get symbol;
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'currency_price')
   String get currencyPrice;
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'init_amount')
   String get initAmount;
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'project_name')
   String get projectName;
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'target_number')
   double get targetNumber;
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'invite_number')
   double get inviteNumber;
 
-  @nullable
+  //@nullable
   String get fork;
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'total_amount')
   String get totalAmount;
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'owner_website')
   String get ownerWebsite;
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'owner_name')
   BuiltMap<String, String> get ownerName;
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'project_description')
   BuiltMap<String, String> get projectDescription;
 
-  @nullable
+  //@nullable
   int get status;
 
 //10-不显示矿池入口，11-显示矿池入口
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'mining_pool_status')
   int get miningPoolStatus;
 
-  @nullable
+  //@nullable
   String get iconUrl;
 
-  @nullable
+  //@nullable
   bool get displayPoolBtn => miningPoolStatus != null && miningPoolStatus == 11;
 
-  @nullable
+  //@nullable
   String get displayPrice => NumberUtil.truncateDecimal(currencyPrice, 6);
 
-  @nullable
+  //@nullable
   String get displayInviteNumber => NumberUtil.truncateDecimal(inviteNumber, 2);
 
-  @nullable
+  //@nullable
   String get displayTotalAmount => NumberUtil.truncateDecimal(totalAmount, 2);
 
-  @nullable
+  //@nullable
   String get displayInitAmount => NumberUtil.truncateDecimal(initAmount, 2);
 
-  @nullable
+  //@nullable
   String get displayProgressPair =>
       '${inviteNumber.toInt()}/${targetNumber.toInt()}';
 
-  @nullable
+  //@nullable
   double get displayProgress =>
       NumberUtil.multiply(NumberUtil.divide(inviteNumber, targetNumber), 120);
 }

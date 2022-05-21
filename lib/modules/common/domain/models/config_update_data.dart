@@ -24,18 +24,18 @@ abstract class ConfigUpdateData
   static Serializer<ConfigUpdateData> get serializer =>
       _$configUpdateDataSerializer;
 
-  @nullable
+  //@nullable
   String get version;
-  @nullable
+  //@nullable
   String get description;
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'force_update')
   bool get forceUpdate;
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'download_url')
   String get downloadUrl;
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'disable_functions')
   BuiltMap<String, String> get disabledModules;
 }

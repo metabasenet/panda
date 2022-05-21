@@ -15,11 +15,11 @@ abstract class InvestConfig
 
 // Fields
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'mints')
   BuiltList<MintItem> get mints;
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'airdrops')
   BuiltList<MintItem> get airdrops;
 

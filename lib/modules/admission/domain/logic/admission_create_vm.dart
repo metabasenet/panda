@@ -7,8 +7,8 @@ abstract class AdmissionCreateVM
       _$AdmissionCreateVM;
   AdmissionCreateVM._();
 
-// Fields
-  @nullable
+  // Fields
+  //@nullable
   String get walletId;
 
 // Withdraw Methods

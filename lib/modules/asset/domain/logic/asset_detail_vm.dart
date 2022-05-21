@@ -6,8 +6,8 @@ abstract class AssetDetailVM
       _$AssetDetailVM;
   AssetDetailVM._();
 
-// Fields
-  @nullable
+  // Fields
+  //@nullable
   Wallet get activeWallet;
 
 // Methods

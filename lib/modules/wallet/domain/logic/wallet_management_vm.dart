@@ -7,7 +7,7 @@ abstract class WalletManagementVM
   WalletManagementVM._();
 
 // UI Fields
-  @nullable
+  //@nullable
   Wallet get activeWallet;
 
 // Actions

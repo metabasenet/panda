@@ -6,7 +6,7 @@ abstract class CommunityJoinVM
       _$CommunityJoinVM;
   CommunityJoinVM._();
 
-  @nullable
+  //@nullable
   String get walletId;
 
   @BuiltValueField(compare: false)

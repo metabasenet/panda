@@ -15,9 +15,9 @@ class _$HDKeyStateSerializer implements StructuredSerializer<HDKeyState> {
   final String wireName = 'HDKeyState';
 
   @override
-  Iterable<Object> serialize(Serializers serializers, HDKeyState object,
+  Iterable<Object?> serialize(Serializers serializers, HDKeyState object,
       {FullType specifiedType = FullType.unspecified}) {
-    final result = <Object>[
+    final result = <Object?>[
       'isConnected',
       serializers.serialize(object.isConnected,
           specifiedType: const FullType(bool)),
@@ -27,19 +27,19 @@ class _$HDKeyStateSerializer implements StructuredSerializer<HDKeyState> {
   }
 
   @override
-  HDKeyState deserialize(Serializers serializers, Iterable<Object> serialized,
+  HDKeyState deserialize(Serializers serializers, Iterable<Object?> serialized,
       {FullType specifiedType = FullType.unspecified}) {
     final result = new HDKeyStateBuilder();
 
     final iterator = serialized.iterator;
     while (iterator.moveNext()) {
-      final key = iterator.current as String;
+      final key = iterator.current! as String;
       iterator.moveNext();
-      final dynamic value = iterator.current;
+      final Object? value = iterator.current;
       switch (key) {
         case 'isConnected':
           result.isConnected = serializers.deserialize(value,
-              specifiedType: const FullType(bool)) as bool;
+              specifiedType: const FullType(bool))! as bool;
           break;
       }
     }
@@ -67,38 +67,35 @@ class _$HDKeyManagementVM extends HDKeyManagementVM {
   final Future<void> Function(String mnemonic) validateMnemonic;
 
   factory _$HDKeyManagementVM(
-          [void Function(HDKeyManagementVMBuilder) updates]) =>
-      (new HDKeyManagementVMBuilder()..update(updates)).build();
+          [void Function(HDKeyManagementVMBuilder)? updates]) =>
+      (new HDKeyManagementVMBuilder()..update(updates))._build();
 
   _$HDKeyManagementVM._(
-      {this.activeWallet,
-      this.invitationCoin,
-      this.wallets,
-      this.localIds,
-      this.changePassword,
-      this.changeName,
-      this.deleteWallet,
-      this.validateMnemonic})
+      {required this.activeWallet,
+      required this.invitationCoin,
+      required this.wallets,
+      required this.localIds,
+      required this.changePassword,
+      required this.changeName,
+      required this.deleteWallet,
+      required this.validateMnemonic})
       : super._() {
-    if (wallets == null) {
-      throw new BuiltValueNullFieldError('HDKeyManagementVM', 'wallets');
-    }
-    if (localIds == null) {
-      throw new BuiltValueNullFieldError('HDKeyManagementVM', 'localIds');
-    }
-    if (changePassword == null) {
-      throw new BuiltValueNullFieldError('HDKeyManagementVM', 'changePassword');
-    }
-    if (changeName == null) {
-      throw new BuiltValueNullFieldError('HDKeyManagementVM', 'changeName');
-    }
-    if (deleteWallet == null) {
-      throw new BuiltValueNullFieldError('HDKeyManagementVM', 'deleteWallet');
-    }
-    if (validateMnemonic == null) {
-      throw new BuiltValueNullFieldError(
-          'HDKeyManagementVM', 'validateMnemonic');
-    }
+    BuiltValueNullFieldError.checkNotNull(
+        activeWallet, 'HDKeyManagementVM', 'activeWallet');
+    BuiltValueNullFieldError.checkNotNull(
+        invitationCoin, 'HDKeyManagementVM', 'invitationCoin');
+    BuiltValueNullFieldError.checkNotNull(
+        wallets, 'HDKeyManagementVM', 'wallets');
+    BuiltValueNullFieldError.checkNotNull(
+        localIds, 'HDKeyManagementVM', 'localIds');
+    BuiltValueNullFieldError.checkNotNull(
+        changePassword, 'HDKeyManagementVM', 'changePassword');
+    BuiltValueNullFieldError.checkNotNull(
+        changeName, 'HDKeyManagementVM', 'changeName');
+    BuiltValueNullFieldError.checkNotNull(
+        deleteWallet, 'HDKeyManagementVM', 'deleteWallet');
+    BuiltValueNullFieldError.checkNotNull(
+        validateMnemonic, 'HDKeyManagementVM', 'validateMnemonic');
   }
 
   @override
@@ -144,62 +141,64 @@ class _$HDKeyManagementVM extends HDKeyManagementVM {
 
 class HDKeyManagementVMBuilder
     implements Builder<HDKeyManagementVM, HDKeyManagementVMBuilder> {
-  _$HDKeyManagementVM _$v;
+  _$HDKeyManagementVM? _$v;
 
-  Wallet _activeWallet;
-  Wallet get activeWallet => _$this._activeWallet;
-  set activeWallet(Wallet activeWallet) => _$this._activeWallet = activeWallet;
+  Wallet? _activeWallet;
+  Wallet? get activeWallet => _$this._activeWallet;
+  set activeWallet(Wallet? activeWallet) => _$this._activeWallet = activeWallet;
 
-  AssetCoinBuilder _invitationCoin;
+  AssetCoinBuilder? _invitationCoin;
   AssetCoinBuilder get invitationCoin =>
       _$this._invitationCoin ??= new AssetCoinBuilder();
-  set invitationCoin(AssetCoinBuilder invitationCoin) =>
+  set invitationCoin(AssetCoinBuilder? invitationCoin) =>
       _$this._invitationCoin = invitationCoin;
 
-  List<Wallet> _wallets;
-  List<Wallet> get wallets => _$this._wallets;
-  set wallets(List<Wallet> wallets) => _$this._wallets = wallets;
+  List<Wallet>? _wallets;
+  List<Wallet>? get wallets => _$this._wallets;
+  set wallets(List<Wallet>? wallets) => _$this._wallets = wallets;
 
-  List<String> _localIds;
-  List<String> get localIds => _$this._localIds;
-  set localIds(List<String> localIds) => _$this._localIds = localIds;
+  List<String>? _localIds;
+  List<String>? get localIds => _$this._localIds;
+  set localIds(List<String>? localIds) => _$this._localIds = localIds;
 
-  Future<void> Function(String pwdOld, String pwdNew) _changePassword;
-  Future<void> Function(String pwdOld, String pwdNew) get changePassword =>
+  Future<void> Function(String pwdOld, String pwdNew)? _changePassword;
+  Future<void> Function(String pwdOld, String pwdNew)? get changePassword =>
       _$this._changePassword;
   set changePassword(
-          Future<void> Function(String pwdOld, String pwdNew) changePassword) =>
+          Future<void> Function(String pwdOld, String pwdNew)?
+              changePassword) =>
       _$this._changePassword = changePassword;
 
-  Future<void> Function(String name) _changeName;
-  Future<void> Function(String name) get changeName => _$this._changeName;
-  set changeName(Future<void> Function(String name) changeName) =>
+  Future<void> Function(String name)? _changeName;
+  Future<void> Function(String name)? get changeName => _$this._changeName;
+  set changeName(Future<void> Function(String name)? changeName) =>
       _$this._changeName = changeName;
 
-  Future<void> Function() _deleteWallet;
-  Future<void> Function() get deleteWallet => _$this._deleteWallet;
-  set deleteWallet(Future<void> Function() deleteWallet) =>
+  Future<void> Function()? _deleteWallet;
+  Future<void> Function()? get deleteWallet => _$this._deleteWallet;
+  set deleteWallet(Future<void> Function()? deleteWallet) =>
       _$this._deleteWallet = deleteWallet;
 
-  Future<void> Function(String mnemonic) _validateMnemonic;
-  Future<void> Function(String mnemonic) get validateMnemonic =>
+  Future<void> Function(String mnemonic)? _validateMnemonic;
+  Future<void> Function(String mnemonic)? get validateMnemonic =>
       _$this._validateMnemonic;
   set validateMnemonic(
-          Future<void> Function(String mnemonic) validateMnemonic) =>
+          Future<void> Function(String mnemonic)? validateMnemonic) =>
       _$this._validateMnemonic = validateMnemonic;
 
   HDKeyManagementVMBuilder();
 
   HDKeyManagementVMBuilder get _$this {
-    if (_$v != null) {
-      _activeWallet = _$v.activeWallet;
-      _invitationCoin = _$v.invitationCoin?.toBuilder();
-      _wallets = _$v.wallets;
-      _localIds = _$v.localIds;
-      _changePassword = _$v.changePassword;
-      _changeName = _$v.changeName;
-      _deleteWallet = _$v.deleteWallet;
-      _validateMnemonic = _$v.validateMnemonic;
+    final $v = _$v;
+    if ($v != null) {
+      _activeWallet = $v.activeWallet;
+      _invitationCoin = $v.invitationCoin.toBuilder();
+      _wallets = $v.wallets;
+      _localIds = $v.localIds;
+      _changePassword = $v.changePassword;
+      _changeName = $v.changeName;
+      _deleteWallet = $v.deleteWallet;
+      _validateMnemonic = $v.validateMnemonic;
       _$v = null;
     }
     return this;
@@ -207,36 +206,43 @@ class HDKeyManagementVMBuilder
 
   @override
   void replace(HDKeyManagementVM other) {
-    if (other == null) {
-      throw new ArgumentError.notNull('other');
-    }
+    ArgumentError.checkNotNull(other, 'other');
     _$v = other as _$HDKeyManagementVM;
   }
 
   @override
-  void update(void Function(HDKeyManagementVMBuilder) updates) {
+  void update(void Function(HDKeyManagementVMBuilder)? updates) {
     if (updates != null) updates(this);
   }
 
   @override
-  _$HDKeyManagementVM build() {
+  HDKeyManagementVM build() => _build();
+
+  _$HDKeyManagementVM _build() {
     _$HDKeyManagementVM _$result;
     try {
       _$result = _$v ??
           new _$HDKeyManagementVM._(
-              activeWallet: activeWallet,
-              invitationCoin: _invitationCoin?.build(),
-              wallets: wallets,
-              localIds: localIds,
-              changePassword: changePassword,
-              changeName: changeName,
-              deleteWallet: deleteWallet,
-              validateMnemonic: validateMnemonic);
+              activeWallet: BuiltValueNullFieldError.checkNotNull(
+                  activeWallet, 'HDKeyManagementVM', 'activeWallet'),
+              invitationCoin: invitationCoin.build(),
+              wallets: BuiltValueNullFieldError.checkNotNull(
+                  wallets, 'HDKeyManagementVM', 'wallets'),
+              localIds: BuiltValueNullFieldError.checkNotNull(
+                  localIds, 'HDKeyManagementVM', 'localIds'),
+              changePassword: BuiltValueNullFieldError.checkNotNull(
+                  changePassword, 'HDKeyManagementVM', 'changePassword'),
+              changeName: BuiltValueNullFieldError.checkNotNull(
+                  changeName, 'HDKeyManagementVM', 'changeName'),
+              deleteWallet: BuiltValueNullFieldError.checkNotNull(
+                  deleteWallet, 'HDKeyManagementVM', 'deleteWallet'),
+              validateMnemonic: BuiltValueNullFieldError.checkNotNull(
+                  validateMnemonic, 'HDKeyManagementVM', 'validateMnemonic'));
     } catch (_) {
-      String _$failedField;
+      late String _$failedField;
       try {
         _$failedField = 'invitationCoin';
-        _invitationCoin?.build();
+        invitationCoin.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
             'HDKeyManagementVM', _$failedField, e.toString());
@@ -252,13 +258,12 @@ class _$HDKeyState extends HDKeyState {
   @override
   final bool isConnected;
 
-  factory _$HDKeyState([void Function(HDKeyStateBuilder) updates]) =>
-      (new HDKeyStateBuilder()..update(updates)).build();
+  factory _$HDKeyState([void Function(HDKeyStateBuilder)? updates]) =>
+      (new HDKeyStateBuilder()..update(updates))._build();
 
-  _$HDKeyState._({this.isConnected}) : super._() {
-    if (isConnected == null) {
-      throw new BuiltValueNullFieldError('HDKeyState', 'isConnected');
-    }
+  _$HDKeyState._({required this.isConnected}) : super._() {
+    BuiltValueNullFieldError.checkNotNull(
+        isConnected, 'HDKeyState', 'isConnected');
   }
 
   @override
@@ -288,17 +293,18 @@ class _$HDKeyState extends HDKeyState {
 }
 
 class HDKeyStateBuilder implements Builder<HDKeyState, HDKeyStateBuilder> {
-  _$HDKeyState _$v;
+  _$HDKeyState? _$v;
 
-  bool _isConnected;
-  bool get isConnected => _$this._isConnected;
-  set isConnected(bool isConnected) => _$this._isConnected = isConnected;
+  bool? _isConnected;
+  bool? get isConnected => _$this._isConnected;
+  set isConnected(bool? isConnected) => _$this._isConnected = isConnected;
 
   HDKeyStateBuilder();
 
   HDKeyStateBuilder get _$this {
-    if (_$v != null) {
-      _isConnected = _$v.isConnected;
+    final $v = _$v;
+    if ($v != null) {
+      _isConnected = $v.isConnected;
       _$v = null;
     }
     return this;
@@ -306,23 +312,26 @@ class HDKeyStateBuilder implements Builder<HDKeyState, HDKeyStateBuilder> {
 
   @override
   void replace(HDKeyState other) {
-    if (other == null) {
-      throw new ArgumentError.notNull('other');
-    }
+    ArgumentError.checkNotNull(other, 'other');
     _$v = other as _$HDKeyState;
   }
 
   @override
-  void update(void Function(HDKeyStateBuilder) updates) {
+  void update(void Function(HDKeyStateBuilder)? updates) {
     if (updates != null) updates(this);
   }
 
   @override
-  _$HDKeyState build() {
-    final _$result = _$v ?? new _$HDKeyState._(isConnected: isConnected);
+  HDKeyState build() => _build();
+
+  _$HDKeyState _build() {
+    final _$result = _$v ??
+        new _$HDKeyState._(
+            isConnected: BuiltValueNullFieldError.checkNotNull(
+                isConnected, 'HDKeyState', 'isConnected'));
     replace(_$result);
     return _$result;
   }
 }
 
-// ignore_for_file: always_put_control_body_on_new_line,always_specify_types,annotate_overrides,avoid_annotating_with_dynamic,avoid_as,avoid_catches_without_on_clauses,avoid_returning_this,lines_longer_than_80_chars,omit_local_variable_types,prefer_expression_function_bodies,sort_constructors_first,test_types_in_equals,unnecessary_const,unnecessary_new
+// ignore_for_file: always_put_control_body_on_new_line,always_specify_types,annotate_overrides,avoid_annotating_with_dynamic,avoid_as,avoid_catches_without_on_clauses,avoid_returning_this,deprecated_member_use_from_same_package,lines_longer_than_80_chars,no_leading_underscores_for_local_identifiers,omit_local_variable_types,prefer_expression_function_bodies,sort_constructors_first,test_types_in_equals,unnecessary_const,unnecessary_new

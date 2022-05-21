@@ -10,24 +10,24 @@ abstract class AdmissionCondition
   static Serializer<AdmissionCondition> get serializer =>
       _$admissionConditionSerializer;
 
-// Fields
-  @nullable
+  // Fields
+  //@nullable
   @BuiltValueField(wireName: 'black_hole_address')
   String get address;
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'black_hole_transfer_data')
   String get transferData;
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'black_hole_transfer_count')
   int get transferCount;
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'black_hole_transfer_progress')
   int get transferProgress;
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'black_hole_transfer_currency')
   BuiltMap<String, BuiltMap<String, String>> get transferCurrency;
 

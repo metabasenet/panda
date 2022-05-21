@@ -72,20 +72,20 @@ abstract class ProjectCreateParams
 
 // TODO： Withdraw Info
 
-  @nullable
+  //@nullable
   String get chain;
-  @nullable
+  //@nullable
   String get symbol;
-  @nullable
+  //@nullable
   String get txId;
-  @nullable
+  //@nullable
   String get address;
-  @nullable
+  //@nullable
   @BuiltValueSerializer(custom: true)
   WalletWithdrawData get withdrawData;
-  @nullable
+  //@nullable
   double get withdrawAmount;
-  @nullable
+  //@nullable
   int get submittedAt;
 
   Map<String, dynamic> toApiParams() {

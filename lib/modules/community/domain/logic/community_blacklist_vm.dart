@@ -7,7 +7,7 @@ abstract class CommunityBlacklistVM
       _$CommunityBlacklistVM;
   CommunityBlacklistVM._();
 // UI Fields
-  @nullable
+  //@nullable
   BuiltList<CommunityTeam> get communityBlacklist;
 
   bool get hasWallet;

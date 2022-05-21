@@ -16,82 +16,63 @@ class _$HomeBannerSerializer implements StructuredSerializer<HomeBanner> {
   final String wireName = 'HomeBanner';
 
   @override
-  Iterable<Object> serialize(Serializers serializers, HomeBanner object,
+  Iterable<Object?> serialize(Serializers serializers, HomeBanner object,
       {FullType specifiedType = FullType.unspecified}) {
-    final result = <Object>[];
-    if (object.id != null) {
-      result
-        ..add('id')
-        ..add(serializers.serialize(object.id,
-            specifiedType: const FullType(int)));
-    }
-    if (object.type != null) {
-      result
-        ..add('type')
-        ..add(serializers.serialize(object.type,
-            specifiedType: const FullType(String)));
-    }
-    if (object.title != null) {
-      result
-        ..add('title')
-        ..add(serializers.serialize(object.title,
-            specifiedType: const FullType(String)));
-    }
-    if (object.content != null) {
-      result
-        ..add('content')
-        ..add(serializers.serialize(object.content,
-            specifiedType: const FullType(String)));
-    }
-    if (object.img != null) {
-      result
-        ..add('img')
-        ..add(serializers.serialize(object.img,
-            specifiedType: const FullType(String)));
-    }
-    if (object.bgImg != null) {
-      result
-        ..add('bg_img')
-        ..add(serializers.serialize(object.bgImg,
-            specifiedType: const FullType(String)));
-    }
+    final result = <Object?>[
+      'id',
+      serializers.serialize(object.id, specifiedType: const FullType(int)),
+      'type',
+      serializers.serialize(object.type, specifiedType: const FullType(String)),
+      'title',
+      serializers.serialize(object.title,
+          specifiedType: const FullType(String)),
+      'content',
+      serializers.serialize(object.content,
+          specifiedType: const FullType(String)),
+      'img',
+      serializers.serialize(object.img, specifiedType: const FullType(String)),
+      'bg_img',
+      serializers.serialize(object.bgImg,
+          specifiedType: const FullType(String)),
+    ];
+
     return result;
   }
 
   @override
-  HomeBanner deserialize(Serializers serializers, Iterable<Object> serialized,
+  HomeBanner deserialize(Serializers serializers, Iterable<Object?> serialized,
       {FullType specifiedType = FullType.unspecified}) {
     final result = new HomeBannerBuilder();
 
     final iterator = serialized.iterator;
     while (iterator.moveNext()) {
-      final key = iterator.current as String;
+      final key = iterator.current! as String;
       iterator.moveNext();
-      final dynamic value = iterator.current;
+      final Object? value = iterator.current;
       switch (key) {
         case 'id':
           result.id = serializers.deserialize(value,
-              specifiedType: const FullType(int)) as int;
+              specifiedType: const FullType(int))! as int;
           break;
         case 'type':
           result.type = serializers.deserialize(value,
-              specifiedType: const FullType(String)) as String;
+              specifiedType: const FullType(String))! as String;
           break;
         case 'title':
           result.title = serializers.deserialize(value,
-              specifiedType: const FullType(String)) as String;
+              specifiedType: const FullType(String))! as String;
           break;
         case 'content':
           result.content = serializers.deserialize(value,
-              specifiedType: const FullType(String)) as String;
+              specifiedType: const FullType(String))! as String;
           break;
         case 'img':
           result.img = serializers.deserialize(value,
-              specifiedType: const FullType(String)) as String;
+              specifiedType: const FullType(String))! as String;
           break;
         case 'bg_img':
           result.bgImg = serializers.deserialize(value,
-              specifiedType: const FullType(String)) as String;
+              specifiedType: const FullType(String))! as String;
           break;
       }
     }
@@ -107,56 +88,51 @@ class _$HomeStateSerializer implements StructuredSerializer<HomeState> {
   final String wireName = 'HomeState';
 
   @override
-  Iterable<Object> serialize(Serializers serializers, HomeState object,
+  Iterable<Object?> serialize(Serializers serializers, HomeState object,
       {FullType specifiedType = FullType.unspecified}) {
-    final result = <Object>[
+    final result = <Object?>[
+      'homeBanners',
+      serializers.serialize(object.homeBanners,
+          specifiedType:
+              const FullType(BuiltList, const [const FullType(HomeBanner)])),
+      'homePrices',
+      serializers.serialize(object.homePrices,
+          specifiedType:
+              const FullType(BuiltList, const [const FullType(AssetPrice)])),
       'isInitialized',
       serializers.serialize(object.isInitialized,
           specifiedType: const FullType(bool)),
     ];
-    if (object.homeBanners != null) {
-      result
-        ..add('homeBanners')
-        ..add(serializers.serialize(object.homeBanners,
-            specifiedType:
-                const FullType(BuiltList, const [const FullType(HomeBanner)])));
-    }
-    if (object.homePrices != null) {
-      result
-        ..add('homePrices')
-        ..add(serializers.serialize(object.homePrices,
-            specifiedType:
-                const FullType(BuiltList, const [const FullType(AssetPrice)])));
-    }
+
     return result;
   }
 
   @override
-  HomeState deserialize(Serializers serializers, Iterable<Object> serialized,
+  HomeState deserialize(Serializers serializers, Iterable<Object?> serialized,
       {FullType specifiedType = FullType.unspecified}) {
     final result = new HomeStateBuilder();
 
     final iterator = serialized.iterator;
     while (iterator.moveNext()) {
-      final key = iterator.current as String;
+      final key = iterator.current! as String;
       iterator.moveNext();
-      final dynamic value = iterator.current;
+      final Object? value = iterator.current;
       switch (key) {
         case 'homeBanners':
           result.homeBanners.replace(serializers.deserialize(value,
                   specifiedType: const FullType(
-                      BuiltList, const [const FullType(HomeBanner)]))
-              as BuiltList<Object>);
+                      BuiltList, const [const FullType(HomeBanner)]))!
+              as BuiltList<Object?>);
           break;
         case 'homePrices':
           result.homePrices.replace(serializers.deserialize(value,
                   specifiedType: const FullType(
-                      BuiltList, const [const FullType(AssetPrice)]))
-              as BuiltList<Object>);
+                      BuiltList, const [const FullType(AssetPrice)]))!
+              as BuiltList<Object?>);
           break;
         case 'isInitialized':
           result.isInitialized = serializers.deserialize(value,
-              specifiedType: const FullType(bool)) as bool;
+              specifiedType: const FullType(bool))! as bool;
           break;
       }
     }
@@ -203,59 +179,64 @@ class _$HomePageVM extends HomePageVM {
   @override
   final Future<void> Function() doRefreshCommunity;
 
-  factory _$HomePageVM([void Function(HomePageVMBuilder) updates]) =>
-      (new HomePageVMBuilder()..update(updates)).build();
+  factory _$HomePageVM([void Function(HomePageVMBuilder)? updates]) =>
+      (new HomePageVMBuilder()..update(updates))._build();
 
   _$HomePageVM._(
-      {this.homePrices,
-      this.homeBanners,
-      this.homeNotices,
-      this.admissionList,
-      this.hasNewVersion,
-      this.newVersionData,
-      this.allTradePairs,
-      this.allTradeMarkets,
-      this.hasWallet,
-      this.communityConfig,
-      this.communityConfigState,
-      this.doLoadHomeData,
-      this.doCheckForBetaUpdates,
-      this.doCheckLanguage,
-      this.doChangeLanguage,
-      this.doChangeTradePair,
-      this.doRefreshHomeData,
-      this.doRefreshCommunity})
+      {required this.homePrices,
+      required this.homeBanners,
+      required this.homeNotices,
+      required this.admissionList,
+      required this.hasNewVersion,
+      required this.newVersionData,
+      required this.allTradePairs,
+      required this.allTradeMarkets,
+      required this.hasWallet,
+      required this.communityConfig,
+      required this.communityConfigState,
+      required this.doLoadHomeData,
+      required this.doCheckForBetaUpdates,
+      required this.doCheckLanguage,
+      required this.doChangeLanguage,
+      required this.doChangeTradePair,
+      required this.doRefreshHomeData,
+      required this.doRefreshCommunity})
       : super._() {
-    if (allTradePairs == null) {
-      throw new BuiltValueNullFieldError('HomePageVM', 'allTradePairs');
-    }
-    if (allTradeMarkets == null) {
-      throw new BuiltValueNullFieldError('HomePageVM', 'allTradeMarkets');
-    }
-    if (hasWallet == null) {
-      throw new BuiltValueNullFieldError('HomePageVM', 'hasWallet');
-    }
-    if (doLoadHomeData == null) {
-      throw new BuiltValueNullFieldError('HomePageVM', 'doLoadHomeData');
-    }
-    if (doCheckForBetaUpdates == null) {
-      throw new BuiltValueNullFieldError('HomePageVM', 'doCheckForBetaUpdates');
-    }
-    if (doCheckLanguage == null) {
-      throw new BuiltValueNullFieldError('HomePageVM', 'doCheckLanguage');
-    }
-    if (doChangeLanguage == null) {
-      throw new BuiltValueNullFieldError('HomePageVM', 'doChangeLanguage');
-    }
-    if (doChangeTradePair == null) {
-      throw new BuiltValueNullFieldError('HomePageVM', 'doChangeTradePair');
-    }
-    if (doRefreshHomeData == null) {
-      throw new BuiltValueNullFieldError('HomePageVM', 'doRefreshHomeData');
-    }
-    if (doRefreshCommunity == null) {
-      throw new BuiltValueNullFieldError('HomePageVM', 'doRefreshCommunity');
-    }
+    BuiltValueNullFieldError.checkNotNull(
+        homePrices, 'HomePageVM', 'homePrices');
+    BuiltValueNullFieldError.checkNotNull(
+        homeBanners, 'HomePageVM', 'homeBanners');
+    BuiltValueNullFieldError.checkNotNull(
+        homeNotices, 'HomePageVM', 'homeNotices');
+    BuiltValueNullFieldError.checkNotNull(
+        admissionList, 'HomePageVM', 'admissionList');
+    BuiltValueNullFieldError.checkNotNull(
+        hasNewVersion, 'HomePageVM', 'hasNewVersion');
+    BuiltValueNullFieldError.checkNotNull(
+        newVersionData, 'HomePageVM', 'newVersionData');
+    BuiltValueNullFieldError.checkNotNull(
+        allTradePairs, 'HomePageVM', 'allTradePairs');
+    BuiltValueNullFieldError.checkNotNull(
+        allTradeMarkets, 'HomePageVM', 'allTradeMarkets');
+    BuiltValueNullFieldError.checkNotNull(hasWallet, 'HomePageVM', 'hasWallet');
+    BuiltValueNullFieldError.checkNotNull(
+        communityConfig, 'HomePageVM', 'communityConfig');
+    BuiltValueNullFieldError.checkNotNull(
+        communityConfigState, 'HomePageVM', 'communityConfigState');
+    BuiltValueNullFieldError.checkNotNull(
+        doLoadHomeData, 'HomePageVM', 'doLoadHomeData');
+    BuiltValueNullFieldError.checkNotNull(
+        doCheckForBetaUpdates, 'HomePageVM', 'doCheckForBetaUpdates');
+    BuiltValueNullFieldError.checkNotNull(
+        doCheckLanguage, 'HomePageVM', 'doCheckLanguage');
+    BuiltValueNullFieldError.checkNotNull(
+        doChangeLanguage, 'HomePageVM', 'doChangeLanguage');
+    BuiltValueNullFieldError.checkNotNull(
+        doChangeTradePair, 'HomePageVM', 'doChangeTradePair');
+    BuiltValueNullFieldError.checkNotNull(
+        doRefreshHomeData, 'HomePageVM', 'doRefreshHomeData');
+    BuiltValueNullFieldError.checkNotNull(
+        doRefreshCommunity, 'HomePageVM', 'doRefreshCommunity');
   }
 
   @override
@@ -332,133 +313,135 @@ class _$HomePageVM extends HomePageVM {
 }
 
 class HomePageVMBuilder implements Builder<HomePageVM, HomePageVMBuilder> {
-  _$HomePageVM _$v;
+  _$HomePageVM? _$v;
 
-  ListBuilder<AssetPrice> _homePrices;
+  ListBuilder<AssetPrice>? _homePrices;
   ListBuilder<AssetPrice> get homePrices =>
       _$this._homePrices ??= new ListBuilder<AssetPrice>();
-  set homePrices(ListBuilder<AssetPrice> homePrices) =>
+  set homePrices(ListBuilder<AssetPrice>? homePrices) =>
       _$this._homePrices = homePrices;
 
-  ListBuilder<HomeBanner> _homeBanners;
+  ListBuilder<HomeBanner>? _homeBanners;
   ListBuilder<HomeBanner> get homeBanners =>
       _$this._homeBanners ??= new ListBuilder<HomeBanner>();
-  set homeBanners(ListBuilder<HomeBanner> homeBanners) =>
+  set homeBanners(ListBuilder<HomeBanner>? homeBanners) =>
       _$this._homeBanners = homeBanners;
 
-  ListBuilder<NoticeInfo> _homeNotices;
+  ListBuilder<NoticeInfo>? _homeNotices;
   ListBuilder<NoticeInfo> get homeNotices =>
       _$this._homeNotices ??= new ListBuilder<NoticeInfo>();
-  set homeNotices(ListBuilder<NoticeInfo> homeNotices) =>
+  set homeNotices(ListBuilder<NoticeInfo>? homeNotices) =>
       _$this._homeNotices = homeNotices;
 
-  ListBuilder<AdmissionInfo> _admissionList;
+  ListBuilder<AdmissionInfo>? _admissionList;
   ListBuilder<AdmissionInfo> get admissionList =>
       _$this._admissionList ??= new ListBuilder<AdmissionInfo>();
-  set admissionList(ListBuilder<AdmissionInfo> admissionList) =>
+  set admissionList(ListBuilder<AdmissionInfo>? admissionList) =>
       _$this._admissionList = admissionList;
 
-  bool _hasNewVersion;
-  bool get hasNewVersion => _$this._hasNewVersion;
-  set hasNewVersion(bool hasNewVersion) =>
+  bool? _hasNewVersion;
+  bool? get hasNewVersion => _$this._hasNewVersion;
+  set hasNewVersion(bool? hasNewVersion) =>
       _$this._hasNewVersion = hasNewVersion;
 
-  ConfigUpdateDataBuilder _newVersionData;
+  ConfigUpdateDataBuilder? _newVersionData;
   ConfigUpdateDataBuilder get newVersionData =>
       _$this._newVersionData ??= new ConfigUpdateDataBuilder();
-  set newVersionData(ConfigUpdateDataBuilder newVersionData) =>
+  set newVersionData(ConfigUpdateDataBuilder? newVersionData) =>
       _$this._newVersionData = newVersionData;
 
-  ListBuilder<TradePair> _allTradePairs;
+  ListBuilder<TradePair>? _allTradePairs;
   ListBuilder<TradePair> get allTradePairs =>
       _$this._allTradePairs ??= new ListBuilder<TradePair>();
-  set allTradePairs(ListBuilder<TradePair> allTradePairs) =>
+  set allTradePairs(ListBuilder<TradePair>? allTradePairs) =>
       _$this._allTradePairs = allTradePairs;
 
-  ListBuilder<TradeMarket> _allTradeMarkets;
+  ListBuilder<TradeMarket>? _allTradeMarkets;
   ListBuilder<TradeMarket> get allTradeMarkets =>
       _$this._allTradeMarkets ??= new ListBuilder<TradeMarket>();
-  set allTradeMarkets(ListBuilder<TradeMarket> allTradeMarkets) =>
+  set allTradeMarkets(ListBuilder<TradeMarket>? allTradeMarkets) =>
       _$this._allTradeMarkets = allTradeMarkets;
 
-  bool _hasWallet;
-  bool get hasWallet => _$this._hasWallet;
-  set hasWallet(bool hasWallet) => _$this._hasWallet = hasWallet;
+  bool? _hasWallet;
+  bool? get hasWallet => _$this._hasWallet;
+  set hasWallet(bool? hasWallet) => _$this._hasWallet = hasWallet;
 
-  CommunityConfigBuilder _communityConfig;
+  CommunityConfigBuilder? _communityConfig;
   CommunityConfigBuilder get communityConfig =>
       _$this._communityConfig ??= new CommunityConfigBuilder();
-  set communityConfig(CommunityConfigBuilder communityConfig) =>
+  set communityConfig(CommunityConfigBuilder? communityConfig) =>
       _$this._communityConfig = communityConfig;
 
-  int _communityConfigState;
-  int get communityConfigState => _$this._communityConfigState;
-  set communityConfigState(int communityConfigState) =>
+  int? _communityConfigState;
+  int? get communityConfigState => _$this._communityConfigState;
+  set communityConfigState(int? communityConfigState) =>
       _$this._communityConfigState = communityConfigState;
 
-  void Function() _doLoadHomeData;
-  void Function() get doLoadHomeData => _$this._doLoadHomeData;
-  set doLoadHomeData(void Function() doLoadHomeData) =>
+  void Function()? _doLoadHomeData;
+  void Function()? get doLoadHomeData => _$this._doLoadHomeData;
+  set doLoadHomeData(void Function()? doLoadHomeData) =>
       _$this._doLoadHomeData = doLoadHomeData;
 
-  Future<ConfigUpdateData> Function() _doCheckForBetaUpdates;
-  Future<ConfigUpdateData> Function() get doCheckForBetaUpdates =>
+  Future<ConfigUpdateData> Function()? _doCheckForBetaUpdates;
+  Future<ConfigUpdateData> Function()? get doCheckForBetaUpdates =>
       _$this._doCheckForBetaUpdates;
   set doCheckForBetaUpdates(
-          Future<ConfigUpdateData> Function() doCheckForBetaUpdates) =>
+          Future<ConfigUpdateData> Function()? doCheckForBetaUpdates) =>
       _$this._doCheckForBetaUpdates = doCheckForBetaUpdates;
 
-  Future<AppLanguage> Function() _doCheckLanguage;
-  Future<AppLanguage> Function() get doCheckLanguage => _$this._doCheckLanguage;
-  set doCheckLanguage(Future<AppLanguage> Function() doCheckLanguage) =>
+  Future<AppLanguage> Function()? _doCheckLanguage;
+  Future<AppLanguage> Function()? get doCheckLanguage =>
+      _$this._doCheckLanguage;
+  set doCheckLanguage(Future<AppLanguage> Function()? doCheckLanguage) =>
       _$this._doCheckLanguage = doCheckLanguage;
 
-  Future<void> Function(String language) _doChangeLanguage;
-  Future<void> Function(String language) get doChangeLanguage =>
+  Future<void> Function(String language)? _doChangeLanguage;
+  Future<void> Function(String language)? get doChangeLanguage =>
       _$this._doChangeLanguage;
   set doChangeLanguage(
-          Future<void> Function(String language) doChangeLanguage) =>
+          Future<void> Function(String language)? doChangeLanguage) =>
       _$this._doChangeLanguage = doChangeLanguage;
 
-  Future<void> Function(TradePair tradePair) _doChangeTradePair;
-  Future<void> Function(TradePair tradePair) get doChangeTradePair =>
+  Future<void> Function(TradePair tradePair)? _doChangeTradePair;
+  Future<void> Function(TradePair tradePair)? get doChangeTradePair =>
       _$this._doChangeTradePair;
   set doChangeTradePair(
-          Future<void> Function(TradePair tradePair) doChangeTradePair) =>
+          Future<void> Function(TradePair tradePair)? doChangeTradePair) =>
       _$this._doChangeTradePair = doChangeTradePair;
 
-  Future<void> Function() _doRefreshHomeData;
-  Future<void> Function() get doRefreshHomeData => _$this._doRefreshHomeData;
-  set doRefreshHomeData(Future<void> Function() doRefreshHomeData) =>
+  Future<void> Function()? _doRefreshHomeData;
+  Future<void> Function()? get doRefreshHomeData => _$this._doRefreshHomeData;
+  set doRefreshHomeData(Future<void> Function()? doRefreshHomeData) =>
       _$this._doRefreshHomeData = doRefreshHomeData;
 
-  Future<void> Function() _doRefreshCommunity;
-  Future<void> Function() get doRefreshCommunity => _$this._doRefreshCommunity;
-  set doRefreshCommunity(Future<void> Function() doRefreshCommunity) =>
+  Future<void> Function()? _doRefreshCommunity;
+  Future<void> Function()? get doRefreshCommunity => _$this._doRefreshCommunity;
+  set doRefreshCommunity(Future<void> Function()? doRefreshCommunity) =>
       _$this._doRefreshCommunity = doRefreshCommunity;
 
   HomePageVMBuilder();
 
   HomePageVMBuilder get _$this {
-    if (_$v != null) {
-      _homePrices = _$v.homePrices?.toBuilder();
-      _homeBanners = _$v.homeBanners?.toBuilder();
-      _homeNotices = _$v.homeNotices?.toBuilder();
-      _admissionList = _$v.admissionList?.toBuilder();
-      _hasNewVersion = _$v.hasNewVersion;
-      _newVersionData = _$v.newVersionData?.toBuilder();
-      _allTradePairs = _$v.allTradePairs?.toBuilder();
-      _allTradeMarkets = _$v.allTradeMarkets?.toBuilder();
-      _hasWallet = _$v.hasWallet;
-      _communityConfig = _$v.communityConfig?.toBuilder();
-      _communityConfigState = _$v.communityConfigState;
-      _doLoadHomeData = _$v.doLoadHomeData;
-      _doCheckForBetaUpdates = _$v.doCheckForBetaUpdates;
-      _doCheckLanguage = _$v.doCheckLanguage;
-      _doChangeLanguage = _$v.doChangeLanguage;
-      _doChangeTradePair = _$v.doChangeTradePair;
-      _doRefreshHomeData = _$v.doRefreshHomeData;
-      _doRefreshCommunity = _$v.doRefreshCommunity;
+    final $v = _$v;
+    if ($v != null) {
+      _homePrices = $v.homePrices.toBuilder();
+      _homeBanners = $v.homeBanners.toBuilder();
+      _homeNotices = $v.homeNotices.toBuilder();
+      _admissionList = $v.admissionList.toBuilder();
+      _hasNewVersion = $v.hasNewVersion;
+      _newVersionData = $v.newVersionData.toBuilder();
+      _allTradePairs = $v.allTradePairs.toBuilder();
+      _allTradeMarkets = $v.allTradeMarkets.toBuilder();
+      _hasWallet = $v.hasWallet;
+      _communityConfig = $v.communityConfig.toBuilder();
+      _communityConfigState = $v.communityConfigState;
+      _doLoadHomeData = $v.doLoadHomeData;
+      _doCheckForBetaUpdates = $v.doCheckForBetaUpdates;
+      _doCheckLanguage = $v.doCheckLanguage;
+      _doChangeLanguage = $v.doChangeLanguage;
+      _doChangeTradePair = $v.doChangeTradePair;
+      _doRefreshHomeData = $v.doRefreshHomeData;
+      _doRefreshCommunity = $v.doRefreshCommunity;
       _$v = null;
     }
     return this;
@@ -466,62 +449,70 @@ class HomePageVMBuilder implements Builder<HomePageVM, HomePageVMBuilder> {
 
   @override
   void replace(HomePageVM other) {
-    if (other == null) {
-      throw new ArgumentError.notNull('other');
-    }
+    ArgumentError.checkNotNull(other, 'other');
     _$v = other as _$HomePageVM;
   }
 
   @override
-  void update(void Function(HomePageVMBuilder) updates) {
+  void update(void Function(HomePageVMBuilder)? updates) {
     if (updates != null) updates(this);
   }
 
   @override
-  _$HomePageVM build() {
+  HomePageVM build() => _build();
+
+  _$HomePageVM _build() {
     _$HomePageVM _$result;
     try {
       _$result = _$v ??
           new _$HomePageVM._(
-              homePrices: _homePrices?.build(),
-              homeBanners: _homeBanners?.build(),
-              homeNotices: _homeNotices?.build(),
-              admissionList: _admissionList?.build(),
-              hasNewVersion: hasNewVersion,
-              newVersionData: _newVersionData?.build(),
+              homePrices: homePrices.build(),
+              homeBanners: homeBanners.build(),
+              homeNotices: homeNotices.build(),
+              admissionList: admissionList.build(),
+              hasNewVersion: BuiltValueNullFieldError.checkNotNull(
+                  hasNewVersion, 'HomePageVM', 'hasNewVersion'),
+              newVersionData: newVersionData.build(),
               allTradePairs: allTradePairs.build(),
               allTradeMarkets: allTradeMarkets.build(),
-              hasWallet: hasWallet,
-              communityConfig: _communityConfig?.build(),
-              communityConfigState: communityConfigState,
-              doLoadHomeData: doLoadHomeData,
-              doCheckForBetaUpdates: doCheckForBetaUpdates,
-              doCheckLanguage: doCheckLanguage,
-              doChangeLanguage: doChangeLanguage,
-              doChangeTradePair: doChangeTradePair,
-              doRefreshHomeData: doRefreshHomeData,
-              doRefreshCommunity: doRefreshCommunity);
+              hasWallet: BuiltValueNullFieldError.checkNotNull(
+                  hasWallet, 'HomePageVM', 'hasWallet'),
+              communityConfig: communityConfig.build(),
+              communityConfigState: BuiltValueNullFieldError.checkNotNull(
+                  communityConfigState, 'HomePageVM', 'communityConfigState'),
+              doLoadHomeData: BuiltValueNullFieldError.checkNotNull(
+                  doLoadHomeData, 'HomePageVM', 'doLoadHomeData'),
+              doCheckForBetaUpdates: BuiltValueNullFieldError.checkNotNull(
+                  doCheckForBetaUpdates, 'HomePageVM', 'doCheckForBetaUpdates'),
+              doCheckLanguage: BuiltValueNullFieldError.checkNotNull(
+                  doCheckLanguage, 'HomePageVM', 'doCheckLanguage'),
+              doChangeLanguage: BuiltValueNullFieldError.checkNotNull(
+                  doChangeLanguage, 'HomePageVM', 'doChangeLanguage'),
+              doChangeTradePair:
+                  BuiltValueNullFieldError.checkNotNull(doChangeTradePair, 'HomePageVM', 'doChangeTradePair'),
+              doRefreshHomeData: BuiltValueNullFieldError.checkNotNull(doRefreshHomeData, 'HomePageVM', 'doRefreshHomeData'),
+              doRefreshCommunity: BuiltValueNullFieldError.checkNotNull(doRefreshCommunity, 'HomePageVM', 'doRefreshCommunity'));
     } catch (_) {
-      String _$failedField;
+      late String _$failedField;
       try {
         _$failedField = 'homePrices';
-        _homePrices?.build();
+        homePrices.build();
         _$failedField = 'homeBanners';
-        _homeBanners?.build();
+        homeBanners.build();
         _$failedField = 'homeNotices';
-        _homeNotices?.build();
+        homeNotices.build();
         _$failedField = 'admissionList';
-        _admissionList?.build();
+        admissionList.build();
 
         _$failedField = 'newVersionData';
-        _newVersionData?.build();
+        newVersionData.build();
         _$failedField = 'allTradePairs';
         allTradePairs.build();
         _$failedField = 'allTradeMarkets';
         allTradeMarkets.build();
 
         _$failedField = 'communityConfig';
-        _communityConfig?.build();
+        communityConfig.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
             'HomePageVM', _$failedField, e.toString());
@@ -546,14 +537,26 @@ class _$HomeBanner extends HomeBanner {
   final String img;
   @override
   final String bgImg;
-  String __imageUrl;
+  String? __imageUrl;
 
-  factory _$HomeBanner([void Function(HomeBannerBuilder) updates]) =>
-      (new HomeBannerBuilder()..update(updates)).build();
+  factory _$HomeBanner([void Function(HomeBannerBuilder)? updates]) =>
+      (new HomeBannerBuilder()..update(updates))._build();
 
   _$HomeBanner._(
-      {this.id, this.type, this.title, this.content, this.img, this.bgImg})
-      : super._();
+      {required this.id,
+      required this.type,
+      required this.title,
+      required this.content,
+      required this.img,
+      required this.bgImg})
+      : super._() {
+    BuiltValueNullFieldError.checkNotNull(id, 'HomeBanner', 'id');
+    BuiltValueNullFieldError.checkNotNull(type, 'HomeBanner', 'type');
+    BuiltValueNullFieldError.checkNotNull(title, 'HomeBanner', 'title');
+    BuiltValueNullFieldError.checkNotNull(content, 'HomeBanner', 'content');
+    BuiltValueNullFieldError.checkNotNull(img, 'HomeBanner', 'img');
+    BuiltValueNullFieldError.checkNotNull(bgImg, 'HomeBanner', 'bgImg');
+  }
 
   @override
   String get imageUrl => __imageUrl ??= super.imageUrl;
@@ -601,42 +604,43 @@ class _$HomeBanner extends HomeBanner {
 }
 
 class HomeBannerBuilder implements Builder<HomeBanner, HomeBannerBuilder> {
-  _$HomeBanner _$v;
+  _$HomeBanner? _$v;
 
-  int _id;
-  int get id => _$this._id;
-  set id(int id) => _$this._id = id;
+  int? _id;
+  int? get id => _$this._id;
+  set id(int? id) => _$this._id = id;
 
-  String _type;
-  String get type => _$this._type;
-  set type(String type) => _$this._type = type;
+  String? _type;
+  String? get type => _$this._type;
+  set type(String? type) => _$this._type = type;
 
-  String _title;
-  String get title => _$this._title;
-  set title(String title) => _$this._title = title;
+  String? _title;
+  String? get title => _$this._title;
+  set title(String? title) => _$this._title = title;
 
-  String _content;
-  String get content => _$this._content;
-  set content(String content) => _$this._content = content;
+  String? _content;
+  String? get content => _$this._content;
+  set content(String? content) => _$this._content = content;
 
-  String _img;
-  String get img => _$this._img;
-  set img(String img) => _$this._img = img;
+  String? _img;
+  String? get img => _$this._img;
+  set img(String? img) => _$this._img = img;
 
-  String _bgImg;
-  String get bgImg => _$this._bgImg;
-  set bgImg(String bgImg) => _$this._bgImg = bgImg;
+  String? _bgImg;
+  String? get bgImg => _$this._bgImg;
+  set bgImg(String? bgImg) => _$this._bgImg = bgImg;
 
   HomeBannerBuilder();
 
   HomeBannerBuilder get _$this {
-    if (_$v != null) {
-      _id = _$v.id;
-      _type = _$v.type;
-      _title = _$v.title;
-      _content = _$v.content;
-      _img = _$v.img;
-      _bgImg = _$v.bgImg;
+    final $v = _$v;
+    if ($v != null) {
+      _id = $v.id;
+      _type = $v.type;
+      _title = $v.title;
+      _content = $v.content;
+      _img = $v.img;
+      _bgImg = $v.bgImg;
       _$v = null;
     }
     return this;
@@ -644,27 +648,32 @@ class HomeBannerBuilder implements Builder<HomeBanner, HomeBannerBuilder> {
 
   @override
   void replace(HomeBanner other) {
-    if (other == null) {
-      throw new ArgumentError.notNull('other');
-    }
+    ArgumentError.checkNotNull(other, 'other');
     _$v = other as _$HomeBanner;
   }
 
   @override
-  void update(void Function(HomeBannerBuilder) updates) {
+  void update(void Function(HomeBannerBuilder)? updates) {
     if (updates != null) updates(this);
   }
 
   @override
-  _$HomeBanner build() {
+  HomeBanner build() => _build();
+
+  _$HomeBanner _build() {
     final _$result = _$v ??
         new _$HomeBanner._(
-            id: id,
-            type: type,
-            title: title,
-            content: content,
-            img: img,
-            bgImg: bgImg);
+            id: BuiltValueNullFieldError.checkNotNull(id, 'HomeBanner', 'id'),
+            type: BuiltValueNullFieldError.checkNotNull(
+                type, 'HomeBanner', 'type'),
+            title: BuiltValueNullFieldError.checkNotNull(
+                title, 'HomeBanner', 'title'),
+            content: BuiltValueNullFieldError.checkNotNull(
+                content, 'HomeBanner', 'content'),
+            img:
+                BuiltValueNullFieldError.checkNotNull(img, 'HomeBanner', 'img'),
+            bgImg: BuiltValueNullFieldError.checkNotNull(
+                bgImg, 'HomeBanner', 'bgImg'));
     replace(_$result);
     return _$result;
   }
@@ -678,14 +687,20 @@ class _$HomeState extends HomeState {
   @override
   final bool isInitialized;
 
-  factory _$HomeState([void Function(HomeStateBuilder) updates]) =>
-      (new HomeStateBuilder()..update(updates)).build();
+  factory _$HomeState([void Function(HomeStateBuilder)? updates]) =>
+      (new HomeStateBuilder()..update(updates))._build();
 
-  _$HomeState._({this.homeBanners, this.homePrices, this.isInitialized})
+  _$HomeState._(
+      {required this.homeBanners,
+      required this.homePrices,
+      required this.isInitialized})
       : super._() {
-    if (isInitialized == null) {
-      throw new BuiltValueNullFieldError('HomeState', 'isInitialized');
-    }
+    BuiltValueNullFieldError.checkNotNull(
+        homeBanners, 'HomeState', 'homeBanners');
+    BuiltValueNullFieldError.checkNotNull(
+        homePrices, 'HomeState', 'homePrices');
+    BuiltValueNullFieldError.checkNotNull(
+        isInitialized, 'HomeState', 'isInitialized');
   }
 
   @override
@@ -721,32 +736,33 @@ class _$HomeState extends HomeState {
 }
 
 class HomeStateBuilder implements Builder<HomeState, HomeStateBuilder> {
-  _$HomeState _$v;
+  _$HomeState? _$v;
 
-  ListBuilder<HomeBanner> _homeBanners;
+  ListBuilder<HomeBanner>? _homeBanners;
   ListBuilder<HomeBanner> get homeBanners =>
       _$this._homeBanners ??= new ListBuilder<HomeBanner>();
-  set homeBanners(ListBuilder<HomeBanner> homeBanners) =>
+  set homeBanners(ListBuilder<HomeBanner>? homeBanners) =>
       _$this._homeBanners = homeBanners;
 
-  ListBuilder<AssetPrice> _homePrices;
+  ListBuilder<AssetPrice>? _homePrices;
   ListBuilder<AssetPrice> get homePrices =>
       _$this._homePrices ??= new ListBuilder<AssetPrice>();
-  set homePrices(ListBuilder<AssetPrice> homePrices) =>
+  set homePrices(ListBuilder<AssetPrice>? homePrices) =>
       _$this._homePrices = homePrices;
 
-  bool _isInitialized;
-  bool get isInitialized => _$this._isInitialized;
-  set isInitialized(bool isInitialized) =>
+  bool? _isInitialized;
+  bool? get isInitialized => _$this._isInitialized;
+  set isInitialized(bool? isInitialized) =>
       _$this._isInitialized = isInitialized;
 
   HomeStateBuilder();
 
   HomeStateBuilder get _$this {
-    if (_$v != null) {
-      _homeBanners = _$v.homeBanners?.toBuilder();
-      _homePrices = _$v.homePrices?.toBuilder();
-      _isInitialized = _$v.isInitialized;
+    final $v = _$v;
+    if ($v != null) {
+      _homeBanners = $v.homeBanners.toBuilder();
+      _homePrices = $v.homePrices.toBuilder();
+      _isInitialized = $v.isInitialized;
       _$v = null;
     }
     return this;
@@ -754,33 +770,34 @@ class HomeStateBuilder implements Builder<HomeState, HomeStateBuilder> {
 
   @override
   void replace(HomeState other) {
-    if (other == null) {
-      throw new ArgumentError.notNull('other');
-    }
+    ArgumentError.checkNotNull(other, 'other');
     _$v = other as _$HomeState;
   }
 
   @override
-  void update(void Function(HomeStateBuilder) updates) {
+  void update(void Function(HomeStateBuilder)? updates) {
     if (updates != null) updates(this);
   }
 
   @override
-  _$HomeState build() {
+  HomeState build() => _build();
+
+  _$HomeState _build() {
     _$HomeState _$result;
     try {
       _$result = _$v ??
           new _$HomeState._(
-              homeBanners: _homeBanners?.build(),
-              homePrices: _homePrices?.build(),
-              isInitialized: isInitialized);
+              homeBanners: homeBanners.build(),
+              homePrices: homePrices.build(),
+              isInitialized: BuiltValueNullFieldError.checkNotNull(
+                  isInitialized, 'HomeState', 'isInitialized'));
     } catch (_) {
-      String _$failedField;
+      late String _$failedField;
       try {
         _$failedField = 'homeBanners';
-        _homeBanners?.build();
+        homeBanners.build();
         _$failedField = 'homePrices';
-        _homePrices?.build();
+        homePrices.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
             'HomeState', _$failedField, e.toString());
@@ -792,4 +809,4 @@ class HomeStateBuilder implements Builder<HomeState, HomeStateBuilder> {
   }
 }
 
-// ignore_for_file: always_put_control_body_on_new_line,always_specify_types,annotate_overrides,avoid_annotating_with_dynamic,avoid_as,avoid_catches_without_on_clauses,avoid_returning_this,lines_longer_than_80_chars,omit_local_variable_types,prefer_expression_function_bodies,sort_constructors_first,test_types_in_equals,unnecessary_const,unnecessary_new
+// ignore_for_file: always_put_control_body_on_new_line,always_specify_types,annotate_overrides,avoid_annotating_with_dynamic,avoid_as,avoid_catches_without_on_clauses,avoid_returning_this,deprecated_member_use_from_same_package,lines_longer_than_80_chars,no_leading_underscores_for_local_identifiers,omit_local_variable_types,prefer_expression_function_bodies,sort_constructors_first,test_types_in_equals,unnecessary_const,unnecessary_new

@@ -14,23 +14,23 @@ abstract class CommunityMemberInfo
     return deserialize<CommunityMemberInfo>(json);
   }
 
-  @nullable
+  //@nullable
   String get name;
 
-  @nullable
+  //@nullable
   String get describe;
 
-  @nullable
+  //@nullable
   String get github;
 
-  @nullable
+  //@nullable
   String get icon;
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'telegram_account')
   String get telegramAccount;
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'admin')
   BuiltMap<String, String> get admin;
 

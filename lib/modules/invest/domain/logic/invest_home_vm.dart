@@ -15,12 +15,12 @@ abstract class InvestHomeVM
 
   String get fiatCurrency;
 
-  @nullable
+  //@nullable
   MintItem get activeMint;
 
   BuiltList<MintItem> get mints;
 
-  @nullable
+  //@nullable
   MintInfo get mintInfo;
 
   BuiltList<MintChart> get chartList;
