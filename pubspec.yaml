@@ -55,11 +55,11 @@ dependencies:
 
   # Crashes / Analytics
   ## sentry: ^4.0.1
-  #=sentry: ^6.5.1
+  sentry: ^6.5.1
   ## sentry_flutter: ^4.0.1
-  #= sentry_flutter: ^6.5.1
+  sentry_flutter: ^6.5.1
   ## amplitude_flutter: ^2.2.3
-  #=amplitude_flutter: ^3.9.0
+  amplitude_flutter: ^3.9.0
 
   # Network
   ## dio: ^3.0.10
@@ -68,8 +68,9 @@ dependencies:
   dio_http2_adapter: ^2.0.0
   ## dio_flutter_transformer: ^3.0.2
   ## connectivity: ^2.0.2
-  ## network_flutter:
-  ##  git: https://github.com/metabasenetwork/network_flutter
+  connectivity: ^3.0.6
+  network_flutter:
+    git: https://github.com/metabasenetwork/network_flutter2
 
   # UI
   ## oktoast: ^2.3.2
