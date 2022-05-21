@@ -114,7 +114,7 @@ dependencies:
   ## flutter_hooks: ^0.15.0
   flutter_hooks: ^0.18.2+1
   ## flutter_secure_storage: ^3.3.5
-  #= flutter_secure_storage: ^5.0.2
+  flutter_secure_storage: ^5.0.2
   ## hive: ^1.4.4+1
   hive: ^2.2.1
   ## hive_flutter: ^0.3.1
