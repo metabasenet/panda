@@ -20,6 +20,15 @@ class NumberUtil {
     return 0;
   }
 
+  //Keep 2 decimal places
+  static String getFixed(String number) {
+    if (number.isNotEmpty) {
+      return double.parse(number).toStringAsFixed(2);
+    } else {
+      return '0.00';
+    }
+  }
+
   /// Get the minimum value of the specified decimal place
   /// [Examples]
   /// if precision is 0 then return 0.1

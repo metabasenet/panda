@@ -108,8 +108,8 @@ class MiningProfitTab extends HookWidget {
           onLoadData: (params) {
             return doLoadData(
               isRefresh: params.isRefresh,
-              skip: params.skip,
-              take: 10,
+              skip: 0,
+              take: 200,
             );
           },
           itemCount: listData.length,
@@ -133,25 +133,25 @@ class MiningProfitTab extends HookWidget {
 
   Widget buildItem(BuildContext context, ProfitRecordItem item, int index) {
     return SizedBox(
-      height: 100,
+      height: 90,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (index != 0) Divider(color: context.greyColor),
-          SizedBox(height: context.edgeSize),
-          Text('height : ${item.height}. balance : ${item.balance}',
-              style: context.textBody()),
           SizedBox(height: context.edgeSizeHalf),
           Text(
-            '投票收益 : ${item.stakeReward}.',
-            style: context.textSmall(),
+            '总收益 : ${NumberUtil.getFixed(item.balance)}',
+            style: context.textBody(),
           ),
-          SizedBox(height: context.edgeSize),
+          //SizedBox(height: context.edgeSize),
+          SizedBox(height: context.edgeSizeHalf),
           Text(
-            '推广收益 : ${item.promotionReward}.',
+            '投票收益 : ${NumberUtil.getFixed(item.vote)}  推广收益 : ${NumberUtil.getFixed(item.extend)}',
             style: context.textSmall(),
           ),
-          SizedBox(height: 4 /*context.edgeSize*/),
+          SizedBox(height: context.edgeSizeHalf),
+          Text('高度 : ${item.height}  交易时间 : ${item.time}',
+              style: context.textSmall()),
         ],
       ),
     );
