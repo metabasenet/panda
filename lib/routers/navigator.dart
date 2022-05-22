@@ -31,7 +31,7 @@ enum AppTabBarPages {
 }
 
 class AppNavigator {
-  static Route<dynamic> onGenerateRoute(RouteSettings settings) {
+  static Route<dynamic>? onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
       // Entry Pages
       case Navigator.defaultRouteName:
@@ -39,67 +39,67 @@ class AppNavigator {
       case AppMainPage.routeName:
         return AppMainPage.route(settings);
       default:
-        if (settings.name.startsWith('/common')) {
+        if (settings.name!.startsWith('/common')) {
           return moduleCommonInitRoutes(settings);
         }
-        if (settings.name.startsWith('/wallet')) {
+        if (settings.name!.startsWith('/wallet')) {
           return moduleWalletInitRoutes(settings);
         }
-        if (settings.name.startsWith('/invitation')) {
+        if (settings.name!.startsWith('/invitation')) {
           return moduleInvitationInitRoutes(settings);
         }
-        if (settings.name.startsWith('/community')) {
+        if (settings.name!.startsWith('/community')) {
           return moduleCommunityInitRoutes(settings);
         }
-        if (settings.name.startsWith('/asset')) {
+        if (settings.name!.startsWith('/asset')) {
           return moduleAssetInitRoutes(settings);
         }
-        if (settings.name.startsWith('/notice')) {
+        if (settings.name!.startsWith('/notice')) {
           return moduleNoticeInitRoutes(settings);
         }
-        if (settings.name.startsWith('/explorer')) {
+        if (settings.name!.startsWith('/explorer')) {
           return moduleExplorerInitRoutes(settings);
         }
-        if (settings.name.startsWith('/settings')) {
+        if (settings.name!.startsWith('/settings')) {
           return moduleSettingsInitRoutes(settings);
         }
-        if (settings.name.startsWith('/open')) {
+        if (settings.name!.startsWith('/open')) {
           return moduleOpenInitRoutes(settings);
         }
-        if (settings.name.startsWith('/trade')) {
+        if (settings.name!.startsWith('/trade')) {
           return moduleTradeInitRoutes(settings);
         }
-        if (settings.name.startsWith('/invest')) {
+        if (settings.name!.startsWith('/invest')) {
           return moduleInvestRoutes(settings);
         }
-        if (settings.name.startsWith('/project')) {
+        if (settings.name!.startsWith('/project')) {
           return moduleProjectInitRoutes(settings);
         }
-        if (settings.name.startsWith('/swap')) {
+        if (settings.name!.startsWith('/swap')) {
           return moduleSwapInitRoutes(settings);
         }
-        if (settings.name.startsWith('/hdkey')) {
+        if (settings.name!.startsWith('/hdkey')) {
           return moduleHDKeyInitRoutes(settings);
         }
-        if (settings.name.startsWith('/admission')) {
+        if (settings.name!.startsWith('/admission')) {
           return moduleAdmissionInitRoutes(settings);
         }
         return null;
     }
   }
 
-  static Future<T> push<T>(
+  static Future<T?> push<T>(
     String routeName, {
-    Object params,
+    required Object params,
     bool replace = false,
   }) {
     if (replace == true) {
-      return navigatorKey.currentState.pushReplacementNamed(
+      return navigatorKey.currentState!.pushReplacementNamed(
         routeName,
         arguments: params,
       );
     } else {
-      return navigatorKey.currentState.pushNamed(
+      return navigatorKey.currentState!.pushNamed(
         routeName,
         arguments: params,
       );
@@ -108,16 +108,16 @@ class AppNavigator {
 
   static void popAndPushNamed(
     String routeName, {
-    Object params,
+    required Object params,
     bool replace = false,
   }) {
     if (replace) {
-      navigatorKey.currentState.pushReplacementNamed(
+      navigatorKey.currentState!.pushReplacementNamed(
         routeName,
         arguments: params,
       );
     } else {
-      navigatorKey.currentState.popAndPushNamed(
+      navigatorKey.currentState!.popAndPushNamed(
         routeName,
         arguments: params,
       );
@@ -125,25 +125,25 @@ class AppNavigator {
   }
 
   static bool canPop() {
-    return navigatorKey.currentState.canPop();
+    return navigatorKey.currentState!.canPop();
   }
 
   static void goBack() {
-    navigatorKey.currentState.pop();
+    navigatorKey.currentState!.pop();
   }
 
   static void popWithResult(dynamic result) {
-    navigatorKey.currentState.pop(result);
+    navigatorKey.currentState!.pop(result);
   }
 
   static void popUntil(String routeName) {
-    navigatorKey.currentState.popUntil(
+    navigatorKey.currentState!.popUntil(
       ModalRoute.withName(routeName),
     );
   }
 
   static void gotoTabBar() {
-    navigatorKey.currentState.popUntil(
+    navigatorKey.currentState!.popUntil(
       ModalRoute.withName(AppMainPage.routeName),
     );
   }

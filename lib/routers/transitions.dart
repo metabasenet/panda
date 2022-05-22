@@ -14,14 +14,14 @@ class DefaultTransition<T> extends MaterialPageRoute<T> {
 }
 
 class FadeRoute extends PageRouteBuilder {
-  FadeRoute({this.page, this.settings})
+  FadeRoute({required this.settings, this.page})
       : super(
           pageBuilder: (
             context,
             animation,
             secondaryAnimation,
           ) =>
-              page,
+              page!,
           transitionsBuilder: (
             context,
             animation,
@@ -33,7 +33,7 @@ class FadeRoute extends PageRouteBuilder {
             child: child,
           ),
         );
-  final Widget page;
+  final Widget? page;
   @override
   final RouteSettings settings;
 }
@@ -46,7 +46,7 @@ class EnterExitRoute extends PageRouteBuilder {
             animation,
             secondaryAnimation,
           ) =>
-              enterPage,
+              enterPage!,
           transitionsBuilder: (
             context,
             animation,
@@ -73,8 +73,8 @@ class EnterExitRoute extends PageRouteBuilder {
           ),
         );
 
-  final Widget enterPage;
-  final Widget exitPage;
+  final Widget? enterPage;
+  final Widget? exitPage;
 }
 
 class RevealRoute extends PageRouteBuilder {
@@ -86,13 +86,13 @@ class RevealRoute extends PageRouteBuilder {
   /// The transition doesn't affect the entry screen so we will only touch
   /// the target screen.
   RevealRoute({
-    @required this.page,
-    @required this.maxRadius,
+    required this.page,
+    required this.maxRadius,
+    required this.settings,
     this.minRadius = 100,
     this.duration = 1000,
     this.centerAlignment = Alignment.center,
     this.centerOffset,
-    this.settings,
   }) : super(
           transitionDuration: Duration(milliseconds: duration),
           pageBuilder: (
@@ -115,7 +115,7 @@ class RevealRoute extends PageRouteBuilder {
               clipper: CircularRevealClipper(
                 fraction: animation.value,
                 centerAlignment: centerAlignment,
-                centerOffset: centerOffset,
+                centerOffset: centerOffset!,
                 minRadius: minRadius,
                 maxRadius: maxRadius,
               ),
@@ -126,7 +126,7 @@ class RevealRoute extends PageRouteBuilder {
 
   final Widget page;
   final Alignment centerAlignment;
-  final Offset centerOffset;
+  final Offset? centerOffset;
   final int duration;
   final double minRadius;
   final double maxRadius;
@@ -136,7 +136,7 @@ class RevealRoute extends PageRouteBuilder {
 
 class CircularRevealClipper extends CustomClipper<Path> {
   const CircularRevealClipper({
-    @required this.fraction,
+    required this.fraction,
     this.centerAlignment,
     this.centerOffset,
     this.minRadius,
@@ -144,10 +144,10 @@ class CircularRevealClipper extends CustomClipper<Path> {
   });
 
   final double fraction;
-  final Alignment centerAlignment;
-  final Offset centerOffset;
-  final double minRadius;
-  final double maxRadius;
+  final Alignment? centerAlignment;
+  final Offset? centerOffset;
+  final double? minRadius;
+  final double? maxRadius;
 
   @override
   Path getClip(Size size) {
@@ -161,7 +161,7 @@ class CircularRevealClipper extends CustomClipper<Path> {
       ..addOval(
         Rect.fromCircle(
           center: center,
-          radius: lerpDouble(minRadius, maxRadius, fraction),
+          radius: lerpDouble(minRadius, maxRadius, fraction)!,
         ),
       );
   }
