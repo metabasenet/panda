@@ -24,7 +24,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
 import 'package:mime_type/mime_type.dart';
-import 'package:network_flutter/network_flutter.dart';
+//import 'package:network_flutter/network_flutter.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:package_info/package_info.dart';
 import 'package:path/path.dart' as path;
@@ -45,12 +45,15 @@ part 'logger/bloc_logger.dart';
 part 'logger/prod_logger.dart';
 part 'network/signature.dart';
 part 'network/upload.dart';
+
 part 'number/byte_utils.dart';
 part 'number/number_utils.dart';
+
 part 'platform/clipboard.dart';
 part 'platform/launcher.dart';
 part 'platform/platform.dart';
 part 'platform/toast.dart';
+
 part 'string/enum_to_string.dart';
 part 'string/string_utils.dart';
 part 'string/uuid.dart';

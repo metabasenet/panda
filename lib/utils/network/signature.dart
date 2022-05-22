@@ -21,7 +21,7 @@ Future<String> getAuthSignature(
   data.putIfAbsent('hash', () => walletId);
 
   // Sort data keys alphabetically
-  final paramsKey = data?.keys?.toList() ?? [];
+  final paramsKey = data.keys.toList();
   paramsKey.sort((a, b) => a.compareTo(b));
   final paramsData = {};
   for (final key in paramsKey) {
@@ -29,8 +29,7 @@ Future<String> getAuthSignature(
   }
 
   final paramsJson = jsonEncode(paramsData);
-
-  final signature = await sha256.hash(
+  final signature = await Sha256().hash(
     utf8.encode('$paramsJson::$timestamp::$walletSign'),
   );
 

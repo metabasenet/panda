@@ -43,7 +43,7 @@ class NumberUtil {
     if (raw is double) {
       return raw;
     }
-    return double.tryParse(raw.toString()) ?? valueIfNull ?? 0.0;
+    return double.tryParse(raw.toString()) ?? valueIfNull;
   }
 
   /// Return a int from any
@@ -55,12 +55,12 @@ class NumberUtil {
     if (raw is int) {
       return raw;
     }
-    return int.tryParse(raw.toString()) ?? valueIfNull ?? 0;
+    return int.tryParse(raw.toString()) ?? valueIfNull;
   }
 
   /// Return a Decimal from any
   ///
-  static Decimal getDecimal(dynamic raw, [Decimal valueIfNull]) {
+  static Decimal getDecimal(dynamic raw, Decimal valueIfNull) {
     if (raw == null) {
       return valueIfNull;
     }
@@ -83,11 +83,8 @@ class NumberUtil {
 
     final amount = Decimal.parse(raw.toString());
     final powPrecision = math.pow(10, precision);
-
-    final result =
-        (amount * Decimal.fromInt(powPrecision.toInt())).truncateToDouble() /
-            powPrecision;
-
+    final result = (amount * Decimal.fromInt(powPrecision.toInt())).toDouble() /
+        powPrecision;
     return _typeConvert<T>(result.toString());
   }
 
@@ -99,7 +96,7 @@ class NumberUtil {
   static Decimal getRawAsUsableDecimal(String raw) {
     final amount = Decimal.parse(raw.toString());
     final result = amount / Decimal.parse(rawPerNano.toString());
-    return result;
+    return result.toDecimal();
   }
 
   /// Return raw as a normal amount.
@@ -153,7 +150,7 @@ class NumberUtil {
     final asPrecision = BigInt.from(10).pow(precision);
     final asDecimal = Decimal.parse(amount.toString());
     final rawDecimal = Decimal.parse(asPrecision.toString());
-    return (asDecimal * rawDecimal).toInt();
+    return (asDecimal * rawDecimal).toBigInt().toInt();
   }
 
   /// Return readable amount as double string
@@ -180,9 +177,8 @@ class NumberUtil {
   static String getPercentOfTotalSupply(BigInt amount) {
     final totalSupply =
         Decimal.parse('133248290000000000000000000000000000000');
-    final amountRaw = Decimal.parse(amount.toString());
-    return ((amountRaw / totalSupply) * Decimal.fromInt(100))
-        .toStringAsFixed(4);
+    final amountRaw = Decimal.parse(amount.toString()) * Decimal.parse('100');
+    return (amountRaw / totalSupply).toDecimal().toStringAsFixed(4);
   }
 
   /// Sanitize a number as something that can actually
@@ -226,15 +222,15 @@ class NumberUtil {
   static T _typeConvert<T>(String value) {
     final type = '${_typeOf<T>()}';
     if (type == 'double') {
-      return double.parse(value, (_) => null) as T;
+      return double.parse(value) as T;
     } else if (type == 'int') {
-      return double.parse(value, (_) => null).toInt() as T;
+      return double.parse(value).toInt() as T;
     } else {
       return value as T;
     }
   }
 
-  static T plus<T>(dynamic v1, dynamic v2) {
+  static T? plus<T>(dynamic v1, dynamic v2) {
     try {
       final value = Decimal.parse('$v1') + Decimal.parse('$v2');
       return _typeConvert<T>(value.toString());
@@ -243,7 +239,7 @@ class NumberUtil {
     }
   }
 
-  static T minus<T>(dynamic v1, dynamic v2) {
+  static T? minus<T>(dynamic v1, dynamic v2) {
     try {
       final value = Decimal.parse('$v1') - Decimal.parse('$v2');
       return _typeConvert<T>(value.toString());
@@ -252,7 +248,7 @@ class NumberUtil {
     }
   }
 
-  static T multiply<T>(dynamic v1, dynamic v2, [int precision]) {
+  static T? multiply<T>(dynamic v1, dynamic v2, [int? precision]) {
     try {
       final value = Decimal.parse('$v1') * Decimal.parse('$v2');
       if (precision != null) {
@@ -264,7 +260,7 @@ class NumberUtil {
     }
   }
 
-  static T divide<T>(dynamic v1, dynamic v2, [int precision]) {
+  static T? divide<T>(dynamic v1, dynamic v2, [int? precision]) {
     try {
       final value = Decimal.parse('$v1') / Decimal.parse('$v2');
       if (precision != null) {

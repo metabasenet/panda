@@ -13,13 +13,16 @@
 
 // Project imports:
 //import 'package:mars/app.dart';
+//import 'dart:typed_data';
+//import 'package:flutter_test/flutter_test.dart';
+//import 'package:mars/crypto/mnt.dart';
+//import 'package:ed25519_dart_base/ed25519_dart.dart';
+//import 'package:hex/hex.dart';
 
-import 'dart:typed_data';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:mars/crypto/mnt.dart';
-import 'package:ed25519_dart_base/ed25519_dart.dart';
-import 'package:hex/hex.dart';
+import 'package:cryptography/cryptography.dart';
+import 'package:mars/utils/cryptography/cryptography.dart';
 
+/*
 String formatBytesAsHexString(Uint8List bytes) {
   final result = StringBuffer();
   for (var i = 0; i < bytes.lengthInBytes; i++) {
@@ -28,8 +31,60 @@ String formatBytesAsHexString(Uint8List bytes) {
   }
   return result.toString();
 }
+*/
+void main() async {
+  final cipher = Chacha20.poly1305Aead();
+  final secretKey = SecretKey(List.filled(32, 0));
+  final nonce = List.filled(12, 0);
+  final ret = await cipher.encrypt(
+    List.filled(32, 0),
+    secretKey: secretKey,
+    nonce: nonce,
+  );
+  final ret_ = List.filled(0, 0, growable: true);
+  ret_.addAll(ret.mac.bytes);
+  ret_.addAll(ret.cipherText);
+  //print(ret_);
+  //print(ret_.length);
 
-void main() {
+  //final ret_ = ret.mac.bytes.addAll(ret.cipherText);
+  //final ret_ = List.from([ret.mac.bytes, ret.cipherText]);
+  //print(ret_.length);
+  final sb = SecretBox(
+    ret_.sublist(16), // ret.cipherText,
+    nonce: nonce,
+    mac: Mac(ret_.sublist(0, 16)), // Mac(expectedMac),
+  );
+  final ret2 = await cipher.decrypt(sb, secretKey: secretKey);
+  print(ret2);
+  print(ret2.length);
+  //print(ret);
+  //print(ret.cipherText);
+  //print(ret.cipherText.length);
+  /*
+  final cipher = Chacha20.poly1305Aead();
+    final listIntPwd = utf8.encode('$password$uniqueChars'.substring(0, 32));
+    final secretKey = SecretKey(listIntPwd);
+    //final nonce = Nonce(utf8.encode(uniqueChars.substring(0, 12)));
+    final nonce = List.filled(12, 0);
+    if (isEncrypt) {
+      final ret = await cipher.encrypt(
+        utf8.encode(value),
+        secretKey: secretKey,
+        nonce: nonce,
+      );
+      //ret.cipherText
+      //return String.fromCharCodes(ret.);
+    } else {
+      SecretBox(
+        Uint8List.fromList(value.codeUnits),
+        nonce: nonce,
+        mac: mac,
+      );
+      //cipher.decrypt(null, secretKey: secretKey);
+    }
+*/
+  /*
   testWidgets('Counter increments smoke test', (tester) async {
     const vote = {
       'address': '20w0e9rcg7nq4pet8yz8ch2jt46f7hyjg256ys7dh5gddp0pja5mtm3js',
@@ -104,5 +159,5 @@ void main() {
     pubkey="e76226a3933711f195aa6c1879e2381976b33337bf7b3b296edd8dff105b24b5"
 	   owner="1965p604xzdrffvg90ax9bk0q3xyqn5zz2vc9zpbe3wdswzazj7d144mm"
     */
-  });
+  });*/
 }

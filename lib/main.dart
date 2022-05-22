@@ -21,6 +21,8 @@ import 'package:flutter_dabank/dabank_window_manager.dart';
 import 'package:wallet_sdk_flutter/wallet_sdk_flutter.dart';
 import 'package:flutter_hdkey/request_bytes_builder.dart';
 import 'package:mars/themes/themes.dart';
+import 'package:mars/utils/utils.dart';
+//import 'package:network_flutter/network_flutter.dart';
 
 void main() {
   //ensureFlutterBindingsInitialized();

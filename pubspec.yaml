@@ -69,8 +69,8 @@ dependencies:
   ## dio_flutter_transformer: ^3.0.2
   ## connectivity: ^2.0.2
   connectivity: ^3.0.6
-  ##network_flutter:
-  ##  git: https://github.com/metabasenetwork/network_flutter2
+  network_flutter:
+    git: https://github.com/metabasenetwork/network_flutter2
 
   # UI
   ## oktoast: ^2.3.2

@@ -33,6 +33,7 @@ class UploadResult extends Error {
 }
 
 class UploadUtils {
+  /*
   static const supportedExtension = ['jpg', 'jpeg', 'png', 'aac', 'protobuf'];
 
   static Future<UploadResult> requestUpload(
@@ -135,5 +136,5 @@ class UploadUtils {
       timer.cancel();
       throw UploadError(UploadErrorCode.uploadFileFailed, error.toString());
     }
-  }
+  }*/
 }
