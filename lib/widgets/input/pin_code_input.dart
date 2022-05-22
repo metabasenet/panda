@@ -2,9 +2,9 @@ part of widgets;
 
 class CSPinCodeInput extends HookWidget {
   const CSPinCodeInput({
-    @required this.textController,
-    @required this.errorController,
-    Key key,
+    required this.textController,
+    required this.errorController,
+    Key? key,
     this.isHaveHDKey = false,
     this.confirmPin,
     this.onConfirm,
@@ -16,20 +16,20 @@ class CSPinCodeInput extends HookWidget {
   }) : super(key: key);
 
   final bool isHaveHDKey;
-  final String btnText;
-  final String labelText;
-  final String confirmPin;
-  final Function(String pin) onPressed;
+  final String? btnText;
+  final String? labelText;
+  final String? confirmPin;
+  final Function(String pin)? onPressed;
   final StreamController<ErrorAnimationType> errorController;
   final String errorText;
   final bool isError;
-  final Function onConfirm;
+  final Function? onConfirm;
   final StreamController<String> textController;
 
   @override
   Widget build(BuildContext context) {
     final width =
-        NumberUtil.minus<double>(context.mediaWidth, context.edgeSizeDouble) /
+        NumberUtil.minus<double>(context.mediaWidth, context.edgeSizeDouble)! /
             6;
     final pinCode = useTextEditingController(text: '');
     final isErrorMessage = useState(true);
@@ -44,13 +44,13 @@ class CSPinCodeInput extends HookWidget {
         errorController.add(ErrorAnimationType.shake);
         return;
       }
-      onPressed(pinCode.text);
+      onPressed!(pinCode.text);
       isErrorMessage.value = false;
     }
 
     void onCompleted() {
-      if (confirmPin.isNotEmpty && pinCode.text != confirmPin) {
-        onConfirm();
+      if (confirmPin!.isNotEmpty && pinCode.text != confirmPin) {
+        onConfirm!();
         textController.add(tr('两次输入不一致，请重新输入'));
         errorController.add(ErrorAnimationType.shake);
         isErrorMessage.value = true;
@@ -82,9 +82,10 @@ class CSPinCodeInput extends HookWidget {
             Padding(
               padding: context.edgeBottom20,
               child: Text(
-                labelText,
+                labelText!,
                 style: context.textBody(
                   bold: true,
+                  fontWeight: FontWeight.normal,
                   color: context.labelColor,
                 ),
               ),
@@ -123,6 +124,8 @@ class CSPinCodeInput extends HookWidget {
                       ? Text(
                           tr(snapshot.data.toString()),
                           style: context.textSecondary(
+                            bold: true,
+                            fontWeight: FontWeight.normal,
                             color: context.redColor,
                           ),
                         )

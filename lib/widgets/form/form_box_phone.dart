@@ -2,8 +2,8 @@ part of widgets;
 
 class FormBoxPhone extends HookWidget {
   const FormBoxPhone({
-    @required this.controller,
-    Key key,
+    required this.controller,
+    Key? key,
     this.maxLength = 15,
     this.hintText,
     this.autoFocus = false,
@@ -16,13 +16,13 @@ class FormBoxPhone extends HookWidget {
 
   final TextEditingController controller;
   final int maxLength;
-  final String hintText;
-  final String title;
+  final String? hintText;
+  final String? title;
   final bool autoFocus;
-  final FieldValidator validator;
-  final EdgeInsetsGeometry margin;
-  final Function(String country) onChangeCountry;
-  final String selectCode;
+  final FieldValidator? validator;
+  final EdgeInsetsGeometry? margin;
+  final Function(String country)? onChangeCountry;
+  final String? selectCode;
 
   @override
   Widget build(BuildContext context) {
@@ -41,9 +41,10 @@ class FormBoxPhone extends HookWidget {
 
       return;
     }, []);
-
+/*
     void showDialog() {
       final name = context.locale;
+      
       showCSBottomSheet(
           context,
           (context) => ListView(
@@ -51,7 +52,7 @@ class FormBoxPhone extends HookWidget {
                   Padding(
                     padding: context.edgeHorizontal,
                     child: Text(
-                      title,
+                      title!,
                       style: context.textBody(bold: true),
                     ),
                   ),
@@ -72,7 +73,7 @@ class FormBoxPhone extends HookWidget {
                 ],
               ));
     }
-
+*/
     return FormBox(
       margin: margin ??
           EdgeInsets.symmetric(
@@ -87,13 +88,14 @@ class FormBoxPhone extends HookWidget {
       hintText: hintText,
       inputLeftWidget: InkWell(
           onTap: () {
-            showDialog();
+            //showDialog();
           },
           child: Row(
             children: [
               Text(
                 '+${code.value}',
-                style: context.textBody(),
+                style:
+                    context.textBody(bold: true, fontWeight: FontWeight.normal),
               ),
               Padding(
                 padding: context.edgeLeft,

@@ -2,13 +2,13 @@ part of widgets;
 
 class CSButtonGroup extends StatelessWidget {
   const CSButtonGroup({
-    @required this.selectedId,
-    Key key,
+    required this.selectedId,
+    Key? key,
     this.onSelectedId,
   }) : super(key: key);
 
   final int selectedId;
-  final Function(int value) onSelectedId;
+  final Function(int value)? onSelectedId;
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +29,7 @@ class CSButtonGroup extends StatelessWidget {
                 selectedId: selectedId,
                 onPress: () {
                   // TradeSide.buy.index;
-                  onSelectedId(0);
+                  onSelectedId!(0);
                 },
               )),
               Flexible(
@@ -43,7 +43,7 @@ class CSButtonGroup extends StatelessWidget {
                     selectedId: selectedId,
                     onPress: () {
                       // TradeSide.sell.index;
-                      onSelectedId(1);
+                      onSelectedId!(1);
                     },
                   ),
                 ),
@@ -56,14 +56,14 @@ class CSButtonGroup extends StatelessWidget {
 
 Widget buttonWidget(
   BuildContext context, {
-  String label,
-  bool isLeft,
-  bool isSelect,
-  Function onPress,
-  int selectedId,
+  String? label,
+  bool? isLeft,
+  bool? isSelect,
+  Function? onPress,
+  int? selectedId,
 }) {
   return ClipPath(
-    clipper: TopBarClipper(isLeft: isLeft),
+    clipper: TopBarClipper(isLeft: isLeft!),
     child: ClipRRect(
       borderRadius: isLeft
           ? BorderRadius.only(
@@ -80,14 +80,14 @@ Widget buttonWidget(
         margin: EdgeInsets.zero,
         padding: EdgeInsets.zero,
         borderRadius: 0,
-        textColor: isSelect ? context.whiteColor : context.bodyColor,
+        textColor: isSelect! ? context.whiteColor : context.bodyColor,
         backgroundColor: isSelect
             ? selectedId == 0
                 ? context.greenColor
                 : context.redColor
             : context.greyDarkColor,
         onPressed: () {
-          onPress();
+          onPress!();
         },
       ),
     ),
@@ -99,7 +99,7 @@ class TopBarClipper extends CustomClipper<Path> {
     this.isLeft,
   });
 
-  bool isLeft;
+  bool? isLeft;
 
   @override
   Path getClip(Size size) {

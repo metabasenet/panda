@@ -9,7 +9,7 @@ enum FormBoxType {
 
 class FormBox extends HookWidget {
   const FormBox({
-    Key key,
+    Key? key,
     this.title,
     this.titleStyle,
     this.titleAction,
@@ -45,54 +45,54 @@ class FormBox extends HookWidget {
   }) : super(key: key);
 
   /// Title on Top-Left
-  final String title;
-  final TextStyle titleStyle;
-  final Widget titleAction;
+  final String? title;
+  final TextStyle? titleStyle;
+  final Widget? titleAction;
 
-  final String hintText;
-  final TextStyle hintStyle;
+  final String? hintText;
+  final TextStyle? hintStyle;
 
   ///  Icon next to Input
-  final IconData iconName;
-  final String iconText;
+  final IconData? iconName;
+  final String? iconText;
   final double iconSize;
-  final Color iconColor;
-  final Widget iconWidget;
-  final VoidCallback onPressIcon;
+  final Color? iconColor;
+  final Widget? iconWidget;
+  final VoidCallback? onPressIcon;
 
   /// Form Input
-  final String value;
-  final String initialValue;
-  final FormBoxType type;
-  final FieldValidator validator;
-  final List<TextInputFormatter> inputFormatters;
-  final TextEditingController controller;
+  final String? value;
+  final String? initialValue;
+  final FormBoxType? type;
+  final FieldValidator? validator;
+  final List<TextInputFormatter>? inputFormatters;
+  final TextEditingController? controller;
 
-  final int maxLines;
-  final int maxLength;
+  final int? maxLines;
+  final int? maxLength;
 
   /// 长度判断 中文是否为双字节
-  final bool maxLengthChineseDouble;
+  final bool? maxLengthChineseDouble;
 
   /// 是否为密文显示
-  final bool obscureText;
+  final bool? obscureText;
 
-  final EdgeInsetsGeometry margin;
+  final EdgeInsetsGeometry? margin;
   final bool autoFocus;
   final bool editable;
   final bool readOnly;
   final bool bordered;
-  final Widget child;
-  final TextStyle inputTextStyle;
-  final Widget inputLeftWidget;
+  final Widget? child;
+  final TextStyle? inputTextStyle;
+  final Widget? inputLeftWidget;
 
   /// If true, show text length and maxLength limit
   final bool showCounterText;
 
-  final ValueChanged<String> onChanged;
-  final Function(bool hasFocus) onFocusChanged;
+  final ValueChanged<String>? onChanged;
+  final Function(bool hasFocus)? onFocusChanged;
 
-  Widget buildSuffixWidget(
+  Widget? buildSuffixWidget(
     BuildContext context,
   ) {
     if (iconName != null) {
@@ -103,7 +103,7 @@ class FormBox extends HookWidget {
         size: iconSize,
         borderRadius: 8,
         onPressed: onPressIcon,
-        icon: iconName,
+        icon: iconName!,
         color: iconColor ?? context.bodyColor,
       );
     }
@@ -118,6 +118,7 @@ class FormBox extends HookWidget {
         label: iconText,
         textStyle: context.textSmall(
           bold: true,
+          fontWeight: FontWeight.normal,
           color: iconColor ?? context.bodyColor,
         ),
       );
@@ -128,16 +129,18 @@ class FormBox extends HookWidget {
         margin: context.edgeRight,
         alignment: Alignment.centerRight,
         child: ValueListenableBuilder<TextEditingValue>(
-          valueListenable: controller,
+          valueListenable: controller!,
           builder: (context, value, _) {
             final length = StringUtils.strLength(
               value.text,
-              chineseDouble: maxLengthChineseDouble,
+              chineseDouble: maxLengthChineseDouble!,
             );
             return Text(
               '$length/$maxLength',
               style: context.textSecondary(
-                color: length < maxLength
+                bold: true,
+                fontWeight: FontWeight.normal,
+                color: length < maxLength!
                     ? context.placeholderColor
                     : context.redColor,
               ),
@@ -157,7 +160,7 @@ class FormBox extends HookWidget {
     // ignore: invalid_use_of_protected_member
     if (onFocusChanged != null && !focusNode.hasListeners) {
       focusNode.addListener(() {
-        onFocusChanged(focusNode.hasFocus);
+        onFocusChanged!(focusNode.hasFocus);
       });
     }
 
@@ -172,15 +175,16 @@ class FormBox extends HookWidget {
               children: [
                 Expanded(
                   child: Text(
-                    title,
+                    title!,
                     style: titleStyle ??
                         context.textBody(
                           bold: true,
+                          fontWeight: FontWeight.normal,
                           color: context.labelColor,
                         ),
                   ),
                 ),
-                if (titleAction != null) titleAction,
+                if (titleAction != null) titleAction!,
               ],
             ),
           ),
@@ -193,11 +197,22 @@ class FormBox extends HookWidget {
                 autofocus: autoFocus,
                 initialValue: controller != null ? null : initialValue ?? value,
                 cursorColor: context.bodyColor,
-                style: inputTextStyle ?? context.textBody(),
+                style: inputTextStyle ??
+                    context.textBody(
+                      bold: true,
+                      fontWeight: FontWeight.normal,
+                    ),
                 decoration: InputDecoration(
                   hintText: hintText,
-                  hintStyle: hintStyle ?? context.textPlaceholder(),
-                  errorStyle: context.textSecondary(color: context.redColor),
+                  hintStyle: hintStyle ??
+                      context.textPlaceholder(
+                        bold: true,
+                        fontWeight: FontWeight.normal,
+                      ),
+                  errorStyle: context.textSecondary(
+                      bold: true,
+                      fontWeight: FontWeight.normal,
+                      color: context.redColor),
                   errorMaxLines: 3,
                   alignLabelWithHint: true,
                   floatingLabelBehavior: FloatingLabelBehavior.always,
@@ -240,11 +255,12 @@ class FormBox extends HookWidget {
                 keyboardType: type == FormBoxType.inputNumber
                     ? TextInputType.numberWithOptions(decimal: true)
                     : TextInputType.text,
-                validator: validator,
+                validator: validator!,
                 controller: controller,
                 inputFormatters: [
                   ...inputFormatters ?? [],
-                  if (maxLengthChineseDouble) ChineseDoubleFormatter(maxLength),
+                  if (maxLengthChineseDouble!)
+                    ChineseDoubleFormatter(maxLength!),
                 ],
                 onChanged: onChanged,
               ),

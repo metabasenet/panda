@@ -80,7 +80,7 @@ dependencies:
   ## flutter_sticky_header: ^0.5.0
   flutter_sticky_header: ^0.6.2
   ## flutter_xlider: ^3.4.0
-  flutter_xlider: ^3.4.0
+  ##flutter_xlider: ^3.4.0
   ## rive: ^0.6.5
   rive: ^0.8.4
   ## simple_animations: ^2.4.2
@@ -90,7 +90,7 @@ dependencies:
   ## dotted_border: ^1.0.7
   dotted_border: ^2.0.0+2
   ## flutter_group_sliver: ^0.0.2
-  flutter_group_sliver: ^0.0.2
+  #flutter_group_sliver: ^0.0.2
   ## flutter_linkify: ^4.0.2
   flutter_linkify: ^5.0.2
 

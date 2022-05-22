@@ -454,13 +454,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.0.1"
-  flutter_group_sliver:
-    dependency: "direct main"
-    description:
-      name: flutter_group_sliver
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "0.0.2"
   flutter_hdkey:
     dependency: "direct main"
     description:
@@ -602,13 +595,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_xlider:
-    dependency: "direct main"
-    description:
-      name: flutter_xlider
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "3.4.0"
   frontend_server_client:
     dependency: transitive
     description:

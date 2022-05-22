@@ -23,6 +23,7 @@ import 'package:flutter_hdkey/request_bytes_builder.dart';
 import 'package:mars/themes/themes.dart';
 import 'package:mars/utils/utils.dart';
 //import 'package:network_flutter/network_flutter.dart';
+import 'package:mars/widgets/widgets.dart';
 
 void main() {
   //ensureFlutterBindingsInitialized();

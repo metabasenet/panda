@@ -2,30 +2,30 @@ part of widgets;
 
 class CSButtonTabsItem<T> {
   CSButtonTabsItem({
-    @required this.id,
-    @required this.label,
+    required this.id,
+    required this.label,
     this.value,
   });
 
   final String id;
   final String label;
-  final T value;
+  final T? value;
 }
 
 class CSButtonTabs<T> extends HookWidget {
   const CSButtonTabs({
-    @required this.items,
-    @required this.selectedId,
+    required this.items,
+    required this.selectedId,
     this.margin,
     this.onSelectedId,
     this.onSelectedValue,
   }) : assert(items != null);
 
-  final EdgeInsets margin;
+  final EdgeInsets? margin;
   final String selectedId;
   final List<CSButtonTabsItem<T>> items;
-  final Function(String id) onSelectedId;
-  final Function(T value) onSelectedValue;
+  final Function(String id)? onSelectedId;
+  final Function(T value)? onSelectedValue;
 
   @override
   Widget build(BuildContext context) {
@@ -67,10 +67,10 @@ class CSButtonTabs<T> extends HookWidget {
                         preferPosition: AutoScrollPosition.begin,
                       );
                       if (onSelectedId != null) {
-                        onSelectedId(item.value.id);
+                        onSelectedId!(item.value.id);
                       }
                       if (onSelectedValue != null) {
-                        onSelectedValue(item.value.value);
+                        onSelectedValue!(item.value.value!);
                       }
                     },
                     child: Container(
@@ -85,6 +85,7 @@ class CSButtonTabs<T> extends HookWidget {
                             item.value.label,
                             style: context.textBody(
                               bold: selectedId == item.value.id,
+                              fontWeight: FontWeight.normal,
                               color: selectedId == item.value.id
                                   ? context.bodyColor
                                   : context.labelColor,

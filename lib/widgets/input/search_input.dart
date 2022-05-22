@@ -2,8 +2,8 @@ part of widgets;
 
 class CSSearchInput extends HookWidget {
   const CSSearchInput({
-    @required this.onChanged,
-    Key key,
+    required this.onChanged,
+    Key? key,
     this.value = '',
     this.height = 50,
     this.radius,
@@ -24,20 +24,20 @@ class CSSearchInput extends HookWidget {
 
   final String value;
   final double height;
-  final double radius;
-  final Color background;
-  final BoxDecoration decoration;
-  final EdgeInsetsGeometry margin;
-  final Widget cmpRight;
+  final double? radius;
+  final Color? background;
+  final BoxDecoration? decoration;
+  final EdgeInsetsGeometry? margin;
+  final Widget? cmpRight;
   final bool showSearchIcon;
   final bool autofocus;
   final int maxLength;
-  final TextEditingController controller;
+  final TextEditingController? controller;
   final String hintText;
-  final TextStyle hintStyle;
-  final TextStyle inputStyle;
-  final VoidCallback onClear;
-  final ValueChanged<String> onSubmitted;
+  final TextStyle? hintStyle;
+  final TextStyle? inputStyle;
+  final VoidCallback? onClear;
+  final ValueChanged<String>? onSubmitted;
   final ValueChanged<String> onChanged;
 
   @override
@@ -71,6 +71,8 @@ class CSSearchInput extends HookWidget {
               maxLength: maxLength,
               style: inputStyle ??
                   context.textSmall(
+                    bold: true,
+                    fontWeight: FontWeight.normal,
                     color: context.bodyColor,
                   ),
               autocorrect: false, //是否自动更正
@@ -78,13 +80,17 @@ class CSSearchInput extends HookWidget {
                 hintText: hintText,
                 border: InputBorder.none,
                 isDense: true,
-                hintStyle: hintStyle ?? context.textPlaceholder(),
+                hintStyle: hintStyle ??
+                    context.textPlaceholder(
+                      bold: true,
+                      fontWeight: FontWeight.normal,
+                    ),
                 counterText: '',
               ),
               onChanged: onChanged,
               onSubmitted: (text) {
                 if (onSubmitted != null) {
-                  onSubmitted(text);
+                  onSubmitted!(text);
                 }
               },
             ),
@@ -103,14 +109,14 @@ class CSSearchInput extends HookWidget {
                   onPressed: () {
                     _controller.clear();
                     if (onClear != null) {
-                      onClear();
+                      onClear!();
                     }
                   },
                 ),
               );
             },
           ),
-          if (cmpRight != null) cmpRight
+          if (cmpRight != null) cmpRight!
         ],
       ),
     );
