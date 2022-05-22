@@ -2,7 +2,7 @@ part of dialogs;
 
 class CSAlertDialog extends StatelessWidget {
   const CSAlertDialog({
-    Key key,
+    Key? key,
     this.title,
     this.titleStyle,
     this.confirmBtnText,
@@ -25,31 +25,31 @@ class CSAlertDialog extends StatelessWidget {
   }) : super(key: key);
 
   /// 弹窗标题
-  final String title;
-  final TextStyle titleStyle;
+  final String? title;
+  final TextStyle? titleStyle;
 
-  final String confirmBtnText;
-  final TextStyle confirmBtnStyle;
-  final int confirmTimeout;
+  final String? confirmBtnText;
+  final TextStyle? confirmBtnStyle;
+  final int? confirmTimeout;
 
   /// 取消按钮
-  final String cancelBtnText;
-  final TextStyle cancelBtnStyle;
+  final String? cancelBtnText;
+  final TextStyle? cancelBtnStyle;
 
-  final String rightTitle;
-  final TextStyle rightTitleStyle;
+  final String? rightTitle;
+  final TextStyle? rightTitleStyle;
 
   /// 弹窗内容
-  final String content;
+  final String? content;
 
   /// 弹窗关闭回调
-  final void Function() onDismiss;
+  final void Function()? onDismiss;
 
   /// 弹窗关闭回调
-  final void Function() onConfirm;
+  final void Function()? onConfirm;
 
   /// 弹窗关闭回调
-  final void Function() onCancel;
+  final void Function()? onCancel;
 
   final bool hideCancel;
   final bool hideConfirm;
@@ -59,9 +59,9 @@ class CSAlertDialog extends StatelessWidget {
 
   final bool dismissOnConfirm;
 
-  final Widget child;
+  final Widget? child;
 
-  final EdgeInsetsGeometry contentPadding;
+  final EdgeInsetsGeometry? contentPadding;
 
   @override
   Widget build(BuildContext context) {
@@ -72,15 +72,15 @@ class CSAlertDialog extends StatelessWidget {
       hideCancel: hideCancel,
       hideConfirm: hideConfirm,
       confirmBtnText: confirmBtnText ?? tr('global:btn_confirm'),
-      confirmBtnStyle: confirmBtnStyle,
+      confirmBtnStyle: confirmBtnStyle!,
       cancelBtnText: cancelBtnText ?? tr('global:btn_cancel'),
-      cancelBtnStyle: cancelBtnStyle,
-      onConfirm: onConfirm,
-      onDismiss: onDismiss,
-      onCancel: onCancel,
+      cancelBtnStyle: cancelBtnStyle!,
+      onConfirm: onConfirm!,
+      onDismiss: onDismiss!,
+      onCancel: onCancel!,
       dismissOnBgClick: dismissOnBgClick,
       dismissOnConfirm: dismissOnConfirm,
-      confirmTimeout: confirmTimeout,
+      confirmTimeout: confirmTimeout!,
       contentWidget: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -91,7 +91,8 @@ class CSAlertDialog extends StatelessWidget {
               child: Text(
                 title ?? tr('global:dialog_alert_title'),
                 textAlign: TextAlign.center,
-                style: titleStyle ?? context.textBig(bold: true),
+                style: titleStyle ??
+                    context.textBig(bold: true, fontWeight: FontWeight.normal),
               ),
             ),
           ),
@@ -108,7 +109,11 @@ class CSAlertDialog extends StatelessWidget {
                       padding: context.edgeBottom20,
                       child: Text(
                         content ?? '',
-                        style: context.textBody(lineHeight: 1.67),
+                        style: context.textBody(
+                          lineHeight: 1.67,
+                          fontWeight: FontWeight.normal,
+                          bold: true,
+                        ),
                       ),
                     ),
               ),
