@@ -13,13 +13,13 @@ class RequestBytesBuilder {
     _params = <List<int>>[];
   }
 
-  Endian _endian; // 排序
-  int _headerLength; // 数据包长度
-  int _id; // 请求序号
-  int _tag; // 请求标识
-  int _index; // 序号
-  int _paramsLength; // 参数长度
-  List<List<int>> _params; // 参数
+  late Endian _endian; // 排序
+  late int _headerLength; // 数据包长度
+  late int _id; // 请求序号
+  late int _tag; // 请求标识
+  late int _index; // 序号
+  late int _paramsLength; // 参数长度
+  late List<List<int>> _params; // 参数
 
   /// 设置排序规则
   RequestBytesBuilder setEndian(Endian endian) {

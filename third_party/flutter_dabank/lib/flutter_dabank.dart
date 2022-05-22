@@ -4,18 +4,18 @@ import 'package:flutter/services.dart';
 
 class EventData {
   EventData(dynamic data) {
-    type = data['type']?.toString();
-    value = data['value']?.toString();
-    error = data['error']?.toString();
+    type = data['type'].toString();
+    value = data['value'].toString();
+    error = data['error'].toString();
   }
 
-  String type;
-  String value;
-  String error;
+  late String type;
+  late String value;
+  late String error;
 
   bool get isUpdate => type == 'update';
 
-  bool get isError => error?.isNotEmpty;
+  bool get isError => error.isNotEmpty;
 
   int get intValue => int.tryParse(value) ?? 0;
 }
@@ -31,8 +31,8 @@ class FlutterDabank {
   static final Map<int, Function> listeners = {};
 
   static Future<void> updateAppAndroid({
-    @required String url,
-    @required bool forceUpdate,
+    required String url,
+    required bool forceUpdate,
   }) async {
     final params = {'url': url};
     await _methodChannel.invokeMethod<void>('updateAppAndroid', params);

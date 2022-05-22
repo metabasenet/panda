@@ -889,15 +889,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.0.0"
-  network_flutter:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: HEAD
-      resolved-ref: "5ef3e184af2569ab0eb50dd5ab091d5897a96ecf"
-      url: "https://github.com/metabasenetwork/network_flutter2"
-    source: git
-    version: "0.0.1"
   octo_image:
     dependency: transitive
     description:
@@ -1585,11 +1576,9 @@ packages:
   wallet_sdk_flutter:
     dependency: "direct main"
     description:
-      path: "."
-      ref: HEAD
-      resolved-ref: dcf3767a5160670900e9bf3039995b173105329a
-      url: "https://github.com/metabasenetwork/wallet_sdk_flutter"
-    source: git
+      path: "third_party/wallet_sdk_flutter"
+      relative: true
+    source: path
     version: "0.0.1"
   watcher:
     dependency: transitive
