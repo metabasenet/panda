@@ -60,15 +60,16 @@ class MiningInvitationTab extends HookWidget {
         children: [
           //if (index != 0) Divider(color: context.greyColor),
           SizedBox(height: context.edgeSize),
-          Text('amount : ${item.amount} MNT', style: context.textBody()),
+          Text('${tr('invest:mining_record_lbl_amount')} : ${item.amount} MNT',
+              style: context.textBody()),
           SizedBox(height: context.edgeSizeHalf),
           Text(
-            'height : ${item.height} . time : ${item.time}',
+            '${tr('invest:mining_record_lbl_height')} : ${item.height}  ${tr('invest:mining_record_lbl_time')} : ${item.time}',
             style: context.textSmall(),
           ),
-          SizedBox(height: context.edgeSize),
+          SizedBox(height: context.edgeSizeHalf),
           Text(
-            'address : ${StringUtils.strCut(item.address, startKeep: 17, endKeep: 17)}',
+            '${tr('invest:mining_record_lbl_address')} : ${StringUtils.strCut(item.address, startKeep: 17, endKeep: 17)}',
             style: context.textSmall(),
           ),
           //SizedBox(height: 4 /*context.edgeSize*/),
@@ -109,7 +110,7 @@ class MiningProfitTab extends HookWidget {
             return doLoadData(
               isRefresh: params.isRefresh,
               skip: 0,
-              take: 200,
+              take: 1000,
             );
           },
           itemCount: listData.length,
@@ -133,24 +134,25 @@ class MiningProfitTab extends HookWidget {
 
   Widget buildItem(BuildContext context, ProfitRecordItem item, int index) {
     return SizedBox(
-      height: 90,
+      height: 100,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (index != 0) Divider(color: context.greyColor),
-          SizedBox(height: context.edgeSizeHalf),
+          //if (index != 0) Divider(color: context.greyColor),
+          SizedBox(height: context.edgeSize),
           Text(
-            '总收益 : ${NumberUtil.getFixed(item.balance)}',
+            '${tr('invest:mining_record_lbl_totalprofit')} : ${NumberUtil.getFixed(item.balance, 6)}',
             style: context.textBody(),
           ),
           //SizedBox(height: context.edgeSize),
           SizedBox(height: context.edgeSizeHalf),
           Text(
-            '投票收益 : ${NumberUtil.getFixed(item.vote)}  推广收益 : ${NumberUtil.getFixed(item.extend)}',
+            '${tr('invest:mining_record_lbl_votingprofit')} : ${NumberUtil.getFixed(item.vote, 6)}  ${tr('invest:mining_record_lbl_Promotionprofit')} : ${NumberUtil.getFixed(item.extend, 6)}',
             style: context.textSmall(),
           ),
           SizedBox(height: context.edgeSizeHalf),
-          Text('高度 : ${item.height}  交易时间 : ${item.time}',
+          Text(
+              '${tr('invest:mining_record_lbl_height')} : ${item.height}  ${tr('invest:mining_record_lbl_time')} : ${item.time}',
               style: context.textSmall()),
         ],
       ),

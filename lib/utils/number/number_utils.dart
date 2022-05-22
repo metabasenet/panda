@@ -20,10 +20,10 @@ class NumberUtil {
     return 0;
   }
 
-  //Keep 2 decimal places
-  static String getFixed(String number) {
-    if (number.isNotEmpty) {
-      return double.parse(number).toStringAsFixed(2);
+  //Keep x decimal places
+  static String getFixed(String number, int decimalPlaces) {
+    if (number.isNotEmpty && number != '0') {
+      return double.parse(number).toStringAsFixed(decimalPlaces);
     } else {
       return '0.00';
     }
