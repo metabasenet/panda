@@ -4,6 +4,7 @@ library asset_ui_module;
 import 'dart:async';
 
 // Flutter imports:
+import 'package:decimal/decimal.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 

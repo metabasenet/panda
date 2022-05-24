@@ -23,7 +23,7 @@ class NumberUtil {
   //Keep x decimal places
   static String getFixed(String number, int decimalPlaces) {
     if (number.isNotEmpty && number != '0') {
-      return double.parse(number).toStringAsFixed(decimalPlaces);
+      return Decimal.parse(number).toStringAsFixed(decimalPlaces);
     } else {
       return '0.00';
     }

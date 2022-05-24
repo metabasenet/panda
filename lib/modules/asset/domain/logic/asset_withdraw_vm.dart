@@ -104,10 +104,18 @@ abstract class AssetWithdrawVM
                 params.withdrawData.symbol == 'USDT') {
               ret['token'] = usdtSpecialAddress;
             }
+
+            //Call interface to synchronize data
             InAppWebViewController appWebViewController = TradeHomePage.webView;
             var src =
                 'window.dispatchEvent(new CustomEvent("Transfer",{"detail":${json.encode(ret)}}));';
             appWebViewController.evaluateJavascript(source: src);
+
+            //Refresh Synchronous data
+            // var srcRefresh =
+            //     'window.dispatchEvent(new CustomEvent("Refresh",{"detail":"refresh"}));';
+            // appWebViewController.evaluateJavascript(source: srcRefresh);
+
             return TradeHomePage.completer.future;
           }
         }

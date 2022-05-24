@@ -88,6 +88,12 @@ class _$AssetCoinSerializer implements StructuredSerializer<AssetCoin> {
         ..add(serializers.serialize(object.balanceUnconfirmed,
             specifiedType: const FullType(double)));
     }
+    if (object.locked != null) {
+      result
+        ..add('locked')
+        ..add(serializers.serialize(object.locked,
+            specifiedType: const FullType(double)));
+    }
     if (object.balanceUpdateFailed != null) {
       result
         ..add('balanceUpdateFailed')
@@ -168,6 +174,10 @@ class _$AssetCoinSerializer implements StructuredSerializer<AssetCoin> {
           break;
         case 'balanceUnconfirmed':
           result.balanceUnconfirmed = serializers.deserialize(value,
+              specifiedType: const FullType(double)) as double;
+          break;
+        case 'locked':
+          result.locked = serializers.deserialize(value,
               specifiedType: const FullType(double)) as double;
           break;
         case 'balanceUpdateFailed':
@@ -1563,6 +1573,8 @@ class _$AssetCoin extends AssetCoin {
   @override
   final double balanceUnconfirmed;
   @override
+  final double locked;
+  @override
   final bool balanceUpdateFailed;
   @override
   final bool isEnabled;
@@ -1586,6 +1598,7 @@ class _$AssetCoin extends AssetCoin {
       this.displayPrecision,
       this.balance,
       this.balanceUnconfirmed,
+      this.locked,
       this.balanceUpdateFailed,
       this.isEnabled,
       this.isFixed,
@@ -1614,6 +1627,7 @@ class _$AssetCoin extends AssetCoin {
         displayPrecision == other.displayPrecision &&
         balance == other.balance &&
         balanceUnconfirmed == other.balanceUnconfirmed &&
+        locked == other.locked &&
         balanceUpdateFailed == other.balanceUpdateFailed &&
         isEnabled == other.isEnabled &&
         isFixed == other.isFixed &&
@@ -1636,18 +1650,23 @@ class _$AssetCoin extends AssetCoin {
                                                 $jc(
                                                     $jc(
                                                         $jc(
-                                                            $jc(0,
-                                                                name.hashCode),
-                                                            fullName.hashCode),
-                                                        chain.hashCode),
-                                                    symbol.hashCode),
-                                                address.hashCode),
-                                            iconOnline.hashCode),
-                                        iconLocal.hashCode),
-                                    chainPrecision.hashCode),
-                                displayPrecision.hashCode),
-                            balance.hashCode),
-                        balanceUnconfirmed.hashCode),
+                                                            $jc(
+                                                                $jc(
+                                                                    0,
+                                                                    name
+                                                                        .hashCode),
+                                                                fullName
+                                                                    .hashCode),
+                                                            chain.hashCode),
+                                                        symbol.hashCode),
+                                                    address.hashCode),
+                                                iconOnline.hashCode),
+                                            iconLocal.hashCode),
+                                        chainPrecision.hashCode),
+                                    displayPrecision.hashCode),
+                                balance.hashCode),
+                            balanceUnconfirmed.hashCode),
+                        locked.hashCode),
                     balanceUpdateFailed.hashCode),
                 isEnabled.hashCode),
             isFixed.hashCode),
@@ -1668,6 +1687,7 @@ class _$AssetCoin extends AssetCoin {
           ..add('displayPrecision', displayPrecision)
           ..add('balance', balance)
           ..add('balanceUnconfirmed', balanceUnconfirmed)
+          ..add('locked', locked)
           ..add('balanceUpdateFailed', balanceUpdateFailed)
           ..add('isEnabled', isEnabled)
           ..add('isFixed', isFixed)
@@ -1726,6 +1746,10 @@ class AssetCoinBuilder implements Builder<AssetCoin, AssetCoinBuilder> {
   set balanceUnconfirmed(double balanceUnconfirmed) =>
       _$this._balanceUnconfirmed = balanceUnconfirmed;
 
+  double _locked;
+  double get locked => _$this._locked;
+  set locked(double locked) => _$this._locked = locked;
+
   bool _balanceUpdateFailed;
   bool get balanceUpdateFailed => _$this._balanceUpdateFailed;
   set balanceUpdateFailed(bool balanceUpdateFailed) =>
@@ -1758,6 +1782,7 @@ class AssetCoinBuilder implements Builder<AssetCoin, AssetCoinBuilder> {
       _displayPrecision = _$v.displayPrecision;
       _balance = _$v.balance;
       _balanceUnconfirmed = _$v.balanceUnconfirmed;
+      _locked = _$v.locked;
       _balanceUpdateFailed = _$v.balanceUpdateFailed;
       _isEnabled = _$v.isEnabled;
       _isFixed = _$v.isFixed;
@@ -1795,6 +1820,7 @@ class AssetCoinBuilder implements Builder<AssetCoin, AssetCoinBuilder> {
             displayPrecision: displayPrecision,
             balance: balance,
             balanceUnconfirmed: balanceUnconfirmed,
+            locked: locked,
             balanceUpdateFailed: balanceUpdateFailed,
             isEnabled: isEnabled,
             isFixed: isFixed,

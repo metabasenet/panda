@@ -18,6 +18,7 @@ class AssetBalanceState {
     @required String address,
     @required double balance,
     @required double unconfirmed,
+    @required double locked,
   }) {
     final uniqueId = '$symbol:$address';
     final item = AssetBalanceInfo(
@@ -25,6 +26,7 @@ class AssetBalanceState {
       address: address,
       balance: balance,
       unconfirmed: unconfirmed,
+      locked: locked,
     );
     balances[uniqueId] = item;
   }
@@ -50,6 +52,7 @@ class AssetBalanceCubit extends Cubit<AssetBalanceState> {
     @required String address,
     @required double balance,
     @required double unconfirmed,
+    @required double locked,
   }) async {
     final newState = AssetBalanceState.fromState(state);
     newState.updateBalance(
@@ -57,6 +60,7 @@ class AssetBalanceCubit extends Cubit<AssetBalanceState> {
       address: address,
       balance: balance,
       unconfirmed: unconfirmed,
+      locked: locked,
     );
     emit(newState);
   }
