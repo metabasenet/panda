@@ -2,17 +2,17 @@ part of asset_ui_module;
 
 class AssetBalanceListener extends StatelessWidget {
   const AssetBalanceListener({
-    @required this.item,
-    @required this.builder,
-    Key key,
+    required this.item,
+    required this.builder,
+    Key? key,
   }) : super(key: key);
 
   final AssetCoin item;
   final Widget Function(
     BuildContext context, {
-    String balance,
-    String unconfirmed,
-    AssetBalanceInfo data,
+    String? balance,
+    String? unconfirmed,
+    AssetBalanceInfo? data,
   }) builder;
 
   @override
@@ -32,9 +32,9 @@ class AssetBalanceListener extends StatelessWidget {
 
     return StreamBuilder<AssetBalanceState>(
         initialData: cubit.state,
-        stream: cubit,
+        //stream: cubit,
         builder: (context, balanceInfo) {
-          final data = balanceInfo.data.getBalanceInfo(uniqueId) ??
+          final data = balanceInfo.data?.getBalanceInfo(uniqueId) ??
               AssetBalanceInfo(
                 symbol: item.symbol,
                 address: item.address,

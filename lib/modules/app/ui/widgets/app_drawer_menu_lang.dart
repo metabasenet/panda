@@ -2,8 +2,8 @@ part of app_module;
 
 class AppDrawerMenuLanguage extends HookWidget {
   const AppDrawerMenuLanguage({
-    @required this.onSelected,
-    Key key,
+    required this.onSelected,
+    Key? key,
   }) : super(key: key);
 
   final void Function(String) onSelected;
@@ -24,7 +24,10 @@ class AppDrawerMenuLanguage extends HookWidget {
       },
       title: Text(
         tr('user:menu_language'),
-        style: context.textBody(bold: true),
+        style: context.textBody(
+          bold: true,
+          fontWeight: FontWeight.normal,
+        ),
       ),
       body: Container(
         decoration: BoxDecoration(

@@ -93,7 +93,6 @@ class AssetTransactionPage extends HookWidget {
             color: color,
           ),
           CSContainer(
-            width: null,
             radius: 24.5,
             secondary: true,
             margin: context.edgeVertical,
@@ -114,6 +113,7 @@ class AssetTransactionPage extends HookWidget {
                   style: context.textSmall(
                     color: statusColor,
                     bold: true,
+                    fontWeight: FontWeight.normal,
                   ),
                 ),
               ],
@@ -134,7 +134,10 @@ class AssetTransactionPage extends HookWidget {
               children: [
                 Text(
                   item['title'] ?? '',
-                  style: context.textSecondary(bold: true),
+                  style: context.textSecondary(
+                    bold: true,
+                    fontWeight: FontWeight.normal,
+                  ),
                 ),
                 Spacer(),
                 if (item['canCopy'] == 'true')
@@ -146,8 +149,8 @@ class AssetTransactionPage extends HookWidget {
                     containerSize: 20,
                     margin: EdgeInsets.symmetric(horizontal: 2),
                     onPressed: () {
-                      copied.value = item['value'];
-                      copyTextToClipboard(item['value']);
+                      copied.value = item['value'] ?? '';
+                      copyTextToClipboard(item['value'] ?? '');
                       Toast.show(tr('global:msg_copy_success'));
                     },
                   ),
@@ -159,6 +162,7 @@ class AssetTransactionPage extends HookWidget {
               style: context.textSecondary(
                 bold: true,
                 color: context.bodyColor,
+                fontWeight: FontWeight.normal,
               ),
             ),
           ],
@@ -174,7 +178,7 @@ class AssetTransactionPage extends HookWidget {
       child: StoreConnector<AppState, AssetTransactionVM>(
         distinct: true,
         converter: AssetTransactionVM.fromStore,
-        onInitialBuild: (viewModel) {
+        onInitialBuild: (_, __, viewModel) {
           amountCoinName.value = viewModel.getCoinName(info.chain, info.symbol);
           feeCoinName.value = viewModel.getCoinName(info.chain, info.feeSymbol);
           if (info.isConfirming || info.isExpired) {

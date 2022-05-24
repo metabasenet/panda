@@ -10,7 +10,7 @@ abstract class AdmissionConfig
   static Serializer<AdmissionConfig> get serializer =>
       _$admissionConfigSerializer;
 
-  static AdmissionConfig fromJson(Map<String, dynamic> json) {
+  static AdmissionConfig? fromJson(Map<String, dynamic> json) {
     return deserialize<AdmissionConfig>(json);
   }
 

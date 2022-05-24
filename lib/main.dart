@@ -10,48 +10,41 @@ import 'package:flutter_dabank/flutter_dabank.dart';
 import 'package:flutter_dabank/dabank_window_manager.dart';
 
 // Project imports:
-//import 'app.dart';
-//import 'modules/app/app.dart';
-//import 'routers/navigator.dart';
-//import 'themes/themes.dart';
-//import 'utils/utils.dart';
+import 'app.dart';
+import 'modules/app/app.dart';
+import 'routers/navigator.dart';
+import 'themes/themes.dart';
+import 'utils/utils.dart';
 
 //Store<AppState> store;
 
-import 'package:wallet_sdk_flutter/wallet_sdk_flutter.dart';
-import 'package:flutter_hdkey/request_bytes_builder.dart';
-import 'package:mars/themes/themes.dart';
-import 'package:mars/utils/utils.dart';
-//import 'package:network_flutter/network_flutter.dart';
-import 'package:mars/widgets/widgets.dart';
-
 void main() {
-  //ensureFlutterBindingsInitialized();
-  //ThemeDisplay.setPortraitMode();
-  //ThemeStatusBar.setStatusBarStyle();
+  ensureFlutterBindingsInitialized();
+  ThemeDisplay.setPortraitMode();
+  ThemeStatusBar.setStatusBarStyle();
 
-  //Toast.onParseError = AppErrors.parseErrorMessages;
+  Toast.onParseError = AppErrors.parseErrorMessages;
 
-  //FlutterError.onError = (details) {
-  //  FlutterError.dumpErrorToConsole(details);
-  //};
+  FlutterError.onError = (details) {
+    FlutterError.dumpErrorToConsole(details);
+  };
 
   //store = createStore();
 
-  //NavigateAction.setNavigatorKey(navigatorKey);
+  NavigateAction.setNavigatorKey(navigatorKey);
 
   // Flipper Config
-  //if (kDebugMode) {
-  //  final flipperClient = FlipperClient.getDefault();
-  //  flipperClient.addPlugin(FlipperNetworkPlugin());
-  //  flipperClient.addPlugin(FlipperReduxInspectorPlugin());
-  //  flipperClient.addPlugin(FlipperSharedPreferencesPlugin());
-  //  flipperClient.start();
-  //}
-
+  if (kDebugMode) {
+    final flipperClient = FlipperClient.getDefault();
+    flipperClient.addPlugin(FlipperNetworkPlugin());
+    flipperClient.addPlugin(FlipperReduxInspectorPlugin());
+    flipperClient.addPlugin(FlipperSharedPreferencesPlugin());
+    flipperClient.start();
+  }
+  /*
   // Run App
-  //SentryFlutter.init(
-  //  CrashesReport.getSentryOptions,
-  //  appRunner: () => runApp(MyApp(store)),
-  //);
+  SentryFlutter.init(
+    CrashesReport.getSentryOptions,
+    appRunner: () => runApp(MyApp(store)),
+  );*/
 }

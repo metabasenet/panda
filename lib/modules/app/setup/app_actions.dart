@@ -10,20 +10,21 @@ class AppActionInitApp extends _BaseAction {
   final StreamController<double> progress;
 
   @override
-  Future<AppState> reduce() async {
+  Future<AppState?> reduce() async {
     // Init App Actions
     progress.add(0.1);
 
     // 1- Load State
-    await store.dispatchFuture(CommonActionLoadCache(), notify: false);
+    await store.dispatchAsync(CommonActionLoadCache(), notify: false);
 
     // 2- Load/Update device info in CommonState
-    await store.dispatchFuture(CommonActionLoadDeviceInfo(), notify: false);
+    await store.dispatchAsync(CommonActionLoadDeviceInfo(), notify: false);
 
     // 3- Load Settings
-    await store.dispatchFuture(CommonActionLoadSettings(), notify: false);
+    await store.dispatchAsync(CommonActionLoadSettings(), notify: false);
 
     // 4- Setup API header with app info
+    /*
     Request().setup(
       AppConstants.randomApiUrl,
       headers: {
@@ -32,9 +33,10 @@ class AppActionInitApp extends _BaseAction {
         'app-version': state.commonState.appInfo.version,
         'app-language': state.commonState.languageForApi,
       },
-    );
+    );*/
 
     if (AppConstants.isBeta) {
+      /*
       final settings = await SettingsRepository().getSettings();
       Request().updateHeader('env', 'develop');
       if (settings.hasApiBaseUrl) {
@@ -45,7 +47,7 @@ class AppActionInitApp extends _BaseAction {
       }
       if (settings.hasProxyUrl && Platform.isAndroid) {
         Request().setupProxy(settings.proxyUrl);
-      }
+      }*/
     } else {
       // First get api url from api1
       store.dispatch(CommonActionLoadHost(), notify: false);
@@ -54,7 +56,7 @@ class AppActionInitApp extends _BaseAction {
 
     // 5- Initial Data
     store
-        .dispatchFuture(WalletActionWalletLoadAll(), notify: false)
+        .dispatchAsync(WalletActionWalletLoadAll(), notify: false)
         .whenComplete(() {
       store.dispatch(AppActionLoadWallet(state.walletState.activeWallet));
     });
@@ -81,7 +83,7 @@ class AppActionInitApp extends _BaseAction {
   }
 
   @override
-  Object wrapError(dynamic error) {
+  Object? wrapError(dynamic error) {
     CrashesReport().reportEvent(
       'CommonLog_01_InitApp',
       error,
@@ -99,11 +101,11 @@ class AppActionLoadWallet extends _BaseAction {
   final Wallet wallet;
 
   @override
-  Future<AppState> reduce() async {
+  Future<AppState?> reduce() async {
     // Make sure I set the current wallet
-    await dispatchFuture(WalletActionWalletSetActive(wallet));
+    await dispatchAsync(WalletActionWalletSetActive(wallet));
 
-    await dispatchFuture(AssetActionSyncWalletCoins(wallet));
+    await dispatchAsync(AssetActionSyncWalletCoins(wallet));
     // Action to be perform after we load the wallet
     if (wallet != null) {
       // Update prices
@@ -127,7 +129,7 @@ class AppActionLoadWallet extends _BaseAction {
   }
 
   @override
-  Object wrapError(dynamic error) {
+  Object? wrapError(dynamic error) {
     CrashesReport().reportEvent(
       'WalletLog_03_LoadActiveWallet',
       error,
@@ -142,7 +144,7 @@ class AppActionAfterChangeLanguage extends _BaseAction {
   final String language;
 
   @override
-  AppState reduce() {
+  AppState? reduce() {
     // NOTE: Add Actions that need reload data when change Language
     dispatch(CommunityActionLoadConfig());
     dispatch(HomeActionInit());
@@ -156,7 +158,7 @@ class AppActionAfterChangeFiatCurrency extends _BaseAction {
   final String fiatCurrency;
 
   @override
-  AppState reduce() {
+  AppState? reduce() {
     // NOTE: Add Actions that need reload data when change Fiat Currency
     dispatch(AssetActionUpdatePrices(fiatCurrency));
 
@@ -169,7 +171,7 @@ class AppActionAfterCommonConfig extends _BaseAction {
   final Config config;
 
   @override
-  AppState reduce() {
+  AppState? reduce() {
     // NOTE: Add Actions that need execute after get the main config
     dispatch(AssetActionSyncWalletCoins(state.walletState.activeWallet));
 

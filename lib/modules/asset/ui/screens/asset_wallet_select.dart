@@ -3,7 +3,7 @@ part of asset_ui_module;
 class AssetWalletSelectPage extends StatelessWidget {
   static const routeName = '/asset/wallet/select';
 
-  static Future<Wallet> open() {
+  static Future open() {
     return AppNavigator.push(routeName);
   }
 
@@ -53,8 +53,8 @@ class AssetWalletSelectPage extends StatelessWidget {
 
   Widget buildItem(
     BuildContext context, {
-    Wallet wallet,
-    String activeWalletId,
+    Wallet? wallet,
+    String? activeWalletId,
   }) {
     return CSContainer(
       margin: context.edgeAll.copyWith(bottom: 0),
@@ -64,8 +64,8 @@ class AssetWalletSelectPage extends StatelessWidget {
       child: FormCell(
         autoHeight: true,
         padding: context.edgeVertical8,
-        hideAccess: activeWalletId == wallet.id,
-        cmpRight: activeWalletId == wallet.id
+        hideAccess: activeWalletId == wallet?.id,
+        cmpRight: activeWalletId == wallet?.id
             ? CSButtonIcon(
                 padding: EdgeInsets.only(
                   right: 2,
@@ -81,8 +81,11 @@ class AssetWalletSelectPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              wallet.name,
-              style: context.textBody(bold: true),
+              wallet!.name,
+              style: context.textBody(
+                bold: true,
+                fontWeight: FontWeight.normal,
+              ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
@@ -92,7 +95,10 @@ class AssetWalletSelectPage extends StatelessWidget {
                 'address': wallet.mntAddress,
               }),
               maxLines: 1,
-              style: context.textSmall(),
+              style: context.textSmall(
+                bold: true,
+                fontWeight: FontWeight.normal,
+              ),
             ),
           ],
         ),

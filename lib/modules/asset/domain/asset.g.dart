@@ -573,8 +573,10 @@ class _$AssetAddressVM extends AssetAddressVM {
   @override
   final BuiltList<AssetAddress> addressList;
   @override
-  final Future<int> Function({AssetCoin coin, String requestId, bool isLocal})
-      loadAddressList;
+  final Future<int> Function(
+      {required AssetCoin coin,
+      required String requestId,
+      required bool isLocal}) loadAddressList;
   @override
   final void Function() clearAddressList;
   @override
@@ -584,7 +586,8 @@ class _$AssetAddressVM extends AssetAddressVM {
   final Future<void> Function(AssetCoin coin, AssetAddress address)
       submitAddressDelete;
   @override
-  final Future<bool> Function({String chain, String address}) validateAddress;
+  final Future<bool> Function({required String chain, required String address})
+      validateAddress;
 
   factory _$AssetAddressVM([void Function(AssetAddressVMBuilder)? updates]) =>
       (new AssetAddressVMBuilder()..update(updates))._build();
@@ -653,13 +656,19 @@ class AssetAddressVMBuilder
   set addressList(ListBuilder<AssetAddress>? addressList) =>
       _$this._addressList = addressList;
 
-  Future<int> Function({AssetCoin coin, String requestId, bool isLocal})?
-      _loadAddressList;
-  Future<int> Function({AssetCoin coin, String requestId, bool isLocal})?
-      get loadAddressList => _$this._loadAddressList;
+  Future<int> Function(
+      {required AssetCoin coin,
+      required String requestId,
+      required bool isLocal})? _loadAddressList;
+  Future<int> Function(
+      {required AssetCoin coin,
+      required String requestId,
+      required bool isLocal})? get loadAddressList => _$this._loadAddressList;
   set loadAddressList(
           Future<int> Function(
-                  {AssetCoin coin, String requestId, bool isLocal})?
+                  {required AssetCoin coin,
+                  required String requestId,
+                  required bool isLocal})?
               loadAddressList) =>
       _$this._loadAddressList = loadAddressList;
 
@@ -686,11 +695,13 @@ class AssetAddressVMBuilder
               submitAddressDelete) =>
       _$this._submitAddressDelete = submitAddressDelete;
 
-  Future<bool> Function({String chain, String address})? _validateAddress;
-  Future<bool> Function({String chain, String address})? get validateAddress =>
-      _$this._validateAddress;
+  Future<bool> Function({required String chain, required String address})?
+      _validateAddress;
+  Future<bool> Function({required String chain, required String address})?
+      get validateAddress => _$this._validateAddress;
   set validateAddress(
-          Future<bool> Function({String chain, String address})?
+          Future<bool> Function(
+                  {required String chain, required String address})?
               validateAddress) =>
       _$this._validateAddress = validateAddress;
 
@@ -1306,10 +1317,10 @@ class _$AssetWithdrawVM extends AssetWithdrawVM {
       WithdrawSubmitParams params, WalletPrivateData walletData,
       [Future<bool> Function() onFinalCheck]) submit;
   @override
-  final double Function({@required String chain, @required String symbol})
+  final double Function({required String chain, required String symbol})
       getCoinBalance;
   @override
-  final AssetCoin Function({@required String chain, @required String symbol})
+  final AssetCoin Function({required String chain, required String symbol})
       getCoinInfo;
   @override
   final Future<WalletPrivateData> Function(String password) doUnlockWallet;
@@ -1416,21 +1427,21 @@ class AssetWithdrawVMBuilder
               submit) =>
       _$this._submit = submit;
 
-  double Function({@required String chain, @required String symbol})?
+  double Function({required String chain, required String symbol})?
       _getCoinBalance;
-  double Function({@required String chain, @required String symbol})?
+  double Function({required String chain, required String symbol})?
       get getCoinBalance => _$this._getCoinBalance;
   set getCoinBalance(
-          double Function({@required String chain, @required String symbol})?
+          double Function({required String chain, required String symbol})?
               getCoinBalance) =>
       _$this._getCoinBalance = getCoinBalance;
 
-  AssetCoin Function({@required String chain, @required String symbol})?
+  AssetCoin Function({required String chain, required String symbol})?
       _getCoinInfo;
-  AssetCoin Function({@required String chain, @required String symbol})?
+  AssetCoin Function({required String chain, required String symbol})?
       get getCoinInfo => _$this._getCoinInfo;
   set getCoinInfo(
-          AssetCoin Function({@required String chain, @required String symbol})?
+          AssetCoin Function({required String chain, required String symbol})?
               getCoinInfo) =>
       _$this._getCoinInfo = getCoinInfo;
 

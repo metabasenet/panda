@@ -11,7 +11,7 @@ class TabBarItem {
     this.isVisible = true,
   });
 
-  int index;
+  int? index;
   final Widget screen;
   final String label;
   final String iconDefault;
@@ -33,7 +33,7 @@ class AppMainPage extends HookWidget {
   }
 
   static void openDrawer() {
-    _scaffoldKey.currentState.openDrawer();
+    _scaffoldKey.currentState?.openDrawer();
   }
 
   static void open() {
@@ -108,7 +108,7 @@ class AppMainPage extends HookWidget {
       child: InkWell(
         onTap: isVisible
             ? () {
-                onSelected(item.index);
+                onSelected(item.index ?? 0);
               }
             : null,
         child: AnimatedContainer(
@@ -128,7 +128,11 @@ class AppMainPage extends HookWidget {
                 padding: context.edgeHorizontal5.copyWith(top: 2),
                 child: Text(
                   tr(item.label),
-                  style: context.textSmall(color: color, bold: true),
+                  style: context.textSmall(
+                    color: color,
+                    bold: true,
+                    fontWeight: FontWeight.normal,
+                  ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -154,7 +158,7 @@ class AppMainPage extends HookWidget {
       key: ValueKey(item.iconRive),
       onTap: () {
         Toast.hide();
-        onSelected(item.index);
+        onSelected(item.index ?? 0);
       },
       child: SizedBox(
         width: menuTabItemWidth,
@@ -173,7 +177,11 @@ class AppMainPage extends HookWidget {
               padding: context.edgeHorizontal5,
               child: Text(
                 tr(item.label),
-                style: context.textSmall(color: color, bold: true),
+                style: context.textSmall(
+                  color: color,
+                  bold: true,
+                  fontWeight: FontWeight.normal,
+                ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -242,7 +250,7 @@ class AppMainPage extends HookWidget {
                 bottom: 40,
                 child: AnimatedSwitcher(
                   duration: Duration(milliseconds: 350),
-                  child: status.data // true if is offline
+                  child: status.data ?? false // true if is offline
                       ? Container(
                           height: 40,
                           width: 220,
@@ -256,6 +264,8 @@ class AppMainPage extends HookWidget {
                             tr('global:msg_app_offline'),
                             style: context.textSecondary(
                               color: context.whiteColor,
+                              bold: true,
+                              fontWeight: FontWeight.normal,
                             ),
                           ),
                         )

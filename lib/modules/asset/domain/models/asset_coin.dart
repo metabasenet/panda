@@ -7,7 +7,7 @@ abstract class AssetCoin implements Built<AssetCoin, AssetCoinBuilder> {
   AssetCoin._();
 
   factory AssetCoin.fromJson(Map<String, dynamic> json) {
-    return deserialize<AssetCoin>(json);
+    return deserialize<AssetCoin>(json)!;
   }
 
   static Serializer<AssetCoin> get serializer => _$assetCoinSerializer;
@@ -60,15 +60,15 @@ abstract class AssetCoin implements Built<AssetCoin, AssetCoinBuilder> {
 
   String get id => '$chain:$symbol';
 
-  String get iconUrl => iconOnline == null || iconOnline.startsWith('assets')
+  String get iconUrl => iconOnline.startsWith('assets')
       ? iconOnline
       : AppConfig().getImageUrlFor(iconOnline);
 
   String get displayBalance => NumberUtil.truncateDecimal<String>(balance);
 
-  String get displayName => name ?? symbol;
+  String get displayName => name;
 
-  String get displayFullName => fullName ?? '';
+  String get displayFullName => fullName;
 
   /// Display the given amount using this Coin displayPrecision
   String displayAmountWithPrecision(dynamic amount) =>

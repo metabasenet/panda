@@ -2,17 +2,17 @@ part of asset_ui_module;
 
 class AssetCoinBox extends StatelessWidget {
   const AssetCoinBox({
-    @required this.title,
-    @required this.coinInfo,
+    required this.title,
+    required this.coinInfo,
     this.titleAction,
     this.onPress,
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   final String title;
-  final Widget titleAction;
+  final Widget? titleAction;
   final AssetCoin coinInfo;
-  final void Function() onPress;
+  final void Function()? onPress;
 
   @override
   Widget build(BuildContext context) {
@@ -39,13 +39,19 @@ class AssetCoinBox extends StatelessWidget {
             SizedBox(width: 10),
             Text(
               coinInfo?.name ?? '',
-              style: context.textBody(bold: true),
+              style: context.textBody(
+                bold: true,
+                fontWeight: FontWeight.normal,
+              ),
             ),
             SizedBox(width: 10),
             if (coinInfo?.fullName != null)
               Text(
                 coinInfo.fullName,
-                style: context.textSecondary(),
+                style: context.textSecondary(
+                  bold: true,
+                  fontWeight: FontWeight.normal,
+                ),
               ),
             Spacer(),
             if (coinInfo != null && onPress != null)

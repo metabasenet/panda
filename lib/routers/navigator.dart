@@ -90,7 +90,7 @@ class AppNavigator {
 
   static Future<T?> push<T>(
     String routeName, {
-    required Object params,
+    Object? params,
     bool replace = false,
   }) {
     if (replace == true) {

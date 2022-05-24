@@ -26,11 +26,10 @@ abstract class AssetTransactionVM
     return AssetTransactionVM((viewModel) => viewModel
       ..getCoinName = (chain, symbol) {
         return VMWithWalletGetCoinInfoImplement.getCoinInfo(
-              store,
-              chain: chain,
-              symbol: symbol,
-            )?.name ??
-            symbol;
+          store,
+          chain: chain,
+          symbol: symbol,
+        ).name;
       }
       ..getSingleTransaction = (transaction) {
         final completer = Completer<Transaction>();
@@ -41,7 +40,7 @@ abstract class AssetTransactionVM
           symbol: transaction.symbol,
         );
 
-        store.dispatchFuture(
+        store.dispatchAsync(
           AssetActionGetSingleTransaction(
             txId: transaction.txId,
             chain: transaction.chain,

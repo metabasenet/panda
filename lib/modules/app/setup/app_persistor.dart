@@ -4,10 +4,10 @@ class AppStatePersistor extends Persistor<AppState> {
   AppStatePersistor(String dbName) {
     persist = LocalPersist(dbName);
   }
-  LocalPersist persist;
+  late LocalPersist persist;
 
   @override
-  Future<AppState> readState() async {
+  Future<AppState?> readState() async {
     // final dbFile = await persist.file();
     final state = await persist.load();
     if (state == null || state.isEmpty) {
@@ -38,27 +38,27 @@ class AppStatePersistor extends Persistor<AppState> {
   }
 
   @override
-  Future<void> deleteState() async {
+  Future<bool> deleteState() async {
     return persist.delete();
   }
 
   @override
   Future<void> persistDifference({
-    AppState lastPersistedState,
-    AppState newState,
+    AppState? lastPersistedState,
+    AppState? newState,
   }) async {
     if (lastPersistedState == null || newState == null) {
       return;
     }
     try {
-      return saveInitialState(newState);
+      saveInitialState(newState);
     } catch (error) {
       return;
     }
   }
 
   @override
-  Future<void> saveInitialState(AppState state) async {
+  Future<File> saveInitialState(AppState state) async {
     return persist.save([
       state.homeState.toCache(),
       state.assetState.toCache(),

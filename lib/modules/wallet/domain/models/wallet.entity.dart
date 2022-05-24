@@ -41,12 +41,12 @@ enum WalletType {
 @HiveType(typeId: kHiveTypeWallet)
 class Wallet extends HiveObject {
   Wallet({
-    @required this.id,
-    @required this.type,
-    @required this.name,
-    @required this.addresses,
-    @required this.hasBackup,
-    @required this.coins,
+    required this.id,
+    required this.type,
+    required this.name,
+    required this.addresses,
+    required this.hasBackup,
+    required this.coins,
   }) {
     balances = [];
     createdAt = DateTime.now();

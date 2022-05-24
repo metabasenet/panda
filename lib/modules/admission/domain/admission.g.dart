@@ -30,11 +30,6 @@ class _$AdmissionInfoSerializer implements StructuredSerializer<AdmissionInfo> {
       'describe',
       serializers.serialize(object.describe,
           specifiedType: const FullType(String)),
-      'end_time',
-      serializers.serialize(object.endTime, specifiedType: const FullType(int)),
-      'start_time',
-      serializers.serialize(object.startTime,
-          specifiedType: const FullType(int)),
       'condition',
       serializers.serialize(object.condition,
           specifiedType: const FullType(
@@ -44,7 +39,19 @@ class _$AdmissionInfoSerializer implements StructuredSerializer<AdmissionInfo> {
           specifiedType: const FullType(BuiltMap,
               const [const FullType(String), const FullType(String)])),
     ];
-
+    Object? value;
+    value = object.endTime;
+    if (value != null) {
+      result
+        ..add('end_time')
+        ..add(serializers.serialize(value, specifiedType: const FullType(int)));
+    }
+    value = object.startTime;
+    if (value != null) {
+      result
+        ..add('start_time')
+        ..add(serializers.serialize(value, specifiedType: const FullType(int)));
+    }
     return result;
   }
 
@@ -74,11 +81,11 @@ class _$AdmissionInfoSerializer implements StructuredSerializer<AdmissionInfo> {
           break;
         case 'end_time':
           result.endTime = serializers.deserialize(value,
-              specifiedType: const FullType(int))! as int;
+              specifiedType: const FullType(int)) as int?;
           break;
         case 'start_time':
           result.startTime = serializers.deserialize(value,
-              specifiedType: const FullType(int))! as int;
+              specifiedType: const FullType(int)) as int?;
           break;
         case 'condition':
           result.condition.replace(serializers.deserialize(value,
@@ -251,19 +258,20 @@ class _$AdmissionCreateVM extends AdmissionCreateVM {
       [Future<bool> Function() onConfirmSubmit]) submit;
   @override
   final Future<void> Function(
-      {AssetCoin coinInfo,
-      String toAddress,
-      String txData,
-      String amount,
-      Future<WalletPrivateData> Function() onUnlockWallet,
-      void Function(String txId) onSuccessTransaction,
-      Future<bool> Function(WalletWithdrawData withdrawData) onConfirmParams,
-      Future<bool> Function() onConfirmSubmit}) doSubmitAdmission;
+      {required AssetCoin coinInfo,
+      required String toAddress,
+      required String txData,
+      required String amount,
+      required Future<WalletPrivateData> Function() onUnlockWallet,
+      required void Function(String txId) onSuccessTransaction,
+      required Future<bool> Function(WalletWithdrawData withdrawData)
+          onConfirmParams,
+      Future<bool> Function()? onConfirmSubmit}) doSubmitAdmission;
   @override
-  final double Function({@required String chain, @required String symbol})
+  final double Function({required String chain, required String symbol})
       getCoinBalance;
   @override
-  final AssetCoin Function({@required String chain, @required String symbol})
+  final AssetCoin Function({required String chain, required String symbol})
       getCoinInfo;
   @override
   final AssetCoin Function(String fork) getCoinInfoByFork;
@@ -370,53 +378,56 @@ class AdmissionCreateVMBuilder
       _$this._submit = submit;
 
   Future<void> Function(
-      {AssetCoin coinInfo,
-      String toAddress,
-      String txData,
-      String amount,
-      Future<WalletPrivateData> Function() onUnlockWallet,
-      void Function(String txId) onSuccessTransaction,
-      Future<bool> Function(WalletWithdrawData withdrawData) onConfirmParams,
-      Future<bool> Function() onConfirmSubmit})? _doSubmitAdmission;
+      {required AssetCoin coinInfo,
+      required String toAddress,
+      required String txData,
+      required String amount,
+      required Future<WalletPrivateData> Function() onUnlockWallet,
+      required void Function(String txId) onSuccessTransaction,
+      required Future<bool> Function(WalletWithdrawData withdrawData)
+          onConfirmParams,
+      Future<bool> Function()? onConfirmSubmit})? _doSubmitAdmission;
   Future<void> Function(
-      {AssetCoin coinInfo,
-      String toAddress,
-      String txData,
-      String amount,
-      Future<WalletPrivateData> Function() onUnlockWallet,
-      void Function(String txId) onSuccessTransaction,
-      Future<bool> Function(WalletWithdrawData withdrawData) onConfirmParams,
-      Future<bool> Function()
-          onConfirmSubmit})? get doSubmitAdmission => _$this._doSubmitAdmission;
+          {required AssetCoin coinInfo,
+          required String toAddress,
+          required String txData,
+          required String amount,
+          required Future<WalletPrivateData> Function() onUnlockWallet,
+          required void Function(String txId) onSuccessTransaction,
+          required Future<bool> Function(WalletWithdrawData withdrawData)
+              onConfirmParams,
+          Future<bool> Function()? onConfirmSubmit})?
+      get doSubmitAdmission => _$this._doSubmitAdmission;
   set doSubmitAdmission(
           Future<void> Function(
-                  {AssetCoin coinInfo,
-                  String toAddress,
-                  String txData,
-                  String amount,
-                  Future<WalletPrivateData> Function() onUnlockWallet,
-                  void Function(String txId) onSuccessTransaction,
-                  Future<bool> Function(WalletWithdrawData withdrawData)
+                  {required AssetCoin coinInfo,
+                  required String toAddress,
+                  required String txData,
+                  required String amount,
+                  required Future<WalletPrivateData> Function() onUnlockWallet,
+                  required void Function(String txId) onSuccessTransaction,
+                  required Future<bool> Function(
+                          WalletWithdrawData withdrawData)
                       onConfirmParams,
-                  Future<bool> Function() onConfirmSubmit})?
+                  Future<bool> Function()? onConfirmSubmit})?
               doSubmitAdmission) =>
       _$this._doSubmitAdmission = doSubmitAdmission;
 
-  double Function({@required String chain, @required String symbol})?
+  double Function({required String chain, required String symbol})?
       _getCoinBalance;
-  double Function({@required String chain, @required String symbol})?
+  double Function({required String chain, required String symbol})?
       get getCoinBalance => _$this._getCoinBalance;
   set getCoinBalance(
-          double Function({@required String chain, @required String symbol})?
+          double Function({required String chain, required String symbol})?
               getCoinBalance) =>
       _$this._getCoinBalance = getCoinBalance;
 
-  AssetCoin Function({@required String chain, @required String symbol})?
+  AssetCoin Function({required String chain, required String symbol})?
       _getCoinInfo;
-  AssetCoin Function({@required String chain, @required String symbol})?
+  AssetCoin Function({required String chain, required String symbol})?
       get getCoinInfo => _$this._getCoinInfo;
   set getCoinInfo(
-          AssetCoin Function({@required String chain, @required String symbol})?
+          AssetCoin Function({required String chain, required String symbol})?
               getCoinInfo) =>
       _$this._getCoinInfo = getCoinInfo;
 
@@ -498,9 +509,9 @@ class _$AdmissionInfo extends AdmissionInfo {
   @override
   final String describe;
   @override
-  final int endTime;
+  final int? endTime;
   @override
-  final int startTime;
+  final int? startTime;
   @override
   final BuiltList<AdmissionCondition> condition;
   @override
@@ -513,8 +524,8 @@ class _$AdmissionInfo extends AdmissionInfo {
       {required this.id,
       required this.name,
       required this.describe,
-      required this.endTime,
-      required this.startTime,
+      this.endTime,
+      this.startTime,
       required this.condition,
       required this.ecological})
       : super._() {
@@ -522,9 +533,6 @@ class _$AdmissionInfo extends AdmissionInfo {
     BuiltValueNullFieldError.checkNotNull(name, 'AdmissionInfo', 'name');
     BuiltValueNullFieldError.checkNotNull(
         describe, 'AdmissionInfo', 'describe');
-    BuiltValueNullFieldError.checkNotNull(endTime, 'AdmissionInfo', 'endTime');
-    BuiltValueNullFieldError.checkNotNull(
-        startTime, 'AdmissionInfo', 'startTime');
     BuiltValueNullFieldError.checkNotNull(
         condition, 'AdmissionInfo', 'condition');
     BuiltValueNullFieldError.checkNotNull(
@@ -657,10 +665,8 @@ class AdmissionInfoBuilder
                   name, 'AdmissionInfo', 'name'),
               describe: BuiltValueNullFieldError.checkNotNull(
                   describe, 'AdmissionInfo', 'describe'),
-              endTime: BuiltValueNullFieldError.checkNotNull(
-                  endTime, 'AdmissionInfo', 'endTime'),
-              startTime: BuiltValueNullFieldError.checkNotNull(
-                  startTime, 'AdmissionInfo', 'startTime'),
+              endTime: endTime,
+              startTime: startTime,
               condition: condition.build(),
               ecological: ecological.build());
     } catch (_) {
@@ -975,9 +981,9 @@ class AdmissionConditionBuilder
 
 class _$AdmissionState extends AdmissionState {
   @override
-  final AdmissionConfig config;
+  final AdmissionConfig? config;
   @override
-  final int configState;
+  final int? configState;
   @override
   final BuiltList<AdmissionInfo> admissionList;
 
@@ -985,13 +991,8 @@ class _$AdmissionState extends AdmissionState {
       (new AdmissionStateBuilder()..update(updates))._build();
 
   _$AdmissionState._(
-      {required this.config,
-      required this.configState,
-      required this.admissionList})
+      {this.config, this.configState, required this.admissionList})
       : super._() {
-    BuiltValueNullFieldError.checkNotNull(config, 'AdmissionState', 'config');
-    BuiltValueNullFieldError.checkNotNull(
-        configState, 'AdmissionState', 'configState');
     BuiltValueNullFieldError.checkNotNull(
         admissionList, 'AdmissionState', 'admissionList');
   }
@@ -1053,7 +1054,7 @@ class AdmissionStateBuilder
   AdmissionStateBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _config = $v.config.toBuilder();
+      _config = $v.config?.toBuilder();
       _configState = $v.configState;
       _admissionList = $v.admissionList.toBuilder();
       _$v = null;
@@ -1080,15 +1081,14 @@ class AdmissionStateBuilder
     try {
       _$result = _$v ??
           new _$AdmissionState._(
-              config: config.build(),
-              configState: BuiltValueNullFieldError.checkNotNull(
-                  configState, 'AdmissionState', 'configState'),
+              config: _config?.build(),
+              configState: configState,
               admissionList: admissionList.build());
     } catch (_) {
       late String _$failedField;
       try {
         _$failedField = 'config';
-        config.build();
+        _config?.build();
 
         _$failedField = 'admissionList';
         admissionList.build();

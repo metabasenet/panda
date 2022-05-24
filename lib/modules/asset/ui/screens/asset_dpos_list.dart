@@ -3,7 +3,7 @@ part of asset_ui_module;
 class AssetDposList extends StatefulWidget {
   const AssetDposList(
     this.coinInfo, {
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   final AssetCoin coinInfo;
@@ -14,7 +14,7 @@ class AssetDposList extends StatefulWidget {
     AppNavigator.push(routeName, params: item);
   }
 
-  static Route<dynamic> route(RouteSettings settings, [AssetCoin item]) {
+  static Route<dynamic> route(RouteSettings settings, [AssetCoin? item]) {
     return DefaultTransition(
       settings,
       AssetDposList(item ?? settings.arguments as AssetCoin),
@@ -64,13 +64,16 @@ class _AssetDposList extends State<AssetDposList> {
                 'name': widget.coinInfo.name,
                 'fullName': widget.coinInfo.fullName,
               }),
-              style: context.textSecondary(),
+              style: context.textSecondary(
+                bold: true,
+                fontWeight: FontWeight.normal,
+              ),
             ),
             SizedBox(height: 10),
             AssetBalanceListener(
               item: widget.coinInfo,
               builder: (context, {balance, unconfirmed, data}) => PriceText(
-                balance,
+                balance ?? '',
                 '',
                 TextSize.big,
               ),
@@ -88,7 +91,7 @@ class _AssetDposList extends State<AssetDposList> {
                   }) =>
                       AssetPriceListener(
                     symbol: widget.coinInfo.symbol,
-                    amount: double.tryParse(balance) ?? 0,
+                    amount: double.tryParse(balance ?? '0') ?? 0,
                     builder: (context, price, fiatCurrency, _) => Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -98,7 +101,10 @@ class _AssetDposList extends State<AssetDposList> {
                               'asset:detail_lbl_valuation',
                               namedArgs: {'symbol': fiatCurrency},
                             ),
-                            style: context.textSecondary(),
+                            style: context.textSecondary(
+                              bold: true,
+                              fontWeight: FontWeight.normal,
+                            ),
                           ),
                           SizedBox(height: 10),
                           PriceText(
@@ -121,7 +127,7 @@ class _AssetDposList extends State<AssetDposList> {
                       unconfirmed,
                       data,
                     }) =>
-                        data.unconfirmed > 0
+                        data?.unconfirmed != 0
                             ? Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -129,7 +135,10 @@ class _AssetDposList extends State<AssetDposList> {
                                     CSButton(
                                       flat: true,
                                       label: tr('asset:detail_lbl_unconfirmed'),
-                                      textStyle: context.textSecondary(),
+                                      textStyle: context.textSecondary(
+                                        bold: true,
+                                        fontWeight: FontWeight.normal,
+                                      ),
                                       alignment: MainAxisAlignment.start,
                                       cmpRight: Padding(
                                         padding: context.edgeLeft5,
@@ -150,7 +159,7 @@ class _AssetDposList extends State<AssetDposList> {
                                     ),
                                     SizedBox(height: 10),
                                     PriceText(
-                                      unconfirmed,
+                                      unconfirmed ?? '0',
                                       '',
                                       TextSize.medium,
                                     ),
@@ -173,18 +182,23 @@ class _AssetDposList extends State<AssetDposList> {
       padding: context.edgeBottom5.copyWith(left: 4),
       child: Text(
         tr('asset:dpos_node_infor'),
-        style: context.textMedium(bold: true),
+        style: context.textMedium(
+          bold: true,
+          fontWeight: FontWeight.normal,
+        ),
       ),
     );
   }
 
   @override
   void initState() {
+    /*
     AssetRepository().getVoteNode().then((res) => {
           setState(() {
             voteNodeList = res;
           }),
         });
+        */
   }
 
   @override
@@ -200,29 +214,34 @@ class _AssetDposList extends State<AssetDposList> {
       child: StoreConnector<AppState, AssetDetailVM>(
         distinct: true,
         converter: AssetDetailVM.fromStore,
-        onInitialBuild: (viewModel) {
+        onInitialBuild: (_, __, viewModel) {
           checkIfWalletHasBackup(context, viewModel);
 //          request.add(CSListViewParams.withParams(_GetAssetListParams()));
         },
-        builder: (context, viewModel) => Column(children: [
-          Expanded(
+        builder: (context, viewModel) => Column(
+          children: [
+            Expanded(
               child: CSListViewStream<_GetAssetListParams>(
-            margin: context.edgeHorizontal,
-            padding: context.edgeAll,
-            decoration: context.boxDecorationOnlyTop(),
-            slivers: [
-              SliverToBoxAdapter(child: buildHeader(context)),
-            ],
-            itemHeader: buildTransactionTitle(context),
-            itemCount: voteNodeList.length,
-            itemBuilder: (context, index) => TransDropItem(
-                item: voteNodeList[index],
-                coinInfo: widget.coinInfo,
-                onChanged: onChanged),
-            emptyLabel: tr('asset:detail_msg_empty'),
-            emptyImageUrl: 'assets/images/empty_record.png',
-          ))
-        ]),
+                margin: context.edgeHorizontal,
+                padding: context.edgeAll,
+                decoration: context.boxDecorationOnlyTop(),
+                slivers: [
+                  SliverToBoxAdapter(child: buildHeader(context)),
+                ],
+                itemHeader: buildTransactionTitle(context),
+                itemCount: voteNodeList.length,
+                itemBuilder: (context, index) => TransDropItem(
+                    item: voteNodeList[index],
+                    coinInfo: widget.coinInfo,
+                    onChanged: onChanged),
+                emptyLabel: tr('asset:detail_msg_empty'),
+                emptyImageUrl: 'assets/images/empty_record.png',
+                requestStream: null,
+                onLoadData: (_) => Future<int>.value(0),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

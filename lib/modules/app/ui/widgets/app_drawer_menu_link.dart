@@ -2,9 +2,9 @@ part of app_module;
 
 class AppDrawerMenuLink extends StatelessWidget {
   const AppDrawerMenuLink({
-    @required this.label,
-    @required this.url,
-    Key key,
+    required this.label,
+    required this.url,
+    Key? key,
   }) : super(key: key);
 
   final String label;
@@ -26,7 +26,10 @@ class AppDrawerMenuLink extends StatelessWidget {
             child: Text(
               label,
               maxLines: 1,
-              style: context.textBody(bold: true),
+              style: context.textBody(
+                bold: true,
+                fontWeight: FontWeight.normal,
+              ),
             ),
           ),
           Icon(

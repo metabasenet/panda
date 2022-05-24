@@ -7,12 +7,12 @@ class AssetAddressListPage extends HookWidget {
     this.selectAddress,
   });
 
-  final AssetCoin coinInfo;
-  final String selectAddress;
+  final AssetCoin? coinInfo;
+  final String? selectAddress;
 
   static const routeName = '/asset/address/list';
 
-  static Future<String> open(AssetCoin coinInfo, String selectAddress) {
+  static Future<String?> open(AssetCoin coinInfo, String selectAddress) {
     return AppNavigator.push<String>(routeName, params: {
       'coinInfo': coinInfo,
       'selectAddress': selectAddress,
@@ -34,7 +34,7 @@ class AssetAddressListPage extends HookWidget {
   void showAddressManageDialog(
     BuildContext context,
     AssetAddressVM viewModel, {
-    AssetAddress item,
+    AssetAddress? item,
   }) {
     final options = [
       CSOptionsItem(
@@ -52,14 +52,14 @@ class AssetAddressListPage extends HookWidget {
       options: options,
       onSelected: (value) {
         if (value == 'edit') {
-          AssetAddressAddPage.open(coinInfo, item);
+          AssetAddressAddPage.open(coinInfo!, item);
         } else if (value == 'delete') {
           showConfirmDialog(
             context,
             content: tr('asset:address_delete_dialog_content'),
             onConfirm: () {
               LoadingDialog.show(context);
-              viewModel.submitAddressDelete(coinInfo, item).then((_) {
+              viewModel.submitAddressDelete(coinInfo!, item!).then((_) {
                 Toast.show(tr('asset:address_delete_msg_success'));
                 LoadingDialog.dismiss(context);
               }).catchError((e) {
@@ -94,7 +94,7 @@ class AssetAddressListPage extends HookWidget {
       child: StoreConnector<AppState, AssetAddressVM>(
         distinct: true,
         converter: AssetAddressVM.fromStore,
-        onInitialBuild: (viewModel) {
+        onInitialBuild: (_, __, viewModel) {
           viewModel.clearAddressList();
           request.add(CSListViewParams.withParams(true, delay: 0));
         },
@@ -135,9 +135,9 @@ class AssetAddressListPage extends HookWidget {
                 requestStream: request,
                 onLoadData: (params) {
                   return viewModel.loadAddressList(
-                    coin: coinInfo,
+                    coin: coinInfo!,
                     requestId: params.requestId ?? '',
-                    isLocal: params.params,
+                    isLocal: params.params!,
                   );
                 },
                 itemCount: viewModel.addressList.length,
@@ -153,7 +153,7 @@ class AssetAddressListPage extends HookWidget {
                   label: tr('asset:address_btn_add'),
                   margin: context.edgeVertical,
                   onPressed: () {
-                    AssetAddressAddPage.open(coinInfo);
+                    AssetAddressAddPage.open(coinInfo!);
                   },
                 ),
               ),
@@ -178,15 +178,16 @@ class AssetAddressListPage extends HookWidget {
       child: Container(
         padding: context.edgeAll8.copyWith(left: 13, right: 13),
         decoration: context.boxDecoration(
-            radius: 8,
-            color: selectIndex == index
-                ? context.primaryColor
-                : context.whiteColor),
+          radius: 8,
+          color:
+              selectIndex == index ? context.primaryColor : context.whiteColor,
+        ),
         child: Text(
           label,
           style: context.textSecondary(
             bold: true,
             color: context.bodyColor,
+            fontWeight: FontWeight.normal,
           ),
         ),
       ),
@@ -230,8 +231,11 @@ class AssetAddressListPage extends HookWidget {
                       ),
                     Expanded(
                       child: Text(
-                        item.comments ?? '',
-                        style: context.textBody(bold: true),
+                        item.comments,
+                        style: context.textBody(
+                          bold: true,
+                          fontWeight: FontWeight.normal,
+                        ),
                       ),
                     ),
                   ],
@@ -246,14 +250,20 @@ class AssetAddressListPage extends HookWidget {
                       ),
                       padding: context.edgeAll5,
                       child: Text(
-                        coinInfo.fullName,
+                        coinInfo!.fullName,
                         style: context.textSmall(
                           color: Color(0xFF94820d),
+                          bold: true,
+                          fontWeight: FontWeight.normal,
                         ),
                       ),
                     ),
                     SizedBox(width: context.edgeSizeHalf),
-                    Text(addressStr ?? '', style: context.textSmall()),
+                    Text(addressStr,
+                        style: context.textSmall(
+                          bold: true,
+                          fontWeight: FontWeight.normal,
+                        )),
                   ],
                 ),
               ],

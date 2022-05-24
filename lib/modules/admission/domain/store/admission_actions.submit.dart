@@ -2,14 +2,14 @@ part of admission_domain_module;
 
 class AdmissionActionCreateSubmit extends _BaseAction {
   AdmissionActionCreateSubmit({
-    @required this.coinInfo,
-    @required this.toAddress,
-    @required this.txData,
-    @required this.amount,
-    @required this.onUnlockWallet,
-    @required this.onSuccessTransaction,
-    @required this.onConfirmParams,
-    @required this.onConfirmSubmit,
+    required this.coinInfo,
+    required this.toAddress,
+    required this.txData,
+    required this.amount,
+    required this.onUnlockWallet,
+    required this.onSuccessTransaction,
+    required this.onConfirmParams,
+    required this.onConfirmSubmit,
   });
 
   final AssetCoin coinInfo;
@@ -22,7 +22,7 @@ class AdmissionActionCreateSubmit extends _BaseAction {
   final Future<bool> Function() onConfirmSubmit;
 
   @override
-  Future<AppState> reduce() async {
+  Future<AppState?> reduce() async {
     final walletData = await onUnlockWallet();
     if (walletData == null) {
       return null;

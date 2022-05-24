@@ -2,9 +2,9 @@ part of admission_ui_module;
 
 class AdmissionLatest extends StatelessWidget {
   const AdmissionLatest({
-    @required this.list,
-    @required this.hasWallet,
-    Key key,
+    required this.list,
+    required this.hasWallet,
+    Key? key,
   }) : super(key: key);
   final List<AdmissionInfo> list;
   final bool hasWallet;
@@ -50,8 +50,11 @@ class AdmissionLatest extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            item.name ?? '',
-            style: context.textMedium(bold: true),
+            item.name,
+            style: context.textMedium(
+              bold: true,
+              fontWeight: FontWeight.normal,
+            ),
           ),
           SizedBox(height: 20),
           CSHorizontalProgress(
@@ -67,13 +70,19 @@ class AdmissionLatest extends StatelessWidget {
               Text(
                 progressLeftLbl,
                 style: context.textSmall(
+                  bold: true,
+                  fontWeight: FontWeight.normal,
                   color: item.isRunning
                       ? context.greenColor
                       : context.secondaryColor,
                 ),
               ),
               Spacer(),
-              Text(progressRightLbl, style: context.textSmall()),
+              Text(progressRightLbl,
+                  style: context.textSmall(
+                    bold: true,
+                    fontWeight: FontWeight.normal,
+                  )),
             ],
           ),
           SizedBox(height: 20),
@@ -109,6 +118,8 @@ class AdmissionLatest extends StatelessWidget {
                         ? tr('admission:list_item_status_success')
                         : tr('admission:list_item_status_failed'),
                     style: context.textSmall(
+                      bold: true,
+                      fontWeight: FontWeight.normal,
                       color: isSuccess
                           ? context.greenColor
                           : context.secondaryColor,
@@ -125,7 +136,11 @@ class AdmissionLatest extends StatelessWidget {
             )
           else
             Center(
-              child: Text(timeLbl, style: context.textSmall()),
+              child: Text(timeLbl,
+                  style: context.textSmall(
+                    bold: true,
+                    fontWeight: FontWeight.normal,
+                  )),
             ),
         ],
       ),
@@ -134,7 +149,7 @@ class AdmissionLatest extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (list == null || list.isEmpty) {
+    if (list.isEmpty) {
       return SizedBox();
     }
 

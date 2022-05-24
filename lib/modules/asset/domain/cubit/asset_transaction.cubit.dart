@@ -1,12 +1,12 @@
 part of asset_domain_module;
 
 class AssetTransactionCubit extends AssetDetailCubit {
-  AssetTransactionCubit([AssetRepository assetRepository])
+  AssetTransactionCubit([AssetRepository? assetRepository])
       : super(assetRepository) {
     _assetRepository = assetRepository ?? AssetRepository();
   }
 
-  AssetRepository _assetRepository;
+  late AssetRepository _assetRepository;
 
   void updateList(List<Transaction> list) {
     emit(list);
@@ -14,11 +14,11 @@ class AssetTransactionCubit extends AssetDetailCubit {
 
   @override
   Future<int> loadAll({
-    @required AssetCoin coin,
-    @required bool isRefresh,
-    @required int page,
-    @required int skip,
-    @required bool onlyCache,
+    required AssetCoin coin,
+    required bool isRefresh,
+    required int page,
+    required int skip,
+    required bool onlyCache,
   }) async {
     final allTransactions = await _assetRepository.getTransactionsFromCache(
       symbol: coin.symbol,

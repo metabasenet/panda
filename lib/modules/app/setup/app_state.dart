@@ -28,13 +28,13 @@ abstract class AppState implements Built<AppState, AppStateBuilder> {
       );
 
   factory AppState.fromCache({
-    HomeState homeState,
-    TradeState tradeState,
-    NoticeState noticeState,
-    AssetState assetState,
-    WalletState walletState,
-    CommunityState communityState,
-    ProjectState projectState,
+    HomeState? homeState,
+    TradeState? tradeState,
+    NoticeState? noticeState,
+    AssetState? assetState,
+    WalletState? walletState,
+    CommunityState? communityState,
+    ProjectState? projectState,
   }) =>
       AppState(
         (a) => a

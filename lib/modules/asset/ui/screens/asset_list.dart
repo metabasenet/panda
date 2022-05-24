@@ -33,6 +33,8 @@ class AssetListPage extends StatelessWidget {
                 tr('asset:list_lbl_updating'),
                 style: context.textSecondary(
                   color: context.whiteColor,
+                  bold: true,
+                  fontWeight: FontWeight.normal,
                 ),
               ),
             ],
@@ -63,7 +65,10 @@ class AssetListPage extends StatelessWidget {
               children: [
                 Text(
                   tr('asset:list_lbl_valuation'),
-                  style: context.textBody(bold: true),
+                  style: context.textBody(
+                    bold: true,
+                    fontWeight: FontWeight.normal,
+                  ),
                 ),
                 SizedBox(height: context.edgeSize),
                 PriceText(
@@ -105,7 +110,7 @@ class AssetListPage extends StatelessWidget {
         onPressed: () {
           AssetWalletSelectPage.open().then((wallet) {
             if (wallet != null) {
-              viewModel.doSwitchWallet(wallet);
+              viewModel.doSwitchWallet(wallet as Wallet);
               // _ignoreIndexChange = true;
               // final index = viewModel.wallets.indexOf(wallet);
               // swiperController.move(index, animation: false).
@@ -217,11 +222,14 @@ class AssetListPage extends StatelessWidget {
       hideLeading: true,
       titleCenter: false,
       title: tr('asset:list_title'),
-      titleStyle: context.textHuge(fontWeight: FontWeight.w700),
+      titleStyle: context.textHuge(
+        fontWeight: FontWeight.w700,
+        bold: true,
+      ),
       child: StoreConnector<AppState, AssetListVM>(
         distinct: true,
         converter: AssetListVM.fromStore,
-        onInitialBuild: (viewModel) {
+        onInitialBuild: (_, __, viewModel) {
           // _ignoreIndexChange = true;
           // swiperController
           //     .move(viewModel.wallets.indexOf(viewModel.activeWallet),

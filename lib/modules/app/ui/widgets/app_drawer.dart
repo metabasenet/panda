@@ -59,6 +59,7 @@ class AppDrawer extends StatelessWidget {
                 label: tr('user:menu_version'),
                 hasNew: viewModel.hasNewVersion,
                 version: AppConstants.appVersion,
+                onPressed: () {},
               ),
               AppDrawerMenuLanguage(
                 onSelected: (language) {
@@ -144,7 +145,11 @@ class AppDrawer extends StatelessWidget {
                 padding: context.edgeAll.copyWith(top: 0),
                 child: Text(
                   tr('user:drawer_copyright'),
-                  style: context.textTiny(color: context.labelColor),
+                  style: context.textTiny(
+                    color: context.labelColor,
+                    bold: true,
+                    fontWeight: FontWeight.normal,
+                  ),
                 ),
               ),
             ],

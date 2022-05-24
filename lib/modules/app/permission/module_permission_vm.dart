@@ -58,29 +58,29 @@ abstract class ModulePermissionVM
           // 通用 config 判断 ，功能关闭 也是刷新 config 获取最新的配置
           if (permission == ModulePermissionState.needConfig ||
               permission == ModulePermissionState.disable) {
-            await store.dispatchFuture(CommonActionLoadConfig());
+            await store.dispatch(CommonActionLoadConfig());
           }
 
           // 特定页面 参数判断
           if (moduleName == ModuleName.trade &&
               state.tradeState.configState != ConfigState.success.index) {
-            await store.dispatchFuture(TradeActionLoadConfig());
+            await store.dispatch(TradeActionLoadConfig());
           }
 
           // 特定页面 参数判断
           if (moduleName == ModuleName.mint &&
               state.investState.configState != ConfigState.success.index) {
-            await store.dispatchFuture(InvestActionLoadConfig());
+            await store.dispatch(InvestActionLoadConfig());
           }
 
           if (moduleName == ModuleName.swap &&
               state.swapState.configState != ConfigState.success.index) {
-            await store.dispatchFuture(SwapActionLoadConfig());
+            await store.dispatch(SwapActionLoadConfig());
           }
 
           if (moduleName == ModuleName.community &&
               state.communityState.configState != ConfigState.success.index) {
-            await store.dispatchFuture(CommunityActionLoadConfig());
+            await store.dispatch(CommunityActionLoadConfig());
           }
 
           return true;

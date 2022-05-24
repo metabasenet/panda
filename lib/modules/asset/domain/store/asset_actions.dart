@@ -9,7 +9,7 @@ class AssetActionSyncWalletCoins extends _BaseAction {
   final Wallet wallet;
 
   @override
-  Future<AppState> reduce() async {
+  Future<AppState?> reduce() async {
     if (wallet == null) {
       return state.rebuild((a) => a..assetState.coins = ListBuilder([]));
     }
@@ -23,15 +23,14 @@ class AssetActionSyncWalletCoins extends _BaseAction {
     // We take the config coins as the good ones
     configCoins.toList().forEach((remote) {
       // Update local coin with config infos (icon, name, etc)
-      final existing = walletCoins?.firstWhere(
+      final existing = walletCoins.firstWhere(
         (local) => local.symbol == remote.symbol && local.chain == remote.chain,
-        orElse: () => null,
       );
       if (existing != null) {
         existing.name = remote.name;
         existing.fullName = remote.fullName;
         existing.iconOnline = remote.icon;
-        existing.contract = remote.contract ?? '';
+        existing.contract = remote.contract;
         existing.chainPrecision = remote.chainPrecision;
         existing.displayPrecision = remote.displayPrecision;
         existing.isFixed = kDefaultCoinFixed.contains(remote.symbol);
@@ -114,7 +113,7 @@ class AssetActionSyncWalletCoins extends _BaseAction {
   }
 
   @override
-  Object wrapError(dynamic error) {
+  Object? wrapError(dynamic error) {
     CrashesReport().reportEvent(
       'AssetLog_01_SyncWalletCoins',
       error,
@@ -126,7 +125,7 @@ class AssetActionSyncWalletCoins extends _BaseAction {
 
 class AssetActionToggleHideSmallAssets extends _BaseAction {
   AssetActionToggleHideSmallAssets({this.hide});
-  final bool hide;
+  final bool? hide;
 
   @override
   Future<AppState> reduce() async {

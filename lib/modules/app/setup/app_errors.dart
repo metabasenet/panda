@@ -3,21 +3,21 @@ part of app_module;
 class AppErrors {
   static String parseErrorMessages(dynamic error) {
     // Common - Request
-    if (error is SocketException || error is RequestNetworkError) {
+    if (error is SocketException) {
       return tr('global:msg_network_error');
     }
     if (error is TimeoutException) {
       return tr('global:msg_network_timeout');
     }
-    if (error is RequestEmptyError) {
-      return tr('global:msg_server_busy');
-    }
-    if (error is RequestResponseError) {
-      return error.message;
-    }
-    if (error is RequestNotFoundError) {
-      return tr('global:msg_server_not_found');
-    }
+    //if (error is RequestEmptyError) {
+    //  return tr('global:msg_server_busy');
+    //}
+    //if (error is RequestResponseError) {
+    //  return error.message;
+    //}
+    //if (error is RequestNotFoundError) {
+    //  return tr('global:msg_server_not_found');
+    //}
     // Common - Permission
     if (error is ImagePermissionCameraError) {
       return tr('global:msg_permission_denied_camera');
@@ -104,7 +104,7 @@ class AppErrors {
 
     // Default message for unhandled errors
     if (kDebugMode || AppConstants.isBeta) {
-      return error?.toString();
+      return error.toString();
     } else {
       return tr('global:msg_app_code_error');
     }

@@ -21,7 +21,7 @@ abstract class AssetDetailVM
     return AssetDetailVM((viewModel) => viewModel
       ..activeWallet = store.state.walletState.activeWallet
       ..doLoadDetail = (coin, isRefresh) {
-        return store.dispatchFuture(AssetActionGetCoinBalance(
+        return store.dispatchAsync(AssetActionGetCoinBalance(
           wallet: store.state.walletState.activeWallet,
           chain: coin.chain,
           symbol: coin.symbol,

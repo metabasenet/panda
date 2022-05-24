@@ -34,7 +34,7 @@ class AssetManagementPage extends StatelessWidget {
         child: StoreConnector<AppState, AssetManagementVM>(
           distinct: true,
           converter: AssetManagementVM.fromStore,
-          onInitialBuild: (viewModel) {
+          onInitialBuild: (_, __, viewModel) {
             viewModel.doSearchCoin('');
           },
           builder: (context, viewModel) => CustomScrollView(
@@ -112,15 +112,16 @@ Widget buildAssetHeader(BuildContext context, String title) => Container(
         title,
         style: context.textBody(
           bold: true,
+          fontWeight: FontWeight.normal,
           color: context.labelColor,
         ),
       ),
     );
 void updateCoinAddress({
-  BuildContext context,
-  AssetManagementVM viewModel,
-  AssetCoin coin,
-  bool isEnabled,
+  required BuildContext context,
+  required AssetManagementVM viewModel,
+  required AssetCoin coin,
+  required bool isEnabled,
 }) {
   showPasswordDialog(
     context,
@@ -186,14 +187,20 @@ Widget buildAssetItem(
         offset: Offset(-10, 0),
         child: Text(
           item.symbol,
-          style: context.textBody(),
+          style: context.textBody(
+            bold: true,
+            fontWeight: FontWeight.normal,
+          ),
         ),
       ),
       subtitle: Transform.translate(
         offset: Offset(-10, 0),
         child: Text(
           item.name,
-          style: context.textSecondary(),
+          style: context.textSecondary(
+            bold: true,
+            fontWeight: FontWeight.normal,
+          ),
         ),
       ),
     ),

@@ -31,15 +31,15 @@ abstract class AssetWithdrawVM
   @override
   @BuiltValueField(compare: false)
   double Function({
-    @required String chain,
-    @required String symbol,
+    required String chain,
+    required String symbol,
   }) get getCoinBalance;
 
   @override
   @BuiltValueField(compare: false)
   AssetCoin Function({
-    @required String chain,
-    @required String symbol,
+    required String chain,
+    required String symbol,
   }) get getCoinInfo;
 
   @override
@@ -67,7 +67,11 @@ abstract class AssetWithdrawVM
           store.dispatch(WalletActionWalletUnlock(password, completer));
           return completer.future;
         }
-        ..submit = (params, walletData, [onConfirmSubmit]) async {
+        ..submit = (
+          params,
+          walletData, [
+          Future<bool> Function()? onConfirmSubmit,
+        ]) async {
           if (params.withdrawData.symbol == 'MNT' &&
               params.withdrawData.chain == AppConstants.mnt_chain) {
             final completer = Completer<String>();
@@ -75,7 +79,7 @@ abstract class AssetWithdrawVM
               params: params,
               walletData: walletData,
               completer: completer,
-              onConfirmSubmit: onConfirmSubmit,
+              onConfirmSubmit: onConfirmSubmit!,
             ));
             return completer.future;
           } else {
@@ -104,21 +108,22 @@ abstract class AssetWithdrawVM
                 params.withdrawData.symbol == 'USDT') {
               ret['token'] = usdtSpecialAddress;
             }
-            InAppWebViewController appWebViewController = TradeHomePage.webView;
-            var src =
+            final InAppWebViewController appWebViewController =
+                TradeHomePage.webView;
+            final src =
                 'window.dispatchEvent(new CustomEvent("Transfer",{"detail":${json.encode(ret)}}));';
             appWebViewController.evaluateJavascript(source: src);
             return TradeHomePage.completer.future;
           }
         }
-        ..getCoinInfo = ({chain, symbol}) {
+        ..getCoinInfo = ({required chain, required symbol}) {
           return VMWithWalletGetCoinInfoImplement.getCoinInfo(
             store,
             chain: chain,
             symbol: symbol,
           );
         }
-        ..getCoinBalance = ({chain, symbol}) {
+        ..getCoinBalance = ({required chain, required symbol}) {
           return VMWithAssetGetCoinBalanceImplement.getCoinBalance(
             store,
             chain: chain,

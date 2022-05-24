@@ -54,7 +54,7 @@ abstract class AdmissionCondition
     if (transferCurrency != null && transferCurrency.isNotEmpty) {
       final firstFork = transferCurrency[transferCurrency.keys.first];
       if (firstFork != null && firstFork.containsKey('amount')) {
-        return firstFork['amount'];
+        return firstFork['amount'] ?? '';
       }
     }
     return '';

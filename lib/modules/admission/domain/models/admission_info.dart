@@ -8,7 +8,7 @@ abstract class AdmissionInfo
 
   static Serializer<AdmissionInfo> get serializer => _$admissionInfoSerializer;
 
-  static AdmissionInfo fromJson(Map<String, dynamic> json) {
+  static AdmissionInfo? fromJson(Map<String, dynamic> json) {
     return deserialize<AdmissionInfo>(json);
   }
 
@@ -24,18 +24,23 @@ abstract class AdmissionInfo
 
   //@nullable
   @BuiltValueField(wireName: 'end_time')
-  int get endTime;
+  int? get endTime;
 
   //@nullable
   @BuiltValueField(wireName: 'start_time')
-  int get startTime;
+  int? get startTime;
 
   //@nullable
   BuiltList<AdmissionCondition> get condition;
 
   /// 第一个规则 现在只有一个
-  AdmissionCondition get transferCondition =>
-      condition != null && condition.isNotEmpty ? condition.first : null;
+  AdmissionCondition? get transferCondition {
+    if (condition.isNotEmpty) {
+      return condition.first;
+    } else {
+      return null;
+    }
+  }
 
 // "ecological": {
 //     "chain": "MNT",
@@ -45,30 +50,30 @@ abstract class AdmissionInfo
   //@nullable
   BuiltMap<String, String> get ecological;
 
-  String get chain => ecological != null ? ecological['chain'] : '';
+  String get chain => ecological['chain'] ?? '';
 
-  String get symbol => ecological != null ? ecological['currency'] : '';
+  String get symbol => ecological['currency'] ?? '';
 
-  String get fork => ecological != null ? ecological['fork'] : '';
+  String get fork => ecological['fork'] ?? '';
 
   bool get isRunning {
     if (startTime != null && endTime != null) {
       final nowTime = SystemDate.getTime();
-      return startTime < nowTime && nowTime < endTime;
+      return startTime! < nowTime && nowTime < endTime!;
     }
     return false;
   }
 
   bool get notStart {
     if (startTime != null) {
-      return startTime > SystemDate.getTime();
+      return startTime! > SystemDate.getTime();
     }
     return false;
   }
 
   bool get isEnd {
     if (endTime != null) {
-      return endTime < SystemDate.getTime();
+      return endTime! < SystemDate.getTime();
     }
     return false;
   }

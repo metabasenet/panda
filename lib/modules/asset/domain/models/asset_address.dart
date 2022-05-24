@@ -8,10 +8,10 @@ abstract class AssetAddress
 
   // Constructors
   factory AssetAddress.fromLocal({
-    String walletName,
-    String address,
-    String chain,
-    String symbol,
+    String? walletName,
+    String? address,
+    String? chain,
+    String? symbol,
   }) {
     return AssetAddress().rebuild((e) => e
       ..address = address
@@ -22,9 +22,9 @@ abstract class AssetAddress
   }
 
   factory AssetAddress.fromAdd({
-    String id,
-    String address,
-    String comments,
+    String? id,
+    String? address,
+    String? comments,
   }) {
     return AssetAddress().rebuild((e) => e
       ..id = id

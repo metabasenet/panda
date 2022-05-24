@@ -53,7 +53,7 @@ class Transaction extends HiveObject {
     final outFirst = '${outList[0] ?? ''}';
 
     return Transaction()
-      ..txId = data['hash']?.toString()
+      ..txId = data['hash'].toString()
       ..chain = 'BTC'
       ..symbol = symbol
       ..fromAddress = isWithdraw ? fromAddress : inFirst
@@ -117,7 +117,9 @@ class Transaction extends HiveObject {
         : 0.0;
 
     return Transaction()
-      ..txId = data['transaction_id']?.toString() ?? data['txID']?.toString()
+      ..txId = (data['transaction_id'].toString().isEmpty)
+          ? data['txID'].toString()
+          : data['transaction_id'].toString()
       ..chain = 'TRX'
       ..symbol = symbol
       ..fromAddress = data['from'].toString()
@@ -139,11 +141,11 @@ class Transaction extends HiveObject {
   }
 
   factory Transaction.fromJson({
-    @required String chain,
-    @required String symbol,
-    @required String fromAddress,
-    @required int chainPrecision,
-    @required Map<String, dynamic> json,
+    required String chain,
+    required String symbol,
+    required String fromAddress,
+    required int chainPrecision,
+    required Map<String, dynamic> json,
   }) {
     switch (chain) {
       case AppConstants.mnt_chain:
@@ -153,7 +155,7 @@ class Transaction extends HiveObject {
       case 'TRX':
         return Transaction.fromTrxTx(symbol, fromAddress, json);
       default:
-        return null;
+        return Transaction.fromTrxTx(symbol, fromAddress, json);
     }
   }
 
@@ -170,17 +172,17 @@ class Transaction extends HiveObject {
         ..toAddress = data['toAddress'].toString()
         ..timestamp = NumberUtil.getInt(data['timestamp'])
         ..confirmations = NumberUtil.getInt(data['confirmed'])
-        ..fee = double.tryParse(data['txFee'].toString())
+        ..fee = double.tryParse(data['txFee'].toString()) ?? 0
         ..feeSymbol = symbol
         ..type = fromAddress.toLowerCase() ==
                 data['fromAddress'].toString().toLowerCase()
             ? TransactionType.withdraw
             : TransactionType.deposit
-        ..amount = double.tryParse(data['amount'].toString());
+        ..amount = double.tryParse(data['amount'].toString()) ?? 0;
 
   factory Transaction.fromSubmit({
-    @required WithdrawSubmitParams params,
-    @required String txId,
+    required WithdrawSubmitParams params,
+    required String txId,
   }) =>
       Transaction()
         ..txId = txId
@@ -196,15 +198,15 @@ class Transaction extends HiveObject {
         ..amount = params.amount;
 
   factory Transaction.fromRaw({
-    @required String txId,
-    @required String chain,
-    @required String symbol,
-    @required String toAddress,
-    @required String fromAddress,
-    @required double feeValue,
-    @required String feeSymbol,
-    @required double amount,
-    @required TransactionType type,
+    required String txId,
+    required String chain,
+    required String symbol,
+    required String toAddress,
+    required String fromAddress,
+    required double feeValue,
+    required String feeSymbol,
+    required double amount,
+    required TransactionType type,
   }) =>
       Transaction()
         ..txId = txId
@@ -220,42 +222,42 @@ class Transaction extends HiveObject {
         ..amount = amount;
 
   @HiveField(0)
-  String txId;
+  late String txId;
   @HiveField(1)
-  String chain;
+  late String chain;
   @HiveField(2)
-  String symbol;
+  late String symbol;
   @HiveField(3)
-  int confirmations;
+  late int confirmations;
   @HiveField(4)
-  int timestamp;
+  late int timestamp;
   @HiveField(5)
-  int blockHeight;
+  late int blockHeight;
   @HiveField(6)
-  bool failed;
+  late bool failed;
 
   @HiveField(7)
-  String toAddress;
+  late String toAddress;
   @HiveField(8)
-  String fromAddress;
+  late String fromAddress;
 
   @HiveField(9)
-  double amount;
+  late double amount;
   @HiveField(10)
-  double fee;
+  late double fee;
   @HiveField(11)
-  String feeSymbol;
+  late String feeSymbol;
 
   /// ETH: Token contract
   /// MNT: Fork ID/TX
   @HiveField(12)
-  String contract;
+  late String contract;
 
   @HiveField(13)
-  TransactionType type;
+  late TransactionType type;
 
   String get displayTime => formatDate(
-        DateTime.fromMillisecondsSinceEpoch((timestamp ?? 0) * 1000),
+        DateTime.fromMillisecondsSinceEpoch(timestamp * 1000),
       );
 
   String get displayAmount => NumberUtil.truncateDecimal<String>(amount);

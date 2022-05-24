@@ -32,10 +32,10 @@ abstract class AdmissionState
 
   // Config
   //@nullable
-  AdmissionConfig get config;
+  AdmissionConfig? get config;
 
   //@nullable
-  int get configState;
+  int? get configState;
 
   // Fields
   //@nullable

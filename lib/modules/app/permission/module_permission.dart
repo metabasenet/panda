@@ -30,7 +30,7 @@ class ModulePermissionUtils {
   /// Return True If the config min version is higher then this app version
   bool isOldVersion(String moduleName) {
     final netVersion = _disabledModules[moduleName];
-    if (VersionUtils.netIsNew(local: _currentVersion, net: netVersion)) {
+    if (VersionUtils.netIsNew(local: _currentVersion, net: netVersion ?? '')) {
       return true;
     }
 

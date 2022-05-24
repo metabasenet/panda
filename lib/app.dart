@@ -44,7 +44,7 @@ class MyApp extends StatelessWidget {
           useOnlyLangCode: true,
           startLocale: Locale(AppConstants.defaultLanguage),
           fallbackLocale: Locale(AppConstants.defaultLanguage),
-          preloaderColor: Colors.black,
+          //preloaderColor: Colors.black,
           supportedLocales: AppLanguages.supportedLocales,
           child: Builder(
             builder: (context) => GestureDetector(
@@ -67,7 +67,7 @@ class MyApp extends StatelessWidget {
                   data: MediaQuery.of(context).copyWith(
                     textScaleFactor: 1.0,
                   ),
-                  child: child,
+                  child: child!,
                 ),
               ),
             ),

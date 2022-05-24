@@ -3,7 +3,7 @@ part of asset_ui_module;
 class AssetDepositPage extends HookWidget {
   AssetDepositPage(
     this.coinInfo, {
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   final AssetCoin coinInfo;
@@ -14,7 +14,7 @@ class AssetDepositPage extends HookWidget {
     AppNavigator.push(routeName, params: item);
   }
 
-  static Route<dynamic> route(RouteSettings settings, [AssetCoin item]) {
+  static Route<dynamic> route(RouteSettings settings, [AssetCoin? item]) {
     return DefaultTransition(
       settings,
       AssetDepositPage(item ?? settings.arguments as AssetCoin),
@@ -26,7 +26,7 @@ class AssetDepositPage extends HookWidget {
   void saveQRCodeView(BuildContext context) {
     LoadingDialog.show(context);
     saveImageState.currentState
-        .capture()
+        ?.capture()
         .whenComplete(() => LoadingDialog.dismiss(context));
   }
 
@@ -58,12 +58,15 @@ class AssetDepositPage extends HookWidget {
                           'name': coinInfo.name,
                           'fullName': coinInfo.fullName,
                         }),
-                        style: context.textBody(bold: true),
+                        style: context.textBody(
+                          bold: true,
+                          fontWeight: FontWeight.normal,
+                        ),
                       ),
                       SizedBox(height: context.edgeSize),
                       Center(
                         child: CSContainer(
-                          width: null,
+                          width: 0,
                           child: QrCodeView(
                             coinInfo.address,
                             size: context.mediaWidth * 0.437,
@@ -77,7 +80,10 @@ class AssetDepositPage extends HookWidget {
                         children: [
                           Text(
                             tr('asset:deposit_lbl_address'),
-                            style: context.textSecondary(bold: true),
+                            style: context.textSecondary(
+                              bold: true,
+                              fontWeight: FontWeight.normal,
+                            ),
                           ),
                           CSButtonIcon(
                             size: 18,
@@ -99,6 +105,7 @@ class AssetDepositPage extends HookWidget {
                         style: context.textSecondary(
                           bold: true,
                           color: context.bodyColor,
+                          fontWeight: FontWeight.normal,
                         ),
                         textAlign: TextAlign.start,
                       ),
@@ -138,7 +145,10 @@ class AssetDepositPage extends HookWidget {
                 'name': coinInfo.name,
                 'fullName': coinInfo.fullName,
               }),
-              style: context.textMedium(bold: true),
+              style: context.textMedium(
+                bold: true,
+                fontWeight: FontWeight.normal,
+              ),
             ),
             SizedBox(height: context.edgeSize),
             QrCodeView(

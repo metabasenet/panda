@@ -18,7 +18,7 @@ class FiatPriceState {
 
   // /// Get Coin Fiat Price
   String getFiatPrice({
-    @required AssetPrice coinPrice,
+    required AssetPrice coinPrice,
     double amount = 1,
   }) {
     if (prices == null) {
@@ -39,14 +39,14 @@ class FiatPriceState {
     final fiatPrice = prices.containsKey(fiatKey) ? prices[fiatKey] : 0.0;
 
     return NumberUtil.truncateDecimal(
-      total * fiatPrice,
+      total * (fiatPrice ?? 0.0),
       AppConstants.fiatPrecision,
     );
   }
 
   // /// Get Coin Single Price
   String getSinglePrice({
-    @required AssetPrice coinPrice,
+    required AssetPrice coinPrice,
     double amount = 1,
   }) {
     if (prices == null) {
@@ -87,13 +87,13 @@ class FiatPriceState {
 }
 
 class FiatPriceCubit extends Cubit<FiatPriceState> {
-  FiatPriceCubit([AssetRepository assetRepository])
+  FiatPriceCubit([AssetRepository? assetRepository])
       : super(
-          FiatPriceState(null, AppConstants.defaultCurrency),
+          FiatPriceState(<String, double>{}, AppConstants.defaultCurrency),
         ) {
     _assetRepository = assetRepository ?? AssetRepository();
   }
-  AssetRepository _assetRepository;
+  late AssetRepository _assetRepository;
 
   Future<void> updateAll() async {
     final prices = await _assetRepository.getFiatPrices();

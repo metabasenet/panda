@@ -103,7 +103,8 @@ class AssetActionAddressEdit extends _BaseAction {
   final bool isDelete;
 
   @override
-  Future<AppState> reduce() async {
+  Future<AppState?> reduce() async {
+    /*
     final walletId = store.state.walletState.activeWalletId;
     // delete
     if (isDelete == true) {
@@ -138,6 +139,7 @@ class AssetActionAddressEdit extends _BaseAction {
     try {
       await store.dispatchFuture(AssetActionAddressList(coinInfo, ''));
     } catch (_) {}
+    */
     return null;
   }
 }

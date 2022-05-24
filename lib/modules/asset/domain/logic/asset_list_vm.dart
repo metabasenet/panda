@@ -46,18 +46,17 @@ abstract class AssetListVM implements Built<AssetListVM, AssetListVMBuilder> {
 
     return AssetListVM(
       (viewModel) => viewModel
-        ..fiatCurrency = store.state.commonState.fiatCurrency ?? ''
-        ..wallets = store.state.walletState.wallets ?? []
+        ..fiatCurrency = store.state.commonState.fiatCurrency
+        ..wallets = store.state.walletState.wallets
         ..hasWallet = store.state.walletState.hasWallet
         ..activeWallet = store.state.walletState.activeWallet
-        ..activeWalletId = store.state.walletState.activeWalletId ?? ''
-        ..activeWalletStatus =
-            store.state.walletState.activeWalletStatus ?? WalletStatus.loading
+        ..activeWalletId = store.state.walletState.activeWalletId
+        ..activeWalletStatus = store.state.walletState.activeWalletStatus
         ..coins = ListBuilder(assetState.coins)
-        ..isBalanceUpdating = store.state.assetState.isBalanceUpdating ?? false
+        ..isBalanceUpdating = store.state.assetState.isBalanceUpdating
         ..doRefreshList = () {
           return Future.wait([
-            store.dispatchFuture(AssetActionUpdatePrices(
+            store.dispatchAsync(AssetActionUpdatePrices(
               store.state.commonState.fiatCurrency,
             )),
             if (store.state.assetState.isBalanceUpdating != true)
@@ -71,10 +70,10 @@ abstract class AssetListVM implements Built<AssetListVM, AssetListVMBuilder> {
           ]);
         }
         ..doSwitchWallet = (wallet) {
-          return store.dispatchFuture(AppActionLoadWallet(wallet));
+          return store.dispatchAsync(AppActionLoadWallet(wallet));
         }
         ..doSyncWallet = (wallet) {
-          return store.dispatchFuture(WalletActionWalletRegister(
+          return store.dispatchAsync(WalletActionWalletRegister(
             wallet,
             withOptions: false,
           ));

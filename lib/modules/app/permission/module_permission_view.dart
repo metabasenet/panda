@@ -2,14 +2,14 @@ part of app_module;
 
 class ModelPermissionView extends StatelessWidget {
   const ModelPermissionView({
-    @required this.moduleName,
-    @required this.child,
+    required this.moduleName,
+    required this.child,
     this.onRefreshSuccess,
   });
 
   final Widget child;
   final String moduleName;
-  final void Function() onRefreshSuccess;
+  final void Function()? onRefreshSuccess;
 
   @override
   Widget build(BuildContext context) {
@@ -93,7 +93,11 @@ class ModelPermissionView extends StatelessWidget {
           SizedBox(height: context.edgeSize),
           Text(
             message,
-            style: context.textBody(color: context.secondaryColor),
+            style: context.textBody(
+              color: context.secondaryColor,
+              bold: true,
+              fontWeight: FontWeight.normal,
+            ),
           ),
           SizedBox(height: context.edgeSize),
           if (btnText.isNotEmpty)
@@ -125,7 +129,7 @@ class ModelPermissionView extends StatelessWidget {
                     .doRefreshModulePermission(moduleName, permission)
                     .then((value) {
                   if (onRefreshSuccess != null && value == true) {
-                    onRefreshSuccess();
+                    onRefreshSuccess!();
                   }
                 }).catchError((error) {
                   Toast.showError(error);

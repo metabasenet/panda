@@ -23,7 +23,7 @@ class AppLocalizationsLoader extends AssetLoader {
   @override
   Future<Map<String, dynamic>> load(String path, Locale locale) async {
     dev.log('Load $isFromNetwork asset from $path', name: 'AppLocalizations');
-
+    /*
     if (isFromNetwork) {
       try {
         // Load from network
@@ -38,7 +38,7 @@ class AppLocalizationsLoader extends AssetLoader {
       } catch (error) {
         dev.log('Error update from network $error', name: 'AppLocalizations');
       }
-    }
+    }*/
 
     final localePath = await getLocalePath(path, locale);
     return json.decode(await rootBundle.loadString(localePath))
@@ -56,15 +56,16 @@ class AppLocalizations {
   }
 
   static void updateFromNetwork(BuildContext context) {
+    /*
     final localization = EasyLocalization.of(context);
     localization.bloc.onChange(
       Resource(
-        path: localization.parent.path,
+        path: localization?.parent.path,
         locale: context.locale,
         assetLoader: AppLocalizationsLoader(isFromNetwork: true),
         useOnlyLangCode: true,
       ),
-    );
+    );*/
   }
 
   static const List<LocalizationsDelegate> localizationsDelegates = [
