@@ -49,25 +49,21 @@ class InvestRepository {
   }
   */
 
-  //
-  Future<List<Map<String, dynamic>>> getProfitRecordList({
+  //get Profit record
+  Future<List<dynamic>> getProfitRecordList({
     @required String fork,
     @required String address,
     @required int skip,
     @required int take,
   }) async {
     final dio = Dio();
-    final response =
-        await dio.get('${AppConstants.randomApiUrl}/profit?address=$address');
-    final data = response.data;
-    return List<Map<String, dynamic>>.from(
-      data.map(
-        (e) => Map<String, dynamic>.from(e as Map<String, dynamic>),
-      ),
-    );
+    final response = await dio.get(
+        '${AppConstants.randomApiUrl}/profit?address=$address&pagenum=${(skip + 1)}&pagesize=$take');
+    final data = response.data as Map<String, dynamic>;
+    return data['data'] as List<dynamic>;
   }
 
-  //
+  //get Invitation record
   Future<List<dynamic>> getProfitInvitationList({
     @required String fork,
     @required String addr,

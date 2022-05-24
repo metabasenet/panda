@@ -47,6 +47,9 @@ abstract class AssetCoin implements Built<AssetCoin, AssetCoinBuilder> {
   double get balanceUnconfirmed;
 
   @nullable
+  double get locked;
+
+  @nullable
   bool get balanceUpdateFailed;
 
   @nullable

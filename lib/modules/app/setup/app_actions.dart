@@ -53,7 +53,7 @@ class AppActionInitApp extends _BaseAction {
     progress.add(0.5);
 
     // 5- Initial Data
-    store
+    await store
         .dispatchFuture(WalletActionWalletLoadAll(), notify: false)
         .whenComplete(() {
       store.dispatch(AppActionLoadWallet(state.walletState.activeWallet));

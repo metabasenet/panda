@@ -132,7 +132,6 @@ class Wallet extends HiveObject {
   }
 
   String getTotalValuation(String fiatCurrency) {
-    final fiatPriceCubit = GetIt.I<FiatPriceCubit>();
     double total = 0.00;
     for (int i = 0; i < balances.length; i++) {
       String strTotal = getTotalPrice(balances[i].symbol, balances[i].balance);
@@ -235,6 +234,7 @@ class Wallet extends HiveObject {
     @required String address,
     @required double balance,
     @required double unconfirmed,
+    @required double locked,
   }) {
     assert(chain != null, symbol != null);
     assert(address != null);
@@ -257,6 +257,7 @@ class Wallet extends HiveObject {
     if (coinBalance != null) {
       coinBalance.balance = balance;
       coinBalance.unconfirmed = unconfirmed;
+      coinBalance.locked = locked;
       coinBalance.updatedAt = DateTime.now();
       save();
     }

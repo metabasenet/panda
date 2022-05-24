@@ -6,12 +6,14 @@ class AssetBalanceInfo {
     @required this.address,
     this.balance = 0,
     this.unconfirmed = 0,
+    this.locked = 0,
   });
 
   final String symbol;
   final String address;
   final double balance;
   final double unconfirmed;
+  final double locked;
 
   bool get hasUnconfirmed => unconfirmed > 0;
 
@@ -25,7 +27,8 @@ class AssetBalanceInfo {
         o.symbol == symbol &&
         o.address == address &&
         o.balance == balance &&
-        o.unconfirmed == unconfirmed;
+        o.unconfirmed == unconfirmed &&
+        o.locked == locked;
   }
 
   @override
@@ -33,6 +36,7 @@ class AssetBalanceInfo {
     return symbol.hashCode ^
         address.hashCode ^
         balance.hashCode ^
-        unconfirmed.hashCode;
+        unconfirmed.hashCode ^
+        locked.hashCode;
   }
 }

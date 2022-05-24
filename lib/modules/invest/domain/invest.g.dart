@@ -408,19 +408,28 @@ class _$ProfitRecordItemSerializer
   Iterable<Object> serialize(Serializers serializers, ProfitRecordItem object,
       {FullType specifiedType = FullType.unspecified}) {
     final result = <Object>[
-      'height',
-      serializers.serialize(object.height, specifiedType: const FullType(int)),
+      'vote',
+      serializers.serialize(object.vote, specifiedType: const FullType(String)),
+      'extend',
+      serializers.serialize(object.extend,
+          specifiedType: const FullType(String)),
       'balance',
       serializers.serialize(object.balance,
           specifiedType: const FullType(String)),
-      'stake_reward',
-      serializers.serialize(object.stakeReward,
+      'height',
+      serializers.serialize(object.height,
           specifiedType: const FullType(String)),
-      'promotion_reward',
-      serializers.serialize(object.promotionReward,
-          specifiedType: const FullType(String)),
+      'txid',
+      serializers.serialize(object.txid, specifiedType: const FullType(String)),
+      'time',
+      serializers.serialize(object.time, specifiedType: const FullType(String)),
     ];
-
+    if (object.totalReward != null) {
+      result
+        ..add('totalReward')
+        ..add(serializers.serialize(object.totalReward,
+            specifiedType: const FullType(String)));
+    }
     return result;
   }
 
@@ -436,20 +445,32 @@ class _$ProfitRecordItemSerializer
       iterator.moveNext();
       final dynamic value = iterator.current;
       switch (key) {
-        case 'height':
-          result.height = serializers.deserialize(value,
-              specifiedType: const FullType(int)) as int;
+        case 'vote':
+          result.vote = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String;
+          break;
+        case 'extend':
+          result.extend = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String;
           break;
         case 'balance':
           result.balance = serializers.deserialize(value,
               specifiedType: const FullType(String)) as String;
           break;
-        case 'stake_reward':
-          result.stakeReward = serializers.deserialize(value,
+        case 'height':
+          result.height = serializers.deserialize(value,
               specifiedType: const FullType(String)) as String;
           break;
-        case 'promotion_reward':
-          result.promotionReward = serializers.deserialize(value,
+        case 'txid':
+          result.txid = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String;
+          break;
+        case 'time':
+          result.time = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String;
+          break;
+        case 'totalReward':
+          result.totalReward = serializers.deserialize(value,
               specifiedType: const FullType(String)) as String;
           break;
       }
@@ -1623,32 +1644,50 @@ class ProfitInvitationItemBuilder
 
 class _$ProfitRecordItem extends ProfitRecordItem {
   @override
-  final int height;
+  final String vote;
+  @override
+  final String extend;
   @override
   final String balance;
   @override
-  final String stakeReward;
+  final String height;
   @override
-  final String promotionReward;
+  final String txid;
+  @override
+  final String time;
+  @override
+  final String totalReward;
 
   factory _$ProfitRecordItem(
           [void Function(ProfitRecordItemBuilder) updates]) =>
       (new ProfitRecordItemBuilder()..update(updates)).build();
 
   _$ProfitRecordItem._(
-      {this.height, this.balance, this.stakeReward, this.promotionReward})
+      {this.vote,
+      this.extend,
+      this.balance,
+      this.height,
+      this.txid,
+      this.time,
+      this.totalReward})
       : super._() {
-    if (height == null) {
-      throw new BuiltValueNullFieldError('ProfitRecordItem', 'height');
+    if (vote == null) {
+      throw new BuiltValueNullFieldError('ProfitRecordItem', 'vote');
+    }
+    if (extend == null) {
+      throw new BuiltValueNullFieldError('ProfitRecordItem', 'extend');
     }
     if (balance == null) {
       throw new BuiltValueNullFieldError('ProfitRecordItem', 'balance');
     }
-    if (stakeReward == null) {
-      throw new BuiltValueNullFieldError('ProfitRecordItem', 'stakeReward');
+    if (height == null) {
+      throw new BuiltValueNullFieldError('ProfitRecordItem', 'height');
     }
-    if (promotionReward == null) {
-      throw new BuiltValueNullFieldError('ProfitRecordItem', 'promotionReward');
+    if (txid == null) {
+      throw new BuiltValueNullFieldError('ProfitRecordItem', 'txid');
+    }
+    if (time == null) {
+      throw new BuiltValueNullFieldError('ProfitRecordItem', 'time');
     }
   }
 
@@ -1664,27 +1703,39 @@ class _$ProfitRecordItem extends ProfitRecordItem {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is ProfitRecordItem &&
-        height == other.height &&
+        vote == other.vote &&
+        extend == other.extend &&
         balance == other.balance &&
-        stakeReward == other.stakeReward &&
-        promotionReward == other.promotionReward;
+        height == other.height &&
+        txid == other.txid &&
+        time == other.time &&
+        totalReward == other.totalReward;
   }
 
   @override
   int get hashCode {
     return $jf($jc(
-        $jc($jc($jc(0, height.hashCode), balance.hashCode),
-            stakeReward.hashCode),
-        promotionReward.hashCode));
+        $jc(
+            $jc(
+                $jc(
+                    $jc($jc($jc(0, vote.hashCode), extend.hashCode),
+                        balance.hashCode),
+                    height.hashCode),
+                txid.hashCode),
+            time.hashCode),
+        totalReward.hashCode));
   }
 
   @override
   String toString() {
     return (newBuiltValueToStringHelper('ProfitRecordItem')
-          ..add('height', height)
+          ..add('vote', vote)
+          ..add('extend', extend)
           ..add('balance', balance)
-          ..add('stakeReward', stakeReward)
-          ..add('promotionReward', promotionReward))
+          ..add('height', height)
+          ..add('txid', txid)
+          ..add('time', time)
+          ..add('totalReward', totalReward))
         .toString();
   }
 }
@@ -1693,31 +1744,45 @@ class ProfitRecordItemBuilder
     implements Builder<ProfitRecordItem, ProfitRecordItemBuilder> {
   _$ProfitRecordItem _$v;
 
-  int _height;
-  int get height => _$this._height;
-  set height(int height) => _$this._height = height;
+  String _vote;
+  String get vote => _$this._vote;
+  set vote(String vote) => _$this._vote = vote;
+
+  String _extend;
+  String get extend => _$this._extend;
+  set extend(String extend) => _$this._extend = extend;
 
   String _balance;
   String get balance => _$this._balance;
   set balance(String balance) => _$this._balance = balance;
 
-  String _stakeReward;
-  String get stakeReward => _$this._stakeReward;
-  set stakeReward(String stakeReward) => _$this._stakeReward = stakeReward;
+  String _height;
+  String get height => _$this._height;
+  set height(String height) => _$this._height = height;
 
-  String _promotionReward;
-  String get promotionReward => _$this._promotionReward;
-  set promotionReward(String promotionReward) =>
-      _$this._promotionReward = promotionReward;
+  String _txid;
+  String get txid => _$this._txid;
+  set txid(String txid) => _$this._txid = txid;
+
+  String _time;
+  String get time => _$this._time;
+  set time(String time) => _$this._time = time;
+
+  String _totalReward;
+  String get totalReward => _$this._totalReward;
+  set totalReward(String totalReward) => _$this._totalReward = totalReward;
 
   ProfitRecordItemBuilder();
 
   ProfitRecordItemBuilder get _$this {
     if (_$v != null) {
-      _height = _$v.height;
+      _vote = _$v.vote;
+      _extend = _$v.extend;
       _balance = _$v.balance;
-      _stakeReward = _$v.stakeReward;
-      _promotionReward = _$v.promotionReward;
+      _height = _$v.height;
+      _txid = _$v.txid;
+      _time = _$v.time;
+      _totalReward = _$v.totalReward;
       _$v = null;
     }
     return this;
@@ -1740,10 +1805,13 @@ class ProfitRecordItemBuilder
   _$ProfitRecordItem build() {
     final _$result = _$v ??
         new _$ProfitRecordItem._(
-            height: height,
+            vote: vote,
+            extend: extend,
             balance: balance,
-            stakeReward: stakeReward,
-            promotionReward: promotionReward);
+            height: height,
+            txid: txid,
+            time: time,
+            totalReward: totalReward);
     replace(_$result);
     return _$result;
   }

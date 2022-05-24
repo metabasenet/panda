@@ -24,6 +24,7 @@ class InvestActionGetProfitRecordList extends _BaseAction {
       take: take,
       skip: skip,
     );
+
     final data = deserializeListOf<ProfitRecordItem>(result);
     return state.rebuild(
       (a) => a.investState.profitRecordList.replace(data),
