@@ -130,12 +130,12 @@ class AssetWithdrawPage extends HookWidget {
       if (feeIsRefreshing.value == false) {
         feeIsRefreshing.value = true;
         final data = withdrawInfo.value;
-        data?.fee = await WalletFeeUtils.getFeeData(
+        data?.fee = (await WalletFeeUtils.getFeeData(
           coinInfo: coinInfo!,
           defaultFee: data.feeDefault,
           level: type,
           fromAddress: data.fromAddress,
-        );
+        ))!;
 
         withdrawInfo.value = data;
         feeIsRefreshing.value = false;

@@ -4,8 +4,8 @@ class TradeOrderCancelProcess {
   static void doCancelOrder(
     BuildContext context,
     TradeHomeVM viewModel, {
-    @required TradeOrder order,
-    @required Function(String) onSuccessTransaction,
+    required TradeOrder order,
+    required Function(String) onSuccessTransaction,
   }) {
     LoadingDialog.show(context);
     viewModel
@@ -19,7 +19,10 @@ class TradeOrderCancelProcess {
           (_) => CSAlertDialog(
             confirmBtnText: tr('trade:order_confirm_cancel_btn'),
             hideCancel: false,
-            cancelBtnStyle: context.textBody(),
+            cancelBtnStyle: context.textBody(
+              bold: true,
+              fontWeight: FontWeight.normal,
+            ),
             onConfirm: () {
               LoadingDialog.show(context);
               completer.complete(true);
@@ -32,17 +35,27 @@ class TradeOrderCancelProcess {
               children: [
                 Text(
                   tr(order.statusCancelMsg),
-                  style: context.textBody(lineHeight: 1.67),
+                  style: context.textBody(
+                    lineHeight: 1.67,
+                    bold: true,
+                    fontWeight: FontWeight.normal,
+                  ),
                 ),
                 SizedBox(height: 30),
                 Text(
                   tr('trade:order_confirm_cancel_amount'),
-                  style: context.textSmall(),
+                  style: context.textSmall(
+                    bold: true,
+                    fontWeight: FontWeight.normal,
+                  ),
                 ),
                 SizedBox(height: 8),
                 Text(
                   '$withdrawAmount ${order.symbol}',
-                  style: context.textMedium(bold: true),
+                  style: context.textMedium(
+                    bold: true,
+                    fontWeight: FontWeight.normal,
+                  ),
                 ),
                 SizedBox(height: 30),
               ],

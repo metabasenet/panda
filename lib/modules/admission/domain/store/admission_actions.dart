@@ -1,7 +1,7 @@
 part of admission_domain_module;
 
 abstract class _BaseAction extends ReduxAction<AppState> {
-  String get walletId => store.state.walletState.activeWalletId;
+  String get walletId => store.state.walletState.activeWalletId!;
   AdmissionConfig get admissionConfig => store.state.admissionState.config!;
 }
 

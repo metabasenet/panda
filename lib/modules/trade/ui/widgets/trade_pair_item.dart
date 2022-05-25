@@ -74,7 +74,10 @@ class TradePairItem extends StatelessWidget {
               if (!showChange && showStatusKey)
                 Text(
                   tr(tradePair.statusTransKey),
-                  style: context.textSmall(),
+                  style: context.textSmall(
+                    bold: true,
+                    fontWeight: FontWeight.normal,
+                  ),
                 )
               else
                 Expanded(
@@ -110,7 +113,10 @@ class TradePairItem extends StatelessWidget {
                       ? Center(
                           child: Text(
                             tr(tradePair.statusTransKey),
-                            style: context.textSmall(),
+                            style: context.textSmall(
+                              bold: true,
+                              fontWeight: FontWeight.normal,
+                            ),
                           ),
                         )
                       : TextChange(

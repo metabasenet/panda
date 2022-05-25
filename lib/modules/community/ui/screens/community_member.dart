@@ -55,7 +55,11 @@ class CommunityMemberPage extends HookWidget {
                 Expanded(
                   child: SelectableText(
                     item.info.name ?? '',
-                    style: context.textMedium(bold: true, lineHeight: 1.5),
+                    style: context.textMedium(
+                      bold: true,
+                      lineHeight: 1.5,
+                      fontWeight: FontWeight.normal,
+                    ),
                   ),
                 ),
                 SizedBox(width: context.edgeSize),
@@ -81,7 +85,10 @@ class CommunityMemberPage extends HookWidget {
                         padding: context.edgeBottom5,
                         child: Text(
                           item['label'].toString(),
-                          style: context.textSecondary(bold: true),
+                          style: context.textSecondary(
+                            bold: true,
+                            fontWeight: FontWeight.normal,
+                          ),
                         ),
                       )
                     else
@@ -92,6 +99,7 @@ class CommunityMemberPage extends HookWidget {
                         bold: true,
                         color: context.bodyColor,
                         lineHeight: 1.5,
+                        fontWeight: FontWeight.normal,
                       ),
                     ),
                   ],

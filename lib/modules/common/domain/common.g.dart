@@ -555,29 +555,53 @@ class _$CommonStateSerializer implements StructuredSerializer<CommonState> {
   Iterable<Object?> serialize(Serializers serializers, CommonState object,
       {FullType specifiedType = FullType.unspecified}) {
     final result = <Object?>[
-      'config',
-      serializers.serialize(object.config,
-          specifiedType: const FullType(Config)),
       'configState',
       serializers.serialize(object.configState,
           specifiedType: const FullType(int)),
-      'appInfo',
-      serializers.serialize(object.appInfo,
-          specifiedType: const FullType(PackageInfo)),
-      'deviceId',
-      serializers.serialize(object.deviceId,
-          specifiedType: const FullType(String)),
-      'language',
-      serializers.serialize(object.language,
-          specifiedType: const FullType(String)),
-      'fiatCurrency',
-      serializers.serialize(object.fiatCurrency,
-          specifiedType: const FullType(String)),
-      'newVersion',
-      serializers.serialize(object.newVersion,
-          specifiedType: const FullType(ConfigUpdate)),
     ];
-
+    Object? value;
+    value = object.config;
+    if (value != null) {
+      result
+        ..add('config')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(Config)));
+    }
+    value = object.appInfo;
+    if (value != null) {
+      result
+        ..add('appInfo')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(PackageInfo)));
+    }
+    value = object.deviceId;
+    if (value != null) {
+      result
+        ..add('deviceId')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.language;
+    if (value != null) {
+      result
+        ..add('language')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.fiatCurrency;
+    if (value != null) {
+      result
+        ..add('fiatCurrency')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.newVersion;
+    if (value != null) {
+      result
+        ..add('newVersion')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(ConfigUpdate)));
+    }
     return result;
   }
 
@@ -602,19 +626,19 @@ class _$CommonStateSerializer implements StructuredSerializer<CommonState> {
           break;
         case 'appInfo':
           result.appInfo = serializers.deserialize(value,
-              specifiedType: const FullType(PackageInfo))! as PackageInfo;
+              specifiedType: const FullType(PackageInfo)) as PackageInfo?;
           break;
         case 'deviceId':
           result.deviceId = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'language':
           result.language = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'fiatCurrency':
           result.fiatCurrency = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'newVersion':
           result.newVersion.replace(serializers.deserialize(value,
@@ -2007,42 +2031,34 @@ class ConfigUpdateDataBuilder
 
 class _$CommonState extends CommonState {
   @override
-  final Config config;
+  final Config? config;
   @override
   final int configState;
   @override
-  final PackageInfo appInfo;
+  final PackageInfo? appInfo;
   @override
-  final String deviceId;
+  final String? deviceId;
   @override
-  final String language;
+  final String? language;
   @override
-  final String fiatCurrency;
+  final String? fiatCurrency;
   @override
-  final ConfigUpdate newVersion;
+  final ConfigUpdate? newVersion;
 
   factory _$CommonState([void Function(CommonStateBuilder)? updates]) =>
       (new CommonStateBuilder()..update(updates))._build();
 
   _$CommonState._(
-      {required this.config,
+      {this.config,
       required this.configState,
-      required this.appInfo,
-      required this.deviceId,
-      required this.language,
-      required this.fiatCurrency,
-      required this.newVersion})
+      this.appInfo,
+      this.deviceId,
+      this.language,
+      this.fiatCurrency,
+      this.newVersion})
       : super._() {
-    BuiltValueNullFieldError.checkNotNull(config, 'CommonState', 'config');
     BuiltValueNullFieldError.checkNotNull(
         configState, 'CommonState', 'configState');
-    BuiltValueNullFieldError.checkNotNull(appInfo, 'CommonState', 'appInfo');
-    BuiltValueNullFieldError.checkNotNull(deviceId, 'CommonState', 'deviceId');
-    BuiltValueNullFieldError.checkNotNull(language, 'CommonState', 'language');
-    BuiltValueNullFieldError.checkNotNull(
-        fiatCurrency, 'CommonState', 'fiatCurrency');
-    BuiltValueNullFieldError.checkNotNull(
-        newVersion, 'CommonState', 'newVersion');
   }
 
   @override
@@ -2131,13 +2147,13 @@ class CommonStateBuilder implements Builder<CommonState, CommonStateBuilder> {
   CommonStateBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _config = $v.config.toBuilder();
+      _config = $v.config?.toBuilder();
       _configState = $v.configState;
       _appInfo = $v.appInfo;
       _deviceId = $v.deviceId;
       _language = $v.language;
       _fiatCurrency = $v.fiatCurrency;
-      _newVersion = $v.newVersion.toBuilder();
+      _newVersion = $v.newVersion?.toBuilder();
       _$v = null;
     }
     return this;
@@ -2162,26 +2178,22 @@ class CommonStateBuilder implements Builder<CommonState, CommonStateBuilder> {
     try {
       _$result = _$v ??
           new _$CommonState._(
-              config: config.build(),
+              config: _config?.build(),
               configState: BuiltValueNullFieldError.checkNotNull(
                   configState, 'CommonState', 'configState'),
-              appInfo: BuiltValueNullFieldError.checkNotNull(
-                  appInfo, 'CommonState', 'appInfo'),
-              deviceId: BuiltValueNullFieldError.checkNotNull(
-                  deviceId, 'CommonState', 'deviceId'),
-              language: BuiltValueNullFieldError.checkNotNull(
-                  language, 'CommonState', 'language'),
-              fiatCurrency: BuiltValueNullFieldError.checkNotNull(
-                  fiatCurrency, 'CommonState', 'fiatCurrency'),
-              newVersion: newVersion.build());
+              appInfo: appInfo,
+              deviceId: deviceId,
+              language: language,
+              fiatCurrency: fiatCurrency,
+              newVersion: _newVersion?.build());
     } catch (_) {
       late String _$failedField;
       try {
         _$failedField = 'config';
-        config.build();
+        _config?.build();
 
         _$failedField = 'newVersion';
-        newVersion.build();
+        _newVersion?.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
             'CommonState', _$failedField, e.toString());
@@ -2210,10 +2222,10 @@ class SettingsAdapter extends TypeAdapter<Settings> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return Settings(
-      language: fields[0] as String,
+      language: fields[0] as String?,
       languageIsSet: fields[1] as bool,
-      fiatCurrency: fields[2] as String,
-      activeWalletId: fields[3] as String,
+      fiatCurrency: fields[2] as String?,
+      activeWalletId: fields[3] as String?,
     )
       ..imageSignature = (fields[5] as Map).cast<String, dynamic>()
       ..imageSignatureLastUpdate = fields[6] as int

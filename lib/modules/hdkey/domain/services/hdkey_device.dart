@@ -33,7 +33,7 @@ class HDKeyDevice {
   final _statusChanged = BehaviorSubject<HDKeyDeviceStatus>();
   final _deviceAttached = StreamController<bool>.broadcast();
   final _walletCreated = StreamController<Wallet>.broadcast();
-  String _connectedWalletId;
+  String? _connectedWalletId;
 
   Stream<HDKeyDeviceStatus> get statusChanged => _statusChanged.stream;
   Stream<bool> get deviceAttached => _deviceAttached.stream;
@@ -41,7 +41,7 @@ class HDKeyDevice {
 
   /// Current connected device wallet ID
   /// - null if no device are connected
-  String get connectedWalletId => _connectedWalletId;
+  String get connectedWalletId => _connectedWalletId ?? '';
 
   void _log(String type, String message) {
     dev.log(
@@ -66,7 +66,7 @@ class HDKeyDevice {
           }
 
           HDKeyCore.connectHDKey().then((isConnected) {
-            if (isConnected) {
+            if (isConnected ?? false) {
               HDKeyCore.getDeviceStatus().then((info) {
                 final isInitialized = info['pincode'] == '0';
                 _emitStatus(isInitialized
@@ -106,7 +106,7 @@ class HDKeyDevice {
   // Methods
 
   // @visibleForTesting
-  Future<void> testDeviceConnection({bool isConnected}) async {
+  Future<void> testDeviceConnection({required bool isConnected}) async {
     if (isConnected) {
       return HDKeyCore.testDeviceDetached();
     }
@@ -142,7 +142,7 @@ class HDKeyDevice {
         }
       });
 
-      await HDKeyCore.writeSecret(secret: 0, data: mnemonic);
+      await HDKeyCore.writeSecret(secret: 0, data: mnemonic!);
       return true;
     } catch (e) {
       // 重置钱包，为了去掉有问题的 币种地址
@@ -157,7 +157,7 @@ class HDKeyDevice {
     final isValid = await HDKeyCore.accessByPinCode(pinCode);
     if (isValid == true) {
       final mnemonic = await HDKeyCore.readSecret(0);
-      final walletId = await generateWalletId(mnemonic);
+      final walletId = await generateWalletId(mnemonic!);
 
       // If we don't have this HDKey wallet, add it
       final wallet = await WalletRepository().getWalletById(walletId);
@@ -172,7 +172,7 @@ class HDKeyDevice {
           return CoinAddress(
             chain: item.key,
             symbol: item.key,
-            address: coin.address,
+            address: coin!.address,
             publicKey: coin.publicKey,
           );
         }).toList();
@@ -198,8 +198,8 @@ class HDKeyDevice {
   }
 
   Future<bool> changePinCode({
-    @required String oldPinCode,
-    @required String newPinCode,
+    required String oldPinCode,
+    required String newPinCode,
   }) async {
     return HDKeyCore.changePin(oldPin: oldPinCode, newPin: newPinCode);
   }

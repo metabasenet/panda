@@ -45,7 +45,7 @@ abstract class CommunityCreateVM
           return completer.future;
         }
         ..createCommunity = (params) {
-          return store.dispatchFuture(CommunityActionCreate(params));
+          return store.dispatchAsync(CommunityActionCreate(params));
         },
     );
   }

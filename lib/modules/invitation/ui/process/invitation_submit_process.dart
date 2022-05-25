@@ -2,15 +2,19 @@ part of invitation_ui_module;
 
 class InvitationSubmitProcess {
   static void doSubmit({
-    @required BuildContext context,
-    @required InvitationCreateVM viewModel,
-    @required AssetCoin coinInfo,
-    @required String toAddress,
-    @required String signCode,
-    @required String sharePrvKey,
-    @required String amount,
-    @required AssetCoin Function({String chain, String symbol}) getCoinInfo,
-    @required Function(String) onSuccessTransaction,
+    required BuildContext context,
+    required InvitationCreateVM viewModel,
+    required AssetCoin coinInfo,
+    required String toAddress,
+    required String signCode,
+    required String sharePrvKey,
+    required String amount,
+    required AssetCoin Function({
+      required String chain,
+      required String symbol,
+    })
+        getCoinInfo,
+    required Function(String) onSuccessTransaction,
   }) {
     LoadingDialog.show(context);
     viewModel

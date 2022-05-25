@@ -26,7 +26,7 @@ class CommunityBlacklistPage extends HookWidget {
       child: StoreConnector<AppState, CommunityBlacklistVM>(
         distinct: true,
         converter: CommunityBlacklistVM.fromStore,
-        onInitialBuild: (viewModel) {
+        onInitialBuild: (_, __, viewModel) {
           viewModel.clearCommunityBlacklist();
           request.add(CSListViewParams(
             take: 20,

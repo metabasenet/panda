@@ -2,21 +2,21 @@ part of trade_domain_module;
 
 class TradeActionOrderCancel extends _BaseAction {
   TradeActionOrderCancel({
-    @required this.order,
-    @required this.onUnlockWallet,
-    @required this.onSuccessTransaction,
-    @required this.onConfirmCancel,
+    required this.order,
+    required this.onUnlockWallet,
+    required this.onSuccessTransaction,
+    required this.onConfirmCancel,
     this.onConfirmSubmit,
   });
 
   final TradeOrder order;
-  final Future<bool> Function() onConfirmSubmit;
+  final Future<bool> Function()? onConfirmSubmit;
   final Future<bool> Function(double withdrawAmount) onConfirmCancel;
   final void Function(String txId) onSuccessTransaction;
   final Future<WalletPrivateData> Function() onUnlockWallet;
 
   @override
-  Future<AppState> reduce() async {
+  Future<AppState?> reduce() async {
     final walletId = store.state.walletState.activeWalletId;
 
     final coinInfo = store.state.assetState.getCoinInfo(
@@ -31,14 +31,14 @@ class TradeActionOrderCancel extends _BaseAction {
     );
 
     WalletWithdrawData withdrawData;
-    WalletTemplateData templateInfo;
+    WalletTemplateData? templateInfo;
 
     final dialogBalance = Completer<double>();
     store.dispatch(TradeActionGetOrderBalance(
       order: order,
       completer: dialogBalance,
     ));
-    double withdrawAmount = await dialogBalance.future;
+    double? withdrawAmount = await dialogBalance.future;
 
     final canContinue = await onConfirmCancel(withdrawAmount);
     if (canContinue != true) {
@@ -58,7 +58,7 @@ class TradeActionOrderCancel extends _BaseAction {
         chain: coinInfo.chain,
         symbol: coinInfo.symbol,
         templateHex: order.templateHex,
-        templateData: null,
+        templateData: {},
         templateAddress: order.templateAddress,
       );
 
@@ -66,15 +66,15 @@ class TradeActionOrderCancel extends _BaseAction {
         // FailOrder already have templateHex from API
         try {
           templateInfo = await TradeRepository().getOrderTemplateInfo(
-            walletId: walletId,
+            walletId: walletId!,
             chain: coinInfo.chain,
             chainPrecision: coinInfo.chainPrecision,
             templateAddress: order.templateAddress,
           );
         } catch (error) {
-          if (templateInfo.templateHex == null) {
-            rethrow;
-          }
+          //if (templateInfo.templateHex == null) {
+          //  rethrow;
+          //}
         }
       }
 
@@ -105,14 +105,14 @@ class TradeActionOrderCancel extends _BaseAction {
         utxos: utxos,
         contract: coinInfo.contract,
       );
-
+      /*
       if (NumberUtil.minus<double>(
             withdrawAmount,
             withdrawData.fee.feeValue,
-          ) <=
+          )  <=
           0) {
         throw TradeLowBalanceForCancelError();
-      }
+      }*/
       withdrawAmount = NumberUtil.minus<double>(
         withdrawAmount,
         withdrawData.fee.feeValue,
@@ -151,7 +151,7 @@ class TradeActionOrderCancel extends _BaseAction {
         contract: coinInfo.contract,
       );
 
-      final balance = state.walletState.activeWallet.getCoinBalance(
+      final balance = state.walletState.activeWallet?.getCoinBalance(
         chain: order.chain,
         symbol: order.chain,
       );
@@ -169,17 +169,19 @@ class TradeActionOrderCancel extends _BaseAction {
     String txId = '';
     if (order.isChainUseApiRawTx) {
       final submitTransaction = Completer<String>();
-      dispatch(WalletActionSignAndSubmitRawTx(
-        chain: withdrawData.chain,
-        symbol: withdrawData.symbol,
-        fromAddress: withdrawData.fromAddress,
-        rawTx: templateInfo.rawTx,
-        walletData: walletData,
-        completer: submitTransaction,
-        onConfirmSubmit: onConfirmSubmit,
-        broadcastType: 'dex',
-        amount: 0,
-      ));
+      dispatch(
+        WalletActionSignAndSubmitRawTx(
+          chain: withdrawData.chain,
+          symbol: withdrawData.symbol,
+          fromAddress: withdrawData.fromAddress,
+          rawTx: templateInfo!.rawTx,
+          walletData: walletData,
+          completer: submitTransaction,
+          onConfirmSubmit: onConfirmSubmit!,
+          broadcastType: 'dex',
+          amount: 0,
+        ),
+      );
       txId = await submitTransaction.future;
 
       // WalletActionSignAndSubmitRawTx will not add a
@@ -190,31 +192,32 @@ class TradeActionOrderCancel extends _BaseAction {
         symbol: withdrawData.symbol,
         feeValue: withdrawData.fee.feeValue,
         feeSymbol: withdrawData.fee.feeSymbol,
-        amount: withdrawAmount,
+        amount: withdrawAmount ?? 0,
         toAddress: coinInfo.address,
         fromAddress: withdrawData.fromAddress,
         type: TransactionType.deposit,
       )));
     } else {
       final submitTransaction = Completer<String>();
-      dispatch(WalletActionWithdrawSubmit(
-        params: WithdrawSubmitParams(
-          withdrawData: withdrawData,
-          amount: withdrawAmount,
-          chainPrecision: coinInfo.chainPrecision,
-          toAddress: coinInfo.address,
-          txTemplateData: templateInfo.templateHex,
-          broadcastType: 'dex',
-        ),
-        walletData: walletData,
-        completer: submitTransaction,
-        onConfirmSubmit: onConfirmSubmit,
-      ));
+      dispatch(
+        WalletActionWithdrawSubmit(
+            params: WithdrawSubmitParams(
+              withdrawData: withdrawData,
+              amount: withdrawAmount ?? 0,
+              chainPrecision: coinInfo.chainPrecision,
+              toAddress: coinInfo.address,
+              txTemplateData: templateInfo!.templateHex,
+              broadcastType: 'dex',
+            ),
+            walletData: walletData,
+            completer: submitTransaction,
+            onConfirmSubmit: onConfirmSubmit!),
+      );
 
       txId = await submitTransaction.future;
     }
 
-    await dispatchFuture(TradeActionOrderAddCancelling(
+    await dispatchAsync(TradeActionOrderAddCancelling(
       order,
       txId,
     ));
@@ -222,7 +225,7 @@ class TradeActionOrderCancel extends _BaseAction {
     // 失败订单的特殊处理
     if (order.isDealFail) {
       //1.保留失败记录
-      await dispatchFuture(WalletActionAddBroadcastTx(
+      await dispatchAsync(WalletActionAddBroadcastTx(
         txId: txId,
         chain: withdrawData.chain,
         symbol: withdrawData.symbol,
@@ -232,12 +235,12 @@ class TradeActionOrderCancel extends _BaseAction {
 
       try {
         //2.提交失败记录
-        await store.dispatchFuture(TradeActionSubmitCancelTxid(
+        await store.dispatchAsync(TradeActionSubmitCancelTxid(
           template: order.templateId,
           txId: txId,
         ));
         //3.如果失败几率提交成功 删除失败记录
-        await dispatchFuture(WalletActionDoneBroadcastTx(
+        await dispatchAsync(WalletActionDoneBroadcastTx(
           txId: txId,
           type: BroadcastTxType.tradeFailOrder,
         ));
@@ -252,7 +255,7 @@ class TradeActionOrderCancel extends _BaseAction {
   }
 
   @override
-  Object wrapError(dynamic error) {
+  Object? wrapError(dynamic error) {
     return parseWalletError(error);
   }
 }
@@ -263,14 +266,14 @@ class TradeActionSubmitCancelTxid extends _BaseAction {
     this.txId,
   });
 
-  final String template;
-  final String txId;
+  final String? template;
+  final String? txId;
 
   @override
-  Future<AppState> reduce() async {
+  Future<AppState?> reduce() async {
     await TradeRepository().postOrderDealFail(
-      txId: txId,
-      template: template,
+      txId: txId!,
+      template: template!,
       walletId: walletId,
     );
     return null;
@@ -279,7 +282,7 @@ class TradeActionSubmitCancelTxid extends _BaseAction {
 
 class TradeActionReSubmitCancelTxid extends _BaseAction {
   @override
-  Future<AppState> reduce() async {
+  Future<AppState?> reduce() async {
     final broadcastRequest = Completer<List<BroadcastTxInfo>>();
     dispatch(WalletActionGetBroadcastsFailed(
       type: BroadcastTxType.tradeFailOrder,
@@ -290,13 +293,13 @@ class TradeActionReSubmitCancelTxid extends _BaseAction {
     for (final item in prevBroadcasts) {
       try {
         // 重新提交
-        await dispatchFuture(TradeActionSubmitCancelTxid(
+        await dispatchAsync(TradeActionSubmitCancelTxid(
           txId: item.txId,
           template: item.apiParams,
         ));
 
         // 提交成功 删除记录
-        await dispatchFuture(WalletActionDoneBroadcastTx(
+        await dispatchAsync(WalletActionDoneBroadcastTx(
           txId: item.txId,
           type: BroadcastTxType.tradeFailOrder,
         ));

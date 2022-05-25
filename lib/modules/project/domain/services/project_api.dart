@@ -2,7 +2,7 @@ part of project_domain_module;
 
 class ProjectApi {
   Future<Map<String, dynamic>> getProjectInfo({
-    @required int id,
+    required int id,
   }) {
     return Request().getObject(
       '/v1/creation/info/$id',
@@ -10,8 +10,8 @@ class ProjectApi {
   }
 
   Future<List<Map<String, dynamic>>> getProjectList({
-    @required int skip,
-    @required int take,
+    required int skip,
+    required int take,
   }) {
     return Request().getListOfObjects(
       '/v1/creation/lists/$skip/$take',
@@ -19,8 +19,8 @@ class ProjectApi {
   }
 
   Future<Map<String, dynamic>> submitProject({
-    @required String walletId,
-    @required Map<String, dynamic> params,
+    required String walletId,
+    required Map<String, dynamic> params,
   }) =>
       addAuthSignature(
         walletId,

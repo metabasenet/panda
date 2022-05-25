@@ -5,13 +5,14 @@ abstract class WalletState implements Built<WalletState, WalletStateBuilder> {
   factory WalletState() {
     return _$WalletState._(
       wallets: [],
+      //activeWallet: Wallet(),
     );
   }
 
   WalletState._();
 
   factory WalletState.fromCache(List<dynamic> _) {
-    return _$WalletState._();
+    return _$WalletState._(wallets: []);
   }
 
   static Serializer<WalletState> get serializer => _$walletStateSerializer;
@@ -25,11 +26,11 @@ abstract class WalletState implements Built<WalletState, WalletStateBuilder> {
   List<Wallet> get wallets;
 
   //@nullable
-  Wallet get activeWallet;
+  Wallet? get activeWallet;
   //@nullable
-  String get activeWalletId;
+  String? get activeWalletId;
   //@nullable
-  WalletStatus get activeWalletStatus;
+  WalletStatus? get activeWalletStatus;
 
   bool get hasWallet => activeWallet != null && activeWalletId != null;
 }

@@ -1,7 +1,7 @@
 part of common_domain_module;
 
 class CommonRepository {
-  factory CommonRepository([CommonApi _api]) {
+  factory CommonRepository([CommonApi? _api]) {
     _instance._api = _api ?? CommonApi();
     return _instance;
   }
@@ -9,13 +9,14 @@ class CommonRepository {
 
   static final _instance = CommonRepository._internal();
 
-  CommonApi _api;
-  Box<Settings> _settings;
+  late CommonApi _api;
+  late Box<Settings> _settings;
 
   static const _settingsCacheKey = 'settings_v1';
 // Methods
 
   Future<void> initializeCache() async {
+    /*
     _settings = await AppHiveCache.openBox<Settings>(_settingsCacheKey);
     if (_settings.get(_settingsCacheKey) == null) {
       await _settings.put(
@@ -25,10 +26,11 @@ class CommonRepository {
           language: AppConstants.defaultLanguage,
         ),
       );
-    }
+    }*/
   }
 
   Settings getSettings() {
+    /*
     if (_settings.get(_settingsCacheKey) == null) {
       final settings = Settings(
         fiatCurrency: AppConstants.defaultCurrency,
@@ -38,6 +40,8 @@ class CommonRepository {
       return settings;
     }
     return _settings.get(_settingsCacheKey);
+    */
+    return Settings();
   }
 
   Future<Config> getConfig() async {
@@ -65,7 +69,7 @@ class CommonRepository {
         }
       }
     };
-    return Config.fromJson(json);
+    return Config.fromJson(json)!;
   }
 
   Future<String> getApiDns() async {
@@ -104,12 +108,12 @@ class CommonRepository {
         'disable_functions': {}
       }
     };
-    return ConfigUpdate.fromJson(json);
+    return ConfigUpdate.fromJson(json)!;
   }
 
   Future<ConfigUpdateData> getLastVersionBeta() async {
     debugPrint('getLastVersionBeta');
-    return null;
+    return ConfigUpdateData();
     /* 没有可以下载的版本
     final appSecret = AppConfig().appCenterAppSecret;
     final appDistribution = AppConfig().appCenterDistribution;

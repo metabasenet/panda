@@ -31,7 +31,10 @@ class HDKeyMnemonicImportDialog extends HookWidget {
           padding: context.edgeBottom20,
           child: Text(
             '将助记词导入（备份）到硬件设备中',
-            style: context.textSecondary(),
+            style: context.textSecondary(
+              bold: true,
+              fontWeight: FontWeight.normal,
+            ),
           ),
         ),
         Expanded(
@@ -58,6 +61,7 @@ class HDKeyMnemonicImportDialog extends HookWidget {
                       'aab',
                       style: context.textBody(
                           bold: true,
+                          fontWeight: FontWeight.normal,
                           color: index == walletSelect.value
                               ? context.whiteColor
                               : context.bodyColor),
@@ -116,6 +120,7 @@ class HDKeyMnemonicImportDialog extends HookWidget {
           title: tr('wallet:lbl_verify_pwd'),
           titleStyle: context.textBody(
             bold: true,
+            fontWeight: FontWeight.normal,
           ),
           controller: pwd,
           hintText: tr('wallet:hint_verify_pwd'),

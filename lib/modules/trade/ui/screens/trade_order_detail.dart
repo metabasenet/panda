@@ -3,13 +3,13 @@ part of trade_ui_module;
 class TradeOrderDetailPage extends HookWidget {
   const TradeOrderDetailPage(
     this.paramsOrderInfo, {
-    Key key,
+    Key? key,
   }) : super(key: key);
   final TradeOrder paramsOrderInfo;
 
   static const routeName = '/trade/order/detail';
 
-  static Future<bool> open(
+  static Future<bool?> open(
     TradeOrder paramsOrderInfo,
   ) {
     return AppNavigator.push<bool>(routeName, params: paramsOrderInfo);
@@ -31,7 +31,7 @@ class TradeOrderDetailPage extends HookWidget {
     BuildContext context,
     TradeOrder detail,
     TradeOrderDetailVM viewModel, {
-    double balance,
+    double? balance,
   }) {
     final precision = GetIt.I<CoinConfig>().getDealPrecision(detail.symbol);
     final infoList = [
@@ -43,15 +43,21 @@ class TradeOrderDetailPage extends HookWidget {
         ),
       },
       {
-        'label': tr('trade:order_lbl_price', namedArgs: {
-          'symbol': detail.priceSymbol,
-        }),
+        'label': tr(
+          'trade:order_lbl_price',
+          namedArgs: {
+            'symbol': detail.priceSymbol,
+          },
+        ),
         'value': NumberUtil.truncateDecimal<String>(detail.price, 8),
       },
       {
-        'label': tr('trade:order_lbl_amount', namedArgs: {
-          'symbol': detail.tradeSymbol,
-        }),
+        'label': tr(
+          'trade:order_lbl_amount',
+          namedArgs: {
+            'symbol': detail.tradeSymbol,
+          },
+        ),
         'value': NumberUtil.truncateDecimal<String>(detail.amount, 8),
       },
       {
@@ -67,7 +73,7 @@ class TradeOrderDetailPage extends HookWidget {
       {
         'label': tr('trade:order_lbl_remaining',
             namedArgs: {'symbol': detail.symbol}),
-        'value': balance >= 0
+        'value': (balance ?? 0) >= 0
             ? NumberUtil.truncateDecimal<String>(balance, precision)
             : '-',
       },
@@ -107,7 +113,10 @@ class TradeOrderDetailPage extends HookWidget {
                     item['label'].toString(),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: context.textTiny(),
+                    style: context.textTiny(
+                      bold: true,
+                      fontWeight: FontWeight.normal,
+                    ),
                     textAlign: TextAlign.start,
                   ),
                   SizedBox(height: 10),
@@ -127,6 +136,8 @@ class TradeOrderDetailPage extends HookWidget {
                           overflow: TextOverflow.ellipsis,
                           style: context.textSecondary(
                             color: context.bodyColor,
+                            bold: true,
+                            fontWeight: FontWeight.normal,
                           ),
                         ),
                       ),
@@ -157,15 +168,15 @@ class TradeOrderDetailPage extends HookWidget {
     BuildContext context,
     TradeOrder detail,
     TradeOrderDetailVM viewModel, {
-    TradeOrderDetailItem data,
-    bool isLast,
-    bool isExchange,
+    TradeOrderDetailItem? data,
+    bool? isLast,
+    bool? isExchange,
   }) {
     final infoList = [
       {
         'label': tr('trade:order_lbl_time'),
         'value': formatDate(
-          DateTime.fromMillisecondsSinceEpoch(data.createdAt * 1000),
+          DateTime.fromMillisecondsSinceEpoch((data?.createdAt ?? 0) * 1000),
           'MM.dd HH:mm:ss',
         ),
       },
@@ -174,21 +185,21 @@ class TradeOrderDetailPage extends HookWidget {
           'trade:order_lbl_final_price',
           namedArgs: {'symbol': detail.priceSymbol},
         ),
-        'value': data.matchPrice,
+        'value': data?.matchPrice,
       },
       {
         'label': tr(
           'trade:order_lbl_quantity',
           namedArgs: {'symbol': detail.tradeSymbol},
         ),
-        'value': data.amount,
+        'value': data?.amount,
       },
       if (isExchange != true)
         {
           'label': detail.isChainUseApiRawTx
               ? tr('trade:order_lbl_template_key')
               : tr('trade:order_lbl_template_address'),
-          'value': data.matchId,
+          'value': data?.matchId,
           'showCopyBtn': true,
         },
       if (isExchange == true)
@@ -199,19 +210,19 @@ class TradeOrderDetailPage extends HookWidget {
               'symbol': detail.isBuy ? detail.tradeSymbol : detail.priceSymbol
             },
           ),
-          'value': data.fee,
+          'value': data?.fee,
         },
       if (isExchange == true)
         {
           'label': tr('trade:order_lbl_txid'),
-          'value': data.txId,
+          'value': data?.txId,
           'showCopyBtn': true,
         },
     ];
     return Container(
       width: context.mediaWidth,
       padding: context.edgeBottom16,
-      decoration: !isLast
+      decoration: !(isLast ?? false)
           ? context.boxCardBorder(
               borderColor: context.greyColor,
               borderWidth: 0.5,
@@ -230,7 +241,10 @@ class TradeOrderDetailPage extends HookWidget {
                 children: [
                   Text(
                     item['label'].toString(),
-                    style: context.textSecondary(),
+                    style: context.textSecondary(
+                      bold: true,
+                      fontWeight: FontWeight.normal,
+                    ),
                   ),
                   Row(
                     children: [
@@ -244,7 +258,11 @@ class TradeOrderDetailPage extends HookWidget {
                                     endKeep: 6,
                                   )
                                 : item['value'].toString(),
-                        style: context.textSecondary(color: context.bodyColor),
+                        style: context.textSecondary(
+                          color: context.bodyColor,
+                          bold: true,
+                          fontWeight: FontWeight.normal,
+                        ),
                       ),
                       if (item['showCopyBtn'] == true &&
                           item['value'] != null &&
@@ -296,7 +314,7 @@ class TradeOrderDetailPage extends HookWidget {
       child: StoreConnector<AppState, TradeOrderDetailVM>(
         distinct: true,
         converter: TradeOrderDetailVM.fromStore,
-        onInitialBuild: (viewModel) {
+        onInitialBuild: (_, __, viewModel) {
           // Get balance
           viewModel
               .getOrderBalance(order)
@@ -340,7 +358,10 @@ class TradeOrderDetailPage extends HookWidget {
                             ),
                             Text(
                               tr(order.statusTransKey),
-                              style: context.textSmall(),
+                              style: context.textSmall(
+                                bold: true,
+                                fontWeight: FontWeight.normal,
+                              ),
                             ),
                           ],
                         ),
@@ -369,6 +390,7 @@ class TradeOrderDetailPage extends HookWidget {
                             style: context.textSecondary(
                               bold: true,
                               color: context.bodyColor,
+                              fontWeight: FontWeight.normal,
                             ),
                           ),
                           ...orderDetailInfo.value.matchList
@@ -404,6 +426,7 @@ class TradeOrderDetailPage extends HookWidget {
                             tr('trade:order_detail_lbl_transaction'),
                             style: context.textSecondary(
                               bold: true,
+                              fontWeight: FontWeight.normal,
                               color: context.bodyColor,
                             ),
                           ),

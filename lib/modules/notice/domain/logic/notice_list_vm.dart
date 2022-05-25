@@ -24,7 +24,7 @@ abstract class NoticeListVM
     bool isRefresh,
     int skip,
   ) async {
-    await store.dispatchFuture(NoticeActionGetList(
+    await store.dispatchAsync(NoticeActionGetList(
       isRefresh: isRefresh,
       skip: skip,
     ));

@@ -14,19 +14,19 @@ abstract class InvestState implements Built<InvestState, InvestStateBuilder> {
   InvestState._();
 
   //@nullable
-  InvestConfig get config;
+  InvestConfig? get config;
 
   //@nullable
   int get configState;
 
   //@nullable
-  List<MintItem> get mints => config?.mints?.toList() ?? [];
+  List<MintItem> get mints => config?.mints.toList() ?? [];
 
   //@nullable
-  MintItem get activeMint;
+  MintItem? get activeMint;
 
   //@nullable
-  MintInfo get mintInfo;
+  MintInfo? get mintInfo;
 
   BuiltList<MintChart> get chartList;
 

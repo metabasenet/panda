@@ -77,7 +77,7 @@ class _AssetDposDetail extends State<AssetDposDetail> {
       context,
       (password) => viewModel.doUnlockWallet(password),
       (walletData, _) async {
-        WalletActionMNTTxSubmit.reduceDpos(txData, walletData.mnemonic)
+        WalletActionMNTTxSubmit.reduceDpos(txData, walletData.mnemonic!)
             .then((res) {
           //AssetRepository()
           //    .submitTransaction(hex: res.toString())

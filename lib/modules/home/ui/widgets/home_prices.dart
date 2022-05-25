@@ -2,13 +2,13 @@ part of home_ui_module;
 
 class HomePricesCard extends StatelessWidget {
   const HomePricesCard({
-    @required this.prices,
-    @required this.doChangeTradePair,
-    @required this.allTradePairs,
+    required this.prices,
+    required this.doChangeTradePair,
+    required this.allTradePairs,
   }) : assert(prices != null);
 
   final List<AssetPrice> prices;
-  static List<AssetPrice> homePrices;
+  static List<AssetPrice>? homePrices;
   final List<TradePair> allTradePairs;
   final Future<void> Function(TradePair tradePair) doChangeTradePair;
   @override
@@ -27,7 +27,10 @@ class HomePricesCard extends StatelessWidget {
         children: [
           Text(
             tr('home:price_title'),
-            style: context.textMedium(bold: true),
+            style: context.textMedium(
+              bold: true,
+              fontWeight: FontWeight.normal,
+            ),
           ),
           Padding(
             padding: context.edgeTop,
@@ -38,7 +41,10 @@ class HomePricesCard extends StatelessWidget {
                   child: Text(
                     tr('home:price_lbl_pair'),
                     maxLines: 1,
-                    style: context.textSmall(),
+                    style: context.textSmall(
+                      bold: true,
+                      fontWeight: FontWeight.normal,
+                    ),
                   ),
                 ),
                 Expanded(
@@ -46,7 +52,10 @@ class HomePricesCard extends StatelessWidget {
                   child: Text(
                     tr('home:price_lbl_price'),
                     maxLines: 1,
-                    style: context.textSmall(),
+                    style: context.textSmall(
+                      bold: true,
+                      fontWeight: FontWeight.normal,
+                    ),
                   ),
                 ),
                 Expanded(
@@ -56,7 +65,10 @@ class HomePricesCard extends StatelessWidget {
                     child: Text(
                       tr('home:price_lbl_change'),
                       maxLines: 1,
-                      style: context.textSmall(),
+                      style: context.textSmall(
+                        bold: true,
+                        fontWeight: FontWeight.normal,
+                      ),
                     ),
                   ),
                 )
@@ -69,9 +81,8 @@ class HomePricesCard extends StatelessWidget {
             itemCount: prices.length,
             itemBuilder: (context, index) {
               final item = prices[index];
-              final tradePair = allTradePairs.firstWhere(
-                  (e) => e.id == item.tradePairId,
-                  orElse: () => null);
+              final tradePair =
+                  allTradePairs.firstWhere((e) => e.id == item.tradePairId);
 
               return CSContainer(
                 radius: 0,

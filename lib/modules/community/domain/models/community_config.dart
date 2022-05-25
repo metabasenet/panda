@@ -10,7 +10,7 @@ abstract class CommunityConfig
   static Serializer<CommunityConfig> get serializer =>
       _$communityConfigSerializer;
 
-  static CommunityConfig fromJson(Map<String, dynamic> json) {
+  static CommunityConfig? fromJson(Map<String, dynamic> json) {
     return deserialize<CommunityConfig>(json);
   }
 

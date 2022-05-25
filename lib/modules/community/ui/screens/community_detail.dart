@@ -41,7 +41,11 @@ class CommunityDetailPage extends HookWidget {
               Expanded(
                 child: SelectableText(
                   info.name ?? '',
-                  style: context.textMedium(bold: true, lineHeight: 1.5),
+                  style: context.textMedium(
+                    bold: true,
+                    lineHeight: 1.5,
+                    fontWeight: FontWeight.normal,
+                  ),
                 ),
               ),
               SizedBox(width: context.edgeSize),
@@ -71,6 +75,8 @@ class CommunityDetailPage extends HookWidget {
                   style: context.textSecondary(
                     color: context.bodyColor,
                     lineHeight: 1.5,
+                    bold: true,
+                    fontWeight: FontWeight.normal,
                   ),
                 ),
               ),
@@ -101,7 +107,10 @@ class CommunityDetailPage extends HookWidget {
             hintText: info.isTeamList
                 ? tr('community:team_list_hint_search')
                 : tr('community:member_list_hint_search'),
-            hintStyle: context.textSmall(),
+            hintStyle: context.textSmall(
+              bold: true,
+              fontWeight: FontWeight.normal,
+            ),
             onChanged: (text) {
               searchText.value = text;
             },
@@ -142,7 +151,7 @@ class CommunityDetailPage extends HookWidget {
         CSListViewParams<_GetCommunityListParams>>();
     final searchText = useState('');
     // 当前分类 是否创建 或者 申请 加入过
-    final hasHistory = useState<bool>(null);
+    final hasHistory = useState<bool?>(null);
 
     final actionBtText = hasHistory.value == true
         ? tr('community:create_btn_my_team')
@@ -198,6 +207,7 @@ class CommunityDetailPage extends HookWidget {
                   textStyle: context.textSecondary(
                     color: context.bodyColor,
                     bold: true,
+                    fontWeight: FontWeight.normal,
                   ),
                   autoWidth: true,
                   padding: context.edgeHorizontal,
@@ -218,7 +228,7 @@ class CommunityDetailPage extends HookWidget {
       child: StoreConnector<AppState, CommunityDetailVM>(
         distinct: true,
         converter: CommunityDetailVM.fromStore,
-        onInitialBuild: (viewModel) {
+        onInitialBuild: (_, __, viewModel) {
           viewModel.clearCommunityList(isTeamList: info.isTeamList);
           loadDetail(viewModel);
         },
@@ -259,7 +269,7 @@ class CommunityDetailPage extends HookWidget {
             return viewModel.loadData(
               isRefresh: params.isRefresh,
               skip: params.skip,
-              searchName: params.params.searchName,
+              searchName: params.params?.searchName ?? '',
               type: info.isTeamList ? info.type.toString() : info.id.toString(),
               isTeamList: info.isTeamList,
             );

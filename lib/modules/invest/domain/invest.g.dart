@@ -442,19 +442,24 @@ class _$InvestHomeVM extends InvestHomeVM {
   @override
   final BuiltList<ProfitRecordItem> profitRecordList;
   @override
-  final AssetCoin Function({String chain, String symbol}) getCoinInfo;
+  final AssetCoin Function({required String chain, required String symbol})
+      getCoinInfo;
   @override
   final Future<void> Function(MintItem mint) doSwitchMint;
   @override
   final Future<void> Function() refreshMintReward;
   @override
-  final Future<int> Function({bool isRefresh, int skip, int take})
-      getProfitInvitationList;
+  final Future<int> Function(
+      {required bool isRefresh,
+      required int skip,
+      required int take}) getProfitInvitationList;
   @override
-  final Future<int> Function({bool isRefresh, int skip, int take})
-      getProfitRecordList;
+  final Future<int> Function(
+      {required bool isRefresh,
+      required int skip,
+      required int take}) getProfitRecordList;
   @override
-  final MintItem Function() getDefaultMint;
+  final MintItem? Function() getDefaultMint;
 
   factory _$InvestHomeVM([void Function(InvestHomeVMBuilder)? updates]) =>
       (new InvestHomeVMBuilder()..update(updates))._build();
@@ -609,11 +614,13 @@ class InvestHomeVMBuilder
   set profitRecordList(ListBuilder<ProfitRecordItem>? profitRecordList) =>
       _$this._profitRecordList = profitRecordList;
 
-  AssetCoin Function({String chain, String symbol})? _getCoinInfo;
-  AssetCoin Function({String chain, String symbol})? get getCoinInfo =>
-      _$this._getCoinInfo;
+  AssetCoin Function({required String chain, required String symbol})?
+      _getCoinInfo;
+  AssetCoin Function({required String chain, required String symbol})?
+      get getCoinInfo => _$this._getCoinInfo;
   set getCoinInfo(
-          AssetCoin Function({String chain, String symbol})? getCoinInfo) =>
+          AssetCoin Function({required String chain, required String symbol})?
+              getCoinInfo) =>
       _$this._getCoinInfo = getCoinInfo;
 
   Future<void> Function(MintItem mint)? _doSwitchMint;
@@ -627,27 +634,39 @@ class InvestHomeVMBuilder
   set refreshMintReward(Future<void> Function()? refreshMintReward) =>
       _$this._refreshMintReward = refreshMintReward;
 
-  Future<int> Function({bool isRefresh, int skip, int take})?
-      _getProfitInvitationList;
-  Future<int> Function({bool isRefresh, int skip, int take})?
+  Future<int> Function(
+      {required bool isRefresh,
+      required int skip,
+      required int take})? _getProfitInvitationList;
+  Future<int> Function(
+          {required bool isRefresh, required int skip, required int take})?
       get getProfitInvitationList => _$this._getProfitInvitationList;
   set getProfitInvitationList(
-          Future<int> Function({bool isRefresh, int skip, int take})?
+          Future<int> Function(
+                  {required bool isRefresh,
+                  required int skip,
+                  required int take})?
               getProfitInvitationList) =>
       _$this._getProfitInvitationList = getProfitInvitationList;
 
-  Future<int> Function({bool isRefresh, int skip, int take})?
-      _getProfitRecordList;
-  Future<int> Function({bool isRefresh, int skip, int take})?
+  Future<int> Function(
+      {required bool isRefresh,
+      required int skip,
+      required int take})? _getProfitRecordList;
+  Future<int> Function(
+          {required bool isRefresh, required int skip, required int take})?
       get getProfitRecordList => _$this._getProfitRecordList;
   set getProfitRecordList(
-          Future<int> Function({bool isRefresh, int skip, int take})?
+          Future<int> Function(
+                  {required bool isRefresh,
+                  required int skip,
+                  required int take})?
               getProfitRecordList) =>
       _$this._getProfitRecordList = getProfitRecordList;
 
-  MintItem Function()? _getDefaultMint;
-  MintItem Function()? get getDefaultMint => _$this._getDefaultMint;
-  set getDefaultMint(MintItem Function()? getDefaultMint) =>
+  MintItem? Function()? _getDefaultMint;
+  MintItem? Function()? get getDefaultMint => _$this._getDefaultMint;
+  set getDefaultMint(MintItem? Function()? getDefaultMint) =>
       _$this._getDefaultMint = getDefaultMint;
 
   InvestHomeVMBuilder();
@@ -749,10 +768,13 @@ class _$InvestProfitVM extends InvestProfitVM {
   @override
   final BuiltList<ProfitRecordItem> profitRecordList;
   @override
-  final AssetCoin Function({String chain, String symbol}) getCoinInfo;
+  final AssetCoin Function({required String chain, required String symbol})
+      getCoinInfo;
   @override
-  final Future<int> Function({bool isRefresh, int skip, int take})
-      getProfitRecordList;
+  final Future<int> Function(
+      {required bool isRefresh,
+      required int skip,
+      required int take}) getProfitRecordList;
 
   factory _$InvestProfitVM([void Function(InvestProfitVMBuilder)? updates]) =>
       (new InvestProfitVMBuilder()..update(updates))._build();
@@ -831,19 +853,27 @@ class InvestProfitVMBuilder
   set profitRecordList(ListBuilder<ProfitRecordItem>? profitRecordList) =>
       _$this._profitRecordList = profitRecordList;
 
-  AssetCoin Function({String chain, String symbol})? _getCoinInfo;
-  AssetCoin Function({String chain, String symbol})? get getCoinInfo =>
-      _$this._getCoinInfo;
+  AssetCoin Function({required String chain, required String symbol})?
+      _getCoinInfo;
+  AssetCoin Function({required String chain, required String symbol})?
+      get getCoinInfo => _$this._getCoinInfo;
   set getCoinInfo(
-          AssetCoin Function({String chain, String symbol})? getCoinInfo) =>
+          AssetCoin Function({required String chain, required String symbol})?
+              getCoinInfo) =>
       _$this._getCoinInfo = getCoinInfo;
 
-  Future<int> Function({bool isRefresh, int skip, int take})?
-      _getProfitRecordList;
-  Future<int> Function({bool isRefresh, int skip, int take})?
+  Future<int> Function(
+      {required bool isRefresh,
+      required int skip,
+      required int take})? _getProfitRecordList;
+  Future<int> Function(
+          {required bool isRefresh, required int skip, required int take})?
       get getProfitRecordList => _$this._getProfitRecordList;
   set getProfitRecordList(
-          Future<int> Function({bool isRefresh, int skip, int take})?
+          Future<int> Function(
+                  {required bool isRefresh,
+                  required int skip,
+                  required int take})?
               getProfitRecordList) =>
       _$this._getProfitRecordList = getProfitRecordList;
 
@@ -1764,13 +1794,13 @@ class ProfitRecordItemBuilder
 
 class _$InvestState extends InvestState {
   @override
-  final InvestConfig config;
+  final InvestConfig? config;
   @override
   final int configState;
   @override
-  final MintItem activeMint;
+  final MintItem? activeMint;
   @override
-  final MintInfo mintInfo;
+  final MintInfo? mintInfo;
   @override
   final BuiltList<MintChart> chartList;
   @override
@@ -1782,20 +1812,16 @@ class _$InvestState extends InvestState {
       (new InvestStateBuilder()..update(updates))._build();
 
   _$InvestState._(
-      {required this.config,
+      {this.config,
       required this.configState,
-      required this.activeMint,
-      required this.mintInfo,
+      this.activeMint,
+      this.mintInfo,
       required this.chartList,
       required this.profitRecordList,
       required this.profitInvitationList})
       : super._() {
-    BuiltValueNullFieldError.checkNotNull(config, 'InvestState', 'config');
     BuiltValueNullFieldError.checkNotNull(
         configState, 'InvestState', 'configState');
-    BuiltValueNullFieldError.checkNotNull(
-        activeMint, 'InvestState', 'activeMint');
-    BuiltValueNullFieldError.checkNotNull(mintInfo, 'InvestState', 'mintInfo');
     BuiltValueNullFieldError.checkNotNull(
         chartList, 'InvestState', 'chartList');
     BuiltValueNullFieldError.checkNotNull(
@@ -1898,10 +1924,10 @@ class InvestStateBuilder implements Builder<InvestState, InvestStateBuilder> {
   InvestStateBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _config = $v.config.toBuilder();
+      _config = $v.config?.toBuilder();
       _configState = $v.configState;
-      _activeMint = $v.activeMint.toBuilder();
-      _mintInfo = $v.mintInfo.toBuilder();
+      _activeMint = $v.activeMint?.toBuilder();
+      _mintInfo = $v.mintInfo?.toBuilder();
       _chartList = $v.chartList.toBuilder();
       _profitRecordList = $v.profitRecordList.toBuilder();
       _profitInvitationList = $v.profitInvitationList.toBuilder();
@@ -1929,11 +1955,11 @@ class InvestStateBuilder implements Builder<InvestState, InvestStateBuilder> {
     try {
       _$result = _$v ??
           new _$InvestState._(
-              config: config.build(),
+              config: _config?.build(),
               configState: BuiltValueNullFieldError.checkNotNull(
                   configState, 'InvestState', 'configState'),
-              activeMint: activeMint.build(),
-              mintInfo: mintInfo.build(),
+              activeMint: _activeMint?.build(),
+              mintInfo: _mintInfo?.build(),
               chartList: chartList.build(),
               profitRecordList: profitRecordList.build(),
               profitInvitationList: profitInvitationList.build());
@@ -1941,12 +1967,12 @@ class InvestStateBuilder implements Builder<InvestState, InvestStateBuilder> {
       late String _$failedField;
       try {
         _$failedField = 'config';
-        config.build();
+        _config?.build();
 
         _$failedField = 'activeMint';
-        activeMint.build();
+        _activeMint?.build();
         _$failedField = 'mintInfo';
-        mintInfo.build();
+        _mintInfo?.build();
         _$failedField = 'chartList';
         chartList.build();
         _$failedField = 'profitRecordList';

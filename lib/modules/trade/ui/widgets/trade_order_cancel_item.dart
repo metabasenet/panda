@@ -2,12 +2,12 @@ part of trade_ui_module;
 
 class TradeOrderCancelItem extends StatelessWidget {
   const TradeOrderCancelItem({
-    @required this.order,
-    @required this.onCancelOrder,
-    @required this.onGetOrderAmount,
-    Key key,
+    required this.order,
+    required this.onCancelOrder,
+    required this.onGetOrderAmount,
+    Key? key,
     this.isHistory = false,
-    this.orderAmount,
+    this.orderAmount = '',
     this.onPress,
   }) : super(key: key);
 
@@ -16,7 +16,7 @@ class TradeOrderCancelItem extends StatelessWidget {
   final String orderAmount;
   final void Function(TradeOrder) onCancelOrder;
   final void Function() onGetOrderAmount;
-  final void Function() onPress;
+  final void Function()? onPress;
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +62,10 @@ class TradeOrderCancelItem extends StatelessWidget {
               Spacer(),
               Text(
                 tr('trade:order_list_lbl_trade_failed'),
-                style: context.textSmall(bold: true),
+                style: context.textSmall(
+                  bold: true,
+                  fontWeight: FontWeight.normal,
+                ),
               )
             ],
           ),
@@ -82,7 +85,10 @@ class TradeOrderCancelItem extends StatelessWidget {
                     children: [
                       Text(
                         item['label'].toString(),
-                        style: context.textTiny(),
+                        style: context.textTiny(
+                          bold: true,
+                          fontWeight: FontWeight.normal,
+                        ),
                       ),
                       SizedBox(height: 10),
                       if (item['showGetAmount'] == 'true')
@@ -93,7 +99,11 @@ class TradeOrderCancelItem extends StatelessWidget {
                           alignment: MainAxisAlignment.start,
                           mainAxisSize: MainAxisSize.min,
                           textStyle: context
-                              .textSecondary(color: context.bodyColor)
+                              .textSecondary(
+                                color: context.bodyColor,
+                                bold: true,
+                                fontWeight: FontWeight.normal,
+                              )
                               .copyWith(decoration: TextDecoration.underline),
                         )
                       else
@@ -102,6 +112,7 @@ class TradeOrderCancelItem extends StatelessWidget {
                           style: context.textSecondary(
                             bold: item['bold'] != 'false',
                             color: context.bodyColor,
+                            fontWeight: FontWeight.normal,
                           ),
                         ),
                     ],
@@ -132,6 +143,7 @@ class TradeOrderCancelItem extends StatelessWidget {
                 textStyle: context.textSmall(
                   bold: true,
                   color: context.bodyColor,
+                  fontWeight: FontWeight.normal,
                 ),
                 autoWidth: true,
                 onPressed: () {
@@ -146,6 +158,7 @@ class TradeOrderCancelItem extends StatelessWidget {
                 height: 28,
                 textStyle: context.textSmall(
                   bold: true,
+                  fontWeight: FontWeight.normal,
                   color: context.bodyColor,
                 ),
                 autoWidth: true,

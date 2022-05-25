@@ -2,17 +2,17 @@ part of trade_ui_module;
 
 class HomeInputCard extends HookWidget {
   const HomeInputCard({
-    @required this.tradeSide,
-    @required this.tradePair,
-    @required this.tradeCoinInfo,
-    @required this.priceCoinInfo,
-    @required this.sideCoinInfo,
-    @required this.sideCoinConfig,
-    @required this.updatePriceEvent,
-    @required this.updateApproveEvent,
-    @required this.onChangeSide,
-    @required this.onSubmitOrder,
-    @required this.onApproveOrder,
+    required this.tradeSide,
+    required this.tradePair,
+    required this.tradeCoinInfo,
+    required this.priceCoinInfo,
+    required this.sideCoinInfo,
+    required this.sideCoinConfig,
+    required this.updatePriceEvent,
+    required this.updateApproveEvent,
+    required this.onChangeSide,
+    required this.onSubmitOrder,
+    required this.onApproveOrder,
   });
 
   final TradeSide tradeSide;
@@ -50,10 +50,10 @@ class HomeInputCard extends HookWidget {
     @required bool isReset,
   }) onApproveOrder;
 
-  double getPriceAdjustment({
-    @required String price,
-    @required String amount,
-    @required int dealPrecision,
+  double? getPriceAdjustment({
+    required String price,
+    required String amount,
+    required int dealPrecision,
   }) {
     var checkTotal = NumberUtil.multiply<double>(
       price,
@@ -65,7 +65,7 @@ class HomeInputCard extends HookWidget {
       final increase = NumberUtil.getDecimalMinValue(
         NumberUtil.getDecimalDigits(price),
       );
-      var newPrice = NumberUtil.getDouble(price);
+      double? newPrice = NumberUtil.getDouble(price);
       while (NumberUtil.getDecimalDigits(checkTotal) > dealPrecision) {
         newPrice = NumberUtil.plus<double>(
           newPrice,
@@ -135,7 +135,7 @@ class HomeInputCard extends HookWidget {
       final price = fiatPriceCubit.state.getFiatPrice(
         coinPrice: coinPriceCubit.state.getCoinPrice(
           tradePairId: tradePair.id,
-        ),
+        )!,
         amount: NumberUtil.getDouble(fieldPrice.text),
       );
       priceFiatValue.add(price);
@@ -165,7 +165,7 @@ class HomeInputCard extends HookWidget {
             price,
             sideCoinConfig.dealPrecision ?? 6,
           );
-          maxChanges.add(maxAmount > 0 ? maxAmount : 0);
+          //maxChanges.add(maxAmount > 0 ? maxAmount : 0);
         } else {
           maxChanges.add(0);
         }
@@ -174,7 +174,7 @@ class HomeInputCard extends HookWidget {
           tradeCoinInfo.balance,
           sideCoinConfig.inputNetworkFee ?? 0,
         );
-        maxChanges.add(maxAmount > 0 ? maxAmount : 0);
+        // maxChanges.add(maxAmount > 0 ? maxAmount : 0);
       }
     }
 
@@ -209,7 +209,9 @@ class HomeInputCard extends HookWidget {
       return null;
     }, [tradeSide]);
 
-    useEffect(() {
+    useEffect(
+      () {
+        /*
       final subInitialPrice = tickersCubit.listen((data) {
         if (fieldPrice.text.isEmpty) {
           updateWithLastPrice();
@@ -229,8 +231,10 @@ class HomeInputCard extends HookWidget {
         subInitialPrice.cancel();
         subUpdatePrice.cancel();
         subUpdateApprove.cancel();
-      };
-    }, []);
+      };*/
+      },
+      [],
+    );
 
     return CSContainer(
       margin: context.edgeAll.copyWith(left: 0, top: 6, bottom: 6),
@@ -258,7 +262,10 @@ class HomeInputCard extends HookWidget {
                   maxInteger: 8,
                   maxDecimal: dealPrecision,
                   hintText: tr('trade:order_hint_price'),
-                  hintStyle: context.textSecondary(bold: true),
+                  hintStyle: context.textSecondary(
+                    bold: true,
+                    fontWeight: FontWeight.normal,
+                  ),
                   onChanged: (price) {
                     updateMaxBuySell();
                     updateTotal();
@@ -276,8 +283,14 @@ class HomeInputCard extends HookWidget {
                     builder: (context, snapshot) => RowItemBar(
                       tr('trade:order_lbl_fiat_price'),
                       '≈ ${snapshot.data} $fiatCurrency',
-                      valueStyle: context.textSmall(),
-                      textStyle: context.textSmall(),
+                      valueStyle: context.textSmall(
+                        bold: true,
+                        fontWeight: FontWeight.normal,
+                      ),
+                      textStyle: context.textSmall(
+                        bold: true,
+                        fontWeight: FontWeight.normal,
+                      ),
                     ),
                   ),
                 ),
@@ -292,11 +305,14 @@ class HomeInputCard extends HookWidget {
                         maxInteger: 8,
                         maxDecimal: dealPrecision,
                         hintText: tr('trade:order_hint_amount'),
-                        unit: tradeCoinInfo?.symbol ?? '',
+                        unit: tradeCoinInfo.symbol,
                         spinner: false,
-                        hintStyle: context.textSecondary(bold: true),
+                        hintStyle: context.textSecondary(
+                          bold: true,
+                          fontWeight: FontWeight.normal,
+                        ),
                         onChanged: (value) {
-                          if (data.balance <= 0) {
+                          if ((data?.balance ?? 0) <= 0) {
                             Toast.show(tr('asset:withdraw_msg_error_balance'));
                           }
                           amountChanges.add(NumberUtil.getDouble(value));
@@ -308,10 +324,16 @@ class HomeInputCard extends HookWidget {
                       RowItemBar(
                         tr('trade:order_lbl_available'),
                         '''$balance ${sideCoinInfo?.symbol ?? ''}''',
-                        key: Key(balance),
+                        key: Key(balance!),
                         valueFlex: 2,
-                        textStyle: context.textSmall(),
-                        valueStyle: context.textSmall(),
+                        textStyle: context.textSmall(
+                          bold: true,
+                          fontWeight: FontWeight.normal,
+                        ),
+                        valueStyle: context.textSmall(
+                          bold: true,
+                          fontWeight: FontWeight.normal,
+                        ),
                       ),
                     ],
                   ),
@@ -338,14 +360,23 @@ class HomeInputCard extends HookWidget {
                   RowItemBar(
                     tr('trade:order_lbl_miner_fee_order'),
                     '''${sideCoinConfig.networkFee ?? '-'} ${sideCoinConfig.symbol ?? ''}''',
-                    valueStyle: context.textSmall(),
-                    textStyle: context.textSmall(),
+                    valueStyle: context.textSmall(
+                      bold: true,
+                      fontWeight: FontWeight.normal,
+                    ),
+                    textStyle: context.textSmall(
+                      bold: true,
+                      fontWeight: FontWeight.normal,
+                    ),
                   ),
                 if (isChainNeedApprove)
                   RowItemBar(
                     tr('trade:order_lbl_approve_balance'),
                     '',
-                    textStyle: context.textSmall(),
+                    textStyle: context.textSmall(
+                      bold: true,
+                      fontWeight: FontWeight.normal,
+                    ),
                     valueWidget: CSButton(
                       flat: true,
                       padding: EdgeInsets.zero,
@@ -353,7 +384,11 @@ class HomeInputCard extends HookWidget {
                       label:
                           '''${approveBalance.data ?? '-'} ${sideCoinInfo.symbol ?? ''}''',
                       textStyle: context
-                          .textSmall(color: context.bodyColor, bold: true)
+                          .textSmall(
+                            color: context.bodyColor,
+                            bold: true,
+                            fontWeight: FontWeight.normal,
+                          )
                           .copyWith(decoration: TextDecoration.underline),
                       onPressed: () {
                         if (NumberUtil.getDouble(approveBalance.data) <= 0) {
@@ -385,8 +420,12 @@ class HomeInputCard extends HookWidget {
                     valueStyle: context.textSmall(
                       color: context.bodyColor,
                       bold: true,
+                      fontWeight: FontWeight.normal,
                     ),
-                    textStyle: context.textSmall(),
+                    textStyle: context.textSmall(
+                      bold: true,
+                      fontWeight: FontWeight.normal,
+                    ),
                     valueFlex: 2,
                   ),
                 ),
@@ -417,8 +456,9 @@ class HomeInputCard extends HookWidget {
                 borderColor: needApprove ? buttonColor : Colors.transparent,
                 bordered: needApprove,
                 onPressed: () {
-                  if (FocusManager.instance.primaryFocus.hasPrimaryFocus) {
-                    FocusManager.instance.primaryFocus.unfocus();
+                  if (FocusManager.instance.primaryFocus?.hasPrimaryFocus ??
+                      false) {
+                    FocusManager.instance.primaryFocus?.unfocus();
                   }
                   if (!hasWallet) {
                     AppNavigator.gotoTabBarPage(AppTabBarPages.wallet);

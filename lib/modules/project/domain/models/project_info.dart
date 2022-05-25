@@ -7,7 +7,7 @@ abstract class ProjectInfo implements Built<ProjectInfo, ProjectInfoBuilder> {
 
   static Serializer<ProjectInfo> get serializer => _$projectInfoSerializer;
 
-  static ProjectInfo fromJson(Map<String, dynamic> json) {
+  static ProjectInfo? fromJson(Map<String, dynamic> json) {
     return deserialize<ProjectInfo>(json);
   }
 
@@ -90,5 +90,6 @@ abstract class ProjectInfo implements Built<ProjectInfo, ProjectInfoBuilder> {
 
   //@nullable
   double get displayProgress =>
-      NumberUtil.multiply(NumberUtil.divide(inviteNumber, targetNumber), 120);
+      NumberUtil.multiply(NumberUtil.divide(inviteNumber, targetNumber), 120) ??
+      0;
 }

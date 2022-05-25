@@ -2,11 +2,11 @@ part of swap_ui_module;
 
 class SwapCoin extends HookWidget {
   const SwapCoin({
-    @required this.fromCoin,
-    @required this.toCoin,
-    @required this.onChangeCoin,
-    @required this.doChangeDirection,
-    @required this.coinList,
+    required this.fromCoin,
+    required this.toCoin,
+    required this.onChangeCoin,
+    required this.doChangeDirection,
+    required this.coinList,
   });
 
   final SwapConfigCoin fromCoin;
@@ -19,7 +19,7 @@ class SwapCoin extends HookWidget {
     BuildContext context,
     SwapConfigCoin baseCoin,
     SwapConfigCoin selectCoin, {
-    bool isSelectFrom,
+    bool? isSelectFrom,
   }) {
     final List<
             MapEntry<SwapConfigCoin, MapEntry<SwapConfigCoin, SwapConfigCoin>>>
@@ -52,7 +52,9 @@ class SwapCoin extends HookWidget {
       options: options,
       onSelected: (value) {
         if (value.key.id != selectCoin.id) {
-          onChangeCoin(isSelectFrom ? value : MapEntry(value.value, value.key));
+          onChangeCoin((isSelectFrom ?? false)
+              ? value
+              : MapEntry(value.value, value.key));
         }
       },
     );
@@ -62,7 +64,7 @@ class SwapCoin extends HookWidget {
   Widget build(BuildContext context) {
     final needReverse = useState(false);
     final angle = useState<double>(0);
-    final rotateAnimation = useState<Animation<double>>(null);
+    final rotateAnimation = useState<Animation<double>?>(null);
 
     final iconSize = 20 + context.edgeSizeDouble;
     final itemWidth =
@@ -100,7 +102,7 @@ class SwapCoin extends HookWidget {
       rotateAnimation.value =
           Tween<double>(begin: 0.0, end: math.pi).animate(controller)
             ..addListener(() {
-              angle.value = rotateAnimation.value.value;
+              angle.value = rotateAnimation.value!.value;
             });
 
       controller.addStatusListener(listener);
@@ -183,8 +185,11 @@ class SwapCoin extends HookWidget {
       margin: EdgeInsets.zero,
       width: itemWidth,
       child: Text(
-        coin?.name ?? '',
-        style: context.textBody(bold: true),
+        coin.name,
+        style: context.textBody(
+          bold: true,
+          fontWeight: FontWeight.normal,
+        ),
         textAlign: textAlign,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,

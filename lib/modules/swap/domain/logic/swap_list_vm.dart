@@ -4,10 +4,8 @@ abstract class SwapListVM implements Built<SwapListVM, SwapListVMBuilder> {
   factory SwapListVM([void Function(SwapListVMBuilder) updates]) = _$SwapListVM;
   SwapListVM._();
 
-  //@nullable
   BuiltList<Swap> get swapList;
 
-// Withdraw Methods
   @BuiltValueField(compare: false)
   Future<int> Function(
     int skip,
@@ -23,11 +21,13 @@ abstract class SwapListVM implements Built<SwapListVM, SwapListVMBuilder> {
         ..swapList = store.state.swapState.swaps.toBuilder()
         ..loadData = (page, skip) async {
           final completer = Completer<int>();
-          store.dispatchFuture(SwapActionGetSwaps(
-            page: page,
-            skip: skip,
-            completer: completer,
-          ));
+          store.dispatchAsync(
+            SwapActionGetSwaps(
+              page: page,
+              skip: skip,
+              completer: completer,
+            ),
+          );
           return completer.future;
         },
     );

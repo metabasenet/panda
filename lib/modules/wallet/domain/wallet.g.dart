@@ -21,17 +21,29 @@ class _$WalletStateSerializer implements StructuredSerializer<WalletState> {
       'wallets',
       serializers.serialize(object.wallets,
           specifiedType: const FullType(List, const [const FullType(Wallet)])),
-      'activeWallet',
-      serializers.serialize(object.activeWallet,
-          specifiedType: const FullType(Wallet)),
-      'activeWalletId',
-      serializers.serialize(object.activeWalletId,
-          specifiedType: const FullType(String)),
-      'activeWalletStatus',
-      serializers.serialize(object.activeWalletStatus,
-          specifiedType: const FullType(WalletStatus)),
     ];
-
+    Object? value;
+    value = object.activeWallet;
+    if (value != null) {
+      result
+        ..add('activeWallet')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(Wallet)));
+    }
+    value = object.activeWalletId;
+    if (value != null) {
+      result
+        ..add('activeWalletId')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.activeWalletStatus;
+    if (value != null) {
+      result
+        ..add('activeWalletStatus')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(WalletStatus)));
+    }
     return result;
   }
 
@@ -54,15 +66,15 @@ class _$WalletStateSerializer implements StructuredSerializer<WalletState> {
           break;
         case 'activeWallet':
           result.activeWallet = serializers.deserialize(value,
-              specifiedType: const FullType(Wallet))! as Wallet;
+              specifiedType: const FullType(Wallet)) as Wallet?;
           break;
         case 'activeWalletId':
           result.activeWalletId = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'activeWalletStatus':
           result.activeWalletStatus = serializers.deserialize(value,
-              specifiedType: const FullType(WalletStatus))! as WalletStatus;
+              specifiedType: const FullType(WalletStatus)) as WalletStatus?;
           break;
       }
     }
@@ -161,7 +173,7 @@ class _$WalletManagementVM extends WalletManagementVM {
   final Future<WalletPrivateData> Function(String password) doUnlockWallet;
   @override
   final Future<String> Function(String name, String password,
-      [String importMnemonic, WalletType type]) createWallet;
+      [String? importMnemonic, WalletType? type]) createWallet;
   @override
   final Future<void> Function(String pwdOld, String pwdNew) changePassword;
   @override
@@ -251,13 +263,13 @@ class WalletManagementVMBuilder
       _$this._doUnlockWallet = doUnlockWallet;
 
   Future<String> Function(String name, String password,
-      [String importMnemonic, WalletType type])? _createWallet;
+      [String? importMnemonic, WalletType? type])? _createWallet;
   Future<String> Function(String name, String password,
-      [String importMnemonic,
-      WalletType type])? get createWallet => _$this._createWallet;
+      [String? importMnemonic,
+      WalletType? type])? get createWallet => _$this._createWallet;
   set createWallet(
           Future<String> Function(String name, String password,
-                  [String importMnemonic, WalletType type])?
+                  [String? importMnemonic, WalletType? type])?
               createWallet) =>
       _$this._createWallet = createWallet;
 
@@ -343,28 +355,22 @@ class _$WalletState extends WalletState {
   @override
   final List<Wallet> wallets;
   @override
-  final Wallet activeWallet;
+  final Wallet? activeWallet;
   @override
-  final String activeWalletId;
+  final String? activeWalletId;
   @override
-  final WalletStatus activeWalletStatus;
+  final WalletStatus? activeWalletStatus;
 
   factory _$WalletState([void Function(WalletStateBuilder)? updates]) =>
       (new WalletStateBuilder()..update(updates))._build();
 
   _$WalletState._(
       {required this.wallets,
-      required this.activeWallet,
-      required this.activeWalletId,
-      required this.activeWalletStatus})
+      this.activeWallet,
+      this.activeWalletId,
+      this.activeWalletStatus})
       : super._() {
     BuiltValueNullFieldError.checkNotNull(wallets, 'WalletState', 'wallets');
-    BuiltValueNullFieldError.checkNotNull(
-        activeWallet, 'WalletState', 'activeWallet');
-    BuiltValueNullFieldError.checkNotNull(
-        activeWalletId, 'WalletState', 'activeWalletId');
-    BuiltValueNullFieldError.checkNotNull(
-        activeWalletStatus, 'WalletState', 'activeWalletStatus');
   }
 
   @override
@@ -457,12 +463,9 @@ class WalletStateBuilder implements Builder<WalletState, WalletStateBuilder> {
         new _$WalletState._(
             wallets: BuiltValueNullFieldError.checkNotNull(
                 wallets, 'WalletState', 'wallets'),
-            activeWallet: BuiltValueNullFieldError.checkNotNull(
-                activeWallet, 'WalletState', 'activeWallet'),
-            activeWalletId: BuiltValueNullFieldError.checkNotNull(
-                activeWalletId, 'WalletState', 'activeWalletId'),
-            activeWalletStatus: BuiltValueNullFieldError.checkNotNull(
-                activeWalletStatus, 'WalletState', 'activeWalletStatus'));
+            activeWallet: activeWallet,
+            activeWalletId: activeWalletId,
+            activeWalletStatus: activeWalletStatus);
     replace(_$result);
     return _$result;
   }
@@ -593,9 +596,9 @@ class CoinAddressAdapter extends TypeAdapter<CoinAddress> {
       symbol: fields[8] as String,
       address: fields[1] as String,
       publicKey: fields[4] as String,
-      addressType: fields[2] as String,
-      addressMemoOrTag: fields[3] as String,
-      description: fields[5] as String,
+      addressType: fields[2] as String?,
+      addressMemoOrTag: fields[3] as String?,
+      description: fields[5] as String?,
     )
       ..createdAt = fields[6] as DateTime
       ..updatedAt = fields[7] as DateTime;
@@ -706,10 +709,10 @@ class CoinInfoAdapter extends TypeAdapter<CoinInfo> {
       chainPrecision: fields[7] as int,
       displayPrecision: fields[8] as int,
       contract: fields[2] as String,
-      iconOnline: fields[5] as String,
-      iconLocal: fields[6] as String,
-      isEnabled: fields[11] as bool,
-      isFixed: fields[10] as bool,
+      iconOnline: fields[5] as String?,
+      iconLocal: fields[6] as String?,
+      isEnabled: fields[11] as bool?,
+      isFixed: fields[10] as bool?,
     );
   }
 

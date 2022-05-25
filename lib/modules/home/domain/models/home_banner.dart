@@ -8,7 +8,7 @@ abstract class HomeBanner implements Built<HomeBanner, HomeBannerBuilder> {
 
   static Serializer<HomeBanner> get serializer => _$homeBannerSerializer;
 
-  static HomeBanner fromJson(Map<String, dynamic> json) {
+  static HomeBanner? fromJson(Map<String, dynamic> json) {
     return deserialize<HomeBanner>(json);
   }
 

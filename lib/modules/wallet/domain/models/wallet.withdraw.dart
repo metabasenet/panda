@@ -2,10 +2,10 @@ part of wallet_domain_module;
 
 class WalletWithdrawFeeData {
   WalletWithdrawFeeData({
-    @required this.feeRate,
-    @required this.feeValue,
-    @required this.feeUnit,
-    @required this.feeSymbol,
+    required this.feeRate,
+    required this.feeValue,
+    required this.feeUnit,
+    required this.feeSymbol,
     this.feeError,
     this.gasPrice,
     this.gasLimit,
@@ -14,22 +14,22 @@ class WalletWithdrawFeeData {
   });
 
   factory WalletWithdrawFeeData.fromJson({
-    @required String feeSymbol,
-    @required Map<String, dynamic> json,
-    String feeUnit,
+    required String feeSymbol,
+    required Map<String, dynamic> json,
+    String? feeUnit,
   }) {
     return WalletWithdrawFeeData(
-      feeRate: json['fee']?.toString(),
+      feeRate: json['fee'].toString(),
       feeValue: 0,
-      feeUnit: feeUnit ?? json['unit']?.toString(),
+      feeUnit: feeUnit ?? json['unit'].toString(),
       feeSymbol: feeSymbol,
       feeError: json['risk']?.toString(),
     );
   }
 
-  int gasPrice;
-  int gasLimit;
-  int nonce;
+  int? gasPrice;
+  int? gasLimit;
+  int? nonce;
 
   final String feeRate;
 
@@ -47,21 +47,21 @@ class WalletWithdrawFeeData {
 
   /// Error code from getFee API
   /// null is not error
-  final String feeError;
+  final String? feeError;
 
   /// Fee in current chain symbol
   double feeValue;
 
   WalletWithdrawFeeData copyWith({
-    String feeRate,
-    String feeLevel,
-    String feeUnit,
-    String feeSymbol,
-    String feeError,
-    double feeValue,
-    int gasPrice,
-    int gasLimit,
-    int nonce,
+    String? feeRate,
+    String? feeLevel,
+    String? feeUnit,
+    String? feeSymbol,
+    String? feeError,
+    double? feeValue,
+    int? gasPrice,
+    int? gasLimit,
+    int? nonce,
   }) {
     return WalletWithdrawFeeData(
       feeRate: feeRate ?? this.feeRate,
@@ -81,13 +81,13 @@ class WalletWithdrawFeeData {
 ///
 class WalletWithdrawData {
   WalletWithdrawData({
-    @required this.chain,
-    @required this.symbol,
-    @required this.fromAddress,
-    @required this.contract,
-    @required this.utxos,
-    @required this.fee,
-    @required this.feeDefault,
+    required this.chain,
+    required this.symbol,
+    required this.fromAddress,
+    required this.contract,
+    required this.utxos,
+    required this.fee,
+    required this.feeDefault,
     this.toAddress,
   });
 
@@ -109,7 +109,7 @@ class WalletWithdrawData {
   /// Used for bitcoin, the fee in satoshi/byte
 
   /// Used for ETH since we need the toAddress to get the fee
-  String toAddress;
+  String? toAddress;
 
   bool get isDoubleTransaction => false;
   // bool get isDoubleTransaction =>
@@ -120,9 +120,9 @@ class WalletWithdrawData {
   /// Example:
   /// for ETH is true
   /// for USDT is false
-  bool get isFeeOnSymbol => fee?.feeSymbol == symbol;
+  bool get isFeeOnSymbol => fee.feeSymbol == symbol;
 
-  String get displayFee => fee?.feeValue != null && fee.feeValue > 0
+  String get displayFee => fee.feeValue != null && fee.feeValue > 0
       ? NumberUtil.truncateDecimal<String>(fee.feeValue, 10)
       : '-';
 }

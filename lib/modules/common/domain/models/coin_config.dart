@@ -33,11 +33,11 @@ class CoinConfig {
     return displayPrecisions[symbol] ?? 8;
   }
 
-  double getTransferMinQuota({String chain, String symbol}) {
+  double getTransferMinQuota({String? chain, String? symbol}) {
     return transferMinQuotas['${chain}_$symbol'] ?? 0;
   }
 
-  ConfigCoinFee getFeeLevel({String chain, String symbol}) {
+  ConfigCoinFee? getFeeLevel({String? chain, String? symbol}) {
     return feeLevels['${chain}_$symbol'];
   }
 }

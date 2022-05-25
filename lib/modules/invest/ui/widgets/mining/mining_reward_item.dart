@@ -2,16 +2,16 @@ part of invest_ui_module;
 
 class MiningRewardItem extends StatelessWidget {
   const MiningRewardItem({
-    @required this.item,
-    @required this.mintItem,
-    Key key,
+    required this.item,
+    required this.mintItem,
+    Key? key,
   }) : super(key: key);
   final ProfitRecordItem item;
   final MintItem mintItem;
 
   @override
   Widget build(BuildContext context) {
-    final symbol = mintItem.symbol;
+    //final symbol = mintItem.symbol;
     return CSContainer(
       margin: context.edgeAll.copyWith(top: 0),
       child: Column(
@@ -22,15 +22,27 @@ class MiningRewardItem extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                      tr('invest:mining_record_lbl_reward',
-                          namedArgs: {'symbol': '10'}),
-                      style: context.textBody()),
+                    tr(
+                      'invest:mining_record_lbl_reward',
+                      namedArgs: {'symbol': '10'},
+                    ),
+                    style: context.textBody(
+                      bold: true,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
                   SizedBox(height: context.edgeSizeHalf),
                   Text(
-                    tr('invest:mining_record_lbl_block_height', namedArgs: {
-                      'height': item.height?.toString() ?? '10',
-                    }),
-                    style: context.textSmall(),
+                    tr(
+                      'invest:mining_record_lbl_block_height',
+                      namedArgs: {
+                        'height': item.height?.toString() ?? '10',
+                      },
+                    ),
+                    style: context.textSmall(
+                      bold: true,
+                      fontWeight: FontWeight.normal,
+                    ),
                   )
                 ],
               ),
@@ -40,6 +52,7 @@ class MiningRewardItem extends StatelessWidget {
                 style: context.textMedium(
                   color: context.greenColor,
                   bold: true,
+                  fontWeight: FontWeight.normal,
                 ),
               ),
             ],
@@ -54,12 +67,20 @@ class MiningRewardItem extends StatelessWidget {
                   children: [
                     Text(
                       tr('invest:mining_record_lbl_holding'),
-                      style: context.textSecondary(color: context.bodyColor),
+                      style: context.textSecondary(
+                        color: context.bodyColor,
+                        bold: true,
+                        fontWeight: FontWeight.normal,
+                      ),
                     ),
                     SizedBox(height: context.edgeSizeHalf),
                     Text(
                       '10',
-                      style: context.textSmall(color: context.bodyColor),
+                      style: context.textSmall(
+                        color: context.bodyColor,
+                        bold: true,
+                        fontWeight: FontWeight.normal,
+                      ),
                     ),
                   ],
                 ),
@@ -68,12 +89,20 @@ class MiningRewardItem extends StatelessWidget {
                   children: [
                     Text(
                       tr('invest:mining_record_lbl_invitation'),
-                      style: context.textSecondary(color: context.bodyColor),
+                      style: context.textSecondary(
+                        color: context.bodyColor,
+                        bold: true,
+                        fontWeight: FontWeight.normal,
+                      ),
                     ),
                     SizedBox(height: context.edgeSizeHalf),
                     Text(
                       '10',
-                      style: context.textSmall(color: context.bodyColor),
+                      style: context.textSmall(
+                        color: context.bodyColor,
+                        bold: true,
+                        fontWeight: FontWeight.normal,
+                      ),
                     ),
                   ],
                 )

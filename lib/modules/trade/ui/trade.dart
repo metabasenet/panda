@@ -73,7 +73,7 @@ part 'widgets/home_orders_card.dart';
 part 'widgets/trade_pair_item.dart';
 part 'widgets/trade_title.dart';
 
-Route<dynamic> moduleTradeInitRoutes(RouteSettings settings) {
+Route<dynamic>? moduleTradeInitRoutes(RouteSettings settings) {
   switch (settings.name) {
     case TradeChartPage.routeName:
       return TradeChartPage.route(settings);

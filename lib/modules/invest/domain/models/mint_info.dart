@@ -41,6 +41,5 @@ abstract class MintInfo implements Built<MintInfo, MintInfoBuilder> {
   @BuiltValueField(wireName: 'min_balance_reward')
   String get minBalanceReward;
 
-  double get totalProfit =>
-      NumberUtil.plus(promotionReward ?? 0, stakeReward ?? 0);
+  double get totalProfit => NumberUtil.plus(promotionReward, stakeReward) ?? 0;
 }

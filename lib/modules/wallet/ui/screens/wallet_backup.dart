@@ -67,12 +67,19 @@ class WalletBackupPage extends HookWidget {
             children: [
               Text(
                 tr('wallet:backup_lbl_1'),
-                style: context.textBody(bold: true),
+                style: context.textBody(
+                  bold: true,
+                  fontWeight: FontWeight.normal,
+                ),
               ),
               SizedBox(height: 10),
               Text(
                 tr('wallet:backup_lbl_2'),
-                style: context.textBody(color: context.orangeColor),
+                style: context.textBody(
+                  color: context.orangeColor,
+                  bold: false,
+                  fontWeight: FontWeight.normal,
+                ),
               ),
             ],
           ),
@@ -134,7 +141,10 @@ class WalletBackupPage extends HookWidget {
         children: [
           Text(
             tr('wallet:backup_lbl_3'),
-            style: context.textBody(bold: true),
+            style: context.textBody(
+              bold: true,
+              fontWeight: FontWeight.normal,
+            ),
           ),
           SizedBox(height: context.edgeSize),
           Container(
@@ -197,17 +207,17 @@ class WalletBackupPage extends HookWidget {
   }
 
   Widget buildItem({
-    BuildContext context,
-    String text,
-    Function(String item) onPress,
+    BuildContext? context,
+    String? text,
+    Function(String item)? onPress,
   }) {
     return InkWell(
       onTap: () {
-        onPress(text);
+        onPress?.call(text!);
       },
-      borderRadius: context.radiusAll5,
+      borderRadius: context!.radiusAll5,
       child: CSContainer(
-        width: null,
+        //width: null,
         radius: 5,
         margin: context.edgeRight8.copyWith(bottom: 10),
         padding: context.edgeAll5,
@@ -216,10 +226,11 @@ class WalletBackupPage extends HookWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              text.split('_')[0] ?? '',
+              text!.split('_')[0] ?? '',
               style: context.textBody(
                 color: context.secondaryColor,
                 bold: true,
+                fontWeight: FontWeight.normal,
               ),
             ),
             Container(

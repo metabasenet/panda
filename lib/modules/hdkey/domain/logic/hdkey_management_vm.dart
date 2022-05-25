@@ -33,31 +33,29 @@ abstract class HDKeyManagementVM
 // UI Logic
   static HDKeyManagementVM fromStore(Store<AppState> store) {
     final allCoin = store.state.assetState.coins;
-    final coinItem = allCoin.firstWhere(
-      (e) => e.symbol == AppConstants.mnt_chain,
-      orElse: () => null,
-    );
+    final coinItem =
+        allCoin.firstWhere((e) => e.symbol == AppConstants.mnt_chain);
     final localWallets = store.state.walletState.wallets ?? [];
 
     return HDKeyManagementVM((viewModel) => viewModel
       ..wallets = localWallets
       ..localIds = localWallets.map((e) => e.id).toList()
       ..validateMnemonic = (mnemonic) {
-        return store.dispatchFuture(WalletActionValidateMnemonic(mnemonic));
+        return store.dispatchAsync(WalletActionValidateMnemonic(mnemonic));
       }
       ..changeName = (name) {
-        return store.dispatchFuture(WalletActionChangeName(name));
+        return store.dispatchAsync(WalletActionChangeName(name));
       }
       ..changePassword = (pwdOld, pwdNew) {
-        return store.dispatchFuture(WalletActionChangePassword(
+        return store.dispatchAsync(WalletActionChangePassword(
           pwdOld,
           pwdNew,
         ));
       }
       ..deleteWallet = () {
-        return store.dispatchFuture(WalletActionDeleteWallet());
+        return store.dispatchAsync(WalletActionDeleteWallet());
       }
       ..activeWallet = store.state.walletState.activeWallet
-      ..invitationCoin = coinItem?.toBuilder());
+      ..invitationCoin = coinItem.toBuilder());
   }
 }

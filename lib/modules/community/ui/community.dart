@@ -42,7 +42,7 @@ part 'widgets/community_type_card.dart';
 part 'widgets/community_quick_entry.dart';
 part 'process/community_join_process.dart';
 
-Route<dynamic> moduleCommunityInitRoutes(RouteSettings settings) {
+Route? moduleCommunityInitRoutes(RouteSettings settings) {
   switch (settings.name) {
     case CommunityTeamPage.routeName:
       return CommunityTeamPage.route(settings);

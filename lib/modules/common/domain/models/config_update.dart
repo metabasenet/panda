@@ -8,7 +8,7 @@ abstract class ConfigUpdate
 
   static Serializer<ConfigUpdate> get serializer => _$configUpdateSerializer;
 
-  static ConfigUpdate fromJson(Map<String, dynamic> json) {
+  static ConfigUpdate? fromJson(Map<String, dynamic> json) {
     return deserialize<ConfigUpdate>(json);
   }
 

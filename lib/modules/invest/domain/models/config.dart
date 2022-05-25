@@ -9,7 +9,7 @@ abstract class InvestConfig
   static Serializer<InvestConfig> get serializer => _$investConfigSerializer;
 
 // Serializers
-  static InvestConfig fromJson(List<dynamic> json) {
+  static InvestConfig? fromJson(List<dynamic> json) {
     return deserialize<InvestConfig>({'mints': json});
   }
 
@@ -23,6 +23,5 @@ abstract class InvestConfig
   @BuiltValueField(wireName: 'airdrops')
   BuiltList<MintItem> get airdrops;
 
-  MintItem get defaultMint =>
-      mints != null && mints.isNotEmpty ? mints.first : null;
+  MintItem? get defaultMint => mints.isNotEmpty ? mints.first : null;
 }

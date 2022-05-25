@@ -73,24 +73,24 @@ class _$InvitationCreateVM extends InvitationCreateVM {
       onWithdrawBefore;
   @override
   final Future<String> Function(
-      WithdrawSubmitParams params, WalletPrivateData walletData,
-      [Future<bool> Function() onConfirmSubmit]) submit;
+      WithdrawSubmitParams? params, WalletPrivateData? walletData,
+      [Future<bool> Function()? onConfirmSubmit]) submit;
   @override
   final Future<void> Function(
-      {AssetCoin coinInfo,
-      String toAddress,
-      String signCode,
-      String sharePrvKey,
-      String amount,
-      Future<WalletPrivateData> Function() onUnlockWallet,
-      void Function(String txId) onSuccessTransaction,
-      Future<bool> Function(WalletWithdrawData withdrawData) onConfirmParams,
-      Future<bool> Function() onConfirmSubmit}) doSubmitInvitation;
+      {AssetCoin? coinInfo,
+      String? toAddress,
+      String? signCode,
+      String? sharePrvKey,
+      String? amount,
+      Future<WalletPrivateData> Function()? onUnlockWallet,
+      void Function(String txId)? onSuccessTransaction,
+      Future<bool> Function(WalletWithdrawData withdrawData)? onConfirmParams,
+      Future<bool> Function()? onConfirmSubmit}) doSubmitInvitation;
   @override
-  final double Function({@required String chain, @required String symbol})
+  final double Function({required String chain, required String symbol})
       getCoinBalance;
   @override
-  final AssetCoin Function({@required String chain, @required String symbol})
+  final AssetCoin Function({required String chain, required String symbol})
       getCoinInfo;
   @override
   final Future<WalletPrivateData> Function(String password) doUnlockWallet;
@@ -191,70 +191,70 @@ class InvitationCreateVMBuilder
       _$this._onWithdrawBefore = onWithdrawBefore;
 
   Future<String> Function(
-      WithdrawSubmitParams params, WalletPrivateData walletData,
-      [Future<bool> Function() onConfirmSubmit])? _submit;
+      WithdrawSubmitParams? params, WalletPrivateData? walletData,
+      [Future<bool> Function()? onConfirmSubmit])? _submit;
   Future<String> Function(
-      WithdrawSubmitParams params, WalletPrivateData walletData,
-      [Future<bool> Function() onConfirmSubmit])? get submit => _$this._submit;
+      WithdrawSubmitParams? params, WalletPrivateData? walletData,
+      [Future<bool> Function()? onConfirmSubmit])? get submit => _$this._submit;
   set submit(
           Future<String> Function(
-                  WithdrawSubmitParams params, WalletPrivateData walletData,
-                  [Future<bool> Function() onConfirmSubmit])?
+                  WithdrawSubmitParams? params, WalletPrivateData? walletData,
+                  [Future<bool> Function()? onConfirmSubmit])?
               submit) =>
       _$this._submit = submit;
 
   Future<void> Function(
-      {AssetCoin coinInfo,
-      String toAddress,
-      String signCode,
-      String sharePrvKey,
-      String amount,
-      Future<WalletPrivateData> Function() onUnlockWallet,
-      void Function(String txId) onSuccessTransaction,
-      Future<bool> Function(WalletWithdrawData withdrawData) onConfirmParams,
-      Future<bool> Function() onConfirmSubmit})? _doSubmitInvitation;
+      {AssetCoin? coinInfo,
+      String? toAddress,
+      String? signCode,
+      String? sharePrvKey,
+      String? amount,
+      Future<WalletPrivateData> Function()? onUnlockWallet,
+      void Function(String txId)? onSuccessTransaction,
+      Future<bool> Function(WalletWithdrawData withdrawData)? onConfirmParams,
+      Future<bool> Function()? onConfirmSubmit})? _doSubmitInvitation;
   Future<void> Function(
-      {AssetCoin coinInfo,
-      String toAddress,
-      String signCode,
-      String sharePrvKey,
-      String amount,
-      Future<WalletPrivateData> Function() onUnlockWallet,
-      void Function(String txId) onSuccessTransaction,
-      Future<bool> Function(WalletWithdrawData withdrawData) onConfirmParams,
-      Future<bool> Function()
+      {AssetCoin? coinInfo,
+      String? toAddress,
+      String? signCode,
+      String? sharePrvKey,
+      String? amount,
+      Future<WalletPrivateData> Function()? onUnlockWallet,
+      void Function(String txId)? onSuccessTransaction,
+      Future<bool> Function(WalletWithdrawData withdrawData)? onConfirmParams,
+      Future<bool> Function()?
           onConfirmSubmit})? get doSubmitInvitation =>
       _$this._doSubmitInvitation;
   set doSubmitInvitation(
           Future<void> Function(
-                  {AssetCoin coinInfo,
-                  String toAddress,
-                  String signCode,
-                  String sharePrvKey,
-                  String amount,
-                  Future<WalletPrivateData> Function() onUnlockWallet,
-                  void Function(String txId) onSuccessTransaction,
-                  Future<bool> Function(WalletWithdrawData withdrawData)
+                  {AssetCoin? coinInfo,
+                  String? toAddress,
+                  String? signCode,
+                  String? sharePrvKey,
+                  String? amount,
+                  Future<WalletPrivateData> Function()? onUnlockWallet,
+                  void Function(String txId)? onSuccessTransaction,
+                  Future<bool> Function(WalletWithdrawData withdrawData)?
                       onConfirmParams,
-                  Future<bool> Function() onConfirmSubmit})?
+                  Future<bool> Function()? onConfirmSubmit})?
               doSubmitInvitation) =>
       _$this._doSubmitInvitation = doSubmitInvitation;
 
-  double Function({@required String chain, @required String symbol})?
+  double Function({required String chain, required String symbol})?
       _getCoinBalance;
-  double Function({@required String chain, @required String symbol})?
+  double Function({required String chain, required String symbol})?
       get getCoinBalance => _$this._getCoinBalance;
   set getCoinBalance(
-          double Function({@required String chain, @required String symbol})?
+          double Function({required String chain, required String symbol})?
               getCoinBalance) =>
       _$this._getCoinBalance = getCoinBalance;
 
-  AssetCoin Function({@required String chain, @required String symbol})?
+  AssetCoin Function({required String chain, required String symbol})?
       _getCoinInfo;
-  AssetCoin Function({@required String chain, @required String symbol})?
+  AssetCoin Function({required String chain, required String symbol})?
       get getCoinInfo => _$this._getCoinInfo;
   set getCoinInfo(
-          AssetCoin Function({@required String chain, @required String symbol})?
+          AssetCoin Function({required String chain, required String symbol})?
               getCoinInfo) =>
       _$this._getCoinInfo = getCoinInfo;
 
@@ -502,8 +502,9 @@ class _$InvitationSelectVM extends InvitationSelectVM {
   @override
   final void Function() loadInvitationCode;
   @override
-  final Future<InvitationCode> Function({String mnemonic, AssetCoin coinInfo})
-      createInvitationCode;
+  final Future<InvitationCode> Function(
+      {required String mnemonic,
+      required AssetCoin coinInfo}) createInvitationCode;
 
   factory _$InvitationSelectVM(
           [void Function(InvitationSelectVMBuilder)? updates]) =>
@@ -599,13 +600,15 @@ class InvitationSelectVMBuilder
   set loadInvitationCode(void Function()? loadInvitationCode) =>
       _$this._loadInvitationCode = loadInvitationCode;
 
-  Future<InvitationCode> Function({String mnemonic, AssetCoin coinInfo})?
-      _createInvitationCode;
-  Future<InvitationCode> Function({String mnemonic, AssetCoin coinInfo})?
+  Future<InvitationCode> Function(
+      {required String mnemonic,
+      required AssetCoin coinInfo})? _createInvitationCode;
+  Future<InvitationCode> Function(
+          {required String mnemonic, required AssetCoin coinInfo})?
       get createInvitationCode => _$this._createInvitationCode;
   set createInvitationCode(
           Future<InvitationCode> Function(
-                  {String mnemonic, AssetCoin coinInfo})?
+                  {required String mnemonic, required AssetCoin coinInfo})?
               createInvitationCode) =>
       _$this._createInvitationCode = createInvitationCode;
 

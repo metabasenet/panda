@@ -14,10 +14,10 @@ abstract class CommunityBlacklistVM
 
   @BuiltValueField(compare: false)
   Future<int> Function({
-    bool isRefresh,
-    int skip,
-    String searchName,
-    String type,
+    required bool isRefresh,
+    required int skip,
+    required String searchName,
+    required String type,
   }) get loadData;
 
   @BuiltValueField(compare: false)
@@ -25,44 +25,47 @@ abstract class CommunityBlacklistVM
 
   // UI Actions
   static Future<int> _loadData({
-    Store<AppState> store,
-    bool isRefresh,
-    int skip,
-    String searchName,
-    String type,
+    Store<AppState>? store,
+    bool isRefresh = false,
+    int skip = 0,
+    String searchName = '',
+    String type = '',
   }) async {
-    await store.dispatchFuture(CommunityActionGetBlacklist(
-      isRefresh: isRefresh,
-      skip: skip,
-      searchName: searchName,
-      type: type,
-    ));
-    return Future.value(
-        store.state.communityState.communityBlacklist?.length ?? 0);
+    await store!.dispatchAsync(
+      CommunityActionGetBlacklist(
+        isRefresh: isRefresh,
+        skip: skip,
+        searchName: searchName,
+        type: type,
+      ),
+    );
+    return Future.value(store.state.communityState.communityBlacklist.length);
   }
 
   // UI Logic
   static CommunityBlacklistVM fromStore(Store<AppState> store) {
-    return CommunityBlacklistVM((viewModel) => viewModel
-      ..communityBlacklist =
-          store.state.communityState.communityBlacklist?.toBuilder()
-      ..hasWallet = store.state.walletState.hasWallet
-      ..loadData = ({
-        isRefresh,
-        skip,
-        searchName,
-        type,
-      }) async {
-        return _loadData(
-          store: store,
-          isRefresh: isRefresh,
-          skip: skip,
-          searchName: searchName,
-          type: type,
-        );
-      }
-      ..clearCommunityBlacklist = () {
-        return store.dispatchFuture(CommunityActionClearBlacklist());
-      });
+    return CommunityBlacklistVM(
+      (viewModel) => viewModel
+        ..communityBlacklist =
+            store.state.communityState.communityBlacklist?.toBuilder()
+        ..hasWallet = store.state.walletState.hasWallet
+        ..loadData = ({
+          required isRefresh,
+          required skip,
+          required searchName,
+          required type,
+        }) async {
+          return _loadData(
+            store: store,
+            isRefresh: isRefresh,
+            skip: skip,
+            searchName: searchName,
+            type: type,
+          );
+        }
+        ..clearCommunityBlacklist = () {
+          return store.dispatchAsync(CommunityActionClearBlacklist());
+        },
+    );
   }
 }

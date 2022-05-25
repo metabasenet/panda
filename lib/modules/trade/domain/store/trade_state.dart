@@ -8,6 +8,9 @@ abstract class TradeState implements Built<TradeState, TradeStateBuilder> {
       tradeSide: TradeSide.buy,
       hideSlowTradePairTip: BuiltList(),
       configState: ConfigState.loading.index,
+      config: TradeConfig(),
+      tradePair: TradePair(),
+      currentOrderDetail: TradeOrderDetail(),
     );
   }
   TradeState._();
@@ -17,11 +20,13 @@ abstract class TradeState implements Built<TradeState, TradeStateBuilder> {
   ) {
     try {
       return _$TradeState._(
-        config: deserialize<TradeConfig>(data[0]),
+        config: deserialize<TradeConfig>(data[0])!,
         hideSlowTradePairTip:
             BuiltList.from(data.length > 1 ? data[1] as List : []),
         tradeSide: TradeSide.buy,
         configState: ConfigState.loading.index,
+        tradePair: TradePair(),
+        currentOrderDetail: TradeOrderDetail(),
       );
     } catch (_) {
       return TradeState();
@@ -76,11 +81,10 @@ abstract class TradeState implements Built<TradeState, TradeStateBuilder> {
       );
 
   TradeConfigCoin getCoinConfig({
-    @required String symbol,
-    @required String chain,
+    required String symbol,
+    required String chain,
   }) =>
-      config?.coins?.firstWhere(
+      config.coins.firstWhere(
         (e) => e.symbol == symbol && e.chain == chain,
-        orElse: () => null,
       );
 }

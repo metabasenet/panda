@@ -28,7 +28,7 @@ import 'package:mars/widgets/widgets.dart';
 part 'screens/settings_dev.dart';
 part 'screens/settings_testnet.dart';
 
-Route<dynamic> moduleSettingsInitRoutes(RouteSettings settings) {
+Route<dynamic>? moduleSettingsInitRoutes(RouteSettings settings) {
   switch (settings.name) {
     case SettingsDevPage.routeName:
       return SettingsDevPage.route(settings);

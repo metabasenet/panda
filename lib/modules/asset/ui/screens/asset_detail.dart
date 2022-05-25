@@ -55,7 +55,7 @@ class AssetDetailPage extends HookWidget {
             context,
             (password) => viewModel.doUnlockWallet(password),
             (data, _) {
-              WalletBackupPage.open(data.mnemonic);
+              WalletBackupPage.open(data.mnemonic!);
             },
           );
         },

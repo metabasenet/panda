@@ -13,28 +13,29 @@ abstract class CommonState implements Built<CommonState, CommonStateBuilder> {
 
 // Fields
   //@nullable
-  Config get config;
+  Config? get config;
 
   //@nullable
   int get configState;
 
   //@nullable
-  PackageInfo get appInfo;
+  PackageInfo? get appInfo;
 
   //@nullable
-  String get deviceId;
+  String? get deviceId;
 
   //@nullable
-  String get language;
+  String? get language;
 
   //@nullable
-  String get fiatCurrency;
+  String? get fiatCurrency;
 
-  String get languageForApi => language == 'zh' ? 'zh-cn' : language;
+  String get languageForApi =>
+      (language ?? '') == 'zh' ? 'zh-cn' : (language ?? '');
 
   //@nullable
-  ConfigUpdate get newVersion;
+  ConfigUpdate? get newVersion;
 
-  BuiltMap<String, String> get disabledModules =>
-      config?.version?.data?.disabledModules;
+  BuiltMap<String, String>? get disabledModules =>
+      config?.version.data.disabledModules;
 }

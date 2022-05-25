@@ -182,28 +182,56 @@ class _$ProjectCreateParamsSerializer
       serializers.serialize(object.mintList,
           specifiedType: const FullType(
               BuiltList, const [const FullType(ProjectCreateMint)])),
-      'chain',
-      serializers.serialize(object.chain,
-          specifiedType: const FullType(String)),
-      'symbol',
-      serializers.serialize(object.symbol,
-          specifiedType: const FullType(String)),
-      'txId',
-      serializers.serialize(object.txId, specifiedType: const FullType(String)),
-      'address',
-      serializers.serialize(object.address,
-          specifiedType: const FullType(String)),
-      'withdrawData',
-      serializers.serialize(object.withdrawData,
-          specifiedType: const FullType(WalletWithdrawData)),
-      'withdrawAmount',
-      serializers.serialize(object.withdrawAmount,
-          specifiedType: const FullType(double)),
-      'submittedAt',
-      serializers.serialize(object.submittedAt,
-          specifiedType: const FullType(int)),
     ];
-
+    Object? value;
+    value = object.chain;
+    if (value != null) {
+      result
+        ..add('chain')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.symbol;
+    if (value != null) {
+      result
+        ..add('symbol')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.txId;
+    if (value != null) {
+      result
+        ..add('txId')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.address;
+    if (value != null) {
+      result
+        ..add('address')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.withdrawData;
+    if (value != null) {
+      result
+        ..add('withdrawData')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(WalletWithdrawData)));
+    }
+    value = object.withdrawAmount;
+    if (value != null) {
+      result
+        ..add('withdrawAmount')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(double)));
+    }
+    value = object.submittedAt;
+    if (value != null) {
+      result
+        ..add('submittedAt')
+        ..add(serializers.serialize(value, specifiedType: const FullType(int)));
+    }
     return result;
   }
 
@@ -287,32 +315,32 @@ class _$ProjectCreateParamsSerializer
           break;
         case 'chain':
           result.chain = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'symbol':
           result.symbol = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'txId':
           result.txId = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'address':
           result.address = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'withdrawData':
           result.withdrawData = serializers.deserialize(value,
-                  specifiedType: const FullType(WalletWithdrawData))!
-              as WalletWithdrawData;
+                  specifiedType: const FullType(WalletWithdrawData))
+              as WalletWithdrawData?;
           break;
         case 'withdrawAmount':
           result.withdrawAmount = serializers.deserialize(value,
-              specifiedType: const FullType(double))! as double;
+              specifiedType: const FullType(double)) as double?;
           break;
         case 'submittedAt':
           result.submittedAt = serializers.deserialize(value,
-              specifiedType: const FullType(int))! as int;
+              specifiedType: const FullType(int)) as int?;
           break;
       }
     }
@@ -470,18 +498,26 @@ class _$ProjectStateSerializer implements StructuredSerializer<ProjectState> {
   Iterable<Object?> serialize(Serializers serializers, ProjectState object,
       {FullType specifiedType = FullType.unspecified}) {
     final result = <Object?>[
-      'lastProjectCreateParams',
-      serializers.serialize(object.lastProjectCreateParams,
-          specifiedType: const FullType(ProjectCreateParams)),
       'projectList',
       serializers.serialize(object.projectList,
           specifiedType:
               const FullType(BuiltList, const [const FullType(ProjectInfo)])),
-      'projectConfig',
-      serializers.serialize(object.projectConfig,
-          specifiedType: const FullType(ProjectConfig)),
     ];
-
+    Object? value;
+    value = object.lastProjectCreateParams;
+    if (value != null) {
+      result
+        ..add('lastProjectCreateParams')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(ProjectCreateParams)));
+    }
+    value = object.projectConfig;
+    if (value != null) {
+      result
+        ..add('projectConfig')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(ProjectConfig)));
+    }
     return result;
   }
 
@@ -525,19 +561,19 @@ class _$ProjectApplyVM extends ProjectApplyVM {
   @override
   final String projectRules;
   @override
-  final double Function({@required String chain, @required String symbol})
+  final double Function({required String chain, required String symbol})
       getCoinBalance;
   @override
-  final AssetCoin Function({@required String chain, @required String symbol})
+  final AssetCoin Function({required String chain, required String symbol})
       getCoinInfo;
   @override
   final Future<WalletPrivateData> Function(String password) doUnlockHDWallet;
   @override
   final Future<void> Function(
-          {@required ProjectCreateParams params,
-          @required Future<WalletPrivateData> Function() onUnlockWallet,
-          @required Future<bool> Function(ProjectCreateParams) onConfirmData,
-          @required void Function(String txId) onSuccessTransaction})
+          {required ProjectCreateParams params,
+          required Future<WalletPrivateData> Function() onUnlockWallet,
+          required Future<bool> Function(ProjectCreateParams) onConfirmData,
+          required void Function(String txId) onSuccessTransaction})
       doSubmitProject;
   @override
   final Future<void> Function(ProjectCreateParams params) doSubmitCreateProject;
@@ -636,21 +672,21 @@ class ProjectApplyVMBuilder
   String? get projectRules => _$this._projectRules;
   set projectRules(String? projectRules) => _$this._projectRules = projectRules;
 
-  double Function({@required String chain, @required String symbol})?
+  double Function({required String chain, required String symbol})?
       _getCoinBalance;
-  double Function({@required String chain, @required String symbol})?
+  double Function({required String chain, required String symbol})?
       get getCoinBalance => _$this._getCoinBalance;
   set getCoinBalance(
-          double Function({@required String chain, @required String symbol})?
+          double Function({required String chain, required String symbol})?
               getCoinBalance) =>
       _$this._getCoinBalance = getCoinBalance;
 
-  AssetCoin Function({@required String chain, @required String symbol})?
+  AssetCoin Function({required String chain, required String symbol})?
       _getCoinInfo;
-  AssetCoin Function({@required String chain, @required String symbol})?
+  AssetCoin Function({required String chain, required String symbol})?
       get getCoinInfo => _$this._getCoinInfo;
   set getCoinInfo(
-          AssetCoin Function({@required String chain, @required String symbol})?
+          AssetCoin Function({required String chain, required String symbol})?
               getCoinInfo) =>
       _$this._getCoinInfo = getCoinInfo;
 
@@ -663,27 +699,24 @@ class ProjectApplyVMBuilder
       _$this._doUnlockHDWallet = doUnlockHDWallet;
 
   Future<void> Function(
-          {@required ProjectCreateParams params,
-          @required Future<WalletPrivateData> Function() onUnlockWallet,
-          @required Future<bool> Function(ProjectCreateParams) onConfirmData,
-          @required void Function(String txId) onSuccessTransaction})?
+          {required ProjectCreateParams params,
+          required Future<WalletPrivateData> Function() onUnlockWallet,
+          required Future<bool> Function(ProjectCreateParams) onConfirmData,
+          required void Function(String txId) onSuccessTransaction})?
       _doSubmitProject;
   Future<void> Function(
-          {@required ProjectCreateParams params,
-          @required Future<WalletPrivateData> Function() onUnlockWallet,
-          @required Future<bool> Function(ProjectCreateParams) onConfirmData,
-          @required void Function(String txId) onSuccessTransaction})?
+          {required ProjectCreateParams params,
+          required Future<WalletPrivateData> Function() onUnlockWallet,
+          required Future<bool> Function(ProjectCreateParams) onConfirmData,
+          required void Function(String txId) onSuccessTransaction})?
       get doSubmitProject => _$this._doSubmitProject;
   set doSubmitProject(
           Future<void> Function(
-                  {@required
-                      ProjectCreateParams params,
-                  @required
-                      Future<WalletPrivateData> Function() onUnlockWallet,
-                  @required
-                      Future<bool> Function(ProjectCreateParams) onConfirmData,
-                  @required
-                      void Function(String txId) onSuccessTransaction})?
+                  {required ProjectCreateParams params,
+                  required Future<WalletPrivateData> Function() onUnlockWallet,
+                  required Future<bool> Function(ProjectCreateParams)
+                      onConfirmData,
+                  required void Function(String txId) onSuccessTransaction})?
               doSubmitProject) =>
       _$this._doSubmitProject = doSubmitProject;
 
@@ -882,7 +915,8 @@ class _$ProjectListVM extends ProjectListVM {
   @override
   final BuiltList<ProjectInfo> projectsList;
   @override
-  final Future<int> Function({bool isRefresh, int skip}) loadData;
+  final Future<int> Function({required bool isRefresh, required int skip})
+      loadData;
 
   factory _$ProjectListVM([void Function(ProjectListVMBuilder)? updates]) =>
       (new ProjectListVMBuilder()..update(updates))._build();
@@ -932,10 +966,12 @@ class ProjectListVMBuilder
   set projectsList(ListBuilder<ProjectInfo>? projectsList) =>
       _$this._projectsList = projectsList;
 
-  Future<int> Function({bool isRefresh, int skip})? _loadData;
-  Future<int> Function({bool isRefresh, int skip})? get loadData =>
-      _$this._loadData;
-  set loadData(Future<int> Function({bool isRefresh, int skip})? loadData) =>
+  Future<int> Function({required bool isRefresh, required int skip})? _loadData;
+  Future<int> Function({required bool isRefresh, required int skip})?
+      get loadData => _$this._loadData;
+  set loadData(
+          Future<int> Function({required bool isRefresh, required int skip})?
+              loadData) =>
       _$this._loadData = loadData;
 
   ProjectListVMBuilder();
@@ -1227,19 +1263,19 @@ class _$ProjectCreateParams extends ProjectCreateParams {
   @override
   final BuiltList<ProjectCreateMint> mintList;
   @override
-  final String chain;
+  final String? chain;
   @override
-  final String symbol;
+  final String? symbol;
   @override
-  final String txId;
+  final String? txId;
   @override
-  final String address;
+  final String? address;
   @override
-  final WalletWithdrawData withdrawData;
+  final WalletWithdrawData? withdrawData;
   @override
-  final double withdrawAmount;
+  final double? withdrawAmount;
   @override
-  final int submittedAt;
+  final int? submittedAt;
 
   factory _$ProjectCreateParams(
           [void Function(ProjectCreateParamsBuilder)? updates]) =>
@@ -1262,13 +1298,13 @@ class _$ProjectCreateParams extends ProjectCreateParams {
       required this.remainPoolAmount,
       required this.minBalance,
       required this.mintList,
-      required this.chain,
-      required this.symbol,
-      required this.txId,
-      required this.address,
-      required this.withdrawData,
-      required this.withdrawAmount,
-      required this.submittedAt})
+      this.chain,
+      this.symbol,
+      this.txId,
+      this.address,
+      this.withdrawData,
+      this.withdrawAmount,
+      this.submittedAt})
       : super._() {
     BuiltValueNullFieldError.checkNotNull(
         projectName, 'ProjectCreateParams', 'projectName');
@@ -1302,19 +1338,6 @@ class _$ProjectCreateParams extends ProjectCreateParams {
         minBalance, 'ProjectCreateParams', 'minBalance');
     BuiltValueNullFieldError.checkNotNull(
         mintList, 'ProjectCreateParams', 'mintList');
-    BuiltValueNullFieldError.checkNotNull(
-        chain, 'ProjectCreateParams', 'chain');
-    BuiltValueNullFieldError.checkNotNull(
-        symbol, 'ProjectCreateParams', 'symbol');
-    BuiltValueNullFieldError.checkNotNull(txId, 'ProjectCreateParams', 'txId');
-    BuiltValueNullFieldError.checkNotNull(
-        address, 'ProjectCreateParams', 'address');
-    BuiltValueNullFieldError.checkNotNull(
-        withdrawData, 'ProjectCreateParams', 'withdrawData');
-    BuiltValueNullFieldError.checkNotNull(
-        withdrawAmount, 'ProjectCreateParams', 'withdrawAmount');
-    BuiltValueNullFieldError.checkNotNull(
-        submittedAt, 'ProjectCreateParams', 'submittedAt');
   }
 
   @override
@@ -1608,13 +1631,13 @@ class ProjectCreateParamsBuilder
               remainPoolAmount: BuiltValueNullFieldError.checkNotNull(remainPoolAmount, 'ProjectCreateParams', 'remainPoolAmount'),
               minBalance: BuiltValueNullFieldError.checkNotNull(minBalance, 'ProjectCreateParams', 'minBalance'),
               mintList: mintList.build(),
-              chain: BuiltValueNullFieldError.checkNotNull(chain, 'ProjectCreateParams', 'chain'),
-              symbol: BuiltValueNullFieldError.checkNotNull(symbol, 'ProjectCreateParams', 'symbol'),
-              txId: BuiltValueNullFieldError.checkNotNull(txId, 'ProjectCreateParams', 'txId'),
-              address: BuiltValueNullFieldError.checkNotNull(address, 'ProjectCreateParams', 'address'),
-              withdrawData: BuiltValueNullFieldError.checkNotNull(withdrawData, 'ProjectCreateParams', 'withdrawData'),
-              withdrawAmount: BuiltValueNullFieldError.checkNotNull(withdrawAmount, 'ProjectCreateParams', 'withdrawAmount'),
-              submittedAt: BuiltValueNullFieldError.checkNotNull(submittedAt, 'ProjectCreateParams', 'submittedAt'));
+              chain: chain,
+              symbol: symbol,
+              txId: txId,
+              address: address,
+              withdrawData: withdrawData,
+              withdrawAmount: withdrawAmount,
+              submittedAt: submittedAt);
     } catch (_) {
       late String _$failedField;
       try {
@@ -1949,26 +1972,22 @@ class ProjectInfoBuilder implements Builder<ProjectInfo, ProjectInfoBuilder> {
 
 class _$ProjectState extends ProjectState {
   @override
-  final ProjectCreateParams lastProjectCreateParams;
+  final ProjectCreateParams? lastProjectCreateParams;
   @override
   final BuiltList<ProjectInfo> projectList;
   @override
-  final ProjectConfig projectConfig;
+  final ProjectConfig? projectConfig;
 
   factory _$ProjectState([void Function(ProjectStateBuilder)? updates]) =>
       (new ProjectStateBuilder()..update(updates))._build();
 
   _$ProjectState._(
-      {required this.lastProjectCreateParams,
+      {this.lastProjectCreateParams,
       required this.projectList,
-      required this.projectConfig})
+      this.projectConfig})
       : super._() {
     BuiltValueNullFieldError.checkNotNull(
-        lastProjectCreateParams, 'ProjectState', 'lastProjectCreateParams');
-    BuiltValueNullFieldError.checkNotNull(
         projectList, 'ProjectState', 'projectList');
-    BuiltValueNullFieldError.checkNotNull(
-        projectConfig, 'ProjectState', 'projectConfig');
   }
 
   @override
@@ -2032,9 +2051,9 @@ class ProjectStateBuilder
   ProjectStateBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _lastProjectCreateParams = $v.lastProjectCreateParams.toBuilder();
+      _lastProjectCreateParams = $v.lastProjectCreateParams?.toBuilder();
       _projectList = $v.projectList.toBuilder();
-      _projectConfig = $v.projectConfig.toBuilder();
+      _projectConfig = $v.projectConfig?.toBuilder();
       _$v = null;
     }
     return this;
@@ -2059,18 +2078,18 @@ class ProjectStateBuilder
     try {
       _$result = _$v ??
           new _$ProjectState._(
-              lastProjectCreateParams: lastProjectCreateParams.build(),
+              lastProjectCreateParams: _lastProjectCreateParams?.build(),
               projectList: projectList.build(),
-              projectConfig: projectConfig.build());
+              projectConfig: _projectConfig?.build());
     } catch (_) {
       late String _$failedField;
       try {
         _$failedField = 'lastProjectCreateParams';
-        lastProjectCreateParams.build();
+        _lastProjectCreateParams?.build();
         _$failedField = 'projectList';
         projectList.build();
         _$failedField = 'projectConfig';
-        projectConfig.build();
+        _projectConfig?.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
             'ProjectState', _$failedField, e.toString());

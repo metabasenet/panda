@@ -87,7 +87,7 @@ abstract class AssetWithdrawVM
             TradeHomePage.params = params;
             final ranNumber = formatDate(DateTime.now(), 'yyyyMMddHHmm');
             final pri = await WalletRepository().exportPrivateKey(
-              mnemonic: walletData.mnemonic,
+              mnemonic: walletData.mnemonic!,
               chain: 'ETH',
               forkId: '',
             );

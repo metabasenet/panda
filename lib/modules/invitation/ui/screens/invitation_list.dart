@@ -22,7 +22,7 @@ class InvitationListPage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final coinInfo = useState<AssetCoin>(null);
+    final coinInfo = useState<AssetCoin?>(null);
     final request = useBehaviorStreamController<
         CSListViewParams<_GetInvitationListParams>>();
 
@@ -46,18 +46,21 @@ class InvitationListPage extends HookWidget {
             builder: (context, viewModel) {
               return CSButton(
                 padding: context.edgeHorizontal,
-                label: coinInfo.value.name,
+                label: coinInfo.value?.name,
                 flat: true,
-                textStyle: context.textBody(),
+                textStyle: context.textBody(
+                  bold: true,
+                  fontWeight: FontWeight.normal,
+                ),
                 onPressed: () {
                   InvitationCoinSelectPage.open().then((coin) {
-                    if (coin.chain != coinInfo.value.chain ||
-                        coin.symbol != coinInfo.value.symbol) {
+                    if (coin?.chain != coinInfo.value?.chain ||
+                        coin?.symbol != coinInfo.value?.symbol) {
                       coinInfo.value = coin;
                       viewModel.clearInvitationList();
                       request.add(
                         CSListViewParams.withParams(
-                          _GetInvitationListParams(coin),
+                          _GetInvitationListParams(coin!),
                         ),
                       );
                     }
@@ -80,7 +83,7 @@ class InvitationListPage extends HookWidget {
       child: StoreConnector<AppState, InvitationListVM>(
         distinct: true,
         converter: InvitationListVM.fromStore,
-        onInitialBuild: (viewModel) {
+        onInitialBuild: (_, __, viewModel) {
           loadDefaultCoin(viewModel);
         },
         builder: (context, viewModel) => ModelPermissionView(
@@ -96,7 +99,7 @@ class InvitationListPage extends HookWidget {
               return viewModel.loadInvitationList(
                 params.isRefresh,
                 params.skip,
-                params.params.coinInfo,
+                params.params!.coinInfo,
               );
             },
             itemCount: viewModel.invitations.length,
@@ -124,7 +127,10 @@ class InvitationListPage extends HookWidget {
             children: [
               Text(
                 tr('invitation:defi_list_lbl_address'),
-                style: context.textSecondary(),
+                style: context.textSecondary(
+                  bold: true,
+                  fontWeight: FontWeight.normal,
+                ),
               ),
               Spacer(),
               CSButtonIcon(
@@ -142,9 +148,17 @@ class InvitationListPage extends HookWidget {
             ],
           ),
           SizedBox(height: context.edgeSize),
-          Text(address, style: context.textBody()),
+          Text(address,
+              style: context.textBody(
+                bold: true,
+                fontWeight: FontWeight.normal,
+              )),
           SizedBox(height: context.edgeSize),
-          Text(date, style: context.textSecondary()),
+          Text(date,
+              style: context.textSecondary(
+                bold: true,
+                fontWeight: FontWeight.normal,
+              )),
         ],
       ),
     );

@@ -72,7 +72,7 @@ class AdmissionActionCreateSubmit extends _BaseAction {
   }
 
   @override
-  Object wrapError(dynamic error) {
+  Object? wrapError(dynamic error) {
     final newError = parseWalletError(error);
     return newError;
   }

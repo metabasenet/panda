@@ -7,7 +7,7 @@ class _GetOrderListParams {
     this.selectedTab = TradeOrderApiStatus.pending,
     this.status = TradeOrderApiStatus.history,
   });
-  final TradePair tradePair;
+  final TradePair? tradePair;
   final String tradeSide;
   final String status;
   final String selectedTab;
@@ -48,36 +48,37 @@ class TradeOrderListPage extends HookWidget {
   Future<int> loadData(
     TradeHomeVM viewModel,
     TradeOrdersCubit cubit, {
-    CSListViewParams<_GetOrderListParams> params,
+    CSListViewParams<_GetOrderListParams>? params,
     bool onlyCache = false,
   }) async {
-    final tradePair = params.params.tradePair;
-    String tradeAddress;
-    String priceAddress;
+    final tradePair = params?.params?.tradePair;
+    late String tradeAddress;
+    late String priceAddress;
     if (tradePair != null) {
       tradeAddress = viewModel
           .getCoinInfo(
             chain: tradePair.tradeChain,
             symbol: tradePair.tradeSymbol,
           )
-          ?.address;
+          .address;
+
       priceAddress = viewModel
           .getCoinInfo(
             chain: tradePair.priceChain,
             symbol: tradePair.priceSymbol,
           )
-          ?.address;
+          .address;
     }
     return cubit
         .loadAll(
-      tradePairId: tradePair?.id,
+      tradePairId: tradePair?.id ?? '',
       tradeAddress: tradeAddress,
       priceAddress: priceAddress,
       walletId: viewModel.activeWalletId,
-      skip: params.skip,
-      take: params.take,
-      tradeSide: params.params.tradeSide,
-      status: params.params.status,
+      skip: params?.skip ?? 0,
+      take: params?.take ?? 0,
+      tradeSide: params?.params?.tradeSide ?? '',
+      status: params?.params?.status ?? '',
       onlyCache: onlyCache,
     )
         .then((value) {
@@ -89,7 +90,7 @@ class TradeOrderListPage extends HookWidget {
       return value;
     }).catchError((error) {
       Toast.showError(error);
-      throw error;
+      //throw error;
     });
   }
 
@@ -128,7 +129,7 @@ class TradeOrderListPage extends HookWidget {
   Widget build(BuildContext context) {
     final selectedTabId = useState(TradeOrderApiStatus.pending);
     // filter
-    final filterTradePair = useState<TradePair>(null);
+    final filterTradePair = useState<TradePair?>(null);
     final filterTradeSide = useState<String>('all');
     final filterStatus = useState<String>(TradeOrderApiStatus.history);
     final orderAmounts = useState<Map<String, double>>({});
@@ -174,7 +175,10 @@ class TradeOrderListPage extends HookWidget {
         padding: context.edgeAll,
         label: getOrderListTitle(selectedTabId.value),
         autoWidth: true,
-        textStyle: context.textTitle(bold: true),
+        textStyle: context.textTitle(
+          bold: true,
+          fontWeight: FontWeight.normal,
+        ),
         onPressed: () {
           showOrderListMenuDialog(context, selectedTabId.value, (selectedId) {
             if (selectedId != selectedTabId.value) {
@@ -226,7 +230,7 @@ class TradeOrderListPage extends HookWidget {
           converter: TradeHomeVM.fromStore,
           builder: (context, viewModel) => TradeSelectDrawer(
             showSelectAll: true,
-            selected: filterTradePair.value,
+            selected: filterTradePair.value!,
             onSelected: (tradePair) {
               if (tradePair != filterTradePair.value) {
                 filterTradePair.value = tradePair;
@@ -243,7 +247,7 @@ class TradeOrderListPage extends HookWidget {
       child: StoreConnector<AppState, TradeHomeVM>(
         distinct: true,
         converter: TradeHomeVM.fromStore,
-        onInitialBuild: (viewModel) {
+        onInitialBuild: (_, __, viewModel) {
           request.add(CSListViewParams.withParams(_GetOrderListParams()));
         },
         builder: (context, viewModel) => Column(
@@ -252,16 +256,17 @@ class TradeOrderListPage extends HookWidget {
               TradeOrderFilterBar(
                 key: Key(selectedTabId.value),
                 isHistory: selectedTabId.value == TradeOrderApiStatus.history,
-                filterTradePair: filterTradePair.value,
+                filterTradePair: filterTradePair.value!,
                 onChange: (tradeSide, status) {
                   filterTradeSide.value = tradeSide;
                   filterStatus.value = status;
-                  doFilterRefreshData(filterTradePair.value, tradeSide, status);
+                  doFilterRefreshData(
+                      filterTradePair.value!, tradeSide, status);
                 },
               ),
             Expanded(
               child: BlocBuilder<TradeOrdersCubit, List<TradeOrder>>(
-                cubit: selectedCubit.value,
+                bloc: selectedCubit.value,
                 builder: (context, data) =>
                     CSListViewStream<_GetOrderListParams>(
                   requestStream: request,
@@ -290,8 +295,8 @@ class TradeOrderListPage extends HookWidget {
                         ? TradeOrderCancelItem(
                             key: Key(order.txId),
                             order: order,
-                            orderAmount: orderAmounts.value[order.templateId]
-                                ?.toString(),
+                            orderAmount:
+                                orderAmounts.value[order.templateId].toString(),
                             isHistory: selectedTabId.value ==
                                 TradeOrderApiStatus.history,
                             onCancelOrder: (item) {
@@ -326,15 +331,17 @@ class TradeOrderListPage extends HookWidget {
                               doCancelOrder(viewModel, item);
                             },
                             onPress: () {
-                              TradeOrderDetailPage.open(order).then((value) {
-                                if (value == true) {
-                                  reloadData(
-                                    context,
-                                    viewModel,
-                                    request,
-                                  );
-                                }
-                              });
+                              TradeOrderDetailPage.open(order).then(
+                                (value) {
+                                  if (value == true) {
+                                    reloadData(
+                                      context,
+                                      viewModel,
+                                      request,
+                                    );
+                                  }
+                                },
+                              );
                             },
                           );
                   },

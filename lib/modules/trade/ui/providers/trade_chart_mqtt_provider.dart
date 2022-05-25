@@ -2,9 +2,9 @@ part of trade_ui_module;
 
 class TradeChartMqttProvider extends TradeBaseMqttProvider {
   const TradeChartMqttProvider({
-    @required TradeMqtt mqtt,
-    @required Widget child,
-    Key key,
+    required TradeMqtt mqtt,
+    required Widget child,
+    Key? key,
   }) : super(key: key, mqtt: mqtt, child: child);
 
   @override
@@ -58,7 +58,7 @@ class TradeChartMqttProvider extends TradeBaseMqttProvider {
 
           switch (event.type) {
             case TradeMqttMsgTypes.deep:
-              if (isAlreadyReceived(event.type, event.data['id']?.toString())) {
+              if (isAlreadyReceived(event.type, event.data['id'].toString())) {
                 return;
               }
               tickersCubit.reloadCurrent();

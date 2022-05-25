@@ -46,7 +46,7 @@ abstract class AssetManagementVM
         ..updateCoinAddress = (data, chain) {
           final completer = Completer<bool>();
           store.dispatch(WalletActionUpdateAddress(
-            mnemonic: data.mnemonic,
+            mnemonic: data.mnemonic!,
             completer: completer,
             chain: chain,
           ));

@@ -205,10 +205,10 @@ class _$SwapStateSerializer implements StructuredSerializer<SwapState> {
 
 class _$SwapCreateVM extends SwapCreateVM {
   @override
-  final double Function({@required String chain, @required String symbol})
+  final double Function({required String chain, required String symbol})
       getCoinBalance;
   @override
-  final AssetCoin Function({@required String chain, @required String symbol})
+  final AssetCoin Function({required String chain, required String symbol})
       getCoinInfo;
   @override
   final Future<WalletPrivateData> Function(String password) doUnlockWallet;
@@ -216,38 +216,38 @@ class _$SwapCreateVM extends SwapCreateVM {
   final List<MapEntry<SwapConfigCoin, SwapConfigCoin>> Function()
       getEnabledTradePairs;
   @override
-  final Future<double> Function(
-      {@required String chain, @required String symbol}) getApproveBalance;
+  final Future<double> Function({required String chain, required String symbol})
+      getApproveBalance;
   @override
   final Future<Transaction> Function(
-      {@required String chain,
-      @required String symbol,
-      @required String fromAddress,
-      @required int chainPrecision,
-      @required String txId}) getTransactionInfo;
+      {required String chain,
+      required String symbol,
+      required String fromAddress,
+      required int chainPrecision,
+      required String txId}) getTransactionInfo;
   @override
   final Future<void> Function(
-      {AssetCoin outCoinInfo,
-      SwapConfigCoin outCoinConfig,
-      Future<WalletPrivateData> Function() onUnlockWallet,
-      Future<bool> Function(
-              {@required WalletTemplateData approveData,
-              @required double currentBalance,
-              @required double approveAmount,
-              @required bool needReset})
+      {required AssetCoin outCoinInfo,
+      required SwapConfigCoin outCoinConfig,
+      required Future<WalletPrivateData> Function() onUnlockWallet,
+      required Future<bool> Function(
+              {required WalletTemplateData approveData,
+              required double currentBalance,
+              required double approveAmount,
+              required bool needReset})
           onConfirmSubmit,
-      void Function(String) onSuccessTransaction}) doApproveSwap;
+      required void Function(String) onSuccessTransaction}) doApproveSwap;
   @override
   final Future<void> Function(
-      {String amount,
-      AssetCoin inCoinInfo,
-      AssetCoin outCoinInfo,
-      SwapConfigCoin inCoinConfig,
-      SwapConfigCoin outCoinConfig,
-      Future<WalletPrivateData> Function() onUnlockWallet,
-      Future<bool> Function() onNoticeDoubleTransaction,
-      Future<bool> Function(SwapCreateParams) onConfirmSubmit,
-      void Function(String) onSuccessTransaction}) doSubmitSwap;
+      {required String amount,
+      required AssetCoin inCoinInfo,
+      required AssetCoin outCoinInfo,
+      required SwapConfigCoin inCoinConfig,
+      required SwapConfigCoin outCoinConfig,
+      required Future<WalletPrivateData> Function() onUnlockWallet,
+      required Future<bool> Function() onNoticeDoubleTransaction,
+      required Future<bool> Function(SwapCreateParams) onConfirmSubmit,
+      required void Function(String) onSuccessTransaction}) doSubmitSwap;
 
   factory _$SwapCreateVM([void Function(SwapCreateVMBuilder)? updates]) =>
       (new SwapCreateVMBuilder()..update(updates))._build();
@@ -317,21 +317,21 @@ class SwapCreateVMBuilder
     implements Builder<SwapCreateVM, SwapCreateVMBuilder> {
   _$SwapCreateVM? _$v;
 
-  double Function({@required String chain, @required String symbol})?
+  double Function({required String chain, required String symbol})?
       _getCoinBalance;
-  double Function({@required String chain, @required String symbol})?
+  double Function({required String chain, required String symbol})?
       get getCoinBalance => _$this._getCoinBalance;
   set getCoinBalance(
-          double Function({@required String chain, @required String symbol})?
+          double Function({required String chain, required String symbol})?
               getCoinBalance) =>
       _$this._getCoinBalance = getCoinBalance;
 
-  AssetCoin Function({@required String chain, @required String symbol})?
+  AssetCoin Function({required String chain, required String symbol})?
       _getCoinInfo;
-  AssetCoin Function({@required String chain, @required String symbol})?
+  AssetCoin Function({required String chain, required String symbol})?
       get getCoinInfo => _$this._getCoinInfo;
   set getCoinInfo(
-          AssetCoin Function({@required String chain, @required String symbol})?
+          AssetCoin Function({required String chain, required String symbol})?
               getCoinInfo) =>
       _$this._getCoinInfo = getCoinInfo;
 
@@ -352,109 +352,110 @@ class SwapCreateVMBuilder
               getEnabledTradePairs) =>
       _$this._getEnabledTradePairs = getEnabledTradePairs;
 
-  Future<double> Function({@required String chain, @required String symbol})?
+  Future<double> Function({required String chain, required String symbol})?
       _getApproveBalance;
-  Future<double> Function({@required String chain, @required String symbol})?
+  Future<double> Function({required String chain, required String symbol})?
       get getApproveBalance => _$this._getApproveBalance;
   set getApproveBalance(
           Future<double> Function(
-                  {@required String chain, @required String symbol})?
+                  {required String chain, required String symbol})?
               getApproveBalance) =>
       _$this._getApproveBalance = getApproveBalance;
 
   Future<Transaction> Function(
-      {@required String chain,
-      @required String symbol,
-      @required String fromAddress,
-      @required int chainPrecision,
-      @required String txId})? _getTransactionInfo;
+      {required String chain,
+      required String symbol,
+      required String fromAddress,
+      required int chainPrecision,
+      required String txId})? _getTransactionInfo;
   Future<Transaction> Function(
-          {@required String chain,
-          @required String symbol,
-          @required String fromAddress,
-          @required int chainPrecision,
-          @required String txId})?
+          {required String chain,
+          required String symbol,
+          required String fromAddress,
+          required int chainPrecision,
+          required String txId})?
       get getTransactionInfo => _$this._getTransactionInfo;
   set getTransactionInfo(
           Future<Transaction> Function(
-                  {@required String chain,
-                  @required String symbol,
-                  @required String fromAddress,
-                  @required int chainPrecision,
-                  @required String txId})?
+                  {required String chain,
+                  required String symbol,
+                  required String fromAddress,
+                  required int chainPrecision,
+                  required String txId})?
               getTransactionInfo) =>
       _$this._getTransactionInfo = getTransactionInfo;
 
   Future<void> Function(
-      {AssetCoin outCoinInfo,
-      SwapConfigCoin outCoinConfig,
-      Future<WalletPrivateData> Function() onUnlockWallet,
-      Future<bool> Function(
-              {@required WalletTemplateData approveData,
-              @required double currentBalance,
-              @required double approveAmount,
-              @required bool needReset})
+      {required AssetCoin outCoinInfo,
+      required SwapConfigCoin outCoinConfig,
+      required Future<WalletPrivateData> Function() onUnlockWallet,
+      required Future<bool> Function(
+              {required WalletTemplateData approveData,
+              required double currentBalance,
+              required double approveAmount,
+              required bool needReset})
           onConfirmSubmit,
-      void Function(String) onSuccessTransaction})? _doApproveSwap;
+      required void Function(String) onSuccessTransaction})? _doApproveSwap;
   Future<void> Function(
-          {AssetCoin outCoinInfo,
-          SwapConfigCoin outCoinConfig,
-          Future<WalletPrivateData> Function() onUnlockWallet,
-          Future<bool> Function(
-                  {@required WalletTemplateData approveData,
-                  @required double currentBalance,
-                  @required double approveAmount,
-                  @required bool needReset})
+          {required AssetCoin outCoinInfo,
+          required SwapConfigCoin outCoinConfig,
+          required Future<WalletPrivateData> Function() onUnlockWallet,
+          required Future<bool> Function(
+                  {required WalletTemplateData approveData,
+                  required double currentBalance,
+                  required double approveAmount,
+                  required bool needReset})
               onConfirmSubmit,
-          void Function(String) onSuccessTransaction})?
+          required void Function(String) onSuccessTransaction})?
       get doApproveSwap => _$this._doApproveSwap;
   set doApproveSwap(
           Future<void> Function(
-                  {AssetCoin outCoinInfo,
-                  SwapConfigCoin outCoinConfig,
-                  Future<WalletPrivateData> Function() onUnlockWallet,
-                  Future<bool> Function(
-                          {@required WalletTemplateData approveData,
-                          @required double currentBalance,
-                          @required double approveAmount,
-                          @required bool needReset})
+                  {required AssetCoin outCoinInfo,
+                  required SwapConfigCoin outCoinConfig,
+                  required Future<WalletPrivateData> Function() onUnlockWallet,
+                  required Future<bool> Function(
+                          {required WalletTemplateData approveData,
+                          required double currentBalance,
+                          required double approveAmount,
+                          required bool needReset})
                       onConfirmSubmit,
-                  void Function(String) onSuccessTransaction})?
+                  required void Function(String) onSuccessTransaction})?
               doApproveSwap) =>
       _$this._doApproveSwap = doApproveSwap;
 
   Future<void> Function(
-      {String amount,
-      AssetCoin inCoinInfo,
-      AssetCoin outCoinInfo,
-      SwapConfigCoin inCoinConfig,
-      SwapConfigCoin outCoinConfig,
-      Future<WalletPrivateData> Function() onUnlockWallet,
-      Future<bool> Function() onNoticeDoubleTransaction,
-      Future<bool> Function(SwapCreateParams) onConfirmSubmit,
-      void Function(String) onSuccessTransaction})? _doSubmitSwap;
+      {required String amount,
+      required AssetCoin inCoinInfo,
+      required AssetCoin outCoinInfo,
+      required SwapConfigCoin inCoinConfig,
+      required SwapConfigCoin outCoinConfig,
+      required Future<WalletPrivateData> Function() onUnlockWallet,
+      required Future<bool> Function() onNoticeDoubleTransaction,
+      required Future<bool> Function(SwapCreateParams) onConfirmSubmit,
+      required void Function(String) onSuccessTransaction})? _doSubmitSwap;
   Future<void> Function(
-          {String amount,
-          AssetCoin inCoinInfo,
-          AssetCoin outCoinInfo,
-          SwapConfigCoin inCoinConfig,
-          SwapConfigCoin outCoinConfig,
-          Future<WalletPrivateData> Function() onUnlockWallet,
-          Future<bool> Function() onNoticeDoubleTransaction,
-          Future<bool> Function(SwapCreateParams) onConfirmSubmit,
-          void Function(String) onSuccessTransaction})?
+          {required String amount,
+          required AssetCoin inCoinInfo,
+          required AssetCoin outCoinInfo,
+          required SwapConfigCoin inCoinConfig,
+          required SwapConfigCoin outCoinConfig,
+          required Future<WalletPrivateData> Function() onUnlockWallet,
+          required Future<bool> Function() onNoticeDoubleTransaction,
+          required Future<bool> Function(SwapCreateParams) onConfirmSubmit,
+          required void Function(String) onSuccessTransaction})?
       get doSubmitSwap => _$this._doSubmitSwap;
   set doSubmitSwap(
           Future<void> Function(
-                  {String amount,
-                  AssetCoin inCoinInfo,
-                  AssetCoin outCoinInfo,
-                  SwapConfigCoin inCoinConfig,
-                  SwapConfigCoin outCoinConfig,
-                  Future<WalletPrivateData> Function() onUnlockWallet,
-                  Future<bool> Function() onNoticeDoubleTransaction,
-                  Future<bool> Function(SwapCreateParams) onConfirmSubmit,
-                  void Function(String) onSuccessTransaction})?
+                  {required String amount,
+                  required AssetCoin inCoinInfo,
+                  required AssetCoin outCoinInfo,
+                  required SwapConfigCoin inCoinConfig,
+                  required SwapConfigCoin outCoinConfig,
+                  required Future<WalletPrivateData> Function() onUnlockWallet,
+                  required Future<bool> Function() onNoticeDoubleTransaction,
+                  required Future<bool> Function(SwapCreateParams)
+                      onConfirmSubmit,
+                  required void Function(String) onSuccessTransaction})?
               doSubmitSwap) =>
       _$this._doSubmitSwap = doSubmitSwap;
 

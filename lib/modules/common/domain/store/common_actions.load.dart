@@ -4,12 +4,12 @@ class CommonActionLoadCache extends _BaseAction {
   CommonActionLoadCache();
 
   @override
-  Future<AppState> reduce() async {
+  Future<AppState?> reduce() async {
     // Load Env
     await DotEnv().load();
     AppConstants.isBeta = DotEnv().env['IS_BETA'] == 'true';
-    AppConstants.buildId = DotEnv().env['BUILD_ID'];
-    AppConstants.commitHash = DotEnv().env['COMMIT_HASH'];
+    AppConstants.buildId = DotEnv().env['BUILD_ID'] ?? '';
+    AppConstants.commitHash = DotEnv().env['COMMIT_HASH'] ?? '';
 
     // Check if is a new installation
     if (Platform.isIOS) {
@@ -32,7 +32,7 @@ class CommonActionLoadCache extends _BaseAction {
       initialState = AppState.initialState();
       await appPersistor.saveInitialState(initialState);
     }
-    return store.state.rebuild((a) => a.replace(initialState));
+    return store.state.rebuild((a) => a.replace(initialState!));
   }
 }
 
@@ -40,7 +40,7 @@ class CommonActionLoadDeviceInfo extends _BaseAction {
   CommonActionLoadDeviceInfo();
 
   @override
-  Future<AppState> reduce() async {
+  Future<AppState?> reduce() async {
     final appInfo = await PlatformUtils.getAppInfo();
     final deviceId = await PlatformUtils.getDeviceId();
     // final deviceInfo = await PlatformUtils.getDeviceInfo();
@@ -57,7 +57,7 @@ class CommonActionLoadSettings extends _BaseAction {
   CommonActionLoadSettings();
 
   @override
-  Future<AppState> reduce() async {
+  Future<AppState?> reduce() async {
     final settings = CommonRepository().getSettings();
 
     settings.installId = settings.installId ?? generateUuidV4();
@@ -75,7 +75,7 @@ class CommonActionLoadHost extends _BaseAction {
   CommonActionLoadHost();
 
   @override
-  Future<AppState> reduce() async {
+  Future<AppState?> reduce() async {
     final hostBase64 = await CommonRepository().getApiDns();
 
     final apiUrl = utf8.decode(base64Decode(hostBase64));
@@ -86,7 +86,7 @@ class CommonActionLoadHost extends _BaseAction {
 
 class CommonActionLoadImageConfig extends _BaseAction {
   @override
-  Future<AppState> reduce() async {
+  Future<AppState?> reduce() async {
     final settings = CommonRepository().getSettings();
     final timeNow = DateTime.now();
     // Use cache last Signature
@@ -95,26 +95,29 @@ class CommonActionLoadImageConfig extends _BaseAction {
       final prevSigned = prevJson['signed'] ?? {};
       AppConfig().setImageUrl(
         prevJson['url'].toString(),
-        prevSigned['Key-Pair-Id']?.toString(),
-        prevSigned['Policy']?.toString(),
-        prevSigned['Signature']?.toString(),
+        prevSigned['Key-Pair-Id'].toString(),
+        prevSigned['Policy'].toString(),
+        prevSigned['Signature'].toString(),
       );
     }
 
     if (kDebugMode ||
         settings.imageSignatureLastUpdate == null ||
         timeNow
-                .difference(DateTime.fromMillisecondsSinceEpoch(
-                    settings.imageSignatureLastUpdate))
+                .difference(
+                  DateTime.fromMillisecondsSinceEpoch(
+                    settings.imageSignatureLastUpdate,
+                  ),
+                )
                 .inDays >
             10) {
       final configJson = await CommonRepository().getConfigImage();
       final configSigned = configJson['signed'] ?? {};
       AppConfig().setImageUrl(
         configJson['url'].toString(),
-        configSigned['Key-Pair-Id']?.toString(),
-        configSigned['Policy']?.toString(),
-        configSigned['Signature']?.toString(),
+        configSigned['Key-Pair-Id'].toString(),
+        configSigned['Policy'].toString(),
+        configSigned['Signature'].toString(),
       );
       settings.imageSignature = configJson;
       settings.imageSignatureLastUpdate = timeNow.millisecondsSinceEpoch;

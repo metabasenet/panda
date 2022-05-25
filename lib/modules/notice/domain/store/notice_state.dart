@@ -44,5 +44,5 @@ abstract class NoticeState implements Built<NoticeState, NoticeStateBuilder> {
   BuiltList<NoticeInfo> get noticeLatest;
 
   //@nullable
-  NoticeInfo get noticeDetail;
+  NoticeInfo? get noticeDetail;
 }

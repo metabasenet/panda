@@ -2,10 +2,10 @@ part of trade_domain_module;
 
 class TradeActionLoadConfig extends _BaseAction {
   @override
-  Future<AppState> reduce() async {
+  Future<AppState?> reduce() async {
     final config = await TradeRepository().getConfig();
     GetIt.I<CoinConfig>().updateFromDex(
-      config.coins.fold(<String, int>{}, (all, coin) {
+      config!.coins.fold(<String, int>{}, (all, coin) {
         all[coin.symbol] = coin.dealPrecision;
         return all;
       }),
@@ -23,14 +23,14 @@ class TradeActionLoadConfig extends _BaseAction {
   }
 
   @override
-  Object wrapError(dynamic error) {
+  Object? wrapError(dynamic error) {
     return error;
   }
 }
 
 class TradeActionLoadConfigAfter extends _BaseAction {
   @override
-  AppState reduce() {
+  AppState? reduce() {
     final isError = tradeConfig == null;
 
     return store.state.rebuild(

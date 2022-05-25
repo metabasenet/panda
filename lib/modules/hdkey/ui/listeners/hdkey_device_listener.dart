@@ -2,9 +2,9 @@ part of hdkey_ui_module;
 
 class HDKeyDeviceListener extends StatelessWidget {
   const HDKeyDeviceListener({
-    @required this.activeWalletId,
-    @required this.builder,
-    Key key,
+    required this.activeWalletId,
+    required this.builder,
+    Key? key,
   }) : super(key: key);
 
   final String activeWalletId;

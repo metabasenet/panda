@@ -10,7 +10,7 @@ class CommunityJoinPage extends HookWidget {
 
   static const routeName = '/community/join';
 
-  static Future<bool> open(CommunityInfo info, CommunityTeam team) {
+  static Future<bool?> open(CommunityInfo info, CommunityTeam team) {
     return AppNavigator.push<bool>(routeName, params: MapEntry(info, team));
   }
 
@@ -26,7 +26,7 @@ class CommunityJoinPage extends HookWidget {
 
   void showConfirmDataTip(
     BuildContext context, {
-    void Function() onConfirm,
+    void Function()? onConfirm,
   }) {
     if (onConfirm != null) {
       showConfirmDialog(
@@ -85,7 +85,7 @@ class CommunityJoinPage extends HookWidget {
       if (!autovalidate.value) {
         autovalidate.value = true;
       }
-      if (formKey.currentState.validate() != true) {
+      if (formKey.currentState?.validate() != true) {
         return;
       }
 
@@ -156,7 +156,7 @@ class CommunityJoinPage extends HookWidget {
               child: StoreConnector<AppState, CommunityJoinVM>(
                 distinct: true,
                 converter: CommunityJoinVM.fromStore,
-                onInitialBuild: (viewModel) {
+                onInitialBuild: (_, __, viewModel) {
                   if (viewModel.walletId == null ||
                       viewModel.walletId.isEmpty) {
                     AppNavigator.gotoTabBar();
@@ -261,7 +261,10 @@ class CommunityJoinPage extends HookWidget {
                             myMember.value.statusRejected
                                 ? myMember.value.rejectedMessage
                                 : myMember.value.blackMessage,
-                            style: context.textBody(),
+                            style: context.textBody(
+                              bold: true,
+                              fontWeight: FontWeight.normal,
+                            ),
                           ),
                         ),
                       ),

@@ -26,10 +26,10 @@ class _$OpenWebviewVM extends OpenWebviewVM {
       WithdrawSubmitParams params, WalletPrivateData walletData,
       [Future<bool> Function() onFinalCheck]) submit;
   @override
-  final double Function({@required String chain, @required String symbol})
+  final double Function({required String chain, required String symbol})
       getCoinBalance;
   @override
-  final String Function({@required String chain, @required String symbol})
+  final String Function({required String chain, required String symbol})
       getCoinAddress;
   @override
   final Future<WalletPrivateData> Function(String password) doUnlockWallet;
@@ -166,21 +166,21 @@ class OpenWebviewVMBuilder
               submit) =>
       _$this._submit = submit;
 
-  double Function({@required String chain, @required String symbol})?
+  double Function({required String chain, required String symbol})?
       _getCoinBalance;
-  double Function({@required String chain, @required String symbol})?
+  double Function({required String chain, required String symbol})?
       get getCoinBalance => _$this._getCoinBalance;
   set getCoinBalance(
-          double Function({@required String chain, @required String symbol})?
+          double Function({required String chain, required String symbol})?
               getCoinBalance) =>
       _$this._getCoinBalance = getCoinBalance;
 
-  String Function({@required String chain, @required String symbol})?
+  String Function({required String chain, required String symbol})?
       _getCoinAddress;
-  String Function({@required String chain, @required String symbol})?
+  String Function({required String chain, required String symbol})?
       get getCoinAddress => _$this._getCoinAddress;
   set getCoinAddress(
-          String Function({@required String chain, @required String symbol})?
+          String Function({required String chain, required String symbol})?
               getCoinAddress) =>
       _$this._getCoinAddress = getCoinAddress;
 

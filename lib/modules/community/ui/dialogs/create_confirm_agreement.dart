@@ -17,6 +17,7 @@ void showConfirmAgreementDialog(
             tr('community:create_lbl_agreement'),
             style: context.textBody(
               bold: true,
+              fontWeight: FontWeight.normal,
             ),
           ),
           SizedBox(height: context.edgeSize),
@@ -27,6 +28,8 @@ void showConfirmAgreementDialog(
                 style: context.textSecondary(
                   color: context.bodyColor,
                   lineHeight: 1.61,
+                  bold: true,
+                  fontWeight: FontWeight.normal,
                 ),
               ),
             ),

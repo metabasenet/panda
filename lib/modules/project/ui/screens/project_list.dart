@@ -5,8 +5,8 @@ class ProjectDetailParams {
     this.id,
     this.iconUrl,
   });
-  final int id;
-  final String iconUrl;
+  final int? id;
+  final String? iconUrl;
 }
 
 class ProjectListPage extends HookWidget {

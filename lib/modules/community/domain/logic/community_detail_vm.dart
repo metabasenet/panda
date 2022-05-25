@@ -20,26 +20,27 @@ abstract class CommunityDetailVM
 
   @BuiltValueField(compare: false)
   Future<int> Function({
-    bool isRefresh,
-    int skip,
-    String searchName,
-    String type,
-    bool isTeamList,
+    required bool isRefresh,
+    required int skip,
+    required String searchName,
+    required String type,
+    required bool isTeamList,
   }) get loadData;
 
   @BuiltValueField(compare: false)
-  Future<void> Function({bool isTeamList}) get clearCommunityList;
+  Future<void> Function({required bool isTeamList}) get clearCommunityList;
 
   @BuiltValueField(compare: false)
   Future<CommunityTeam> Function(String teamId) get getCommunityTeam;
 
   @BuiltValueField(compare: false)
-  Future<bool> Function({bool isTeam, String type}) get getHasHistory;
+  Future<bool> Function({required bool isTeam, required String type})
+      get getHasHistory;
 
   @BuiltValueField(compare: false)
   Future<bool> Function({
-    String fork,
-    String fromAddress,
+    required String fork,
+    required String fromAddress,
   }) get checkOnChainData;
 
   // UI Logic
@@ -52,13 +53,13 @@ abstract class CommunityDetailVM
       ..communityConfig = store.state.communityState.config?.toBuilder()
       ..hasWallet = store.state.walletState.hasWallet
       ..loadData = ({
-        isRefresh,
-        skip,
-        searchName,
-        type,
-        isTeamList,
+        required isRefresh,
+        required skip,
+        required searchName,
+        required type,
+        required isTeamList,
       }) async {
-        await store.dispatchFuture(CommunityActionGetList(
+        await store.dispatchAsync(CommunityActionGetList(
           isRefresh: isRefresh,
           skip: skip,
           searchName: searchName,
@@ -66,16 +67,16 @@ abstract class CommunityDetailVM
           isTeamList: isTeamList,
         ));
         final length = isTeamList
-            ? store.state.communityState.communityTeamList?.length
-            : store.state.communityState.communityMemberList?.length;
-        return Future.value(length ?? 0);
+            ? store.state.communityState.communityTeamList.length
+            : store.state.communityState.communityMemberList.length;
+        return Future.value(length);
       }
-      ..clearCommunityList = ({isTeamList}) {
-        return store.dispatchFuture(
+      ..clearCommunityList = ({required isTeamList}) {
+        return store.dispatchAsync(
           CommunityActionClearList(isTeamList: isTeamList),
         );
       }
-      ..getHasHistory = ({isTeam, type}) async {
+      ..getHasHistory = ({required isTeam, required type}) async {
         if (isTeam) {
           final completer = Completer<CommunityTeam>();
           store.dispatch(CommunityActionGetMyTeam(
@@ -102,7 +103,7 @@ abstract class CommunityDetailVM
         ));
         return completer.future;
       }
-      ..checkOnChainData = ({fork, fromAddress}) {
+      ..checkOnChainData = ({required fork, required fromAddress}) {
         final completer = Completer<bool>();
         store.dispatch(InvitationActionCheckRelationChild(
           fork: fork,

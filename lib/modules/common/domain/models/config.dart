@@ -7,7 +7,7 @@ abstract class Config implements Built<Config, ConfigBuilder> {
 
   static Serializer<Config> get serializer => _$configSerializer;
 
-  static Config fromJson(Map<String, dynamic> json) {
+  static Config? fromJson(Map<String, dynamic> json) {
     return deserialize<Config>(json);
   }
 

@@ -11,11 +11,11 @@ abstract class SettingsConfig
       _$settingsConfigSerializer;
 
 // Serializers
-  static SettingsConfig fromJson(dynamic json) {
+  static SettingsConfig? fromJson(dynamic json) {
     return deserialize<SettingsConfig>(json);
   }
 
-  Object toJson() {
+  Object? toJson() {
     return serialize<SettingsConfig>(this);
   }
 
@@ -42,9 +42,9 @@ abstract class SettingsConfig
 
   bool get isApiDevServer => apiBaseUrl == AppConstants.apiUrlDev.first;
 
-  bool get hasProxyUrl => proxyUrl?.isNotEmpty == true;
+  bool get hasProxyUrl => proxyUrl.isNotEmpty == true;
 
-  bool get hasApiBaseUrl => apiBaseUrl?.isNotEmpty == true;
+  bool get hasApiBaseUrl => apiBaseUrl.isNotEmpty == true;
 
-  bool get hasApiAppVersion => apiAppVersion?.isNotEmpty == true;
+  bool get hasApiAppVersion => apiAppVersion.isNotEmpty == true;
 }

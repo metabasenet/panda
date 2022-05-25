@@ -24,34 +24,36 @@ abstract class InvitationSelectVM
 
   @BuiltValueField(compare: false)
   Future<InvitationCode> Function({
-    String mnemonic,
-    AssetCoin coinInfo,
+    required String mnemonic,
+    required AssetCoin coinInfo,
   }) get createInvitationCode;
 
   static InvitationSelectVM fromStore(Store<AppState> store) {
-    return InvitationSelectVM((viewModel) => viewModel
-      ..walletId = store.state.walletState.activeWalletId
-      ..invitationCodes =
-          store.state.invitationState.invitationCodes.toBuilder()
-      ..getInvitationCoins = () {
-        return VMWithInvitation.getInvitationCoins(store);
-      }
-      ..loadInvitationCode = () {
-        store.dispatch(InvitationActionLoadCode());
-      }
-      ..createInvitationCode = ({mnemonic, coinInfo}) {
-        final completer = Completer<InvitationCode>();
-        store.dispatch(InvitationActionCreateCode(
-          mnemonic: mnemonic,
-          coinInfo: coinInfo,
-          completer: completer,
-        ));
-        return completer.future;
-      }
-      ..doUnlockWallet = (password) {
-        final completer = Completer<WalletPrivateData>();
-        store.dispatch(WalletActionWalletUnlock(password, completer));
-        return completer.future;
-      });
+    return InvitationSelectVM(
+      (viewModel) => viewModel
+        ..walletId = store.state.walletState.activeWalletId
+        ..invitationCodes =
+            store.state.invitationState.invitationCodes.toBuilder()
+        ..getInvitationCoins = () {
+          return VMWithInvitation.getInvitationCoins(store);
+        }
+        ..loadInvitationCode = () {
+          store.dispatch(InvitationActionLoadCode());
+        }
+        ..createInvitationCode = ({required mnemonic, required coinInfo}) {
+          final completer = Completer<InvitationCode>();
+          store.dispatch(InvitationActionCreateCode(
+            mnemonic: mnemonic,
+            coinInfo: coinInfo,
+            completer: completer,
+          ));
+          return completer.future;
+        }
+        ..doUnlockWallet = (password) {
+          final completer = Completer<WalletPrivateData>();
+          store.dispatch(WalletActionWalletUnlock(password, completer));
+          return completer.future;
+        },
+    );
   }
 }

@@ -7,7 +7,7 @@ abstract class NoticeInfo implements Built<NoticeInfo, NoticeInfoBuilder> {
 
   static Serializer<NoticeInfo> get serializer => _$noticeInfoSerializer;
 
-  static NoticeInfo fromJson(Map<String, dynamic> json) {
+  static NoticeInfo? fromJson(Map<String, dynamic> json) {
     return deserialize<NoticeInfo>(json);
   }
 

@@ -1,14 +1,14 @@
 part of trade_domain_module;
 
 class TradeOrdersPendingCubit extends TradeOrdersCubit {
-  TradeOrdersPendingCubit([TradeRepository tradeRepository])
+  TradeOrdersPendingCubit([TradeRepository? tradeRepository])
       : super(tradeRepository);
 
   // ▼▼▼▼▼▼ Update/Load Data ▼▼▼▼▼▼  //
 
   Future<void> loadPendingOrdersFromCache({
-    @required String walletId,
-    @required String tradePairId,
+    required String walletId,
+    required String tradePairId,
   }) async {
     // First emit cached orders
     final cachedOrders = await tradeRepository.getTradeOrdersFromCache(
@@ -23,10 +23,10 @@ class TradeOrdersPendingCubit extends TradeOrdersCubit {
   }
 
   Future<void> loadData({
-    @required String walletId,
-    @required String tradePairId,
-    @required String tradeAddress,
-    @required String priceAddress,
+    required String walletId,
+    required String tradePairId,
+    required String tradeAddress,
+    required String priceAddress,
   }) async {
     if (walletId == null || walletId.isEmpty) {
       return;
@@ -62,15 +62,15 @@ class TradeOrdersPendingCubit extends TradeOrdersCubit {
 
   @override
   Future<int> loadAll({
-    @required String walletId,
-    @required String tradePairId,
-    @required String tradeAddress,
-    @required String priceAddress,
-    @required int skip,
-    @required int take,
-    @required String tradeSide,
-    @required String status,
-    @required bool onlyCache,
+    required String walletId,
+    required String tradePairId,
+    required String tradeAddress,
+    required String priceAddress,
+    required int skip,
+    required int take,
+    required String tradeSide,
+    required String status,
+    required bool onlyCache,
   }) async {
     if (walletId == null || walletId.isEmpty) {
       return 0;
@@ -167,9 +167,9 @@ class TradeOrdersPendingCubit extends TradeOrdersCubit {
 
   /// Add/Update a ticker from mqtt
   Future<void> updateFromMqtt({
-    @required String txId,
-    @required String tradePairId,
-    @required String walletId,
+    required String txId,
+    required String tradePairId,
+    required String walletId,
   }) async {
     // if (tradePairId != state.tradePair?.id) {
     //   return;

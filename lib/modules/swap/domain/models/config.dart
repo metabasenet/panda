@@ -8,7 +8,7 @@ abstract class SwapConfig implements Built<SwapConfig, SwapConfigBuilder> {
   static Serializer<SwapConfig> get serializer => _$swapConfigSerializer;
 
 // Serializers
-  static SwapConfig fromJson(List<List<dynamic>> json) {
+  static SwapConfig? fromJson(List<List<dynamic>> json) {
     return deserialize<SwapConfig>({'tradePairs': json});
   }
 

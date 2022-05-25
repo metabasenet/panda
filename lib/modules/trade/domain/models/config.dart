@@ -8,7 +8,7 @@ abstract class TradeConfig implements Built<TradeConfig, TradeConfigBuilder> {
   static Serializer<TradeConfig> get serializer => _$tradeConfigSerializer;
 
 // Serializers
-  static TradeConfig fromJson(Map<String, dynamic> json) {
+  static TradeConfig? fromJson(Map<String, dynamic> json) {
     return deserialize<TradeConfig>(json);
   }
 
@@ -28,7 +28,7 @@ abstract class TradeConfig implements Built<TradeConfig, TradeConfigBuilder> {
     final randomIndex = random.nextInt(mqttHosts.length);
     final hostData = mqttHosts[randomIndex].split(':');
     if (hostData.length != 2) {
-      return null;
+      //return null;
     }
     return MapEntry(hostData.first, NumberUtil.getInt(hostData.last));
   }
@@ -61,7 +61,7 @@ abstract class TradeConfig implements Built<TradeConfig, TradeConfigBuilder> {
     return allPairs;
   }
 
-  List<TradeMarket> get allTradeMarkets {
+  List<TradeMarket?> get allTradeMarkets {
     final markets = tradePairs.entries
         .map((market) {
           final hasPairs =
@@ -81,7 +81,7 @@ abstract class TradeConfig implements Built<TradeConfig, TradeConfigBuilder> {
     final fixedSort = ['USDT-MNT', 'USDT-ERC20', 'USDT-TRC20'];
 
     markets.sort((a, b) {
-      if (fixedSort.indexOf(a.id) > fixedSort.indexOf(b.id)) {
+      if (fixedSort.indexOf(a!.id) > fixedSort.indexOf(b!.id)) {
         return 1;
       }
       if (fixedSort.indexOf(a.id) < fixedSort.indexOf(b.id)) {

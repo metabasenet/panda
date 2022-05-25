@@ -6,7 +6,7 @@ class CommunityCreatePage extends HookWidget {
 
   static const routeName = '/community/create';
 
-  static Future<bool> open(CommunityInfo type) {
+  static Future<bool?> open(CommunityInfo type) {
     return AppNavigator.push<bool>(routeName, params: type);
   }
 
@@ -21,7 +21,7 @@ class CommunityCreatePage extends HookWidget {
 
   void showConfirmDataTip(
     BuildContext context, {
-    void Function() onConfirm,
+    void Function()? onConfirm,
   }) {
     if (onConfirm != null) {
       showConfirmAgreementDialog(context, onConfirm);
@@ -36,7 +36,7 @@ class CommunityCreatePage extends HookWidget {
   void handleSelectCoin(
     BuildContext context,
     List<AssetCoin> list,
-    ValueNotifier<AssetCoin> selectCoin,
+    ValueNotifier<AssetCoin?> selectCoin,
   ) {
     final options = list
         .map(
@@ -44,8 +44,8 @@ class CommunityCreatePage extends HookWidget {
               label: e.symbol,
               value: e,
               color: selectCoin.value != null &&
-                      selectCoin.value.chain == e.chain &&
-                      selectCoin.value.symbol == e.symbol
+                      selectCoin.value?.chain == e.chain &&
+                      selectCoin.value?.symbol == e.symbol
                   ? context.primaryColor
                   : null),
         )
@@ -67,7 +67,7 @@ class CommunityCreatePage extends HookWidget {
     final isGroupUploading = useValueNotifier(false);
     final type = typeInfo.teamType;
 
-    final selectCoin = useState<AssetCoin>(null);
+    final selectCoin = useState<AssetCoin?>(null);
 
     final name = useTextEditingController(text: '');
     final desc = useTextEditingController(text: '');
@@ -102,7 +102,7 @@ class CommunityCreatePage extends HookWidget {
       if (!autovalidate.value) {
         autovalidate.value = true;
       }
-      if (formKey.currentState.validate() != true) {
+      if (formKey.currentState?.validate() != true) {
         return;
       }
 
@@ -175,7 +175,7 @@ class CommunityCreatePage extends HookWidget {
               child: StoreConnector<AppState, CommunityCreateVM>(
                 distinct: true,
                 converter: CommunityCreateVM.fromStore,
-                onInitialBuild: (viewModel) {
+                onInitialBuild: (_, __, viewModel) {
                   if (viewModel.walletId == null ||
                       viewModel.walletId.isEmpty) {
                     AppNavigator.gotoTabBar();
@@ -244,7 +244,7 @@ class CommunityCreatePage extends HookWidget {
                     if (visibleItems.contains('coin'))
                       AssetCoinBox(
                         title: ecologyLbl,
-                        coinInfo: selectCoin.value,
+                        coinInfo: selectCoin.value!,
                         onPress: canEdit
                             ? () {
                                 handleSelectCoin(
@@ -316,7 +316,10 @@ class CommunityCreatePage extends HookWidget {
                             myTeam.value.statusRejected
                                 ? myTeam.value.rejectedMessage
                                 : myTeam.value.blackMessage,
-                            style: context.textBody(),
+                            style: context.textBody(
+                              bold: true,
+                              fontWeight: FontWeight.normal,
+                            ),
                           ),
                         ),
                       ),

@@ -18,9 +18,9 @@ String getOrderListTitle(String state) {
 
   final item = tradeOrderOptions.firstWhere(
     (e) => e.value == state,
-    orElse: () => null,
+    //orElse: () => null,
   );
-  return item != null ? item.label : '';
+  return item.label;
 }
 
 void showOrderListMenuDialog(
@@ -63,11 +63,11 @@ void showOrderListTradeFilterDialog(
   BuildContext context,
   List<FilterType> data,
   String activeId, {
-  Function(FilterType type) onSelect,
+  Function(FilterType type)? onSelect,
 }) {
   final list = data
       .map((e) => CSOptionsItem(
-            label: e.label,
+            label: e.label ?? '',
             value: e.id,
             color: activeId == e.id ? context.primaryColor : null,
           ))
@@ -77,7 +77,7 @@ void showOrderListTradeFilterDialog(
     context,
     options: list,
     onSelected: (value) {
-      onSelect(data.firstWhere((e) => e.id == value));
+      onSelect?.call(data.firstWhere((e) => e.id == value));
     },
   );
 }

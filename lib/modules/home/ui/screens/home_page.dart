@@ -11,10 +11,10 @@ class HomePage extends StatelessWidget {
         WebViewPage.open(bannerItem.content, bannerItem.title);
         break;
       case 'SYSTEM_NOTICE':
-        NoticeDetailPage.open(
-          null,
-          NumberUtil.getInt(bannerItem.content, -1),
-        );
+        //NoticeDetailPage.open(
+        //  null,
+        //  NumberUtil.getInt(bannerItem.content, -1),
+        //);
         break;
       default:
     }
@@ -50,7 +50,10 @@ class HomePage extends StatelessWidget {
         converter: HomePageVM.fromStore,
         builder: (context, viewModel) => Text(
           tr('home:title'),
-          style: context.textHuge(fontWeight: FontWeight.w700),
+          style: context.textHuge(
+            fontWeight: FontWeight.w700,
+            bold: true,
+          ),
         ),
       ),
       outerChild: Container(
@@ -70,7 +73,7 @@ class HomePage extends StatelessWidget {
       child: StoreConnector<AppState, HomePageVM>(
         distinct: true,
         converter: HomePageVM.fromStore,
-        onInitialBuild: (viewModel) {
+        onInitialBuild: (_, __, viewModel) {
           viewModel.doLoadHomeData();
           if (AppConstants.isBeta && !kDebugMode) {
             // Only on Beta force check for new version
@@ -93,7 +96,7 @@ class HomePage extends StatelessWidget {
                   content: newLangTr
                       .get(
                         'global:msg_change_language',
-                      )
+                      )!
                       .replaceAll(RegExp('{name}'), lang.name),
                   cancelBtnText: newLangTr.get('global:btn_not_ask'),
                   confirmBtnText: newLangTr.get('global:btn_confirm'),
@@ -109,7 +112,7 @@ class HomePage extends StatelessWidget {
             });
           }
         },
-        onDidChange: (viewModel) {
+        onDidChange: (_, __, viewModel) {
           if (viewModel.hasNewVersion && !_hasShownNewVersionDialog) {
             handleShowNewVersion(context, viewModel.newVersionData);
           }
@@ -152,7 +155,10 @@ class HomePage extends StatelessWidget {
                         alignment: MainAxisAlignment.start,
                         margin: context.edgeLeft,
                         backgroundColor: context.whiteColor,
-                        textStyle: context.textSmall(bold: true),
+                        textStyle: context.textSmall(
+                          bold: true,
+                          fontWeight: FontWeight.normal,
+                        ),
                         cmpLeft: Padding(
                           padding: context.edgeRight8,
                           child: Icon(
@@ -170,7 +176,7 @@ class HomePage extends StatelessWidget {
                 ),
               ),
               HomeBanners(
-                viewModel.homeBanners?.toList(),
+                viewModel.homeBanners.toList(),
                 handleOpenBannerPage,
               ),
               /*

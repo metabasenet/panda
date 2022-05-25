@@ -8,7 +8,7 @@ abstract class TradeInfo24h
   TradeInfo24h._();
 
   // Serializers
-  static TradeInfo24h fromJson(Map<String, dynamic> json) {
+  static TradeInfo24h? fromJson(Map<String, dynamic> json) {
     return deserialize<TradeInfo24h>(json);
   }
 

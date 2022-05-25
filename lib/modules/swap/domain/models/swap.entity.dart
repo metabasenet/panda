@@ -34,28 +34,28 @@ class Swap extends HiveObject {
   }
 
   factory Swap.fromApi({
-    @required Swap cached,
-    @required Map<String, dynamic> json,
+    required Swap cached,
+    required Map<String, dynamic> json,
   }) {
     return Swap()
-      ..txId = json['user_out_txid']?.toString()
+      ..txId = json['user_out_txid'].toString()
       ..status = _mapStatusFromInt(NumberUtil.getInt(json['status']))
-      ..outSymbol = json['user_out_currency']?.toString()
-      ..outChain = json['user_out_chain']?.toString()
-      ..outAmount = json['user_out_amount']?.toString()
-      ..inSymbol = json['user_in_currency']?.toString()
-      ..inChain = json['user_in_chain']?.toString()
-      ..inAmount = json['user_in_amount']?.toString()
-      ..toAddress = cached?.toAddress
-      ..fromAddress = cached?.fromAddress
+      ..outSymbol = json['user_out_currency'].toString()
+      ..outChain = json['user_out_chain'].toString()
+      ..outAmount = json['user_out_amount'].toString()
+      ..inSymbol = json['user_in_currency'].toString()
+      ..inChain = json['user_in_chain'].toString()
+      ..inAmount = json['user_in_amount'].toString()
+      ..toAddress = cached.toAddress
+      ..fromAddress = cached.fromAddress
       ..transferFee = NumberUtil.getDouble(json['transfer_fee'])
       ..createdAt = NumberUtil.getInt(json['created_at'])
       ..updatedAt = NumberUtil.getInt(json['updated_at']);
   }
 
   factory Swap.fromSubmit({
-    @required SwapCreateParams params,
-    @required String txId,
+    required SwapCreateParams params,
+    required String txId,
   }) =>
       Swap()
         ..txId = txId
@@ -73,35 +73,35 @@ class Swap extends HiveObject {
         ..updatedAt = SystemDate.getTime();
 
   @HiveField(0)
-  String txId;
+  late String txId;
   @HiveField(1)
-  String toAddress;
+  late String toAddress;
   @HiveField(2)
-  String fromAddress;
+  late String fromAddress;
 
   @HiveField(4)
-  String outSymbol;
+  late String outSymbol;
   @HiveField(5)
-  String outChain;
+  late String outChain;
   @HiveField(6)
-  String outAmount;
+  late String outAmount;
 
   @HiveField(7)
-  String inSymbol;
+  late String inSymbol;
   @HiveField(8)
-  String inChain;
+  late String inChain;
   @HiveField(9)
-  String inAmount;
+  late String inAmount;
 
   @HiveField(10)
-  double transferFee;
+  late double transferFee;
 
   @HiveField(11)
-  int createdAt;
+  late int createdAt;
   @HiveField(12)
-  int updatedAt;
+  late int updatedAt;
   @HiveField(20)
-  SwapStatus status;
+  late SwapStatus status;
 
   static SwapStatus _mapStatusFromInt(
     int apiStatus,

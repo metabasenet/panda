@@ -7,12 +7,12 @@ class InvitationCode extends HiveObject {
   }
 
   factory InvitationCode.create({
-    @required String chain,
-    @required String symbol,
-    @required String fork,
-    @required String address,
-    @required String subSign,
-    @required String sharePrvKey,
+    required String chain,
+    required String symbol,
+    required String fork,
+    required String address,
+    required String subSign,
+    required String sharePrvKey,
   }) =>
       InvitationCode()
         ..chain = chain
@@ -24,19 +24,19 @@ class InvitationCode extends HiveObject {
         ..createdAt = SystemDate.getTime();
 
   @HiveField(0)
-  String chain;
+  late String chain;
   @HiveField(1)
-  String symbol;
+  late String symbol;
   @HiveField(2)
-  String fork;
+  late String fork;
   @HiveField(4)
-  String address;
+  late String address;
 
   @HiveField(5)
-  String subSign;
+  late String subSign;
   @HiveField(6)
-  String sharePrvKey;
+  late String sharePrvKey;
 
   @HiveField(7)
-  int createdAt;
+  late int createdAt;
 }

@@ -2,7 +2,7 @@ part of common_domain_module;
 
 class CommonActionLoadConfig extends _BaseAction {
   @override
-  Future<AppState> reduce() async {
+  Future<AppState?> reduce() async {
     final config = await CommonRepository().getConfig();
 
     try {
@@ -14,7 +14,7 @@ class CommonActionLoadConfig extends _BaseAction {
     GetIt.I<CoinConfig>().updateFromConfig(config);
     GetIt.I<ModulePermissionUtils>().updateFromConfig(
       config,
-      state.commonState.appInfo.version,
+      state.commonState.appInfo?.version ?? '',
     );
 
     return state.rebuild(
@@ -28,11 +28,11 @@ class CommonActionLoadConfig extends _BaseAction {
   void after() {
     super.after();
     dispatch(CommonActionLoadConfigAfter());
-    dispatch(AppActionAfterCommonConfig(state.commonState.config));
+    dispatch(AppActionAfterCommonConfig(state.commonState.config ?? Config()));
   }
 
   @override
-  Object wrapError(dynamic error) {
+  Object? wrapError(dynamic error) {
     return error;
   }
 }

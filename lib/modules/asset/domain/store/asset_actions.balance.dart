@@ -30,7 +30,7 @@ class AssetActionGetCoinBalance extends _BaseAction {
     );
 
     // By default always use cached balance
-    final cachedBalance = balanceInfo.balance;
+    final cachedBalance = balanceInfo!.balance;
     var newBalance = balanceInfo.balance;
     var newUnconfirmed = balanceInfo.unconfirmed;
     /*

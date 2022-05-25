@@ -2,26 +2,26 @@ part of swap_domain_module;
 
 class SwapActionSwapApprove extends _BaseAction {
   SwapActionSwapApprove({
-    @required this.outCoinInfo,
-    @required this.outCoinConfig,
-    @required this.onConfirmSubmit,
-    @required this.onUnlockWallet,
-    @required this.onSuccessTransaction,
+    required this.outCoinInfo,
+    required this.outCoinConfig,
+    required this.onConfirmSubmit,
+    required this.onUnlockWallet,
+    required this.onSuccessTransaction,
   });
 
   final AssetCoin outCoinInfo;
   final SwapConfigCoin outCoinConfig;
   final Future<WalletPrivateData> Function() onUnlockWallet;
   final Future<bool> Function({
-    @required WalletTemplateData approveData,
-    @required double currentBalance,
-    @required double approveAmount,
-    @required bool needReset,
+    required WalletTemplateData approveData,
+    required double currentBalance,
+    required double approveAmount,
+    required bool needReset,
   }) onConfirmSubmit;
   final void Function(String txId) onSuccessTransaction;
 
   @override
-  Future<AppState> reduce() async {
+  Future<AppState?> reduce() async {
     // Get balance again to double check
     final currentBalance = await SwapRepository().getApproveBalance(
       chain: outCoinInfo.chain,
@@ -58,7 +58,7 @@ class SwapActionSwapApprove extends _BaseAction {
     final approveData = WalletTemplateData(
       chain: outCoinInfo.chain,
       symbol: outCoinInfo.symbol,
-      templateHex: null, // No Hex for approve
+      templateHex: '', // No Hex for approve
       templateData: transInfo,
       templateAddress: outCoinInfo.address,
     );
@@ -66,7 +66,7 @@ class SwapActionSwapApprove extends _BaseAction {
     final canContinue = await onConfirmSubmit(
       approveData: approveData,
       currentBalance: currentBalance,
-      approveAmount: approveAmount,
+      approveAmount: approveAmount ?? 0,
       needReset: approveNeedReset,
     );
     if (canContinue != true) {
@@ -88,7 +88,7 @@ class SwapActionSwapApprove extends _BaseAction {
       rawTx: approveData.rawTx,
       walletData: walletData,
       completer: submitTransaction,
-      amount: approveAmount,
+      amount: approveAmount ?? 0,
     ));
     final txId = await submitTransaction.future;
 
@@ -98,7 +98,7 @@ class SwapActionSwapApprove extends _BaseAction {
       symbol: outCoinInfo.chain,
       feeValue: approveData.feeValue,
       feeSymbol: outCoinInfo.chain,
-      amount: approveAmount,
+      amount: approveAmount ?? 0,
       toAddress: approveData.contract,
       fromAddress: outCoinInfo.address,
       type: TransactionType.approveCall,
@@ -110,7 +110,7 @@ class SwapActionSwapApprove extends _BaseAction {
   }
 
   @override
-  Object wrapError(dynamic error) {
+  Object? wrapError(dynamic error) {
     return parseWalletError(error);
   }
 }

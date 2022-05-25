@@ -22,7 +22,7 @@ class InvitationCodePage extends HookWidget {
   void saveQRCodeView(BuildContext context) {
     LoadingDialog.show(context);
     saveImageState.currentState
-        .capture()
+        ?.capture()
         .whenComplete(() => LoadingDialog.dismiss(context));
   }
 
@@ -81,7 +81,7 @@ class InvitationCodePage extends HookWidget {
       backgroundColor: context.bgSecondaryColor,
       child: StoreConnector<AppState, InvitationCreateVM>(
         converter: InvitationCreateVM.fromStore,
-        onInitialBuild: (viewModel) {
+        onInitialBuild: (_, __, viewModel) {
           final coinInfo = viewModel.getCoinInfo(
             chain: inviteCode.chain,
             symbol: inviteCode.symbol,
@@ -104,7 +104,7 @@ class InvitationCodePage extends HookWidget {
                         children: [
                           Center(
                             child: CSContainer(
-                              width: null,
+                              //width: null,
                               child: QrCodeView(
                                 qrCodeStr,
                                 size: context.mediaWidth * 0.437,
@@ -144,7 +144,10 @@ class InvitationCodePage extends HookWidget {
                           child: Text(
                             tipText[index],
                             style: context.textSecondary(
-                                color: tipTextColor[index]),
+                              color: tipTextColor[index],
+                              bold: true,
+                              fontWeight: FontWeight.normal,
+                            ),
                           ),
                         );
                       },
@@ -188,14 +191,17 @@ class InvitationCodePage extends HookWidget {
 
   Widget renderItem(
     BuildContext context, {
-    String title,
-    String value,
-    String copyLbl,
+    String? title,
+    String? value,
+    String? copyLbl,
   }) {
     return FormBox(
       margin: context.edgeVertical,
       title: title,
-      titleStyle: context.textSecondary(bold: true),
+      titleStyle: context.textSecondary(
+        bold: true,
+        fontWeight: FontWeight.normal,
+      ),
       titleAction: CSButtonIcon(
         borderRadius: 4,
         icon: CSIcons.Copy,
@@ -204,14 +210,15 @@ class InvitationCodePage extends HookWidget {
         size: 18,
         margin: EdgeInsets.symmetric(horizontal: 2),
         onPressed: () {
-          copyTextToClipboard(copyLbl);
+          copyTextToClipboard(copyLbl!);
           Toast.show(tr('global:msg_copy_success'));
         },
       ),
       child: Text(
-        value,
+        value!,
         style: context.textSecondary(
           bold: true,
+          fontWeight: FontWeight.normal,
           color: context.bodyColor,
         ),
       ),
@@ -236,7 +243,10 @@ class InvitationCodePage extends HookWidget {
               tr('invitation:code_detail_invitation', namedArgs: {
                 'symbol': coinName,
               }),
-              style: context.textMedium(bold: true),
+              style: context.textMedium(
+                bold: true,
+                fontWeight: FontWeight.normal,
+              ),
             ),
             SizedBox(height: context.edgeSize),
             QrCodeView(

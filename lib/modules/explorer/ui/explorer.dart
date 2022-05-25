@@ -22,7 +22,7 @@ import 'package:mars/modules/common/domain/common.dart';
 part 'screens/explorer_home.dart';
 part 'widgets/explorer_bar.dart';
 
-Route<dynamic> moduleExplorerInitRoutes(RouteSettings settings) {
+Route<dynamic>? moduleExplorerInitRoutes(RouteSettings settings) {
   switch (settings.name) {
     case ExplorerHomePage.routeName:
       return ExplorerHomePage.route(settings);

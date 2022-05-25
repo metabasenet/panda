@@ -6,9 +6,9 @@ class TradeOrderSubmitProcess {
     TradeHomeVM viewModel, {
 
     /// If True user request a reset
-    @required bool userReset,
-    @required AssetCoin coinInfo,
-    @required Function(String) onSuccessTransaction,
+    required bool userReset,
+    required AssetCoin coinInfo,
+    required Function(String) onSuccessTransaction,
   }) {
     var isReset = userReset;
     LoadingDialog.show(context);
@@ -17,10 +17,10 @@ class TradeOrderSubmitProcess {
       tradePair: viewModel.tradePair,
       tradeSide: viewModel.tradeSide,
       onConfirmSubmit: ({
-        approveData,
-        currentBalance,
-        approveAmount,
-        needReset,
+        required approveData,
+        required currentBalance,
+        required approveAmount,
+        required needReset,
       }) {
         isReset = userReset || needReset;
         LoadingDialog.dismiss(context);
@@ -83,10 +83,10 @@ class TradeOrderSubmitProcess {
   static void doCreateOrder(
     BuildContext context,
     TradeHomeVM viewModel, {
-    @required String price,
-    @required String amount,
-    @required String total,
-    @required Function(String) onSuccessTransaction,
+    required String price,
+    required String amount,
+    required String total,
+    required Function(String) onSuccessTransaction,
   }) {
     LoadingDialog.show(context);
     viewModel

@@ -10,7 +10,7 @@ class NoticeDetailPage extends StatelessWidget {
 
   static const routeName = '/notice/detail';
 
-  static void open(NoticeInfo item, [int itemId]) {
+  static void open(NoticeInfo item, [int? itemId]) {
     AppNavigator.push(routeName, params: MapEntry(itemId ?? item.id, item));
   }
 

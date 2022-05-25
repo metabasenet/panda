@@ -68,7 +68,7 @@ class WalletManagementPage extends HookWidget {
             WalletChangePasswordPage.open(password);
             break;
           case _WalletMenu.backup:
-            WalletBackupPage.open(data.mnemonic);
+            WalletBackupPage.open(data.mnemonic!);
             break;
           case _WalletMenu.export:
             WalletExportPage.open(data);
@@ -83,6 +83,7 @@ class WalletManagementPage extends HookWidget {
               cancelBtnStyle: context.textBody(
                 color: context.redColor,
                 bold: true,
+                fontWeight: FontWeight.normal,
               ),
               onConfirm: () {
                 LoadingDialog.show(context);
@@ -121,6 +122,7 @@ class WalletManagementPage extends HookWidget {
                 style: context.textBody(
                   color: context.labelColor,
                   bold: true,
+                  fontWeight: FontWeight.normal,
                 ),
               ),
             ),
@@ -184,6 +186,7 @@ class WalletManagementPage extends HookWidget {
                 style: context.textBody(
                   color: context.labelColor,
                   bold: true,
+                  fontWeight: FontWeight.normal,
                 ),
               ),
             ),
@@ -230,6 +233,7 @@ class WalletManagementPage extends HookWidget {
                 labelStyle: context.textBody(
                   bold: true,
                   color: context.redColor,
+                  fontWeight: FontWeight.normal,
                 ),
                 hideAccess: true,
                 cmpLeft: Spacer(),

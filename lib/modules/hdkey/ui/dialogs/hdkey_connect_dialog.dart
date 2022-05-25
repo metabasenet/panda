@@ -16,8 +16,8 @@ void showHDKeyConnectingDialog(
 
 class HDKeyWalletConnect extends HookWidget {
   const HDKeyWalletConnect({
-    @required this.initialStatus,
-    @required this.statusStream,
+    required this.initialStatus,
+    required this.statusStream,
   });
 
   final HDKeyDeviceStatus initialStatus;
@@ -39,6 +39,7 @@ class HDKeyWalletConnect extends HookWidget {
               style: context.textBody(
                 color: context.titleColor,
                 bold: true,
+                fontWeight: FontWeight.normal,
               ),
             ),
             SizedBox(height: context.edgeSizeDouble),
@@ -76,6 +77,7 @@ class HDKeyWalletConnect extends HookWidget {
                 tr('设备连接中，请稍后…'),
                 style: context.textBody(
                   bold: true,
+                  fontWeight: FontWeight.normal,
                 ),
               ),
             ),

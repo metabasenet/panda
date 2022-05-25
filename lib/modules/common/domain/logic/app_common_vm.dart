@@ -30,8 +30,8 @@ abstract class AppCommonVM implements Built<AppCommonVM, AppCommonVMBuilder> {
     return AppCommonVM(
       (viewModel) => viewModel
         ..doChangeLanguage = (language) async {
-          await store.dispatchFuture(CommonActionChangeLanguage(language));
-          await store.dispatchFuture(CommonActionChangeFiatCurrency(
+          await store.dispatchAsync(CommonActionChangeLanguage(language));
+          await store.dispatchAsync(CommonActionChangeFiatCurrency(
             AppLanguages.getCurrencyByLanguage(language),
           ));
         }

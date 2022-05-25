@@ -1,11 +1,15 @@
 part of invitation_ui_module;
 
 Future<bool> showInvitationConfirmDialog({
-  @required BuildContext context,
-  @required WalletWithdrawData withdrawData,
-  @required AssetCoin coinInfo,
-  @required String amount,
-  @required AssetCoin Function({String chain, String symbol}) getCoinInfo,
+  required BuildContext context,
+  required WalletWithdrawData withdrawData,
+  required AssetCoin coinInfo,
+  required String amount,
+  required AssetCoin Function({
+    required String chain,
+    required String symbol,
+  })
+      getCoinInfo,
 }) {
   final response = Completer<bool>();
 
@@ -49,7 +53,7 @@ Future<bool> showInvitationConfirmDialog({
     CSConfirmItem(
       label: tr('invitation:defi_create_dialog_total_amount'),
       notice: coinInfo.name,
-      value: totalAmount,
+      value: totalAmount!,
     ),
     if (!isFeeSameChain)
       CSConfirmItem(

@@ -6,9 +6,9 @@ abstract class _BaseAction extends ReduxAction<AppState> {
 
 class InvitationActionGetList extends _BaseAction {
   InvitationActionGetList({
-    @required this.isRefresh,
-    @required this.skip,
-    @required this.coin,
+    required this.isRefresh,
+    required this.skip,
+    required this.coin,
   });
 
   final bool isRefresh;
@@ -20,7 +20,7 @@ class InvitationActionGetList extends _BaseAction {
     final walletId = state.walletState.activeWalletId;
 
     final data = await InvitationRepository().getInvitationList(
-      walletId: walletId,
+      walletId: walletId!,
       address: coin.address,
       contract: coin.contract,
       skip: skip,
@@ -30,7 +30,7 @@ class InvitationActionGetList extends _BaseAction {
     final list = <Invitation>[];
     for (final item in data) {
       list.add(Invitation(
-        item['current']?.toString(),
+        item['current'].toString(),
         NumberUtil.getInt(item['created_at']),
       ));
     }
@@ -52,9 +52,9 @@ class InvitationActionClear extends _BaseAction {
 
 class InvitationActionCheckRelationParent extends _BaseAction {
   InvitationActionCheckRelationParent({
-    @required this.fork,
-    @required this.toAddress,
-    @required this.completer,
+    required this.fork,
+    required this.toAddress,
+    required this.completer,
   });
 
   final String fork;
@@ -62,13 +62,13 @@ class InvitationActionCheckRelationParent extends _BaseAction {
   final Completer<bool> completer;
 
   @override
-  Future<AppState> reduce() async {
+  Future<AppState?> reduce() async {
     final deviceId = await PlatformUtils.getDeviceId();
     final walletId = state.walletState.activeWalletId;
 
     await InvitationRepository().checkRelationParent(
       fork: fork,
-      walletId: walletId,
+      walletId: walletId!,
       deviceId: deviceId,
       toAddress: toAddress,
     );
@@ -78,17 +78,17 @@ class InvitationActionCheckRelationParent extends _BaseAction {
   }
 
   @override
-  Object wrapError(dynamic error) {
-    completer.completeError(error);
+  Object? wrapError(dynamic error) {
+    completer.completeError(error as Object);
     return error;
   }
 }
 
 class InvitationActionCheckRelationChild extends _BaseAction {
   InvitationActionCheckRelationChild({
-    @required this.fork,
-    @required this.fromAddress,
-    @required this.completer,
+    required this.fork,
+    required this.fromAddress,
+    required this.completer,
   });
 
   final String fork;
@@ -96,14 +96,14 @@ class InvitationActionCheckRelationChild extends _BaseAction {
   final Completer<bool> completer;
 
   @override
-  Future<AppState> reduce() async {
+  Future<AppState?> reduce() async {
     final deviceId = await PlatformUtils.getDeviceId();
     final walletId = state.walletState.activeWalletId;
 
     await InvitationRepository().checkRelationChild(
       fork: fork,
       fromAddress: fromAddress,
-      walletId: walletId,
+      walletId: walletId!,
       deviceId: deviceId,
     );
 
@@ -112,8 +112,8 @@ class InvitationActionCheckRelationChild extends _BaseAction {
   }
 
   @override
-  Object wrapError(dynamic error) {
-    completer.completeError(error);
+  Object? wrapError(dynamic error) {
+    completer.completeError(error as Object);
     return error;
   }
 }
@@ -124,7 +124,7 @@ class InvitationActionLoadCode extends _BaseAction {
     final walletId = state.walletState.activeWalletId;
 
     final result = await InvitationRepository().getInvitationCodeFromCache(
-      walletId,
+      walletId!,
     );
     return state.rebuild(
       (s) => s.invitationState.invitationCodes.replace(result),
@@ -132,16 +132,16 @@ class InvitationActionLoadCode extends _BaseAction {
   }
 
   @override
-  Object wrapError(dynamic error) {
+  Object? wrapError(dynamic error) {
     return error;
   }
 }
 
 class InvitationActionCreateCode extends _BaseAction {
   InvitationActionCreateCode({
-    @required this.mnemonic,
-    @required this.coinInfo,
-    @required this.completer,
+    required this.mnemonic,
+    required this.coinInfo,
+    required this.completer,
   });
 
   final String mnemonic;
@@ -163,7 +163,7 @@ class InvitationActionCreateCode extends _BaseAction {
 
     final invitationData =
         await InvitationRepository().createInvitationCodeData(
-      signPrivateKey: privateKey,
+      signPrivateKey: privateKey!,
       codePublicKey: sharedKeyPair.publicKey,
       codePrivateKey: sharedKeyPair.privateKey,
       codeForkId: coinInfo.contract,
@@ -171,13 +171,12 @@ class InvitationActionCreateCode extends _BaseAction {
 
     //获取全部缓存
     final allCode = await InvitationRepository().getInvitationCodeFromCache(
-      walletId,
+      walletId!,
     );
 
     // 应该不会有重复的，但是以防万一
     final existingCode = allCode.firstWhere(
       (e) => e.chain == coinInfo.chain && e.symbol == coinInfo.symbol,
-      orElse: () => null,
     );
 
     var newCode = existingCode;
@@ -207,9 +206,9 @@ class InvitationActionCreateCode extends _BaseAction {
   }
 
   @override
-  Object wrapError(dynamic error) {
+  Object? wrapError(dynamic error) {
     final newError = parseWalletError(error);
-    completer.completeError(newError);
+    completer.completeError(newError as Object);
     return newError;
   }
 }

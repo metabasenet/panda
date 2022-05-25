@@ -9,7 +9,7 @@ enum _CreateSteps {
 
 class HDKeyDeviceEmpty extends HookWidget {
   HDKeyDeviceEmpty({
-    @required this.onCreate,
+    required this.onCreate,
   });
 
   final pageController = PageController();
@@ -25,14 +25,14 @@ class HDKeyDeviceEmpty extends HookWidget {
     final textController = useStreamController<String>();
     final errorController = useStreamController<ErrorAnimationType>();
 
-    void goNextPage([int duration]) {
+    void goNextPage([int? duration]) {
       pageController.nextPage(
         duration: Duration(milliseconds: duration ?? 200),
         curve: Curves.easeIn,
       );
     }
 
-    void goPreviousPage([int duration]) {
+    void goPreviousPage([int? duration]) {
       pageController.previousPage(
         duration: Duration(milliseconds: duration ?? 200),
         curve: Curves.easeIn,
@@ -58,6 +58,7 @@ class HDKeyDeviceEmpty extends HookWidget {
                 tr('您的设备尚未创建硬件钱包'),
                 style: context.textBody(
                   bold: true,
+                  fontWeight: FontWeight.normal,
                 ),
               ),
             ),
@@ -67,6 +68,8 @@ class HDKeyDeviceEmpty extends HookWidget {
                 tr('请为硬件设置PIN码并创建钱包'),
                 style: context.textBody(
                   color: context.labelColor,
+                  bold: true,
+                  fontWeight: FontWeight.normal,
                 ),
               ),
             ),
@@ -143,6 +146,7 @@ class HDKeyDeviceEmpty extends HookWidget {
                 style: context.textBody(
                   color: context.titleColor,
                   bold: true,
+                  fontWeight: FontWeight.normal,
                 ),
               ),
               SizedBox(height: context.edgeSizeDouble),

@@ -2,13 +2,14 @@ part of community_ui_module;
 
 class CommunityJoinProcess {
   static Future<void> checkCanJoin({
-    @required BuildContext context,
-    @required CommunityInfo info,
-    @required Future<CommunityTeam> Function(String teamId) onGetTeamInfo,
-    @required
-        Future<bool> Function({String fork, String fromAddress}) onCheckOnChain,
-    CommunityTeam team,
-    Function(bool) onJoinResult,
+    required BuildContext context,
+    required CommunityInfo info,
+    required Future<CommunityTeam> Function(String teamId) onGetTeamInfo,
+    required Future<bool> Function(
+            {required String fork, required String fromAddress})
+        onCheckOnChain,
+    CommunityTeam? team,
+    Function(bool)? onJoinResult,
   }) async {
     if (team != null ? !team.canJoin : !info.canJoin) {
       showJoinStatusDialog(

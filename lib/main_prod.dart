@@ -16,7 +16,7 @@ import 'routers/navigator.dart';
 import 'themes/themes.dart';
 import 'utils/utils.dart';
 
-Store<AppState> store;
+late Store<AppState> store;
 
 void main() {
   ensureFlutterBindingsInitialized();
@@ -26,7 +26,7 @@ void main() {
   Toast.onParseError = AppErrors.parseErrorMessages;
 
   FlutterError.onError = (details) {
-    Zone.current.handleUncaughtError(details.exception, details.stack);
+    Zone.current.handleUncaughtError(details.exception, details.stack!);
   };
 
   store = createStore();

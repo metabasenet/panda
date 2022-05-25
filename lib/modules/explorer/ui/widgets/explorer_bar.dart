@@ -2,14 +2,14 @@ part of explorer_ui_module;
 
 class ExplorerBar extends HookWidget {
   const ExplorerBar({
-    Key key,
+    Key? key,
     this.explorerList,
   }) : super(key: key);
-  final List<ExplorerItem> explorerList;
+  final List<ExplorerItem>? explorerList;
 
   @override
   Widget build(BuildContext context) {
-    final selected = useState<ExplorerItem>(explorerList.first);
+    final selected = useState<ExplorerItem>(explorerList!.first);
     final searchController = useTextEditingController(text: '');
 
     final onlyAddress =
@@ -36,7 +36,7 @@ class ExplorerBar extends HookWidget {
       }
 
       final settings = CommonRepository().getSettings();
-      url += '&language=' + settings.language;
+      url += '&language=${settings.language}';
       WebViewPage.open(url);
     }
 
@@ -52,7 +52,7 @@ class ExplorerBar extends HookWidget {
             child: Wrap(
               runSpacing: context.edgeSize,
               spacing: context.edgeSize,
-              children: explorerList
+              children: explorerList!
                   .map(
                     (item) => buildItem(
                       context,
@@ -78,14 +78,21 @@ class ExplorerBar extends HookWidget {
             hintText: tr('explorer:hint_blockchain_search_txid'),
             showSearchIcon: false,
             onChanged: (_) {},
-            hintStyle: context.textSmall(),
+            hintStyle: context.textSmall(
+              bold: true,
+              fontWeight: FontWeight.normal,
+            ),
             cmpRight: CSButton(
               label: tr('global:btn_paste'),
               padding: context.edgeHorizontal8.copyWith(
                 right: context.edgeSize,
               ),
               borderRadius: 25,
-              textStyle: context.textSmall(color: context.bodyColor),
+              textStyle: context.textSmall(
+                color: context.bodyColor,
+                bold: true,
+                fontWeight: FontWeight.normal,
+              ),
               flat: true,
               onPressed: () {
                 getTextFromClipboard().then((value) {
@@ -118,27 +125,27 @@ class ExplorerBar extends HookWidget {
 
 Widget buildItem(
   BuildContext context, {
-  ExplorerItem item,
-  bool isSelect,
-  Function(ExplorerItem item) onPress,
+  ExplorerItem? item,
+  bool? isSelect,
+  Function(ExplorerItem item)? onPress,
 }) {
   return InkWell(
     onTap: () {
-      onPress(item);
+      onPress?.call(item!);
     },
     child: Container(
       padding: context.edgeHorizontal5,
       height: 36,
       decoration: BoxDecoration(
-        color: isSelect ? context.primaryColor : context.whiteColor,
+        color: (isSelect ?? false) ? context.primaryColor : context.whiteColor,
         borderRadius: BorderRadius.all(Radius.circular(8)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (item.coinInfo != null && item.coinInfo.iconUrl != null)
+          if (item?.coinInfo != null && item?.coinInfo.iconUrl != null)
             CSImage(
-              item.coinInfo.iconUrl,
+              item!.coinInfo.iconUrl,
               fallbackUrl: item.coinInfo.iconLocal,
               width: 22,
               height: 22,
@@ -147,9 +154,10 @@ Widget buildItem(
           Padding(
             padding: context.edgeLeft5,
             child: Text(
-              item.config.name,
+              item!.config.name,
               style: context.textSecondary(
                 bold: true,
+                fontWeight: FontWeight.normal,
                 color: context.bodyColor,
               ),
             ),

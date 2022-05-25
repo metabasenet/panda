@@ -22,7 +22,7 @@ abstract class AssetDetailVM
       ..activeWallet = store.state.walletState.activeWallet
       ..doLoadDetail = (coin, isRefresh) {
         return store.dispatchAsync(AssetActionGetCoinBalance(
-          wallet: store.state.walletState.activeWallet,
+          wallet: store.state.walletState.activeWallet!,
           chain: coin.chain,
           symbol: coin.symbol,
           address: coin.address,

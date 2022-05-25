@@ -16,7 +16,7 @@ import 'routers/navigator.dart';
 import 'themes/themes.dart';
 import 'utils/utils.dart';
 
-//Store<AppState> store;
+late Store<AppState> store;
 
 void main() {
   ensureFlutterBindingsInitialized();
@@ -41,10 +41,10 @@ void main() {
     flipperClient.addPlugin(FlipperSharedPreferencesPlugin());
     flipperClient.start();
   }
-  /*
+
   // Run App
   SentryFlutter.init(
     CrashesReport.getSentryOptions,
     appRunner: () => runApp(MyApp(store)),
-  );*/
+  );
 }

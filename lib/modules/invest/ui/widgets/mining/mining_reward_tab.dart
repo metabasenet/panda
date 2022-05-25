@@ -2,13 +2,13 @@ part of invest_ui_module;
 
 class MiningRewardTab extends HookWidget {
   const MiningRewardTab({
-    @required this.mintInfo,
-    @required this.symbol,
-    @required this.mintItem,
-    @required this.coinInfo,
-    @required this.chartList,
-    @required this.doRefresh,
-    Key key,
+    required this.mintInfo,
+    required this.symbol,
+    required this.mintItem,
+    required this.coinInfo,
+    required this.chartList,
+    required this.doRefresh,
+    Key? key,
   }) : super(key: key);
 
   final MintInfo mintInfo;
@@ -140,9 +140,17 @@ class MiningRewardTab extends HookWidget {
   List<Widget> buildItem(BuildContext context, String title, String value) {
     return [
       SizedBox(height: context.edgeSizeHalf),
-      Text(title, style: context.textSmall()),
+      Text(title,
+          style: context.textSmall(
+            bold: true,
+            fontWeight: FontWeight.normal,
+          )),
       SizedBox(height: context.edgeSizeHalf),
-      Text(value, style: context.textMedium(bold: true)),
+      Text(value,
+          style: context.textMedium(
+            bold: true,
+            fontWeight: FontWeight.normal,
+          )),
       SizedBox(height: context.edgeSize),
       Divider(height: 0.5, color: context.greyColor),
       SizedBox(height: context.edgeSizeHalf),

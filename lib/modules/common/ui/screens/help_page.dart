@@ -2,9 +2,9 @@ part of common_ui_module;
 
 class HelpCenterGroup {
   HelpCenterGroup({
-    @required this.icon,
-    @required this.title,
-    @required this.links,
+    required this.icon,
+    required this.title,
+    required this.links,
   });
 
   final String title;
@@ -14,8 +14,8 @@ class HelpCenterGroup {
 
 class HelpCenterLink {
   HelpCenterLink({
-    @required this.title,
-    @required this.url,
+    required this.title,
+    required this.url,
   });
   final String title;
   final String url;
@@ -38,8 +38,8 @@ class HelpCenterPage extends HookWidget {
 
   Widget buildGroup(
     BuildContext context, {
-    @required IconData icon,
-    @required String title,
+    required IconData icon,
+    required String title,
   }) {
     return Container(
       width: context.mediaWidth * 0.32,
@@ -55,7 +55,10 @@ class HelpCenterPage extends HookWidget {
           SizedBox(height: 4),
           Text(
             title,
-            style: context.textBody(),
+            style: context.textBody(
+              bold: true,
+              fontWeight: FontWeight.normal,
+            ),
             textAlign: TextAlign.center,
           ),
         ],
@@ -65,9 +68,9 @@ class HelpCenterPage extends HookWidget {
 
   Widget buildQuestion(
     BuildContext context, {
-    @required String question,
-    @required String url,
-    @required bool hideBorder,
+    required String question,
+    required String url,
+    required bool hideBorder,
   }) {
     return CSContainer(
       padding: context.edgeAll.copyWith(top: 20, bottom: 20),
@@ -100,6 +103,8 @@ class HelpCenterPage extends HookWidget {
               question,
               style: context.textSecondary(
                 color: context.bodyColor,
+                bold: true,
+                fontWeight: FontWeight.normal,
               ),
             ),
           ),
@@ -216,7 +221,10 @@ class HelpCenterPage extends HookWidget {
                   children: [
                     Text(
                       tr('user:help_title'),
-                      style: context.textHuge(bold: true),
+                      style: context.textHuge(
+                        bold: true,
+                        fontWeight: FontWeight.normal,
+                      ),
                     ),
                     CSImage(
                       'assets/images/help_bg.png',

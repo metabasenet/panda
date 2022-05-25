@@ -58,7 +58,7 @@ class AppActionInitApp extends _BaseAction {
     store
         .dispatchAsync(WalletActionWalletLoadAll(), notify: false)
         .whenComplete(() {
-      store.dispatch(AppActionLoadWallet(state.walletState.activeWallet));
+      store.dispatch(AppActionLoadWallet(state.walletState.activeWallet!));
     });
     store.dispatch(CommonActionLoadConfig(), notify: false);
     store.dispatch(CommonActionLoadImageConfig(), notify: false);
@@ -72,10 +72,10 @@ class AppActionInitApp extends _BaseAction {
 
     progress.add(0.8);
 
-    AnalyticsReport().setUserId(state.commonState.deviceId);
+    AnalyticsReport().setUserId(state.commonState.deviceId ?? '');
     AnalyticsReport().reportLog(
       'InitApp',
-      {'version': state.commonState.appInfo.version},
+      {'version': state.commonState.appInfo?.version},
     );
 
     progress.add(1);
@@ -110,7 +110,7 @@ class AppActionLoadWallet extends _BaseAction {
     if (wallet != null) {
       // Update prices
       dispatch(AssetActionUpdatePrices(
-        store.state.commonState.fiatCurrency,
+        store.state.commonState.fiatCurrency ?? '',
       ));
       // Update balances
       dispatch(AssetActionUpdateWalletBalances(
@@ -173,7 +173,7 @@ class AppActionAfterCommonConfig extends _BaseAction {
   @override
   AppState? reduce() {
     // NOTE: Add Actions that need execute after get the main config
-    dispatch(AssetActionSyncWalletCoins(state.walletState.activeWallet));
+    dispatch(AssetActionSyncWalletCoins(state.walletState.activeWallet!));
 
     return null;
   }

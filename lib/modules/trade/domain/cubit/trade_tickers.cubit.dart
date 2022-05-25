@@ -2,9 +2,9 @@ part of trade_domain_module;
 
 class TradeTickersState {
   TradeTickersState({
-    @required this.span,
-    @required this.tradePair,
-    @required this.tickers,
+    required this.span,
+    required this.tradePair,
+    required this.tickers,
   });
 
   final String span;
@@ -28,16 +28,16 @@ class TradeTickersState {
 }
 
 class TradeTickersCubit extends Cubit<TradeTickersState> {
-  TradeTickersCubit([TradeRepository tradeRepository])
+  TradeTickersCubit([TradeRepository? tradeRepository])
       : super(TradeTickersState(
           tickers: [],
-          tradePair: null,
+          tradePair: TradePair(),
           span: '0',
         )) {
     _tradeRepository = tradeRepository ?? TradeRepository();
   }
 
-  TradeRepository _tradeRepository;
+  late TradeRepository _tradeRepository;
 
   String get latestBuyPrice {
     final tickers = state.tickers
@@ -60,7 +60,7 @@ class TradeTickersCubit extends Cubit<TradeTickersState> {
     int tradeSideId,
   ) {
     // Calculate max amount
-    double maxAmount = 0;
+    double? maxAmount = 0;
     final amountList = state.tickers.map((e) => e.amount).toList();
     if (amountList.length > 1) {
       maxAmount = NumberUtil.plus<double>(
@@ -81,7 +81,7 @@ class TradeTickersCubit extends Cubit<TradeTickersState> {
           ? b.price.compareTo(a.price)
           : a.price.compareTo(b.price),
     );
-    return MapEntry(maxAmount, list);
+    return MapEntry(maxAmount!, list);
   }
 
   // ▼▼▼▼▼▼ Utility ▼▼▼▼▼▼  //
@@ -93,7 +93,7 @@ class TradeTickersCubit extends Cubit<TradeTickersState> {
         : tradePair.spans.isEmpty
             ? '0'
             : tradePair.spans.first;
-    return span;
+    return span!;
   }
 
   Future<void> changeSpan(String span) async {
@@ -112,7 +112,7 @@ class TradeTickersCubit extends Cubit<TradeTickersState> {
   /// Update all tickers from api
   Future<void> loadData(TradePair tradePair) async {
     final span = getSpan(tradePair);
-    if (state.tradePair?.id != tradePair?.id) {
+    if (state.tradePair.id != tradePair.id) {
       emit(TradeTickersState(
         tickers: [],
         tradePair: tradePair,
@@ -135,7 +135,7 @@ class TradeTickersCubit extends Cubit<TradeTickersState> {
   void clearData() {
     emit(TradeTickersState(
       tickers: [],
-      tradePair: null,
+      tradePair: TradePair(),
       span: state.span,
     ));
   }
@@ -147,10 +147,10 @@ class TradeTickersCubit extends Cubit<TradeTickersState> {
 
   /// Add/Update a ticker from mqtt
   Future<void> updateFromMqttAmount({
-    @required String tradePairId,
-    @required Map<String, dynamic> json,
+    required String tradePairId,
+    required Map<String, dynamic> json,
   }) async {
-    if (tradePairId != state.tradePair?.id) {
+    if (tradePairId != state.tradePair.id) {
       return;
     }
 
@@ -191,10 +191,10 @@ class TradeTickersCubit extends Cubit<TradeTickersState> {
   /// When a price change, we need to remove a
   /// certain amount from the depth amount
   Future<void> updateFromMqttPrice({
-    @required TradePair tradePair,
-    @required Map<String, dynamic> json,
+    required TradePair tradePair,
+    required Map<String, dynamic> json,
   }) async {
-    if (tradePair == null || state.tradePair?.id != tradePair?.id) {
+    if (tradePair == null || state.tradePair.id != tradePair.id) {
       return;
     }
 

@@ -37,7 +37,7 @@ class SwapListPage extends StatelessWidget {
       child: StoreConnector<AppState, SwapListVM>(
         distinct: true,
         converter: SwapListVM.fromStore,
-        onInitialBuild: (viewModel) {},
+        onInitialBuild: (_, __, viewModel) {},
         builder: (context, viewModel) => Container(
           decoration: ThemeBorders.borderTop,
           child: CSListViewStream(

@@ -3,7 +3,7 @@ part of common_ui_module;
 class QRScannerPage extends StatefulWidget {
   static const routeName = '/common/scan';
 
-  static Future<String> open() {
+  static Future<String?> open() {
     return AppNavigator.push<String>(routeName);
   }
 
@@ -18,10 +18,10 @@ class QRScannerPage extends StatefulWidget {
 class _QRScannerPage extends State<QRScannerPage>
     with TickerProviderStateMixin {
   final qrKey = GlobalKey(debugLabel: 'QR');
-  QRViewController qrController;
-  StreamSubscription<String> qrSubscription;
-  AnimationController animationController;
-  Animation<Offset> animation;
+  late QRViewController qrController;
+  late StreamSubscription<String> qrSubscription;
+  late AnimationController animationController;
+  late Animation<Offset> animation;
   final borderWidth = 6.0;
   bool hasPermission = false;
 

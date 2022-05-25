@@ -2,15 +2,15 @@ part of invitation_domain_module;
 
 class InvitationActionCreateSubmit extends _BaseAction {
   InvitationActionCreateSubmit({
-    @required this.coinInfo,
-    @required this.toAddress,
-    @required this.signCode,
-    @required this.sharePrvKey,
-    @required this.amount,
-    @required this.onUnlockWallet,
-    @required this.onSuccessTransaction,
-    @required this.onConfirmParams,
-    @required this.onConfirmSubmit,
+    required this.coinInfo,
+    required this.toAddress,
+    required this.signCode,
+    required this.sharePrvKey,
+    required this.amount,
+    required this.onUnlockWallet,
+    required this.onSuccessTransaction,
+    required this.onConfirmParams,
+    required this.onConfirmSubmit,
   });
 
   final AssetCoin coinInfo;
@@ -24,7 +24,7 @@ class InvitationActionCreateSubmit extends _BaseAction {
   final Future<bool> Function() onConfirmSubmit;
 
   @override
-  Future<AppState> reduce() async {
+  Future<AppState?> reduce() async {
     final canContinue = await onConfirmSubmit();
     if (canContinue == false) {
       return null;
@@ -44,7 +44,7 @@ class InvitationActionCreateSubmit extends _BaseAction {
     final parentCode = await InvitationRepository().createInvitationCodeData(
       signPrivateKey: sharePrvKey,
       codePrivateKey: sharePrvKey,
-      codePublicKey: parentPubKey,
+      codePublicKey: parentPubKey!,
       codeForkId: '', // No need
     );
 
@@ -98,7 +98,7 @@ class InvitationActionCreateSubmit extends _BaseAction {
   }
 
   @override
-  Object wrapError(dynamic error) {
+  Object? wrapError(dynamic error) {
     return parseWalletError(error);
   }
 }

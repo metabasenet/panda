@@ -86,10 +86,10 @@ abstract class HomePageVM implements Built<HomePageVM, HomePageVMBuilder> {
           }
         }
         ..doRefreshHomeData = () async {
-          return store.dispatchFuture(HomeActionInit());
+          store.dispatchAsync(HomeActionInit());
         }
         ..doRefreshCommunity = () async {
-          return store.dispatchFuture(CommunityActionLoadConfig());
+          store.dispatchAsync(CommunityActionLoadConfig());
         }
         ..doCheckForBetaUpdates = () {
           final completer = Completer<ConfigUpdateData>();
@@ -105,13 +105,13 @@ abstract class HomePageVM implements Built<HomePageVM, HomePageVMBuilder> {
           return completer.future;
         }
         ..doChangeLanguage = (language) async {
-          await store.dispatchFuture(CommonActionChangeLanguage(language));
-          await store.dispatchFuture(CommonActionChangeFiatCurrency(
+          await store.dispatchAsync(CommonActionChangeLanguage(language));
+          await store.dispatchAsync(CommonActionChangeFiatCurrency(
             AppLanguages.getCurrencyByLanguage(language),
           ));
         }
         ..doChangeTradePair = (tradePair) {
-          return store.dispatchFuture(
+          return store.dispatchAsync(
             TradeActionOrderChangePair(tradePair),
           );
         },

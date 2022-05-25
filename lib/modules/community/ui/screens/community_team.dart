@@ -89,7 +89,11 @@ class CommunityTeamPage extends HookWidget {
                     Expanded(
                       child: SelectableText(
                         team.name,
-                        style: context.textMedium(bold: true, lineHeight: 1.5),
+                        style: context.textMedium(
+                          bold: true,
+                          lineHeight: 1.5,
+                          fontWeight: FontWeight.normal,
+                        ),
                       ),
                     ),
                     SizedBox(width: context.edgeSize),
@@ -117,7 +121,10 @@ class CommunityTeamPage extends HookWidget {
                                 padding: context.edgeBottom5,
                                 child: Text(
                                   item['label'].toString(),
-                                  style: context.textSecondary(bold: true),
+                                  style: context.textSecondary(
+                                    bold: true,
+                                    fontWeight: FontWeight.normal,
+                                  ),
                                 ),
                               )
                             else
@@ -129,6 +136,7 @@ class CommunityTeamPage extends HookWidget {
                                 bold: true,
                                 color: context.bodyColor,
                                 lineHeight: 1.5,
+                                fontWeight: FontWeight.normal,
                               ),
                             ),
                           ],

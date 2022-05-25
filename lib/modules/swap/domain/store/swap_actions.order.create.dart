@@ -2,11 +2,11 @@ part of swap_domain_module;
 
 class SwapCreateParams {
   SwapCreateParams({
-    @required this.amount,
-    @required this.outCoinInfo,
-    @required this.inCoinInfo,
-    @required this.outCoinConfig,
-    @required this.inCoinConfig,
+    required this.amount,
+    required this.outCoinInfo,
+    required this.inCoinInfo,
+    required this.outCoinConfig,
+    required this.inCoinConfig,
   });
 
   final double amount;
@@ -14,7 +14,7 @@ class SwapCreateParams {
   final AssetCoin inCoinInfo;
   final SwapConfigCoin outCoinConfig;
   final SwapConfigCoin inCoinConfig;
-  WalletTemplateData templateData;
+  late WalletTemplateData templateData;
 
   /// If true, this chain used API to create Order transaction RawTx
   bool get isChainUseApiRawTx => ['ETH', 'TRX'].contains(outCoinInfo.chain);
@@ -22,15 +22,15 @@ class SwapCreateParams {
 
 class SwapActionSwapSubmit extends _BaseAction {
   SwapActionSwapSubmit({
-    @required this.outCoinInfo,
-    @required this.inCoinInfo,
-    @required this.outCoinConfig,
-    @required this.inCoinConfig,
-    @required this.amount,
-    @required this.onNoticeDoubleTransaction,
-    @required this.onConfirmSubmit,
-    @required this.onUnlockWallet,
-    @required this.onSuccessTransaction,
+    required this.outCoinInfo,
+    required this.inCoinInfo,
+    required this.outCoinConfig,
+    required this.inCoinConfig,
+    required this.amount,
+    required this.onNoticeDoubleTransaction,
+    required this.onConfirmSubmit,
+    required this.onUnlockWallet,
+    required this.onSuccessTransaction,
   });
 
   final AssetCoin outCoinInfo;
@@ -44,7 +44,7 @@ class SwapActionSwapSubmit extends _BaseAction {
   final void Function(String txId) onSuccessTransaction;
 
   @override
-  Future<AppState> reduce() async {
+  Future<AppState?> reduce() async {
     final params = SwapCreateParams(
       amount: NumberUtil.getDouble(amount),
       outCoinInfo: outCoinInfo,
@@ -57,7 +57,7 @@ class SwapActionSwapSubmit extends _BaseAction {
 
     final completer = Completer<double>();
     store.dispatch(AssetActionGetCoinBalance(
-      wallet: store.state.walletState.activeWallet,
+      wallet: store.state.walletState.activeWallet!,
       chain: params.inCoinConfig.chain,
       symbol: params.inCoinConfig.symbol,
       address: params.inCoinConfig.address,
@@ -206,7 +206,7 @@ class SwapActionSwapSubmit extends _BaseAction {
   }
 
   @override
-  Object wrapError(dynamic error) {
+  Object? wrapError(dynamic error) {
     return error;
   }
 }

@@ -20,7 +20,7 @@ class WalletImportPage extends HookWidget {
     WalletType walletType,
     TextEditingController mnemonic,
   ) {
-    final isValid = formKey.currentState.validate();
+    final isValid = formKey.currentState!.validate();
 
     if (!autovalidate.value) {
       autovalidate.value = true;
@@ -30,7 +30,7 @@ class WalletImportPage extends HookWidget {
       return;
     }
 
-    formKey.currentState.save();
+    formKey.currentState?.save();
     LoadingDialog.show(context);
     viewModel.validateMnemonic(mnemonic.text).then((_) {
       LoadingDialog.dismiss(context);
@@ -64,7 +64,7 @@ class WalletImportPage extends HookWidget {
                   padding: EdgeInsets.zero,
                   child: FormCell(
                     label: walletType.value.transKey != null
-                        ? tr(walletType.value.transKey)
+                        ? tr(walletType.value.transKey!)
                         : walletType.value.name,
                     cmpLeft: Padding(
                       padding: context.edgeRight8,
@@ -99,7 +99,11 @@ class WalletImportPage extends HookWidget {
                 validator: RequiredValidator(
                   errorText: tr('wallet:import_msg_mnemonic_empty'),
                 ),
-                inputTextStyle: context.textBody(lineHeight: 1.6),
+                inputTextStyle: context.textBody(
+                  lineHeight: 1.6,
+                  bold: false,
+                  fontWeight: FontWeight.normal,
+                ),
               ),
               SizedBox(height: 50),
               ButtonDisableListener(

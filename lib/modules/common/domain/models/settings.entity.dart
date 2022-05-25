@@ -10,19 +10,19 @@ class Settings extends HiveObject {
   });
 
   @HiveField(0)
-  String language;
+  String? language;
   @HiveField(1)
   bool languageIsSet;
   @HiveField(2)
-  String fiatCurrency;
+  String? fiatCurrency;
   @HiveField(3)
-  String activeWalletId;
+  String? activeWalletId;
 
   @HiveField(5)
-  Map<String, dynamic> imageSignature;
+  late Map<String, dynamic> imageSignature;
   @HiveField(6)
-  int imageSignatureLastUpdate;
+  late int imageSignatureLastUpdate;
 
   @HiveField(7)
-  String installId;
+  late String installId;
 }

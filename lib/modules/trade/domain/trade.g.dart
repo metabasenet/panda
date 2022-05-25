@@ -1123,7 +1123,7 @@ class _$TradeOrderListVM extends TradeOrderListVM {
   @override
   final String walletId;
   @override
-  final AssetCoin Function({@required String chain, @required String symbol})
+  final AssetCoin Function({required String chain, required String symbol})
       getCoinInfo;
 
   factory _$TradeOrderListVM(
@@ -1174,12 +1174,12 @@ class TradeOrderListVMBuilder
   String? get walletId => _$this._walletId;
   set walletId(String? walletId) => _$this._walletId = walletId;
 
-  AssetCoin Function({@required String chain, @required String symbol})?
+  AssetCoin Function({required String chain, required String symbol})?
       _getCoinInfo;
-  AssetCoin Function({@required String chain, @required String symbol})?
+  AssetCoin Function({required String chain, required String symbol})?
       get getCoinInfo => _$this._getCoinInfo;
   set getCoinInfo(
-          AssetCoin Function({@required String chain, @required String symbol})?
+          AssetCoin Function({required String chain, required String symbol})?
               getCoinInfo) =>
       _$this._getCoinInfo = getCoinInfo;
 
@@ -1255,54 +1255,49 @@ class _$TradeHomeVM extends TradeHomeVM {
   @override
   final Future<void> Function(TradePair tradePair) doSubscribeMqtt;
   @override
-  final AssetCoin Function({@required String chain, @required String symbol})
+  final AssetCoin Function({required String chain, required String symbol})
       getCoinInfo;
   @override
   final Future<WalletPrivateData> Function(String password) doUnlockWallet;
   @override
   final Future<void> Function(
-      {@required
-          TradeSide tradeSide,
-      @required
-          TradePair tradePair,
-      @required
-          Future<bool> Function(
-                  {@required WalletTemplateData approveData,
-                  @required double currentBalance,
-                  @required double approveAmount,
-                  @required bool needReset})
-              onConfirmSubmit,
-      @required
-          Future<WalletPrivateData> Function() onUnlockWallet,
-      @required
-          void Function(String) onSuccessTransaction}) doApproveOrder;
+      {required TradeSide tradeSide,
+      required TradePair tradePair,
+      required Future<bool> Function(
+              {required WalletTemplateData approveData,
+              required double currentBalance,
+              required double approveAmount,
+              required bool needReset})
+          onConfirmSubmit,
+      required Future<WalletPrivateData> Function() onUnlockWallet,
+      required void Function(String) onSuccessTransaction}) doApproveOrder;
   @override
   final Future<void> Function(
-      {@required TradeSide tradeSide,
-      @required TradePair tradePair,
-      @required String price,
-      @required String amount,
-      @required String total,
-      @required Future<bool> Function(DexCreateOrderParams) onConfirmSubmit,
-      @required Future<WalletPrivateData> Function() onUnlockWallet,
-      @required void Function(String) onSuccessTransaction}) doCreateOrder;
+      {required TradeSide tradeSide,
+      required TradePair tradePair,
+      required String price,
+      required String amount,
+      required String total,
+      required Future<bool> Function(DexCreateOrderParams) onConfirmSubmit,
+      required Future<WalletPrivateData> Function() onUnlockWallet,
+      required void Function(String) onSuccessTransaction}) doCreateOrder;
   @override
   final Future<void> Function(
-      {@required TradeOrder order,
-      @required Future<bool> Function(double) onConfirmCancel,
-      @required Future<WalletPrivateData> Function() onUnlockWallet,
-      @required void Function(String) onSuccessTransaction}) doCancelOrder;
+      {required TradeOrder order,
+      required Future<bool> Function(double) onConfirmCancel,
+      required Future<WalletPrivateData> Function() onUnlockWallet,
+      required void Function(String) onSuccessTransaction}) doCancelOrder;
   @override
   final Future<Transaction> Function(
-      {@required String chain,
-      @required String symbol,
-      @required String fromAddress,
-      @required int chainPrecision,
-      @required String txId}) getTransactionInfo;
+      {required String chain,
+      required String symbol,
+      required String fromAddress,
+      required int chainPrecision,
+      required String txId}) getTransactionInfo;
   @override
   final Future<void> Function(
-      {@required WithdrawSubmitParams param,
-      @required String txId}) transferResult;
+      {required WithdrawSubmitParams param,
+      required String txId}) transferResult;
   @override
   final bool Function(TradePair) needShowSlowTradePair;
   @override
@@ -1570,12 +1565,12 @@ class TradeHomeVMBuilder implements Builder<TradeHomeVM, TradeHomeVMBuilder> {
           Future<void> Function(TradePair tradePair)? doSubscribeMqtt) =>
       _$this._doSubscribeMqtt = doSubscribeMqtt;
 
-  AssetCoin Function({@required String chain, @required String symbol})?
+  AssetCoin Function({required String chain, required String symbol})?
       _getCoinInfo;
-  AssetCoin Function({@required String chain, @required String symbol})?
+  AssetCoin Function({required String chain, required String symbol})?
       get getCoinInfo => _$this._getCoinInfo;
   set getCoinInfo(
-          AssetCoin Function({@required String chain, @required String symbol})?
+          AssetCoin Function({required String chain, required String symbol})?
               getCoinInfo) =>
       _$this._getCoinInfo = getCoinInfo;
 
@@ -1588,152 +1583,128 @@ class TradeHomeVMBuilder implements Builder<TradeHomeVM, TradeHomeVMBuilder> {
       _$this._doUnlockWallet = doUnlockWallet;
 
   Future<void> Function(
-      {@required
-          TradeSide tradeSide,
-      @required
-          TradePair tradePair,
-      @required
-          Future<bool> Function(
-                  {@required WalletTemplateData approveData,
-                  @required double currentBalance,
-                  @required double approveAmount,
-                  @required bool needReset})
-              onConfirmSubmit,
-      @required
-          Future<WalletPrivateData> Function() onUnlockWallet,
-      @required
-          void Function(String) onSuccessTransaction})? _doApproveOrder;
+      {required TradeSide tradeSide,
+      required TradePair tradePair,
+      required Future<bool> Function(
+              {required WalletTemplateData approveData,
+              required double currentBalance,
+              required double approveAmount,
+              required bool needReset})
+          onConfirmSubmit,
+      required Future<WalletPrivateData> Function() onUnlockWallet,
+      required void Function(String) onSuccessTransaction})? _doApproveOrder;
   Future<void> Function(
-      {@required
-          TradeSide tradeSide,
-      @required
-          TradePair tradePair,
-      @required
-          Future<bool> Function(
-                  {@required WalletTemplateData approveData,
-                  @required double currentBalance,
-                  @required double approveAmount,
-                  @required bool needReset})
+          {required TradeSide tradeSide,
+          required TradePair tradePair,
+          required Future<bool> Function(
+                  {required WalletTemplateData approveData,
+                  required double currentBalance,
+                  required double approveAmount,
+                  required bool needReset})
               onConfirmSubmit,
-      @required
-          Future<WalletPrivateData> Function() onUnlockWallet,
-      @required
-          void Function(String) onSuccessTransaction})? get doApproveOrder =>
-      _$this._doApproveOrder;
+          required Future<WalletPrivateData> Function() onUnlockWallet,
+          required void Function(String) onSuccessTransaction})?
+      get doApproveOrder => _$this._doApproveOrder;
   set doApproveOrder(
           Future<void> Function(
-                  {@required
-                      TradeSide tradeSide,
-                  @required
-                      TradePair tradePair,
-                  @required
-                      Future<bool> Function(
-                              {@required WalletTemplateData approveData,
-                              @required double currentBalance,
-                              @required double approveAmount,
-                              @required bool needReset})
-                          onConfirmSubmit,
-                  @required
-                      Future<WalletPrivateData> Function() onUnlockWallet,
-                  @required
-                      void Function(String) onSuccessTransaction})?
+                  {required TradeSide tradeSide,
+                  required TradePair tradePair,
+                  required Future<bool> Function(
+                          {required WalletTemplateData approveData,
+                          required double currentBalance,
+                          required double approveAmount,
+                          required bool needReset})
+                      onConfirmSubmit,
+                  required Future<WalletPrivateData> Function() onUnlockWallet,
+                  required void Function(String) onSuccessTransaction})?
               doApproveOrder) =>
       _$this._doApproveOrder = doApproveOrder;
 
   Future<void> Function(
-      {@required TradeSide tradeSide,
-      @required TradePair tradePair,
-      @required String price,
-      @required String amount,
-      @required String total,
-      @required Future<bool> Function(DexCreateOrderParams) onConfirmSubmit,
-      @required Future<WalletPrivateData> Function() onUnlockWallet,
-      @required void Function(String) onSuccessTransaction})? _doCreateOrder;
+      {required TradeSide tradeSide,
+      required TradePair tradePair,
+      required String price,
+      required String amount,
+      required String total,
+      required Future<bool> Function(DexCreateOrderParams) onConfirmSubmit,
+      required Future<WalletPrivateData> Function() onUnlockWallet,
+      required void Function(String) onSuccessTransaction})? _doCreateOrder;
   Future<void> Function(
-          {@required TradeSide tradeSide,
-          @required TradePair tradePair,
-          @required String price,
-          @required String amount,
-          @required String total,
-          @required Future<bool> Function(DexCreateOrderParams) onConfirmSubmit,
-          @required Future<WalletPrivateData> Function() onUnlockWallet,
-          @required void Function(String) onSuccessTransaction})?
+          {required TradeSide tradeSide,
+          required TradePair tradePair,
+          required String price,
+          required String amount,
+          required String total,
+          required Future<bool> Function(DexCreateOrderParams) onConfirmSubmit,
+          required Future<WalletPrivateData> Function() onUnlockWallet,
+          required void Function(String) onSuccessTransaction})?
       get doCreateOrder => _$this._doCreateOrder;
   set doCreateOrder(
           Future<void> Function(
-                  {@required
-                      TradeSide tradeSide,
-                  @required
-                      TradePair tradePair,
-                  @required
-                      String price,
-                  @required
-                      String amount,
-                  @required
-                      String total,
-                  @required
-                      Future<bool> Function(DexCreateOrderParams)
-                          onConfirmSubmit,
-                  @required
-                      Future<WalletPrivateData> Function() onUnlockWallet,
-                  @required
-                      void Function(String) onSuccessTransaction})?
+                  {required TradeSide tradeSide,
+                  required TradePair tradePair,
+                  required String price,
+                  required String amount,
+                  required String total,
+                  required Future<bool> Function(DexCreateOrderParams)
+                      onConfirmSubmit,
+                  required Future<WalletPrivateData> Function() onUnlockWallet,
+                  required void Function(String) onSuccessTransaction})?
               doCreateOrder) =>
       _$this._doCreateOrder = doCreateOrder;
 
   Future<void> Function(
-      {@required TradeOrder order,
-      @required Future<bool> Function(double) onConfirmCancel,
-      @required Future<WalletPrivateData> Function() onUnlockWallet,
-      @required void Function(String) onSuccessTransaction})? _doCancelOrder;
+      {required TradeOrder order,
+      required Future<bool> Function(double) onConfirmCancel,
+      required Future<WalletPrivateData> Function() onUnlockWallet,
+      required void Function(String) onSuccessTransaction})? _doCancelOrder;
   Future<void> Function(
-          {@required TradeOrder order,
-          @required Future<bool> Function(double) onConfirmCancel,
-          @required Future<WalletPrivateData> Function() onUnlockWallet,
-          @required void Function(String) onSuccessTransaction})?
+          {required TradeOrder order,
+          required Future<bool> Function(double) onConfirmCancel,
+          required Future<WalletPrivateData> Function() onUnlockWallet,
+          required void Function(String) onSuccessTransaction})?
       get doCancelOrder => _$this._doCancelOrder;
   set doCancelOrder(
           Future<void> Function(
-                  {@required TradeOrder order,
-                  @required Future<bool> Function(double) onConfirmCancel,
-                  @required Future<WalletPrivateData> Function() onUnlockWallet,
-                  @required void Function(String) onSuccessTransaction})?
+                  {required TradeOrder order,
+                  required Future<bool> Function(double) onConfirmCancel,
+                  required Future<WalletPrivateData> Function() onUnlockWallet,
+                  required void Function(String) onSuccessTransaction})?
               doCancelOrder) =>
       _$this._doCancelOrder = doCancelOrder;
 
   Future<Transaction> Function(
-      {@required String chain,
-      @required String symbol,
-      @required String fromAddress,
-      @required int chainPrecision,
-      @required String txId})? _getTransactionInfo;
+      {required String chain,
+      required String symbol,
+      required String fromAddress,
+      required int chainPrecision,
+      required String txId})? _getTransactionInfo;
   Future<Transaction> Function(
-          {@required String chain,
-          @required String symbol,
-          @required String fromAddress,
-          @required int chainPrecision,
-          @required String txId})?
+          {required String chain,
+          required String symbol,
+          required String fromAddress,
+          required int chainPrecision,
+          required String txId})?
       get getTransactionInfo => _$this._getTransactionInfo;
   set getTransactionInfo(
           Future<Transaction> Function(
-                  {@required String chain,
-                  @required String symbol,
-                  @required String fromAddress,
-                  @required int chainPrecision,
-                  @required String txId})?
+                  {required String chain,
+                  required String symbol,
+                  required String fromAddress,
+                  required int chainPrecision,
+                  required String txId})?
               getTransactionInfo) =>
       _$this._getTransactionInfo = getTransactionInfo;
 
   Future<void> Function(
-      {@required WithdrawSubmitParams param,
-      @required String txId})? _transferResult;
+      {required WithdrawSubmitParams param,
+      required String txId})? _transferResult;
   Future<void> Function(
-      {@required WithdrawSubmitParams param,
-      @required String txId})? get transferResult => _$this._transferResult;
+      {required WithdrawSubmitParams param,
+      required String txId})? get transferResult => _$this._transferResult;
   set transferResult(
           Future<void> Function(
-                  {@required WithdrawSubmitParams param,
-                  @required String txId})?
+                  {required WithdrawSubmitParams param, required String txId})?
               transferResult) =>
       _$this._transferResult = transferResult;
 

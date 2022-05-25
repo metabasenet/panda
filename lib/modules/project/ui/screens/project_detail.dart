@@ -8,7 +8,7 @@ class ProjectDetailStatus {
 class ProjectDetailPage extends HookWidget {
   const ProjectDetailPage(
     this.params, {
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   static const routeName = '/project/detail';
@@ -78,9 +78,9 @@ class ProjectDetailPage extends HookWidget {
       child: StoreConnector<AppState, ProjectDetailVM>(
         distinct: true,
         converter: ProjectDetailVM.fromStore,
-        onInitialBuild: (viewModel) {
+        onInitialBuild: (_, __, viewModel) {
           LoadingDialog.show(context);
-          viewModel.getProjectDetail(params.id).then((value) {
+          viewModel.getProjectDetail(params.id ?? 0).then((value) {
             projectInfo.value = value;
           }).catchError((e) {
             Toast.showError(e);
@@ -106,8 +106,11 @@ class ProjectDetailPage extends HookWidget {
                         width: context.mediaWidth * 0.8,
                         padding: context.edgeLeft10,
                         child: Text(
-                          projectInfo.value?.projectName ?? '',
-                          style: context.textBody(bold: true),
+                          projectInfo.value.projectName,
+                          style: context.textBody(
+                            bold: true,
+                            fontWeight: FontWeight.normal,
+                          ),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
@@ -146,9 +149,12 @@ class ProjectDetailPage extends HookWidget {
                                 Expanded(
                                   flex: 2,
                                   child: Text(
-                                    item['name'].toString() ?? '',
+                                    item['name'].toString(),
                                     style: context.textBody(
-                                        color: context.secondaryColor),
+                                      bold: true,
+                                      fontWeight: FontWeight.normal,
+                                      color: context.secondaryColor,
+                                    ),
                                   ),
                                 ),
                                 Expanded(
@@ -172,6 +178,8 @@ class ProjectDetailPage extends HookWidget {
                                                   item['isWebAddress'] == true
                                                       ? context.orangeColor
                                                       : context.bodyColor,
+                                              bold: true,
+                                              fontWeight: FontWeight.normal,
                                             )
                                             .copyWith(height: 1.71),
                                         maxLines: 3,
@@ -207,7 +215,12 @@ class ProjectDetailPage extends HookWidget {
                                     .value.projectDescription['default']
                                     .toString()
                                 : '',
-                            style: context.textBody().copyWith(height: 2),
+                            style: context
+                                .textBody(
+                                  bold: true,
+                                  fontWeight: FontWeight.normal,
+                                )
+                                .copyWith(height: 2),
                           ),
                         ),
                       ],

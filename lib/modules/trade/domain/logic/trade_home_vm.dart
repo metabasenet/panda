@@ -45,8 +45,8 @@ abstract class TradeHomeVM implements Built<TradeHomeVM, TradeHomeVMBuilder> {
 
   @BuiltValueField(compare: false)
   AssetCoin Function({
-    @required String chain,
-    @required String symbol,
+    required String chain,
+    required String symbol,
   }) get getCoinInfo;
 
   @BuiltValueField(compare: false)
@@ -54,52 +54,52 @@ abstract class TradeHomeVM implements Built<TradeHomeVM, TradeHomeVMBuilder> {
 
   @BuiltValueField(compare: false)
   Future<void> Function({
-    @required TradeSide tradeSide,
-    @required TradePair tradePair,
-    @required
-        Future<bool> Function(
-                {@required WalletTemplateData approveData,
-                @required double currentBalance,
-                @required double approveAmount,
-                @required bool needReset})
-            onConfirmSubmit,
-    @required Future<WalletPrivateData> Function() onUnlockWallet,
-    @required void Function(String) onSuccessTransaction,
+    required TradeSide tradeSide,
+    required TradePair tradePair,
+    required Future<bool> Function({
+      required WalletTemplateData approveData,
+      required double currentBalance,
+      required double approveAmount,
+      required bool needReset,
+    })
+        onConfirmSubmit,
+    required Future<WalletPrivateData> Function() onUnlockWallet,
+    required void Function(String) onSuccessTransaction,
   }) get doApproveOrder;
 
   @BuiltValueField(compare: false)
   Future<void> Function({
-    @required TradeSide tradeSide,
-    @required TradePair tradePair,
-    @required String price,
-    @required String amount,
-    @required String total,
-    @required Future<bool> Function(DexCreateOrderParams) onConfirmSubmit,
-    @required Future<WalletPrivateData> Function() onUnlockWallet,
-    @required void Function(String) onSuccessTransaction,
+    required TradeSide tradeSide,
+    required TradePair tradePair,
+    required String price,
+    required String amount,
+    required String total,
+    required Future<bool> Function(DexCreateOrderParams) onConfirmSubmit,
+    required Future<WalletPrivateData> Function() onUnlockWallet,
+    required void Function(String) onSuccessTransaction,
   }) get doCreateOrder;
 
   @BuiltValueField(compare: false)
   Future<void> Function({
-    @required TradeOrder order,
-    @required Future<bool> Function(double) onConfirmCancel,
-    @required Future<WalletPrivateData> Function() onUnlockWallet,
-    @required void Function(String) onSuccessTransaction,
+    required TradeOrder order,
+    required Future<bool> Function(double) onConfirmCancel,
+    required Future<WalletPrivateData> Function() onUnlockWallet,
+    required void Function(String) onSuccessTransaction,
   }) get doCancelOrder;
 
   @BuiltValueField(compare: false)
   Future<Transaction> Function({
-    @required String chain,
-    @required String symbol,
-    @required String fromAddress,
-    @required int chainPrecision,
-    @required String txId,
+    required String chain,
+    required String symbol,
+    required String fromAddress,
+    required int chainPrecision,
+    required String txId,
   }) get getTransactionInfo;
 
   @BuiltValueField(compare: false)
   Future<void> Function({
-    @required WithdrawSubmitParams param,
-    @required String txId,
+    required WithdrawSubmitParams param,
+    required String txId,
   }) get transferResult;
 
   @BuiltValueField(compare: false)
@@ -113,9 +113,9 @@ abstract class TradeHomeVM implements Built<TradeHomeVM, TradeHomeVMBuilder> {
 
   static TradeHomeVM fromStore(Store<AppState> store) {
     final tradeState = store.state.tradeState;
-    final activeWalletId = store.state.walletState?.activeWalletId ?? '';
+    final activeWalletId = store.state.walletState.activeWalletId;
     final fiatCurrency = store.state.commonState.fiatCurrency ?? '';
-    final tradePair = tradeState.tradePair ?? tradeState.getDefaultTradePair();
+    final tradePair = tradeState.tradePair;
 
     final tradeCoinInfo = VMWithWalletGetCoinInfoImplement.getCoinInfo(
       store,
@@ -130,23 +130,23 @@ abstract class TradeHomeVM implements Built<TradeHomeVM, TradeHomeVMBuilder> {
     final sideCoinInfo =
         tradeState.tradeSide == TradeSide.buy ? priceCoinInfo : tradeCoinInfo;
     final sideCoinConfig = tradeState.getCoinConfig(
-      chain: sideCoinInfo?.chain,
-      symbol: sideCoinInfo?.symbol,
+      chain: sideCoinInfo.chain,
+      symbol: sideCoinInfo.symbol,
     );
 
     return TradeHomeVM((viewModel) => viewModel
       ..hasWallet = store.state.walletState.hasWallet
-      ..ethAddress = store.state.walletState.activeWallet?.ethAddress ?? ''
+      ..ethAddress = store.state.walletState.activeWallet!.ethAddress
       ..tradePair = tradePair.toBuilder()
       ..tradeSide = tradeState.tradeSide
       ..fiatCurrency = fiatCurrency
       ..activeWalletId = activeWalletId
-      ..tradeCoinInfo = tradeCoinInfo?.toBuilder()
-      ..priceCoinInfo = priceCoinInfo?.toBuilder()
-      ..sideCoinInfo = sideCoinInfo?.toBuilder()
-      ..sideCoinConfig = sideCoinConfig?.toBuilder()
-      ..allTradePairs = ListBuilder(tradeState.config?.allTradePairs ?? [])
-      ..getCoinInfo = ({chain, symbol}) {
+      ..tradeCoinInfo = tradeCoinInfo.toBuilder()
+      ..priceCoinInfo = priceCoinInfo.toBuilder()
+      ..sideCoinInfo = sideCoinInfo.toBuilder()
+      ..sideCoinConfig = sideCoinConfig.toBuilder()
+      ..allTradePairs = ListBuilder(tradeState.config.allTradePairs)
+      ..getCoinInfo = ({required chain, required symbol}) {
         return VMWithWalletGetCoinInfoImplement.getCoinInfo(
           store,
           chain: chain,
@@ -154,11 +154,11 @@ abstract class TradeHomeVM implements Built<TradeHomeVM, TradeHomeVMBuilder> {
         );
       }
       ..getTransactionInfo = ({
-        chain,
-        symbol,
-        fromAddress,
-        chainPrecision,
-        txId,
+        required chain,
+        required symbol,
+        required fromAddress,
+        required chainPrecision,
+        required txId,
       }) {
         final completer = Completer<Transaction>();
         store.dispatch(
@@ -174,7 +174,7 @@ abstract class TradeHomeVM implements Built<TradeHomeVM, TradeHomeVMBuilder> {
         return completer.future;
       }
       ..doUpdateCoinBalance = (tradePair) {
-        final tradeSide = tradeState.tradeSide ?? TradeSide.buy;
+        final tradeSide = tradeState.tradeSide;
         final coinInfo = VMWithWalletGetCoinInfoImplement.getCoinInfo(
           store,
           chain: tradePair.sideChain(tradeSide),
@@ -183,9 +183,9 @@ abstract class TradeHomeVM implements Built<TradeHomeVM, TradeHomeVMBuilder> {
         if (coinInfo == null) {
           return Future.value();
         }
-        return store.dispatchFuture(
+        return store.dispatchAsync(
           AssetActionGetCoinBalance(
-            wallet: store.state.walletState.activeWallet,
+            wallet: store.state.walletState.activeWallet!,
             chain: coinInfo.chain,
             symbol: coinInfo.symbol,
             address: coinInfo.address,
@@ -194,7 +194,7 @@ abstract class TradeHomeVM implements Built<TradeHomeVM, TradeHomeVMBuilder> {
         );
       }
       ..getApproveBalance = (tradePair) {
-        final tradeSide = tradeState.tradeSide ?? TradeSide.buy;
+        final tradeSide = tradeState.tradeSide;
         final coinInfo = VMWithWalletGetCoinInfoImplement.getCoinInfo(
           store,
           chain: tradePair.sideChain(tradeSide),
@@ -219,13 +219,13 @@ abstract class TradeHomeVM implements Built<TradeHomeVM, TradeHomeVMBuilder> {
         return completer.future;
       }
       ..doApproveOrder = ({
-        tradeSide,
-        tradePair,
-        onUnlockWallet,
-        onConfirmSubmit,
-        onSuccessTransaction,
+        required tradeSide,
+        required tradePair,
+        required onUnlockWallet,
+        required onConfirmSubmit,
+        required onSuccessTransaction,
       }) {
-        return store.dispatchFuture(TradeActionOrderApprove(
+        return store.dispatchAsync(TradeActionOrderApprove(
           tradePair: tradePair,
           tradeSide: tradeSide,
           onUnlockWallet: onUnlockWallet,
@@ -234,16 +234,16 @@ abstract class TradeHomeVM implements Built<TradeHomeVM, TradeHomeVMBuilder> {
         ));
       }
       ..doCreateOrder = ({
-        tradeSide,
-        tradePair,
-        price,
-        amount,
-        total,
-        onUnlockWallet,
-        onConfirmSubmit,
-        onSuccessTransaction,
+        required tradeSide,
+        required tradePair,
+        required price,
+        required amount,
+        required total,
+        required onUnlockWallet,
+        required onConfirmSubmit,
+        required onSuccessTransaction,
       }) {
-        return store.dispatchFuture(TradeActionOrderCreate(
+        return store.dispatchAsync(TradeActionOrderCreate(
           tradeSide: tradeSide,
           tradePair: tradePair,
           price: NumberUtil.getDouble(price),
@@ -255,12 +255,12 @@ abstract class TradeHomeVM implements Built<TradeHomeVM, TradeHomeVMBuilder> {
         ));
       }
       ..doCancelOrder = ({
-        order,
-        onUnlockWallet,
-        onConfirmCancel,
-        onSuccessTransaction,
+        required order,
+        required onUnlockWallet,
+        required onConfirmCancel,
+        required onSuccessTransaction,
       }) {
-        return store.dispatchFuture(TradeActionOrderCancel(
+        return store.dispatchAsync(TradeActionOrderCancel(
           order: order,
           onUnlockWallet: onUnlockWallet,
           onConfirmCancel: onConfirmCancel,
@@ -268,17 +268,17 @@ abstract class TradeHomeVM implements Built<TradeHomeVM, TradeHomeVMBuilder> {
         ));
       }
       ..doChangeTradePair = (tradePair) {
-        return store.dispatchFuture(
+        return store.dispatchAsync(
           TradeActionOrderChangePair(tradePair),
         );
       }
       ..doChangeTradeSide = (tradeSide) {
-        return store.dispatchFuture(
+        return store.dispatchAsync(
           TradeActionOrderChangeSide(tradeSide),
         );
       }
       ..doSubscribeMqtt = (tradePair) {
-        return store.dispatchFuture(
+        return store.dispatchAsync(
           TradeActionSubscribeMqttOrder(tradePair),
         );
       }
@@ -298,9 +298,9 @@ abstract class TradeHomeVM implements Built<TradeHomeVM, TradeHomeVMBuilder> {
       ..doHideSlowTradePair = (tradePair) {
         store.dispatch(TradeActionTipHideSlowTradePair(tradePair));
       }
-      ..transferResult = ({param, txId}) {
+      ..transferResult = ({required param, required txId}) {
         return store
-            .dispatchFuture(AssetActionAddTransaction(Transaction.fromSubmit(
+            .dispatchAsync(AssetActionAddTransaction(Transaction.fromSubmit(
           params: param,
           txId: txId,
         )));

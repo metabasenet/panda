@@ -664,8 +664,8 @@ class _$CommunityTeamVM extends CommunityTeamVM {
   @override
   final Future<CommunityTeam> Function(String teamId) getCommunityTeam;
   @override
-  final Future<bool> Function({String fork, String fromAddress})
-      checkOnChainData;
+  final Future<bool> Function(
+      {required String fork, required String fromAddress}) checkOnChainData;
 
   factory _$CommunityTeamVM([void Function(CommunityTeamVMBuilder)? updates]) =>
       (new CommunityTeamVMBuilder()..update(updates))._build();
@@ -729,11 +729,13 @@ class CommunityTeamVMBuilder
           Future<CommunityTeam> Function(String teamId)? getCommunityTeam) =>
       _$this._getCommunityTeam = getCommunityTeam;
 
-  Future<bool> Function({String fork, String fromAddress})? _checkOnChainData;
-  Future<bool> Function({String fork, String fromAddress})?
+  Future<bool> Function({required String fork, required String fromAddress})?
+      _checkOnChainData;
+  Future<bool> Function({required String fork, required String fromAddress})?
       get checkOnChainData => _$this._checkOnChainData;
   set checkOnChainData(
-          Future<bool> Function({String fork, String fromAddress})?
+          Future<bool> Function(
+                  {required String fork, required String fromAddress})?
               checkOnChainData) =>
       _$this._checkOnChainData = checkOnChainData;
 
@@ -801,20 +803,21 @@ class _$CommunityDetailVM extends CommunityDetailVM {
   final CommunityConfig communityConfig;
   @override
   final Future<int> Function(
-      {bool isRefresh,
-      int skip,
-      String searchName,
-      String type,
-      bool isTeamList}) loadData;
+      {required bool isRefresh,
+      required int skip,
+      required String searchName,
+      required String type,
+      required bool isTeamList}) loadData;
   @override
-  final Future<void> Function({bool isTeamList}) clearCommunityList;
+  final Future<void> Function({required bool isTeamList}) clearCommunityList;
   @override
   final Future<CommunityTeam> Function(String teamId) getCommunityTeam;
   @override
-  final Future<bool> Function({bool isTeam, String type}) getHasHistory;
+  final Future<bool> Function({required bool isTeam, required String type})
+      getHasHistory;
   @override
-  final Future<bool> Function({String fork, String fromAddress})
-      checkOnChainData;
+  final Future<bool> Function(
+      {required String fork, required String fromAddress}) checkOnChainData;
 
   factory _$CommunityDetailVM(
           [void Function(CommunityDetailVMBuilder)? updates]) =>
@@ -922,32 +925,33 @@ class CommunityDetailVMBuilder
       _$this._communityConfig = communityConfig;
 
   Future<int> Function(
-      {bool isRefresh,
-      int skip,
-      String searchName,
-      String type,
-      bool isTeamList})? _loadData;
+      {required bool isRefresh,
+      required int skip,
+      required String searchName,
+      required String type,
+      required bool isTeamList})? _loadData;
   Future<int> Function(
-      {bool isRefresh,
-      int skip,
-      String searchName,
-      String type,
-      bool isTeamList})? get loadData => _$this._loadData;
+      {required bool isRefresh,
+      required int skip,
+      required String searchName,
+      required String type,
+      required bool isTeamList})? get loadData => _$this._loadData;
   set loadData(
           Future<int> Function(
-                  {bool isRefresh,
-                  int skip,
-                  String searchName,
-                  String type,
-                  bool isTeamList})?
+                  {required bool isRefresh,
+                  required int skip,
+                  required String searchName,
+                  required String type,
+                  required bool isTeamList})?
               loadData) =>
       _$this._loadData = loadData;
 
-  Future<void> Function({bool isTeamList})? _clearCommunityList;
-  Future<void> Function({bool isTeamList})? get clearCommunityList =>
+  Future<void> Function({required bool isTeamList})? _clearCommunityList;
+  Future<void> Function({required bool isTeamList})? get clearCommunityList =>
       _$this._clearCommunityList;
   set clearCommunityList(
-          Future<void> Function({bool isTeamList})? clearCommunityList) =>
+          Future<void> Function({required bool isTeamList})?
+              clearCommunityList) =>
       _$this._clearCommunityList = clearCommunityList;
 
   Future<CommunityTeam> Function(String teamId)? _getCommunityTeam;
@@ -957,18 +961,22 @@ class CommunityDetailVMBuilder
           Future<CommunityTeam> Function(String teamId)? getCommunityTeam) =>
       _$this._getCommunityTeam = getCommunityTeam;
 
-  Future<bool> Function({bool isTeam, String type})? _getHasHistory;
-  Future<bool> Function({bool isTeam, String type})? get getHasHistory =>
-      _$this._getHasHistory;
+  Future<bool> Function({required bool isTeam, required String type})?
+      _getHasHistory;
+  Future<bool> Function({required bool isTeam, required String type})?
+      get getHasHistory => _$this._getHasHistory;
   set getHasHistory(
-          Future<bool> Function({bool isTeam, String type})? getHasHistory) =>
+          Future<bool> Function({required bool isTeam, required String type})?
+              getHasHistory) =>
       _$this._getHasHistory = getHasHistory;
 
-  Future<bool> Function({String fork, String fromAddress})? _checkOnChainData;
-  Future<bool> Function({String fork, String fromAddress})?
+  Future<bool> Function({required String fork, required String fromAddress})?
+      _checkOnChainData;
+  Future<bool> Function({required String fork, required String fromAddress})?
       get checkOnChainData => _$this._checkOnChainData;
   set checkOnChainData(
-          Future<bool> Function({String fork, String fromAddress})?
+          Future<bool> Function(
+                  {required String fork, required String fromAddress})?
               checkOnChainData) =>
       _$this._checkOnChainData = checkOnChainData;
 
@@ -1310,7 +1318,10 @@ class _$CommunityBlacklistVM extends CommunityBlacklistVM {
   final bool hasWallet;
   @override
   final Future<int> Function(
-      {bool isRefresh, int skip, String searchName, String type}) loadData;
+      {required bool isRefresh,
+      required int skip,
+      required String searchName,
+      required String type}) loadData;
   @override
   final Future<void> Function() clearCommunityBlacklist;
 
@@ -1382,15 +1393,21 @@ class CommunityBlacklistVMBuilder
   set hasWallet(bool? hasWallet) => _$this._hasWallet = hasWallet;
 
   Future<int> Function(
-      {bool isRefresh, int skip, String searchName, String type})? _loadData;
+      {required bool isRefresh,
+      required int skip,
+      required String searchName,
+      required String type})? _loadData;
   Future<int> Function(
-      {bool isRefresh,
-      int skip,
-      String searchName,
-      String type})? get loadData => _$this._loadData;
+      {required bool isRefresh,
+      required int skip,
+      required String searchName,
+      required String type})? get loadData => _$this._loadData;
   set loadData(
           Future<int> Function(
-                  {bool isRefresh, int skip, String searchName, String type})?
+                  {required bool isRefresh,
+                  required int skip,
+                  required String searchName,
+                  required String type})?
               loadData) =>
       _$this._loadData = loadData;
 

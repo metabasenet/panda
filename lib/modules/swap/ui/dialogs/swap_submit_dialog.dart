@@ -2,8 +2,12 @@ part of swap_ui_module;
 
 Future<bool> showSwapConfirmDialog(
   BuildContext context, {
-  @required SwapCreateParams params,
-  @required AssetCoin Function({String chain, String symbol}) getCoinInfo,
+  required SwapCreateParams params,
+  required AssetCoin Function({
+    required String chain,
+    required String symbol,
+  })
+      getCoinInfo,
 }) {
   final response = Completer<bool>();
 
@@ -59,14 +63,14 @@ Future<bool> showSwapConfirmDialog(
       notice: inCoinName,
       value: '$payAmount',
     ),
-    CSConfirmItem(
-      label: tr('swap:confirm_dialog_lbl_real_amount'),
-      notice: inCoinName,
-      value: NumberUtil.minus<String>(
-        payAmount,
-        params.inCoinConfig.transferFee,
-      ),
-    ),
+    //CSConfirmItem(
+    //label: tr('swap:confirm_dialog_lbl_real_amount'),
+    //notice: inCoinName,
+    //value: NumberUtil.minus<String>(
+    //  payAmount,
+    //  params.inCoinConfig.transferFee,
+    //),
+    //),
     CSConfirmItem(
       label: tr('swap:confirm_dialog_lbl_fee'),
       notice: feeCoinName,

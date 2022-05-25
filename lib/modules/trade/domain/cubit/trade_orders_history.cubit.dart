@@ -1,24 +1,24 @@
 part of trade_domain_module;
 
 class TradeOrdersHistoryCubit extends TradeOrdersCubit {
-  TradeOrdersHistoryCubit([TradeRepository tradeRepository])
+  TradeOrdersHistoryCubit([TradeRepository? tradeRepository])
       : super(tradeRepository) {
     _tradeRepository = tradeRepository ?? TradeRepository();
   }
 
-  TradeRepository _tradeRepository;
+  late TradeRepository _tradeRepository;
 
   @override
   Future<int> loadAll({
-    @required String walletId,
-    @required String tradePairId,
-    @required String tradeAddress,
-    @required String priceAddress,
-    @required int skip,
-    @required int take,
-    @required String tradeSide,
-    @required String status,
-    @required bool onlyCache,
+    required String walletId,
+    required String tradePairId,
+    required String tradeAddress,
+    required String priceAddress,
+    required int skip,
+    required int take,
+    required String tradeSide,
+    required String status,
+    required bool onlyCache,
   }) async {
     if (onlyCache == true) {
       if (skip == 0) {

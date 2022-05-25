@@ -6,8 +6,8 @@ abstract class MintChart implements Built<MintChart, MintChartBuilder> {
   MintChart._();
 
   factory MintChart.create({
-    String balance,
-    String reward,
+    String? balance,
+    String? reward,
     bool isBalance = false,
   }) {
     return MintChart().rebuild((e) => e

@@ -14,8 +14,8 @@ abstract class CommunityTeamVM
 
   @BuiltValueField(compare: false)
   Future<bool> Function({
-    String fork,
-    String fromAddress,
+    required String fork,
+    required String fromAddress,
   }) get checkOnChainData;
 
   // UI Logic
@@ -30,7 +30,7 @@ abstract class CommunityTeamVM
         ));
         return completer.future;
       }
-      ..checkOnChainData = ({fork, fromAddress}) {
+      ..checkOnChainData = ({required fork, required fromAddress}) {
         final completer = Completer<bool>();
         store.dispatch(InvitationActionCheckRelationChild(
           fork: fork,

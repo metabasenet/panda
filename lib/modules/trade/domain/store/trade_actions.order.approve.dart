@@ -2,26 +2,26 @@ part of trade_domain_module;
 
 class TradeActionOrderApprove extends _BaseAction {
   TradeActionOrderApprove({
-    @required this.tradePair,
-    @required this.tradeSide,
-    @required this.onConfirmSubmit,
-    @required this.onUnlockWallet,
-    @required this.onSuccessTransaction,
+    required this.tradePair,
+    required this.tradeSide,
+    required this.onConfirmSubmit,
+    required this.onUnlockWallet,
+    required this.onSuccessTransaction,
   });
 
   final TradePair tradePair;
   final TradeSide tradeSide;
   final Future<bool> Function({
-    @required WalletTemplateData approveData,
-    @required double currentBalance,
-    @required double approveAmount,
-    @required bool needReset,
+    required WalletTemplateData approveData,
+    required double currentBalance,
+    required double approveAmount,
+    required bool needReset,
   }) onConfirmSubmit;
   final Future<WalletPrivateData> Function() onUnlockWallet;
   final void Function(String) onSuccessTransaction;
 
   @override
-  Future<AppState> reduce() async {
+  Future<AppState?> reduce() async {
     // Coin to use for creating templateData
     final sellCoinInfo = store.state.assetState.getCoinInfo(
       chain: tradePair.sideChain(tradeSide),
@@ -70,7 +70,7 @@ class TradeActionOrderApprove extends _BaseAction {
     final approveData = WalletTemplateData(
       chain: sellCoinInfo.chain,
       symbol: sellCoinInfo.symbol,
-      templateHex: null, // No Hex for approve
+      templateHex: '', // No Hex for approve
       templateData: transInfo,
       templateAddress: sellCoinInfo.address,
     );
@@ -78,7 +78,7 @@ class TradeActionOrderApprove extends _BaseAction {
     final canContinue = await onConfirmSubmit(
       approveData: approveData,
       currentBalance: currentBalance,
-      approveAmount: approveAmount,
+      approveAmount: approveAmount!,
       needReset: approveNeedReset,
     );
     if (canContinue != true) {
@@ -122,7 +122,7 @@ class TradeActionOrderApprove extends _BaseAction {
   }
 
   @override
-  Object wrapError(dynamic error) {
+  Object? wrapError(dynamic error) {
     return parseWalletError(error);
   }
 }

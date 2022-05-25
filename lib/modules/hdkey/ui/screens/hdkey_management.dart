@@ -11,7 +11,7 @@ class HDKeyManagementPage extends StatelessWidget {
     return DefaultTransition(settings, HDKeyManagementPage());
   }
 
-  void showResetHDKeyDialog(BuildContext context, {Function onPress}) {
+  void showResetHDKeyDialog(BuildContext context, {Function? onPress}) {
     showConfirmDialog(
       context,
       title: tr('重置硬件钱包确认'),
@@ -20,7 +20,7 @@ class HDKeyManagementPage extends StatelessWidget {
       confirmBtnText: tr('确认重置'),
       confirmTimeout: 3,
       onConfirm: () {
-        onPress();
+        onPress?.call();
       },
     );
   }
@@ -86,6 +86,7 @@ class HDKeyManagementPage extends StatelessWidget {
                   cancelBtnStyle: context.textBody(
                     color: context.redColor,
                     bold: true,
+                    fontWeight: FontWeight.normal,
                   ),
                   onConfirm: () {
                     LoadingDialog.show(context);

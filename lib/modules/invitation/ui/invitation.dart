@@ -37,7 +37,7 @@ part 'screens/invitation_create.dart';
 part 'screens/invitation_list.dart';
 part 'process/invitation_submit_process.dart';
 
-Route<dynamic> moduleInvitationInitRoutes(RouteSettings settings) {
+Route<dynamic>? moduleInvitationInitRoutes(RouteSettings settings) {
   switch (settings.name) {
     case InvitationCreatePage.routeName:
       return InvitationCreatePage.route(settings);

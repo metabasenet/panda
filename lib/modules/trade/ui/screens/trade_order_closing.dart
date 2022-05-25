@@ -30,42 +30,10 @@ class TradeOrderClosingPage extends HookWidget {
   Future<int> loadData(
     TradeHomeVM viewModel,
     TradeOrdersCubit cubit, {
-    CSListViewParams<_GetOrderListParams> params,
+    CSListViewParams<_GetOrderListParams>? params,
     bool onlyCache = false,
   }) async {
-    final tradePair = params.params.tradePair;
-    String tradeAddress;
-    String priceAddress;
-    if (tradePair != null) {
-      tradeAddress = viewModel
-          .getCoinInfo(
-            chain: tradePair?.tradeChain,
-            symbol: tradePair?.tradeSymbol,
-          )
-          ?.address;
-      priceAddress = viewModel
-          .getCoinInfo(
-            chain: tradePair?.priceChain,
-            symbol: tradePair?.priceSymbol,
-          )
-          ?.address;
-    }
-    return cubit
-        .loadAll(
-      tradePairId: tradePair.id,
-      tradeAddress: tradeAddress,
-      priceAddress: priceAddress,
-      walletId: viewModel.activeWalletId,
-      skip: params.skip,
-      take: params.take,
-      tradeSide: params.params.tradeSide,
-      status: params.params.status,
-      onlyCache: onlyCache,
-    )
-        .catchError((error) {
-      Toast.showError(error);
-      throw error;
-    });
+    return 0;
   }
 
   void reloadList(
@@ -124,7 +92,10 @@ class TradeOrderClosingPage extends HookWidget {
         padding: context.edgeAll,
         label: getOrderListTitle(selectedTabId.value),
         autoWidth: true,
-        textStyle: context.textTitle(bold: true),
+        textStyle: context.textTitle(
+          bold: true,
+          fontWeight: FontWeight.normal,
+        ),
         onPressed: () {
           showOrderCloseMenuDialog(context, selectedTabId.value, (selectedId) {
             if (selectedId != selectedTabId.value) {
@@ -161,7 +132,7 @@ class TradeOrderClosingPage extends HookWidget {
       ),
       child: StoreConnector<AppState, TradeHomeVM>(
         distinct: true,
-        onInitialBuild: (viewModel) {
+        onInitialBuild: (_, __, viewModel) {
           if (viewModel.hasWallet) {
             request.add(CSListViewParams.withParams(
               _GetOrderListParams(tradePair: tradePair),
@@ -176,7 +147,7 @@ class TradeOrderClosingPage extends HookWidget {
           children: [
             Expanded(
               child: BlocBuilder<TradeOrdersCubit, List<TradeOrder>>(
-                cubit: selectedCubit.value,
+                bloc: selectedCubit.value,
                 builder: (context, data) =>
                     CSListViewStream<_GetOrderListParams>(
                   requestStream: request,
@@ -201,7 +172,7 @@ class TradeOrderClosingPage extends HookWidget {
                         ? TradeOrderCancelItem(
                             orderAmount: orderAmounts
                                 .value[data[index].templateId]
-                                ?.toString(),
+                                .toString(),
                             key: Key(data[index].txId),
                             order: data[index],
                             onCancelOrder: (item) {

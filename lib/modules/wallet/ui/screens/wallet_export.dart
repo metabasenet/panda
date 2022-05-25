@@ -63,7 +63,10 @@ class WalletExportPage extends HookWidget {
               children: [
                 Text(
                   tr('wallet:export_privatekey_tip_lbl'),
-                  style: context.textBody(bold: true),
+                  style: context.textBody(
+                    bold: true,
+                    fontWeight: FontWeight.normal,
+                  ),
                 ),
                 SizedBox(height: context.edgeSize),
                 ...tips
@@ -86,7 +89,13 @@ class WalletExportPage extends HookWidget {
                             ),
                             SizedBox(width: 10),
                             Expanded(
-                              child: Text(e, style: context.textBody()),
+                              child: Text(
+                                e,
+                                style: context.textBody(
+                                  bold: false,
+                                  fontWeight: FontWeight.normal,
+                                ),
+                              ),
                             )
                           ],
                         ),
@@ -133,12 +142,18 @@ class WalletExportPage extends HookWidget {
                 children: [
                   Text(
                     tr('wallet:export_privatekey_tip4'),
-                    style: context.textBody(bold: true),
+                    style: context.textBody(
+                      bold: true,
+                      fontWeight: FontWeight.normal,
+                    ),
                   ),
                   SizedBox(height: 10),
                   Text(
                     tr('wallet:export_privatekey_tip5'),
-                    style: context.textSecondary(),
+                    style: context.textSecondary(
+                      bold: false,
+                      fontWeight: FontWeight.normal,
+                    ),
                   ),
                   SizedBox(height: context.edgeSize),
                   // ...data.getChains().map((e) => CSButton(
@@ -154,7 +169,10 @@ class WalletExportPage extends HookWidget {
                       padding: context.edgeAll,
                       child: Text(
                         '' ?? '',
-                        style: context.textBody(),
+                        style: context.textBody(
+                          bold: false,
+                          fontWeight: FontWeight.normal,
+                        ),
                       ),
                     ),
                   ),
@@ -162,7 +180,10 @@ class WalletExportPage extends HookWidget {
                     padding: context.edgeVertical,
                     child: Text(
                       tr('wallet:global:lbl_attention'),
-                      style: context.textBody(bold: true),
+                      style: context.textBody(
+                        bold: true,
+                        fontWeight: FontWeight.normal,
+                      ),
                     ),
                   ),
                   Padding(

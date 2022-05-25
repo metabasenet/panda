@@ -4,11 +4,11 @@ class InvitationCoinSelectPage extends HookWidget {
   const InvitationCoinSelectPage({this.showInvitationCode});
 
   /// 是否为显示 邀请码 二维码
-  final bool showInvitationCode;
+  final bool? showInvitationCode;
 
   static const routeName = '/invitation/coin/select';
 
-  static Future<AssetCoin> open({bool showInvitationCode = false}) {
+  static Future<AssetCoin?> open({bool showInvitationCode = false}) {
     return AppNavigator.push<AssetCoin>(routeName, params: showInvitationCode);
   }
 
@@ -28,9 +28,9 @@ class InvitationCoinSelectPage extends HookWidget {
       child: StoreConnector<AppState, InvitationSelectVM>(
         distinct: true,
         converter: InvitationSelectVM.fromStore,
-        onInitialBuild: (viewModel) {
+        onInitialBuild: (_, __, viewModel) {
           invitationCoins.value = viewModel.getInvitationCoins();
-          if (showInvitationCode) {
+          if (showInvitationCode ?? false) {
             viewModel.loadInvitationCode();
           }
         },
@@ -46,7 +46,6 @@ class InvitationCoinSelectPage extends HookWidget {
               final item = invitationCoins.value[index];
               final codeItem = viewModel.invitationCodes.firstWhere(
                 (e) => e.chain == item.chain && e.symbol == item.symbol,
-                orElse: () => null,
               );
               return _buildItem(
                 context: context,
@@ -67,7 +66,7 @@ class InvitationCoinSelectPage extends HookWidget {
     AssetCoin coin,
     InvitationCode codeItem,
   ) {
-    if (showInvitationCode) {
+    if (showInvitationCode ?? false) {
       if (codeItem != null) {
         InvitationCodePage.open(codeItem);
         return;
@@ -79,7 +78,7 @@ class InvitationCoinSelectPage extends HookWidget {
           LoadingDialog.show(context);
           viewModel
               .createInvitationCode(
-            mnemonic: walletData.mnemonic,
+            mnemonic: walletData.mnemonic!,
             coinInfo: coin,
           )
               .then((newCode) {
@@ -98,10 +97,10 @@ class InvitationCoinSelectPage extends HookWidget {
   }
 
   Widget _buildItem({
-    BuildContext context,
-    InvitationSelectVM viewModel,
-    AssetCoin coin,
-    InvitationCode codeItem,
+    required BuildContext context,
+    required InvitationSelectVM viewModel,
+    required AssetCoin coin,
+    required InvitationCode codeItem,
   }) {
     final hasCode = codeItem != null;
     if (coin == null) {
@@ -125,13 +124,15 @@ class InvitationCoinSelectPage extends HookWidget {
             bordered: true,
           ),
         ),
-        cmpRight: showInvitationCode
+        cmpRight: (showInvitationCode ?? false)
             ? Text(
                 hasCode
                     ? tr('invitation:code_state_created')
                     : tr('invitation:code_state_not_create'),
                 style: context.textTiny(
                   color: hasCode ? context.secondaryColor : context.redColor,
+                  bold: true,
+                  fontWeight: FontWeight.normal,
                 ),
               )
             : null,

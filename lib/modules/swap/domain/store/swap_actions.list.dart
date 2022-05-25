@@ -5,18 +5,18 @@ class SwapActionReviseSwap extends _BaseAction {
     this.swap,
     this.isAdd,
   });
-  final Swap swap;
-  final bool isAdd;
+  final Swap? swap;
+  final bool? isAdd;
 
   @override
   Future<AppState> reduce() async {
     final walletId = state.walletState.activeWalletId;
-    final allSwaps = await SwapRepository().getSwapsFromCache(walletId);
-    if (isAdd) {
-      allSwaps.add(swap);
+    final allSwaps = await SwapRepository().getSwapsFromCache(walletId!);
+    if (isAdd ?? false) {
+      allSwaps.add(swap!);
     } else {
       for (final item in allSwaps) {
-        if (item.txId == swap.txId) {
+        if (item.txId == swap?.txId) {
           item.status = SwapStatus.pending;
         }
       }
@@ -41,7 +41,7 @@ class _SwapActionLoadSwaps extends _BaseAction {
   @override
   Future<AppState> reduce() async {
     final walletId = state.walletState.activeWalletId;
-    final swaps = await SwapRepository().getSwapsFromCache(walletId);
+    final swaps = await SwapRepository().getSwapsFromCache(walletId!);
 
     swaps.sort((a, b) => b.createdAt == a.createdAt
         ? b.txId.compareTo(b.txId)
@@ -59,9 +59,9 @@ class _SwapActionLoadSwaps extends _BaseAction {
 
 class SwapActionGetSwaps extends _BaseAction {
   SwapActionGetSwaps({
-    @required this.page,
-    @required this.skip,
-    @required this.completer,
+    required this.page,
+    required this.skip,
+    required this.completer,
   });
 
   final int page;
@@ -70,7 +70,7 @@ class SwapActionGetSwaps extends _BaseAction {
 
   @override
   Future<void> before() {
-    return dispatchFuture(_SwapActionLoadSwaps(page));
+    return dispatchAsync(_SwapActionLoadSwaps(page));
   }
 
   @override
@@ -88,7 +88,6 @@ class SwapActionGetSwaps extends _BaseAction {
     final newSwaps = rawData.map((item) => Swap.fromApi(
           cached: allSwaps.firstWhere(
             (element) => element.txId == item['user_out_txid'],
-            orElse: () => null,
           ),
           json: item,
         ));
@@ -122,8 +121,8 @@ class SwapActionGetSwaps extends _BaseAction {
   }
 
   @override
-  Object wrapError(dynamic error) {
-    completer.completeError(error);
+  Object? wrapError(dynamic error) {
+    completer.completeError(error as Object);
     return error;
   }
 }

@@ -8,7 +8,7 @@ abstract class CommunityTeam
 
   static Serializer<CommunityTeam> get serializer => _$communityTeamSerializer;
 
-  static CommunityTeam fromJson(Map<String, dynamic> json) {
+  static CommunityTeam? fromJson(Map<String, dynamic> json) {
     return deserialize<CommunityTeam>(json);
   }
 
@@ -93,7 +93,7 @@ abstract class CommunityTeam
   /// 平均持币
   String get displayAverageBalance {
     if (options != null && options.addressAverageBalance != null) {
-      var balance = '';
+      String? balance = '';
       if (options.addressAverageBalance.containsKey('MNT')) {
         balance = options.addressAverageBalance['MNT'];
       } else if (options.addressAverageBalance.containsKey('MNT')) {

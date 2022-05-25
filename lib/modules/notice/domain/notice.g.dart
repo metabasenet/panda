@@ -466,22 +466,18 @@ class _$NoticeState extends NoticeState {
   @override
   final BuiltList<NoticeInfo> noticeLatest;
   @override
-  final NoticeInfo noticeDetail;
+  final NoticeInfo? noticeDetail;
 
   factory _$NoticeState([void Function(NoticeStateBuilder)? updates]) =>
       (new NoticeStateBuilder()..update(updates))._build();
 
   _$NoticeState._(
-      {required this.noticeList,
-      required this.noticeLatest,
-      required this.noticeDetail})
+      {required this.noticeList, required this.noticeLatest, this.noticeDetail})
       : super._() {
     BuiltValueNullFieldError.checkNotNull(
         noticeList, 'NoticeState', 'noticeList');
     BuiltValueNullFieldError.checkNotNull(
         noticeLatest, 'NoticeState', 'noticeLatest');
-    BuiltValueNullFieldError.checkNotNull(
-        noticeDetail, 'NoticeState', 'noticeDetail');
   }
 
   @override
@@ -544,7 +540,7 @@ class NoticeStateBuilder implements Builder<NoticeState, NoticeStateBuilder> {
     if ($v != null) {
       _noticeList = $v.noticeList.toBuilder();
       _noticeLatest = $v.noticeLatest.toBuilder();
-      _noticeDetail = $v.noticeDetail.toBuilder();
+      _noticeDetail = $v.noticeDetail?.toBuilder();
       _$v = null;
     }
     return this;
@@ -571,7 +567,7 @@ class NoticeStateBuilder implements Builder<NoticeState, NoticeStateBuilder> {
           new _$NoticeState._(
               noticeList: noticeList.build(),
               noticeLatest: noticeLatest.build(),
-              noticeDetail: noticeDetail.build());
+              noticeDetail: _noticeDetail?.build());
     } catch (_) {
       late String _$failedField;
       try {
@@ -580,7 +576,7 @@ class NoticeStateBuilder implements Builder<NoticeState, NoticeStateBuilder> {
         _$failedField = 'noticeLatest';
         noticeLatest.build();
         _$failedField = 'noticeDetail';
-        noticeDetail.build();
+        _noticeDetail?.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
             'NoticeState', _$failedField, e.toString());

@@ -2,19 +2,19 @@ part of trade_ui_module;
 
 class TradeOrderItem extends StatelessWidget {
   const TradeOrderItem({
-    @required this.order,
-    @required this.onCancelOrder,
-    Key key,
+    required this.order,
+    required this.onCancelOrder,
+    Key? key,
     this.isHistory = false,
     this.margin,
     this.onPress,
   }) : super(key: key);
 
   final TradeOrder order;
-  final EdgeInsetsGeometry margin;
+  final EdgeInsetsGeometry? margin;
   final bool isHistory;
   final Function(TradeOrder) onCancelOrder;
-  final void Function() onPress;
+  final void Function()? onPress;
 
   @override
   Widget build(BuildContext context) {
@@ -97,6 +97,7 @@ class TradeOrderItem extends StatelessWidget {
                   textStyle: context.textSmall(
                     bold: true,
                     color: context.bodyColor,
+                    fontWeight: FontWeight.normal,
                   ),
                   autoWidth: true,
                   onPressed: () {
@@ -112,6 +113,7 @@ class TradeOrderItem extends StatelessWidget {
                   style: context.textSmall(
                     bold: true,
                     color: statusColor,
+                    fontWeight: FontWeight.normal,
                   ),
                 )
             ],
@@ -131,13 +133,18 @@ class TradeOrderItem extends StatelessWidget {
                     children: [
                       Text(
                         infoList[index]['label'].toString(),
-                        style: context.textTiny(),
+                        style: context.textTiny(
+                          bold: true,
+                          fontWeight: FontWeight.normal,
+                        ),
                       ),
                       SizedBox(height: 10),
                       Text(
                         infoList[index]['value'].toString(),
                         style: context.textSecondary(
                           color: context.bodyColor,
+                          bold: true,
+                          fontWeight: FontWeight.normal,
                         ),
                       ),
                     ],

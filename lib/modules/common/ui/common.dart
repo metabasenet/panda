@@ -46,7 +46,7 @@ part 'widgets/showcase_view.dart';
 part 'widgets/upload_button.dart';
 part 'widgets/upload_button_group.dart';
 
-Route<dynamic> moduleCommonInitRoutes(RouteSettings settings) {
+Route? moduleCommonInitRoutes(RouteSettings settings) {
   switch (settings.name) {
     case QRScannerPage.routeName:
       return QRScannerPage.route(settings);

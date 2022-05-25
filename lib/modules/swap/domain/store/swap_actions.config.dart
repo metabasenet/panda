@@ -2,10 +2,10 @@ part of swap_domain_module;
 
 class SwapActionLoadConfig extends _BaseAction {
   @override
-  Future<AppState> reduce() async {
+  Future<AppState?> reduce() async {
     final config = await SwapRepository().getConfig();
     return store.state.rebuild(
-      (a) => a.swapState.config = config.toBuilder(),
+      (a) => a.swapState.config = config?.toBuilder(),
     );
   }
 
@@ -16,7 +16,7 @@ class SwapActionLoadConfig extends _BaseAction {
   }
 
   @override
-  Object wrapError(dynamic error) {
+  Object? wrapError(dynamic error) {
     return error;
   }
 }

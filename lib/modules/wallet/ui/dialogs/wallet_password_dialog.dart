@@ -4,14 +4,14 @@ void showPasswordDialog(
   BuildContext context,
   Future<WalletPrivateData> Function(String password) onUnlockRequest,
   void Function(WalletPrivateData data, String password) onUnlockSuccess, {
-  String defaultValue,
+  String? defaultValue,
 }) {
   showCSBottomSheet(
     context,
     (context) => WalletPasswordDialog(
       onUnlockRequest: onUnlockRequest,
       onUnlockSuccess: onUnlockSuccess,
-      defaultValue: defaultValue,
+      defaultValue: defaultValue ?? '',
     ),
     minHeight: 0,
     maxHeight: context.mediaHeight * 0.35,
@@ -20,8 +20,8 @@ void showPasswordDialog(
 
 class WalletPasswordDialog extends HookWidget {
   const WalletPasswordDialog({
-    @required this.onUnlockRequest,
-    @required this.onUnlockSuccess,
+    required this.onUnlockRequest,
+    required this.onUnlockSuccess,
     this.defaultValue = '',
   });
 
@@ -40,7 +40,7 @@ class WalletPasswordDialog extends HookWidget {
     final fieldPassword = useTextEditingController(
       text: kDebugMode ? 'Qq111111' : defaultValue,
     );
-    final countdownSub = useValueNotifier<StreamSubscription>();
+    final countdownSub = useValueNotifier<StreamSubscription?>(null);
     final countdownInc = useStreamController<int>();
     final buttonDisabled = useStreamController<bool>();
 
@@ -75,7 +75,7 @@ class WalletPasswordDialog extends HookWidget {
           LoadingDialog.dismiss(context);
           Toast.show(tr('wallet:tip_pwd_invalid'));
           startCountdown();
-          throw error;
+          //throw error;
         });
       } else {
         Toast.show(tr('wallet:tip_pwd_empty'));
@@ -100,6 +100,7 @@ class WalletPasswordDialog extends HookWidget {
           title: tr('wallet:lbl_verify_pwd'),
           titleStyle: context.textBody(
             bold: true,
+            fontWeight: FontWeight.normal,
           ),
           titleAction: StreamBuilder<int>(
             initialData: countdownLimit,
@@ -108,7 +109,10 @@ class WalletPasswordDialog extends HookWidget {
               tr('wallet:lbl_verify_pwd_countdown', namedArgs: {
                 'seconds': snapshot.data.toString(),
               }),
-              style: context.textSecondary(),
+              style: context.textSecondary(
+                bold: false,
+                fontWeight: FontWeight.normal,
+              ),
             ),
           ),
           hintText: tr('wallet:hint_verify_pwd'),
@@ -140,7 +144,7 @@ class WalletPasswordDialog extends HookWidget {
                   stream: buttonDisabled.stream,
                   builder: (context, snapshot) => CSButton(
                     label: tr('global:btn_commit'),
-                    disabled: snapshot.data,
+                    disabled: snapshot.data!,
                     onPressed: () {
                       handleSubmit(context, fieldPassword.text);
                     },

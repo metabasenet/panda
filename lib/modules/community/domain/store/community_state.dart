@@ -9,6 +9,7 @@ abstract class CommunityState
       communityTeamList: BuiltList([]),
       communityMemberList: BuiltList([]),
       configState: ConfigState.loading.index,
+      config: CommunityConfig(),
     );
   }
   CommunityState._();
@@ -22,7 +23,7 @@ abstract class CommunityState
         communityTeamList: BuiltList([]),
         communityMemberList: BuiltList([]),
         configState: ConfigState.loading.index,
-        config: deserialize<CommunityConfig>(data[0]),
+        config: deserialize<CommunityConfig>(data[0])!,
       );
     } catch (_) {
       return CommunityState();

@@ -22,7 +22,7 @@ class WalletChangeNamePage extends HookWidget {
     ValueNotifier<bool> autovalidate,
     TextEditingController newName,
   ) {
-    final isValid = formKey.currentState.validate();
+    final isValid = formKey.currentState!.validate();
 
     if (!autovalidate.value) {
       autovalidate.value = true;
@@ -32,7 +32,7 @@ class WalletChangeNamePage extends HookWidget {
       return;
     }
 
-    formKey.currentState.save();
+    formKey.currentState!.save();
     viewModel.changeName(newName.text).then((_) {
       AppNavigator.goBack();
       Toast.show(tr('wallet:change_name_msg_success'));

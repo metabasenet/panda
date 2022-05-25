@@ -11,13 +11,14 @@ abstract class ConfigUpdateData
     String version,
     String description,
     String downloadUrl, {
-    bool forceUpdate,
+    bool? forceUpdate,
   }) {
     return _$ConfigUpdateData._(
       version: version,
       description: description,
       downloadUrl: downloadUrl,
-      forceUpdate: forceUpdate,
+      forceUpdate: forceUpdate!,
+      disabledModules: BuiltMap<String, String>(),
     );
   }
 

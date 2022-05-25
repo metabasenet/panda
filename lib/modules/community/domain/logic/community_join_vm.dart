@@ -30,7 +30,7 @@ abstract class CommunityJoinVM
           return completer.future;
         }
         ..joinTeam = (params) {
-          return store.dispatchFuture(CommunityActionJoin(params));
+          return store.dispatchAsync(CommunityActionJoin(params));
         },
     );
   }
