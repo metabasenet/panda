@@ -259,7 +259,7 @@
   "asset:lbl_balance": "Balance: {balance} {symbol}",
   "asset:lbl_coin_name": "{name}({fullName})",
   "asset:list_title": "Assets",
-  "asset:list_lbl_valuation": "Total assets",
+  "asset:list_lbl_valuation": "Total assets({symbol})",
   "asset:list_lbl_updating": "Updating price",
   "asset:list_lbl_hide_small": "Hide small assets",
   "asset:detail_title": "Assets details",
