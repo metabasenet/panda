@@ -13,7 +13,7 @@ class CommunityBlacklistPage extends HookWidget {
   static Route<dynamic> route(RouteSettings settings) {
     return DefaultTransition(
       settings,
-      CommunityBlacklistPage(settings.arguments as CommunityInfo),
+      CommunityBlacklistPage(settings.arguments! as CommunityInfo),
     );
   }
 
@@ -44,17 +44,17 @@ class CommunityBlacklistPage extends HookWidget {
               type: '${info.type}',
             );
           },
-          itemCount: viewModel.communityBlacklist.length,
+          itemCount: viewModel.communityBlacklist?.length ?? 0,
           itemBuilder: (context, index) => CommunityListItem(
-            name: viewModel.communityBlacklist[index].name,
-            displayIcon: viewModel.communityBlacklist[index].displayIcon,
+            name: viewModel.communityBlacklist?[index].name ?? '',
+            displayIcon: viewModel.communityBlacklist?[index].displayIcon ?? '',
             hasWallet: viewModel.hasWallet,
             isBlacklist: true,
             index: index,
             onPress: () {
               CommunityTeamPage.open(
                 info,
-                viewModel.communityBlacklist[index],
+                viewModel.communityBlacklist![index],
               );
             },
           ),

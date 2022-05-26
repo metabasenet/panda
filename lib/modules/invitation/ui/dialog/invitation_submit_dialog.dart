@@ -66,12 +66,12 @@ Future<bool> showInvitationConfirmDialog({
   final errorText = payBalanceNotEnough
       ? tr(
           'invitation:defi_create_dialog_pay_balance_not_enough',
-          namedArgs: {'symbol': coinInfo.name},
+          namedArgs: {'symbol': coinInfo.name ?? ''},
         )
       : feeBalanceNotEnough
           ? tr(
               'invitation:defi_create_dialog_fee_balance_not_enough',
-              namedArgs: {'symbol': feeCoin.name},
+              namedArgs: {'symbol': feeCoin.name ?? ''},
             )
           : '';
 

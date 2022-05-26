@@ -23,8 +23,11 @@ class ProjectActionGetList extends _BaseAction {
     final projectsWithCoin = projects.map(
       (project) => project.rebuild(
         (a) => a.iconUrl = state.assetState
-            .getCoinInfo(chain: AppConstants.mnt_chain, symbol: project.symbol)
-            ?.iconUrl,
+            .getCoinInfo(
+              chain: AppConstants.mnt_chain,
+              symbol: project.symbol ?? '',
+            )
+            .iconUrl,
       ),
     );
 

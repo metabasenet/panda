@@ -73,7 +73,7 @@ class CommunityTypeCard extends HookWidget {
                   Padding(
                     padding: context.edgeTop8,
                     child: Text(
-                      item.name,
+                      item.name ?? '',
                       textAlign: TextAlign.center,
                       softWrap: true,
                       maxLines: 2,
@@ -124,8 +124,8 @@ class CommunityTypeCard extends HookWidget {
       );
     }
 
-    final list = config?.types?.toList() ?? [];
-    list.retainWhere((x) => config.homeList.contains(x.type));
+    final list = config.types?.toList() ?? [];
+    list.retainWhere((x) => config.homeList!.contains(x.type));
     final swiperNumber = (list.length / 4).ceil();
 
     return Swiper(

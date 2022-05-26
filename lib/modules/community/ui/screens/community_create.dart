@@ -13,7 +13,7 @@ class CommunityCreatePage extends HookWidget {
   static Route<bool> route(RouteSettings settings) {
     return DefaultTransition<bool>(
       settings,
-      CommunityCreatePage(settings.arguments as CommunityInfo),
+      CommunityCreatePage(settings.arguments! as CommunityInfo),
     );
   }
 
@@ -41,7 +41,7 @@ class CommunityCreatePage extends HookWidget {
     final options = list
         .map(
           (e) => CSOptionsItem<AssetCoin>(
-              label: e.symbol,
+              label: e.symbol ?? '',
               value: e,
               color: selectCoin.value != null &&
                       selectCoin.value?.chain == e.chain &&
@@ -116,11 +116,6 @@ class CommunityCreatePage extends HookWidget {
         images: images,
       );
 
-      final errorKey = params.isValid();
-      if (errorKey != null) {
-        return Toast.show(tr('community:error_msg_$errorKey'));
-      }
-
       showConfirmDataTip(
         context,
         onConfirm: () {
@@ -177,36 +172,33 @@ class CommunityCreatePage extends HookWidget {
                 converter: CommunityCreateVM.fromStore,
                 onInitialBuild: (_, __, viewModel) {
                   if (viewModel.walletId == null ||
-                      viewModel.walletId.isEmpty) {
+                      (viewModel.walletId?.isEmpty ?? true)) {
                     AppNavigator.gotoTabBar();
                     AppNavigator.gotoTabBarPage(AppTabBarPages.wallet);
                     Toast.show(tr('wallet:msg_create_wallet_need'));
                     return;
                   }
-                  if (type == null) {
-                    AppNavigator.goBack();
-                    return;
-                  }
 
-                  if (viewModel.coinList.isEmpty == true) {
+                  if (viewModel.coinList?.isNotEmpty != false) {
                     return;
                   }
                   LoadingDialog.show(context);
-                  viewModel.getMyTeam(typeInfo.type).then((teamInfo) {
+                  viewModel.getMyTeam(typeInfo.type ?? 0).then((teamInfo) {
                     LoadingDialog.dismiss(context);
                     // 创建过
-                    if (teamInfo != null && teamInfo.id != null) {
+                    if (teamInfo.id != null) {
                       myTeam.value = teamInfo;
-                      name.text = teamInfo.name;
-                      desc.text = teamInfo.describe;
-                      telegram.text = teamInfo.options.telegramAccount;
+                      name.text = teamInfo.name ?? '';
+                      desc.text = teamInfo.describe ?? '';
+                      telegram.text = teamInfo.options?.telegramAccount ?? '';
 
                       // 根据创建历史的字段 找到之前选中的币种
-                      final coin = viewModel.coinList.firstWhere(
-                          (e) =>
-                              e.chain == teamInfo.chain &&
-                              e.symbol == teamInfo.symbol,
-                          orElse: () => viewModel.coinList.first);
+                      final coin = viewModel.coinList!.firstWhere(
+                        (e) =>
+                            e.chain == teamInfo.chain &&
+                            e.symbol == teamInfo.symbol,
+                        orElse: () => viewModel.coinList!.first,
+                      );
                       selectCoin.value = coin;
                     } else {
                       // 没有创建过
@@ -249,7 +241,7 @@ class CommunityCreatePage extends HookWidget {
                             ? () {
                                 handleSelectCoin(
                                   context,
-                                  viewModel.coinList.toList(),
+                                  viewModel.coinList?.toList() ?? [],
                                   selectCoin,
                                 );
                               }
@@ -270,7 +262,7 @@ class CommunityCreatePage extends HookWidget {
                         type: FormBoxType.child,
                         child: UploadButton(
                           size: imgItemWidth,
-                          signature: viewModel.walletId,
+                          signature: viewModel.walletId ?? '',
                           uploadType: 'hd_team_icon',
                           onRemove: () {
                             logo.text = '';
@@ -292,7 +284,7 @@ class CommunityCreatePage extends HookWidget {
                           child: UploadButtonGroup(
                             itemSize: imgItemWidth,
                             maxImages: 5,
-                            signature: viewModel.walletId,
+                            signature: viewModel.walletId ?? '',
                             uploadType: 'business_license',
                             onChanges: (paths) {
                               images.clear();

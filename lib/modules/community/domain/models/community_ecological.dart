@@ -13,18 +13,18 @@ abstract class CommunityEcological
 // Fields
 
   //@nullable
-  String get chain;
+  String? get chain;
 
   //@nullable
   @BuiltValueField(wireName: 'currency')
-  String get symbol;
+  String? get symbol;
 
   //@nullable
-  String get name;
+  String? get name;
 
   //@nullable
-  String get fork;
+  String? get fork;
 
   //@nullable
-  String get id;
+  String? get id;
 }

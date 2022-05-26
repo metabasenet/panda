@@ -12,7 +12,7 @@ class _$OpenWebviewVM extends OpenWebviewVM {
   @override
   final bool hasWallet;
   @override
-  final Wallet activeWallet;
+  final Wallet? activeWallet;
   @override
   final String activeWalletId;
   @override
@@ -40,7 +40,7 @@ class _$OpenWebviewVM extends OpenWebviewVM {
   _$OpenWebviewVM._(
       {required this.fiatCurrency,
       required this.hasWallet,
-      required this.activeWallet,
+      this.activeWallet,
       required this.activeWalletId,
       required this.activeWalletStatus,
       required this.onWithdrawBefore,
@@ -53,8 +53,6 @@ class _$OpenWebviewVM extends OpenWebviewVM {
         fiatCurrency, 'OpenWebviewVM', 'fiatCurrency');
     BuiltValueNullFieldError.checkNotNull(
         hasWallet, 'OpenWebviewVM', 'hasWallet');
-    BuiltValueNullFieldError.checkNotNull(
-        activeWallet, 'OpenWebviewVM', 'activeWallet');
     BuiltValueNullFieldError.checkNotNull(
         activeWalletId, 'OpenWebviewVM', 'activeWalletId');
     BuiltValueNullFieldError.checkNotNull(
@@ -233,8 +231,7 @@ class OpenWebviewVMBuilder
                 fiatCurrency, 'OpenWebviewVM', 'fiatCurrency'),
             hasWallet: BuiltValueNullFieldError.checkNotNull(
                 hasWallet, 'OpenWebviewVM', 'hasWallet'),
-            activeWallet: BuiltValueNullFieldError.checkNotNull(
-                activeWallet, 'OpenWebviewVM', 'activeWallet'),
+            activeWallet: activeWallet,
             activeWalletId: BuiltValueNullFieldError.checkNotNull(
                 activeWalletId, 'OpenWebviewVM', 'activeWalletId'),
             activeWalletStatus: BuiltValueNullFieldError.checkNotNull(
@@ -245,7 +242,8 @@ class OpenWebviewVMBuilder
                 submit, 'OpenWebviewVM', 'submit'),
             getCoinBalance: BuiltValueNullFieldError.checkNotNull(
                 getCoinBalance, 'OpenWebviewVM', 'getCoinBalance'),
-            getCoinAddress: BuiltValueNullFieldError.checkNotNull(getCoinAddress, 'OpenWebviewVM', 'getCoinAddress'),
+            getCoinAddress: BuiltValueNullFieldError.checkNotNull(
+                getCoinAddress, 'OpenWebviewVM', 'getCoinAddress'),
             doUnlockWallet: BuiltValueNullFieldError.checkNotNull(doUnlockWallet, 'OpenWebviewVM', 'doUnlockWallet'));
     replace(_$result);
     return _$result;

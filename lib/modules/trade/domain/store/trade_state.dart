@@ -37,7 +37,7 @@ abstract class TradeState implements Built<TradeState, TradeStateBuilder> {
   List<dynamic> toCache() {
     try {
       return [
-        serialize<TradeConfig>(config),
+        serialize<TradeConfig>(config!),
         hideSlowTradePairTip.toList(),
       ];
     } catch (_) {
@@ -48,20 +48,20 @@ abstract class TradeState implements Built<TradeState, TradeStateBuilder> {
 // Fields
 
   //@nullable
-  TradeConfig get config;
+  TradeConfig? get config;
 
   //@nullable
-  int get configState;
+  int? get configState;
 
   //@nullable
-  TradePair get tradePair;
+  TradePair? get tradePair;
 
   TradeSide get tradeSide;
 
   BuiltList<String> get hideSlowTradePairTip;
 
   //@nullable
-  TradeOrderDetail get currentOrderDetail;
+  TradeOrderDetail? get currentOrderDetail;
 
 // Methods
   TradePair getDefaultTradePair() => (config?.allTradePairs ?? []).firstWhere(
@@ -84,7 +84,7 @@ abstract class TradeState implements Built<TradeState, TradeStateBuilder> {
     required String symbol,
     required String chain,
   }) =>
-      config.coins.firstWhere(
+      config!.coins.firstWhere(
         (e) => e.symbol == symbol && e.chain == chain,
       );
 }

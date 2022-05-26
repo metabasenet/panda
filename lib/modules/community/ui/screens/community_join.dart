@@ -15,7 +15,7 @@ class CommunityJoinPage extends HookWidget {
   }
 
   static Route<bool> route(RouteSettings settings) {
-    final item = settings.arguments as MapEntry<CommunityInfo, CommunityTeam>;
+    final item = settings.arguments! as MapEntry<CommunityInfo, CommunityTeam>;
     return DefaultTransition<bool>(
       settings,
       CommunityJoinPage(item.key, item.value),
@@ -90,8 +90,8 @@ class CommunityJoinPage extends HookWidget {
       }
 
       final params = TeamJoinParams.toApiParams(
-        type: info.type,
-        teamId: team.id,
+        type: info.type ?? 0,
+        teamId: team.id ?? '',
         name: name.text,
         desc: desc.text,
         github: github.text,
@@ -158,26 +158,26 @@ class CommunityJoinPage extends HookWidget {
                 converter: CommunityJoinVM.fromStore,
                 onInitialBuild: (_, __, viewModel) {
                   if (viewModel.walletId == null ||
-                      viewModel.walletId.isEmpty) {
+                      (viewModel.walletId?.isEmpty ?? true)) {
                     AppNavigator.gotoTabBar();
                     AppNavigator.gotoTabBarPage(AppTabBarPages.wallet);
                     Toast.show(tr('wallet:msg_create_wallet_need'));
                     return;
                   }
-                  if (info == null) {
-                    AppNavigator.goBack();
-                  }
+                  //if (info == null) {
+                  //  AppNavigator.goBack();
+                  //}
 
                   LoadingDialog.show(context);
-                  viewModel.getMyJoin(team.id).then((memberInfo) {
+                  viewModel.getMyJoin(team.id ?? '').then((memberInfo) {
                     LoadingDialog.dismiss(context);
                     // 创建过
-                    if (memberInfo != null && memberInfo.id != null) {
+                    if (memberInfo.id != null) {
                       myMember.value = memberInfo;
-                      name.text = memberInfo.info.name;
-                      desc.text = memberInfo.info.describe;
-                      github.text = memberInfo.info.github;
-                      telegram.text = memberInfo.info.telegramAccount;
+                      name.text = memberInfo.info?.name ?? '';
+                      desc.text = memberInfo.info?.describe ?? '';
+                      github.text = memberInfo.info?.github ?? '';
+                      telegram.text = memberInfo.info?.telegramAccount ?? '';
                     } else {
                       // 没有创建过
                       showConfirmDataTip(context);
@@ -235,7 +235,7 @@ class CommunityJoinPage extends HookWidget {
                         type: FormBoxType.child,
                         child: UploadButton(
                           size: imgItemWidth,
-                          signature: viewModel.walletId,
+                          signature: viewModel.walletId ?? '',
                           uploadType: 'hd_team_user_icon',
                           onRemove: () {
                             logo.text = '';

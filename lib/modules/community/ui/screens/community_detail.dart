@@ -23,7 +23,7 @@ class CommunityDetailPage extends HookWidget {
   static Route<dynamic> route(RouteSettings settings) {
     return DefaultTransition(
       settings,
-      CommunityDetailPage(settings.arguments as CommunityInfo),
+      CommunityDetailPage(settings.arguments! as CommunityInfo),
     );
   }
 
@@ -165,7 +165,7 @@ class CommunityDetailPage extends HookWidget {
       if (info.canCreate || info.canJoin) {
         final type = info.isTeamList ? info.type.toString() : info.id;
         viewModel
-            .getHasHistory(isTeam: info.isTeamList, type: type)
+            .getHasHistory(isTeam: info.isTeamList, type: type ?? '')
             .then((value) {
           hasHistory.value = value;
         }).catchError((error) {
@@ -275,36 +275,42 @@ class CommunityDetailPage extends HookWidget {
             );
           },
           itemCount: info.isTeamList
-              ? viewModel.communityTeamList.length
-              : viewModel.communityMemberList.length,
+              ? viewModel.communityTeamList?.length ?? 0
+              : viewModel.communityMemberList?.length ?? 0,
           itemBuilder: (context, index) {
             return info.isTeamList
                 ? CommunityListItem(
-                    order: viewModel.communityTeamList[index].order,
-                    name: viewModel.communityTeamList[index].name,
-                    displayIcon: viewModel.communityTeamList[index].displayIcon,
+                    order: viewModel.communityTeamList?[index].order ?? 0,
+                    name: viewModel.communityTeamList?[index].name ?? '',
+                    displayIcon:
+                        viewModel.communityTeamList?[index].displayIcon ?? '',
                     hasWallet: viewModel.hasWallet,
-                    isMine: viewModel.communityTeamList[index].isMine,
-                    isSuccess: viewModel.communityTeamList[index].statusSuccess,
+                    isMine: viewModel.communityTeamList?[index].isMine ?? false,
+                    isSuccess:
+                        viewModel.communityTeamList?[index].statusSuccess ??
+                            false,
                     index: index,
                     onPress: () {
                       CommunityTeamPage.open(
                         info,
-                        viewModel.communityTeamList[index],
+                        viewModel.communityTeamList![index],
                       );
                     },
                   )
                 : CommunityListItem(
-                    order: viewModel.communityMemberList[index].order,
-                    name: viewModel.communityMemberList[index].info.name,
-                    displayIcon:
-                        viewModel.communityMemberList[index].info.displayIcon,
-                    isMine: viewModel.communityMemberList[index].isMine,
+                    order: viewModel.communityMemberList?[index].order ?? 0,
+                    name:
+                        viewModel.communityMemberList?[index].info?.name ?? '',
+                    displayIcon: viewModel
+                            .communityMemberList?[index].info?.displayIcon ??
+                        '',
+                    isMine:
+                        viewModel.communityMemberList?[index].isMine ?? false,
                     hasWallet: viewModel.hasWallet,
                     index: index,
                     onPress: () {
                       CommunityMemberPage.open(
-                        viewModel.communityMemberList[index],
+                        viewModel.communityMemberList![index],
                       );
                     },
                   );

@@ -38,8 +38,8 @@ class SwapCreatePage extends HookWidget {
       approveBalanceLoading.value = true;
       viewModel
           .getApproveBalance(
-        chain: coinConfig.chain,
-        symbol: coinConfig.symbol,
+        chain: coinConfig.chain ?? '',
+        symbol: coinConfig.symbol ?? '',
       )
           .then((value) {
         approveBalance.value = value;

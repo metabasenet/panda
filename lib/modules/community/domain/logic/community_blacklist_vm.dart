@@ -2,13 +2,13 @@ part of community_domain_module;
 
 abstract class CommunityBlacklistVM
     implements Built<CommunityBlacklistVM, CommunityBlacklistVMBuilder> {
-  factory CommunityBlacklistVM(
-          [void Function(CommunityBlacklistVMBuilder) updates]) =
-      _$CommunityBlacklistVM;
+  factory CommunityBlacklistVM([
+    void Function(CommunityBlacklistVMBuilder) updates,
+  ]) = _$CommunityBlacklistVM;
   CommunityBlacklistVM._();
 // UI Fields
   //@nullable
-  BuiltList<CommunityTeam> get communityBlacklist;
+  BuiltList<CommunityTeam>? get communityBlacklist;
 
   bool get hasWallet;
 
@@ -39,7 +39,7 @@ abstract class CommunityBlacklistVM
         type: type,
       ),
     );
-    return Future.value(store.state.communityState.communityBlacklist.length);
+    return Future.value(store.state.communityState.communityBlacklist?.length);
   }
 
   // UI Logic

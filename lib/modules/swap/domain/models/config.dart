@@ -16,26 +16,29 @@ abstract class SwapConfig implements Built<SwapConfig, SwapConfigBuilder> {
 
   //@nullable
   @BuiltValueField(wireName: 'tradePairs')
-  BuiltList<BuiltList<SwapConfigCoin>> get tradePairs;
+  BuiltList<BuiltList<SwapConfigCoin>>? get tradePairs;
 
   List<MapEntry<SwapConfigCoin, SwapConfigCoin>> get enabledTradePairs {
     final result = <MapEntry<SwapConfigCoin, SwapConfigCoin>>[];
 
-    for (final pairs in tradePairs) {
-      if (pairs.first.enabled) {
-        result.add(MapEntry(
-          pairs.last,
-          pairs.first,
-        ));
+    for (final pairs in tradePairs!) {
+      if (pairs.first.enabled ?? false) {
+        result.add(
+          MapEntry(
+            pairs.last,
+            pairs.first,
+          ),
+        );
       }
-      if (pairs.last.enabled) {
-        result.add(MapEntry(
-          pairs.first,
-          pairs.last,
-        ));
+      if (pairs.last.enabled ?? false) {
+        result.add(
+          MapEntry(
+            pairs.first,
+            pairs.last,
+          ),
+        );
       }
     }
-
     return result;
   }
 }

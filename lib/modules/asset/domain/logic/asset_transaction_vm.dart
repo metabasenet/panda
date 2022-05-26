@@ -26,10 +26,11 @@ abstract class AssetTransactionVM
     return AssetTransactionVM((viewModel) => viewModel
       ..getCoinName = (chain, symbol) {
         return VMWithWalletGetCoinInfoImplement.getCoinInfo(
-          store,
-          chain: chain,
-          symbol: symbol,
-        ).name;
+              store,
+              chain: chain,
+              symbol: symbol,
+            ).name ??
+            '';
       }
       ..getSingleTransaction = (transaction) {
         final completer = Completer<Transaction>();
@@ -46,7 +47,7 @@ abstract class AssetTransactionVM
             chain: transaction.chain,
             symbol: transaction.symbol,
             fromAddress: transaction.fromAddress,
-            chainPrecision: coinInfo.chainPrecision,
+            chainPrecision: coinInfo.chainPrecision ?? 0,
             completer: completer,
           ),
         );

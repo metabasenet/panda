@@ -38,14 +38,18 @@ class _$ConfigSerializer implements StructuredSerializer<Config> {
       'otc_on_chain',
       serializers.serialize(object.otc,
           specifiedType: const FullType(ConfigOtc)),
-      'system_store',
-      serializers.serialize(object.system,
-          specifiedType: const FullType(ConfigSystem)),
       'version',
       serializers.serialize(object.version,
           specifiedType: const FullType(ConfigUpdate)),
     ];
-
+    Object? value;
+    value = object.system;
+    if (value != null) {
+      result
+        ..add('system_store')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(ConfigSystem)));
+    }
     return result;
   }
 
@@ -109,29 +113,48 @@ class _$ConfigCoinSerializer implements StructuredSerializer<ConfigCoin> {
           specifiedType: const FullType(String)),
       'icon_url',
       serializers.serialize(object.icon, specifiedType: const FullType(String)),
-      'anchor',
-      serializers.serialize(object.contract,
-          specifiedType: const FullType(String)),
       'transfer_fee',
       serializers.serialize(object.transferFee,
           specifiedType: const FullType(double)),
-      'chain_precision',
-      serializers.serialize(object.chainPrecision,
-          specifiedType: const FullType(int)),
       'display_precision',
       serializers.serialize(object.displayPrecision,
           specifiedType: const FullType(int)),
-      'transfer_min_quota',
-      serializers.serialize(object.transferMinQuota,
-          specifiedType: const FullType(double)),
-      'defi_reward',
-      serializers.serialize(object.defiReward,
-          specifiedType: const FullType(bool)),
-      'hd_wallet_fee_level',
-      serializers.serialize(object.hdWalletFeeLevel,
-          specifiedType: const FullType(ConfigCoinFee)),
     ];
-
+    Object? value;
+    value = object.contract;
+    if (value != null) {
+      result
+        ..add('anchor')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.chainPrecision;
+    if (value != null) {
+      result
+        ..add('chain_precision')
+        ..add(serializers.serialize(value, specifiedType: const FullType(int)));
+    }
+    value = object.transferMinQuota;
+    if (value != null) {
+      result
+        ..add('transfer_min_quota')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(double)));
+    }
+    value = object.defiReward;
+    if (value != null) {
+      result
+        ..add('defi_reward')
+        ..add(
+            serializers.serialize(value, specifiedType: const FullType(bool)));
+    }
+    value = object.hdWalletFeeLevel;
+    if (value != null) {
+      result
+        ..add('hd_wallet_fee_level')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(ConfigCoinFee)));
+    }
     return result;
   }
 
@@ -168,7 +191,7 @@ class _$ConfigCoinSerializer implements StructuredSerializer<ConfigCoin> {
           break;
         case 'anchor':
           result.contract = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'transfer_fee':
           result.transferFee = serializers.deserialize(value,
@@ -176,7 +199,7 @@ class _$ConfigCoinSerializer implements StructuredSerializer<ConfigCoin> {
           break;
         case 'chain_precision':
           result.chainPrecision = serializers.deserialize(value,
-              specifiedType: const FullType(int))! as int;
+              specifiedType: const FullType(int)) as int?;
           break;
         case 'display_precision':
           result.displayPrecision = serializers.deserialize(value,
@@ -184,11 +207,11 @@ class _$ConfigCoinSerializer implements StructuredSerializer<ConfigCoin> {
           break;
         case 'transfer_min_quota':
           result.transferMinQuota = serializers.deserialize(value,
-              specifiedType: const FullType(double))! as double;
+              specifiedType: const FullType(double)) as double?;
           break;
         case 'defi_reward':
           result.defiReward = serializers.deserialize(value,
-              specifiedType: const FullType(bool))! as bool;
+              specifiedType: const FullType(bool)) as bool?;
           break;
         case 'hd_wallet_fee_level':
           result.hdWalletFeeLevel.replace(serializers.deserialize(value,
@@ -260,22 +283,6 @@ class _$ConfigOtcSerializer implements StructuredSerializer<ConfigOtc> {
   Iterable<Object?> serialize(Serializers serializers, ConfigOtc object,
       {FullType specifiedType = FullType.unspecified}) {
     final result = <Object?>[
-      'enable',
-      serializers.serialize(object.enable, specifiedType: const FullType(bool)),
-      'max_ads',
-      serializers.serialize(object.maxAds, specifiedType: const FullType(int)),
-      'trade_pair',
-      serializers.serialize(object.tradePairs,
-          specifiedType: const FullType(BuiltMap, const [
-            const FullType(String),
-            const FullType(BuiltList, const [const FullType(String)])
-          ])),
-      'deposit_fee',
-      serializers.serialize(object.depositAmount,
-          specifiedType: const FullType(String)),
-      'deposit_currency',
-      serializers.serialize(object.depositCurrency,
-          specifiedType: const FullType(String)),
       'system_otc_address',
       serializers.serialize(object.systemOtcAddress,
           specifiedType: const FullType(BuiltMap,
@@ -284,7 +291,44 @@ class _$ConfigOtcSerializer implements StructuredSerializer<ConfigOtc> {
       serializers.serialize(object.systemDepositAddress,
           specifiedType: const FullType(String)),
     ];
-
+    Object? value;
+    value = object.enable;
+    if (value != null) {
+      result
+        ..add('enable')
+        ..add(
+            serializers.serialize(value, specifiedType: const FullType(bool)));
+    }
+    value = object.maxAds;
+    if (value != null) {
+      result
+        ..add('max_ads')
+        ..add(serializers.serialize(value, specifiedType: const FullType(int)));
+    }
+    value = object.tradePairs;
+    if (value != null) {
+      result
+        ..add('trade_pair')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(BuiltMap, const [
+              const FullType(String),
+              const FullType(BuiltList, const [const FullType(String)])
+            ])));
+    }
+    value = object.depositAmount;
+    if (value != null) {
+      result
+        ..add('deposit_fee')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.depositCurrency;
+    if (value != null) {
+      result
+        ..add('deposit_currency')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
     return result;
   }
 
@@ -301,11 +345,11 @@ class _$ConfigOtcSerializer implements StructuredSerializer<ConfigOtc> {
       switch (key) {
         case 'enable':
           result.enable = serializers.deserialize(value,
-              specifiedType: const FullType(bool))! as bool;
+              specifiedType: const FullType(bool)) as bool?;
           break;
         case 'max_ads':
           result.maxAds = serializers.deserialize(value,
-              specifiedType: const FullType(int))! as int;
+              specifiedType: const FullType(int)) as int?;
           break;
         case 'trade_pair':
           result.tradePairs.replace(serializers.deserialize(value,
@@ -316,11 +360,11 @@ class _$ConfigOtcSerializer implements StructuredSerializer<ConfigOtc> {
           break;
         case 'deposit_fee':
           result.depositAmount = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'deposit_currency':
           result.depositCurrency = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'system_otc_address':
           result.systemOtcAddress.replace(serializers.deserialize(value,
@@ -347,13 +391,18 @@ class _$ConfigSystemSerializer implements StructuredSerializer<ConfigSystem> {
   @override
   Iterable<Object?> serialize(Serializers serializers, ConfigSystem object,
       {FullType specifiedType = FullType.unspecified}) {
-    final result = <Object?>[
-      'config',
-      serializers.serialize(object.config,
-          specifiedType: const FullType(BuiltMap,
-              const [const FullType(String), const FullType(ConfigSystemApp)])),
-    ];
-
+    final result = <Object?>[];
+    Object? value;
+    value = object.config;
+    if (value != null) {
+      result
+        ..add('config')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(BuiltMap, const [
+              const FullType(String),
+              const FullType(ConfigSystemApp)
+            ])));
+    }
     return result;
   }
 
@@ -393,11 +442,15 @@ class _$ConfigSystemAppSerializer
   @override
   Iterable<Object?> serialize(Serializers serializers, ConfigSystemApp object,
       {FullType specifiedType = FullType.unspecified}) {
-    final result = <Object?>[
-      'enable',
-      serializers.serialize(object.enable, specifiedType: const FullType(bool)),
-    ];
-
+    final result = <Object?>[];
+    Object? value;
+    value = object.enable;
+    if (value != null) {
+      result
+        ..add('enable')
+        ..add(
+            serializers.serialize(value, specifiedType: const FullType(bool)));
+    }
     return result;
   }
 
@@ -415,7 +468,7 @@ class _$ConfigSystemAppSerializer
       switch (key) {
         case 'enable':
           result.enable = serializers.deserialize(value,
-              specifiedType: const FullType(bool))! as bool;
+              specifiedType: const FullType(bool)) as bool?;
           break;
       }
     }
@@ -433,15 +486,22 @@ class _$ConfigUpdateSerializer implements StructuredSerializer<ConfigUpdate> {
   @override
   Iterable<Object?> serialize(Serializers serializers, ConfigUpdate object,
       {FullType specifiedType = FullType.unspecified}) {
-    final result = <Object?>[
-      'update',
-      serializers.serialize(object.needUpdate,
-          specifiedType: const FullType(bool)),
-      'data',
-      serializers.serialize(object.data,
-          specifiedType: const FullType(ConfigUpdateData)),
-    ];
-
+    final result = <Object?>[];
+    Object? value;
+    value = object.needUpdate;
+    if (value != null) {
+      result
+        ..add('update')
+        ..add(
+            serializers.serialize(value, specifiedType: const FullType(bool)));
+    }
+    value = object.data;
+    if (value != null) {
+      result
+        ..add('data')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(ConfigUpdateData)));
+    }
     return result;
   }
 
@@ -459,7 +519,7 @@ class _$ConfigUpdateSerializer implements StructuredSerializer<ConfigUpdate> {
       switch (key) {
         case 'update':
           result.needUpdate = serializers.deserialize(value,
-              specifiedType: const FullType(bool))! as bool;
+              specifiedType: const FullType(bool)) as bool?;
           break;
         case 'data':
           result.data.replace(serializers.deserialize(value,
@@ -483,25 +543,44 @@ class _$ConfigUpdateDataSerializer
   @override
   Iterable<Object?> serialize(Serializers serializers, ConfigUpdateData object,
       {FullType specifiedType = FullType.unspecified}) {
-    final result = <Object?>[
-      'version',
-      serializers.serialize(object.version,
-          specifiedType: const FullType(String)),
-      'description',
-      serializers.serialize(object.description,
-          specifiedType: const FullType(String)),
-      'force_update',
-      serializers.serialize(object.forceUpdate,
-          specifiedType: const FullType(bool)),
-      'download_url',
-      serializers.serialize(object.downloadUrl,
-          specifiedType: const FullType(String)),
-      'disable_functions',
-      serializers.serialize(object.disabledModules,
-          specifiedType: const FullType(BuiltMap,
-              const [const FullType(String), const FullType(String)])),
-    ];
-
+    final result = <Object?>[];
+    Object? value;
+    value = object.version;
+    if (value != null) {
+      result
+        ..add('version')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.description;
+    if (value != null) {
+      result
+        ..add('description')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.forceUpdate;
+    if (value != null) {
+      result
+        ..add('force_update')
+        ..add(
+            serializers.serialize(value, specifiedType: const FullType(bool)));
+    }
+    value = object.downloadUrl;
+    if (value != null) {
+      result
+        ..add('download_url')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.disabledModules;
+    if (value != null) {
+      result
+        ..add('disable_functions')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(BuiltMap,
+                const [const FullType(String), const FullType(String)])));
+    }
     return result;
   }
 
@@ -519,19 +598,19 @@ class _$ConfigUpdateDataSerializer
       switch (key) {
         case 'version':
           result.version = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'description':
           result.description = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'force_update':
           result.forceUpdate = serializers.deserialize(value,
-              specifiedType: const FullType(bool))! as bool;
+              specifiedType: const FullType(bool)) as bool?;
           break;
         case 'download_url':
           result.downloadUrl = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'disable_functions':
           result.disabledModules.replace(serializers.deserialize(value,
@@ -554,11 +633,7 @@ class _$CommonStateSerializer implements StructuredSerializer<CommonState> {
   @override
   Iterable<Object?> serialize(Serializers serializers, CommonState object,
       {FullType specifiedType = FullType.unspecified}) {
-    final result = <Object?>[
-      'configState',
-      serializers.serialize(object.configState,
-          specifiedType: const FullType(int)),
-    ];
+    final result = <Object?>[];
     Object? value;
     value = object.config;
     if (value != null) {
@@ -566,6 +641,12 @@ class _$CommonStateSerializer implements StructuredSerializer<CommonState> {
         ..add('config')
         ..add(serializers.serialize(value,
             specifiedType: const FullType(Config)));
+    }
+    value = object.configState;
+    if (value != null) {
+      result
+        ..add('configState')
+        ..add(serializers.serialize(value, specifiedType: const FullType(int)));
     }
     value = object.appInfo;
     if (value != null) {
@@ -622,7 +703,7 @@ class _$CommonStateSerializer implements StructuredSerializer<CommonState> {
           break;
         case 'configState':
           result.configState = serializers.deserialize(value,
-              specifiedType: const FullType(int))! as int;
+              specifiedType: const FullType(int)) as int?;
           break;
         case 'appInfo':
           result.appInfo = serializers.deserialize(value,
@@ -884,7 +965,7 @@ class _$Config extends Config {
   @override
   final ConfigOtc otc;
   @override
-  final ConfigSystem system;
+  final ConfigSystem? system;
   @override
   final ConfigUpdate version;
 
@@ -894,12 +975,11 @@ class _$Config extends Config {
   _$Config._(
       {required this.coins,
       required this.otc,
-      required this.system,
+      this.system,
       required this.version})
       : super._() {
     BuiltValueNullFieldError.checkNotNull(coins, 'Config', 'coins');
     BuiltValueNullFieldError.checkNotNull(otc, 'Config', 'otc');
-    BuiltValueNullFieldError.checkNotNull(system, 'Config', 'system');
     BuiltValueNullFieldError.checkNotNull(version, 'Config', 'version');
   }
 
@@ -967,7 +1047,7 @@ class ConfigBuilder implements Builder<Config, ConfigBuilder> {
     if ($v != null) {
       _coins = $v.coins.toBuilder();
       _otc = $v.otc.toBuilder();
-      _system = $v.system.toBuilder();
+      _system = $v.system?.toBuilder();
       _version = $v.version.toBuilder();
       _$v = null;
     }
@@ -995,7 +1075,7 @@ class ConfigBuilder implements Builder<Config, ConfigBuilder> {
           new _$Config._(
               coins: coins.build(),
               otc: otc.build(),
-              system: system.build(),
+              system: _system?.build(),
               version: version.build());
     } catch (_) {
       late String _$failedField;
@@ -1005,7 +1085,7 @@ class ConfigBuilder implements Builder<Config, ConfigBuilder> {
         _$failedField = 'otc';
         otc.build();
         _$failedField = 'system';
-        system.build();
+        _system?.build();
         _$failedField = 'version';
         version.build();
       } catch (e) {
@@ -1031,19 +1111,19 @@ class _$ConfigCoin extends ConfigCoin {
   @override
   final String icon;
   @override
-  final String contract;
+  final String? contract;
   @override
   final double transferFee;
   @override
-  final int chainPrecision;
+  final int? chainPrecision;
   @override
   final int displayPrecision;
   @override
-  final double transferMinQuota;
+  final double? transferMinQuota;
   @override
-  final bool defiReward;
+  final bool? defiReward;
   @override
-  final ConfigCoinFee hdWalletFeeLevel;
+  final ConfigCoinFee? hdWalletFeeLevel;
 
   factory _$ConfigCoin([void Function(ConfigCoinBuilder)? updates]) =>
       (new ConfigCoinBuilder()..update(updates))._build();
@@ -1054,32 +1134,23 @@ class _$ConfigCoin extends ConfigCoin {
       required this.name,
       required this.fullName,
       required this.icon,
-      required this.contract,
+      this.contract,
       required this.transferFee,
-      required this.chainPrecision,
+      this.chainPrecision,
       required this.displayPrecision,
-      required this.transferMinQuota,
-      required this.defiReward,
-      required this.hdWalletFeeLevel})
+      this.transferMinQuota,
+      this.defiReward,
+      this.hdWalletFeeLevel})
       : super._() {
     BuiltValueNullFieldError.checkNotNull(symbol, 'ConfigCoin', 'symbol');
     BuiltValueNullFieldError.checkNotNull(chain, 'ConfigCoin', 'chain');
     BuiltValueNullFieldError.checkNotNull(name, 'ConfigCoin', 'name');
     BuiltValueNullFieldError.checkNotNull(fullName, 'ConfigCoin', 'fullName');
     BuiltValueNullFieldError.checkNotNull(icon, 'ConfigCoin', 'icon');
-    BuiltValueNullFieldError.checkNotNull(contract, 'ConfigCoin', 'contract');
     BuiltValueNullFieldError.checkNotNull(
         transferFee, 'ConfigCoin', 'transferFee');
     BuiltValueNullFieldError.checkNotNull(
-        chainPrecision, 'ConfigCoin', 'chainPrecision');
-    BuiltValueNullFieldError.checkNotNull(
         displayPrecision, 'ConfigCoin', 'displayPrecision');
-    BuiltValueNullFieldError.checkNotNull(
-        transferMinQuota, 'ConfigCoin', 'transferMinQuota');
-    BuiltValueNullFieldError.checkNotNull(
-        defiReward, 'ConfigCoin', 'defiReward');
-    BuiltValueNullFieldError.checkNotNull(
-        hdWalletFeeLevel, 'ConfigCoin', 'hdWalletFeeLevel');
   }
 
   @override
@@ -1224,7 +1295,7 @@ class ConfigCoinBuilder implements Builder<ConfigCoin, ConfigCoinBuilder> {
       _displayPrecision = $v.displayPrecision;
       _transferMinQuota = $v.transferMinQuota;
       _defiReward = $v.defiReward;
-      _hdWalletFeeLevel = $v.hdWalletFeeLevel.toBuilder();
+      _hdWalletFeeLevel = $v.hdWalletFeeLevel?.toBuilder();
       _$v = null;
     }
     return this;
@@ -1259,24 +1330,20 @@ class ConfigCoinBuilder implements Builder<ConfigCoin, ConfigCoinBuilder> {
                   fullName, 'ConfigCoin', 'fullName'),
               icon: BuiltValueNullFieldError.checkNotNull(
                   icon, 'ConfigCoin', 'icon'),
-              contract: BuiltValueNullFieldError.checkNotNull(
-                  contract, 'ConfigCoin', 'contract'),
+              contract: contract,
               transferFee: BuiltValueNullFieldError.checkNotNull(
                   transferFee, 'ConfigCoin', 'transferFee'),
-              chainPrecision: BuiltValueNullFieldError.checkNotNull(
-                  chainPrecision, 'ConfigCoin', 'chainPrecision'),
+              chainPrecision: chainPrecision,
               displayPrecision: BuiltValueNullFieldError.checkNotNull(
                   displayPrecision, 'ConfigCoin', 'displayPrecision'),
-              transferMinQuota: BuiltValueNullFieldError.checkNotNull(
-                  transferMinQuota, 'ConfigCoin', 'transferMinQuota'),
-              defiReward:
-                  BuiltValueNullFieldError.checkNotNull(defiReward, 'ConfigCoin', 'defiReward'),
-              hdWalletFeeLevel: hdWalletFeeLevel.build());
+              transferMinQuota: transferMinQuota,
+              defiReward: defiReward,
+              hdWalletFeeLevel: _hdWalletFeeLevel?.build());
     } catch (_) {
       late String _$failedField;
       try {
         _$failedField = 'hdWalletFeeLevel';
-        hdWalletFeeLevel.build();
+        _hdWalletFeeLevel?.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
             'ConfigCoin', _$failedField, e.toString());
@@ -1396,15 +1463,15 @@ class ConfigCoinFeeBuilder
 
 class _$ConfigOtc extends ConfigOtc {
   @override
-  final bool enable;
+  final bool? enable;
   @override
-  final int maxAds;
+  final int? maxAds;
   @override
-  final BuiltMap<String, BuiltList<String>> tradePairs;
+  final BuiltMap<String, BuiltList<String>>? tradePairs;
   @override
-  final String depositAmount;
+  final String? depositAmount;
   @override
-  final String depositCurrency;
+  final String? depositCurrency;
   @override
   final BuiltMap<String, String> systemOtcAddress;
   @override
@@ -1414,22 +1481,14 @@ class _$ConfigOtc extends ConfigOtc {
       (new ConfigOtcBuilder()..update(updates))._build();
 
   _$ConfigOtc._(
-      {required this.enable,
-      required this.maxAds,
-      required this.tradePairs,
-      required this.depositAmount,
-      required this.depositCurrency,
+      {this.enable,
+      this.maxAds,
+      this.tradePairs,
+      this.depositAmount,
+      this.depositCurrency,
       required this.systemOtcAddress,
       required this.systemDepositAddress})
       : super._() {
-    BuiltValueNullFieldError.checkNotNull(enable, 'ConfigOtc', 'enable');
-    BuiltValueNullFieldError.checkNotNull(maxAds, 'ConfigOtc', 'maxAds');
-    BuiltValueNullFieldError.checkNotNull(
-        tradePairs, 'ConfigOtc', 'tradePairs');
-    BuiltValueNullFieldError.checkNotNull(
-        depositAmount, 'ConfigOtc', 'depositAmount');
-    BuiltValueNullFieldError.checkNotNull(
-        depositCurrency, 'ConfigOtc', 'depositCurrency');
     BuiltValueNullFieldError.checkNotNull(
         systemOtcAddress, 'ConfigOtc', 'systemOtcAddress');
     BuiltValueNullFieldError.checkNotNull(
@@ -1529,7 +1588,7 @@ class ConfigOtcBuilder implements Builder<ConfigOtc, ConfigOtcBuilder> {
     if ($v != null) {
       _enable = $v.enable;
       _maxAds = $v.maxAds;
-      _tradePairs = $v.tradePairs.toBuilder();
+      _tradePairs = $v.tradePairs?.toBuilder();
       _depositAmount = $v.depositAmount;
       _depositCurrency = $v.depositCurrency;
       _systemOtcAddress = $v.systemOtcAddress.toBuilder();
@@ -1558,15 +1617,11 @@ class ConfigOtcBuilder implements Builder<ConfigOtc, ConfigOtcBuilder> {
     try {
       _$result = _$v ??
           new _$ConfigOtc._(
-              enable: BuiltValueNullFieldError.checkNotNull(
-                  enable, 'ConfigOtc', 'enable'),
-              maxAds: BuiltValueNullFieldError.checkNotNull(
-                  maxAds, 'ConfigOtc', 'maxAds'),
-              tradePairs: tradePairs.build(),
-              depositAmount: BuiltValueNullFieldError.checkNotNull(
-                  depositAmount, 'ConfigOtc', 'depositAmount'),
-              depositCurrency: BuiltValueNullFieldError.checkNotNull(
-                  depositCurrency, 'ConfigOtc', 'depositCurrency'),
+              enable: enable,
+              maxAds: maxAds,
+              tradePairs: _tradePairs?.build(),
+              depositAmount: depositAmount,
+              depositCurrency: depositCurrency,
               systemOtcAddress: systemOtcAddress.build(),
               systemDepositAddress: BuiltValueNullFieldError.checkNotNull(
                   systemDepositAddress, 'ConfigOtc', 'systemDepositAddress'));
@@ -1574,7 +1629,7 @@ class ConfigOtcBuilder implements Builder<ConfigOtc, ConfigOtcBuilder> {
       late String _$failedField;
       try {
         _$failedField = 'tradePairs';
-        tradePairs.build();
+        _tradePairs?.build();
 
         _$failedField = 'systemOtcAddress';
         systemOtcAddress.build();
@@ -1591,14 +1646,12 @@ class ConfigOtcBuilder implements Builder<ConfigOtc, ConfigOtcBuilder> {
 
 class _$ConfigSystem extends ConfigSystem {
   @override
-  final BuiltMap<String, ConfigSystemApp> config;
+  final BuiltMap<String, ConfigSystemApp>? config;
 
   factory _$ConfigSystem([void Function(ConfigSystemBuilder)? updates]) =>
       (new ConfigSystemBuilder()..update(updates))._build();
 
-  _$ConfigSystem._({required this.config}) : super._() {
-    BuiltValueNullFieldError.checkNotNull(config, 'ConfigSystem', 'config');
-  }
+  _$ConfigSystem._({this.config}) : super._();
 
   @override
   ConfigSystem rebuild(void Function(ConfigSystemBuilder) updates) =>
@@ -1640,7 +1693,7 @@ class ConfigSystemBuilder
   ConfigSystemBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _config = $v.config.toBuilder();
+      _config = $v.config?.toBuilder();
       _$v = null;
     }
     return this;
@@ -1663,12 +1716,12 @@ class ConfigSystemBuilder
   _$ConfigSystem _build() {
     _$ConfigSystem _$result;
     try {
-      _$result = _$v ?? new _$ConfigSystem._(config: config.build());
+      _$result = _$v ?? new _$ConfigSystem._(config: _config?.build());
     } catch (_) {
       late String _$failedField;
       try {
         _$failedField = 'config';
-        config.build();
+        _config?.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
             'ConfigSystem', _$failedField, e.toString());
@@ -1682,14 +1735,12 @@ class ConfigSystemBuilder
 
 class _$ConfigSystemApp extends ConfigSystemApp {
   @override
-  final bool enable;
+  final bool? enable;
 
   factory _$ConfigSystemApp([void Function(ConfigSystemAppBuilder)? updates]) =>
       (new ConfigSystemAppBuilder()..update(updates))._build();
 
-  _$ConfigSystemApp._({required this.enable}) : super._() {
-    BuiltValueNullFieldError.checkNotNull(enable, 'ConfigSystemApp', 'enable');
-  }
+  _$ConfigSystemApp._({this.enable}) : super._();
 
   @override
   ConfigSystemApp rebuild(void Function(ConfigSystemAppBuilder) updates) =>
@@ -1752,10 +1803,7 @@ class ConfigSystemAppBuilder
   ConfigSystemApp build() => _build();
 
   _$ConfigSystemApp _build() {
-    final _$result = _$v ??
-        new _$ConfigSystemApp._(
-            enable: BuiltValueNullFieldError.checkNotNull(
-                enable, 'ConfigSystemApp', 'enable'));
+    final _$result = _$v ?? new _$ConfigSystemApp._(enable: enable);
     replace(_$result);
     return _$result;
   }
@@ -1763,18 +1811,14 @@ class ConfigSystemAppBuilder
 
 class _$ConfigUpdate extends ConfigUpdate {
   @override
-  final bool needUpdate;
+  final bool? needUpdate;
   @override
-  final ConfigUpdateData data;
+  final ConfigUpdateData? data;
 
   factory _$ConfigUpdate([void Function(ConfigUpdateBuilder)? updates]) =>
       (new ConfigUpdateBuilder()..update(updates))._build();
 
-  _$ConfigUpdate._({required this.needUpdate, required this.data}) : super._() {
-    BuiltValueNullFieldError.checkNotNull(
-        needUpdate, 'ConfigUpdate', 'needUpdate');
-    BuiltValueNullFieldError.checkNotNull(data, 'ConfigUpdate', 'data');
-  }
+  _$ConfigUpdate._({this.needUpdate, this.data}) : super._();
 
   @override
   ConfigUpdate rebuild(void Function(ConfigUpdateBuilder) updates) =>
@@ -1824,7 +1868,7 @@ class ConfigUpdateBuilder
     final $v = _$v;
     if ($v != null) {
       _needUpdate = $v.needUpdate;
-      _data = $v.data.toBuilder();
+      _data = $v.data?.toBuilder();
       _$v = null;
     }
     return this;
@@ -1848,15 +1892,12 @@ class ConfigUpdateBuilder
     _$ConfigUpdate _$result;
     try {
       _$result = _$v ??
-          new _$ConfigUpdate._(
-              needUpdate: BuiltValueNullFieldError.checkNotNull(
-                  needUpdate, 'ConfigUpdate', 'needUpdate'),
-              data: data.build());
+          new _$ConfigUpdate._(needUpdate: needUpdate, data: _data?.build());
     } catch (_) {
       late String _$failedField;
       try {
         _$failedField = 'data';
-        data.build();
+        _data?.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
             'ConfigUpdate', _$failedField, e.toString());
@@ -1870,38 +1911,27 @@ class ConfigUpdateBuilder
 
 class _$ConfigUpdateData extends ConfigUpdateData {
   @override
-  final String version;
+  final String? version;
   @override
-  final String description;
+  final String? description;
   @override
-  final bool forceUpdate;
+  final bool? forceUpdate;
   @override
-  final String downloadUrl;
+  final String? downloadUrl;
   @override
-  final BuiltMap<String, String> disabledModules;
+  final BuiltMap<String, String>? disabledModules;
 
   factory _$ConfigUpdateData(
           [void Function(ConfigUpdateDataBuilder)? updates]) =>
       (new ConfigUpdateDataBuilder()..update(updates))._build();
 
   _$ConfigUpdateData._(
-      {required this.version,
-      required this.description,
-      required this.forceUpdate,
-      required this.downloadUrl,
-      required this.disabledModules})
-      : super._() {
-    BuiltValueNullFieldError.checkNotNull(
-        version, 'ConfigUpdateData', 'version');
-    BuiltValueNullFieldError.checkNotNull(
-        description, 'ConfigUpdateData', 'description');
-    BuiltValueNullFieldError.checkNotNull(
-        forceUpdate, 'ConfigUpdateData', 'forceUpdate');
-    BuiltValueNullFieldError.checkNotNull(
-        downloadUrl, 'ConfigUpdateData', 'downloadUrl');
-    BuiltValueNullFieldError.checkNotNull(
-        disabledModules, 'ConfigUpdateData', 'disabledModules');
-  }
+      {this.version,
+      this.description,
+      this.forceUpdate,
+      this.downloadUrl,
+      this.disabledModules})
+      : super._();
 
   @override
   ConfigUpdateData rebuild(void Function(ConfigUpdateDataBuilder) updates) =>
@@ -1979,7 +2009,7 @@ class ConfigUpdateDataBuilder
       _description = $v.description;
       _forceUpdate = $v.forceUpdate;
       _downloadUrl = $v.downloadUrl;
-      _disabledModules = $v.disabledModules.toBuilder();
+      _disabledModules = $v.disabledModules?.toBuilder();
       _$v = null;
     }
     return this;
@@ -2004,20 +2034,16 @@ class ConfigUpdateDataBuilder
     try {
       _$result = _$v ??
           new _$ConfigUpdateData._(
-              version: BuiltValueNullFieldError.checkNotNull(
-                  version, 'ConfigUpdateData', 'version'),
-              description: BuiltValueNullFieldError.checkNotNull(
-                  description, 'ConfigUpdateData', 'description'),
-              forceUpdate: BuiltValueNullFieldError.checkNotNull(
-                  forceUpdate, 'ConfigUpdateData', 'forceUpdate'),
-              downloadUrl: BuiltValueNullFieldError.checkNotNull(
-                  downloadUrl, 'ConfigUpdateData', 'downloadUrl'),
-              disabledModules: disabledModules.build());
+              version: version,
+              description: description,
+              forceUpdate: forceUpdate,
+              downloadUrl: downloadUrl,
+              disabledModules: _disabledModules?.build());
     } catch (_) {
       late String _$failedField;
       try {
         _$failedField = 'disabledModules';
-        disabledModules.build();
+        _disabledModules?.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
             'ConfigUpdateData', _$failedField, e.toString());
@@ -2033,7 +2059,7 @@ class _$CommonState extends CommonState {
   @override
   final Config? config;
   @override
-  final int configState;
+  final int? configState;
   @override
   final PackageInfo? appInfo;
   @override
@@ -2050,16 +2076,13 @@ class _$CommonState extends CommonState {
 
   _$CommonState._(
       {this.config,
-      required this.configState,
+      this.configState,
       this.appInfo,
       this.deviceId,
       this.language,
       this.fiatCurrency,
       this.newVersion})
-      : super._() {
-    BuiltValueNullFieldError.checkNotNull(
-        configState, 'CommonState', 'configState');
-  }
+      : super._();
 
   @override
   CommonState rebuild(void Function(CommonStateBuilder) updates) =>
@@ -2179,8 +2202,7 @@ class CommonStateBuilder implements Builder<CommonState, CommonStateBuilder> {
       _$result = _$v ??
           new _$CommonState._(
               config: _config?.build(),
-              configState: BuiltValueNullFieldError.checkNotNull(
-                  configState, 'CommonState', 'configState'),
+              configState: configState,
               appInfo: appInfo,
               deviceId: deviceId,
               language: language,

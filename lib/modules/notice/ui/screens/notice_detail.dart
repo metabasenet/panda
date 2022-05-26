@@ -15,7 +15,7 @@ class NoticeDetailPage extends StatelessWidget {
   }
 
   static Route<dynamic> route(RouteSettings settings) {
-    final item = settings.arguments as MapEntry<int, NoticeInfo>;
+    final item = settings.arguments! as MapEntry<int, NoticeInfo>;
     return DefaultTransition(
       settings,
       NoticeDetailPage(item.value, item.key),
@@ -27,25 +27,27 @@ class NoticeDetailPage extends StatelessWidget {
     final width = context.mediaWidth - context.edgeSizeDouble;
 
     return CSScaffold(
-      title: item?.title ?? tr('global:lbl_loading'),
+      title: item.title ?? tr('global:lbl_loading'),
       scrollable: true,
       child: Container(
         width: double.infinity,
         padding: context.edgeBottom,
         child: StoreConnector<AppState, NoticeDetailVM>(
           onInit: (store) {
-            store.dispatch(NoticeActionGetDetail(itemId ?? item.id));
+            store.dispatch(NoticeActionGetDetail(itemId));
           },
           distinct: true,
           converter: NoticeDetailVM.fromStore,
           builder: (context, viewModel) => viewModel.noticeDetail != null &&
-                  viewModel.noticeDetail.id == itemId
+                  viewModel.noticeDetail!.id == itemId
               ? Column(
-                  children: viewModel.noticeDetail.shareImgWithUrl
-                      .map((imgUrl) => CSImage(
-                            imgUrl,
-                            width: width,
-                          ))
+                  children: viewModel.noticeDetail!.shareImgWithUrl
+                      .map(
+                        (imgUrl) => CSImage(
+                          imgUrl,
+                          width: width,
+                        ),
+                      )
                       .toList(),
                 )
               : Container(),

@@ -15,63 +15,64 @@ class SwapSubmitProcess {
     LoadingDialog.show(context);
     viewModel
         .doApproveSwap(
-            outCoinInfo: outCoinInfo,
-            outCoinConfig: outCoinConfig,
-            onConfirmSubmit: ({
-              required approveData,
-              required currentBalance,
-              required approveAmount,
-              required needReset,
-            }) {
-              isReset = userReset || needReset;
-              LoadingDialog.dismiss(context);
-              return showTradeOrderApproveDialog(
-                context,
-                coinInfo: outCoinInfo,
-                approveData: approveData,
-                currentBalance: currentBalance,
-                approveAmount: approveAmount,
-                needReset: needReset,
-                userReset: userReset,
-                getCoinInfo: viewModel.getCoinInfo,
-              );
-            },
-            onUnlockWallet: () {
-              LoadingDialog.dismiss(context);
-              final completer = Completer<WalletPrivateData>();
-              showPasswordDialog(
-                context,
-                (password) => viewModel.doUnlockWallet(password),
-                (walletData, _) {
-                  LoadingDialog.show(context);
-                  completer.complete(walletData);
-                },
-              );
-              return completer.future;
-            },
-            onSuccessTransaction: (txId) {
-              LoadingDialog.dismiss(context);
-              showTradeOrderTransactionPendingDialog(
-                context,
-                txId: txId,
-                chain: outCoinInfo.chain,
-                getTransactionInfo: (txId) => viewModel.getTransactionInfo(
-                  txId: txId,
-                  chain: outCoinInfo.chain,
-                  symbol: outCoinInfo.symbol,
-                  fromAddress: outCoinInfo.address,
-                  chainPrecision: outCoinInfo.chainPrecision,
-                ),
-                onConfirmed: (txId) {
-                  if (isReset == true) {
-                    Toast.show(tr('swap:create_msg_approve_reset_success'));
-                  } else {
-                    Toast.show(tr('swap:create_msg_approve_success'));
-                  }
-                  onSuccessTransaction(txId);
-                },
-              );
-            })
+      outCoinInfo: outCoinInfo,
+      outCoinConfig: outCoinConfig,
+      onConfirmSubmit: ({
+        required approveData,
+        required currentBalance,
+        required approveAmount,
+        required needReset,
+      }) {
+        isReset = userReset || needReset;
+        LoadingDialog.dismiss(context);
+        return showTradeOrderApproveDialog(
+          context,
+          coinInfo: outCoinInfo,
+          approveData: approveData,
+          currentBalance: currentBalance,
+          approveAmount: approveAmount,
+          needReset: needReset,
+          userReset: userReset,
+          getCoinInfo: viewModel.getCoinInfo,
+        );
+      },
+      onUnlockWallet: () {
+        LoadingDialog.dismiss(context);
+        final completer = Completer<WalletPrivateData>();
+        showPasswordDialog(
+          context,
+          (password) => viewModel.doUnlockWallet(password),
+          (walletData, _) {
+            LoadingDialog.show(context);
+            completer.complete(walletData);
+          },
+        );
+        return completer.future;
+      },
+      onSuccessTransaction: (txId) {
+        LoadingDialog.dismiss(context);
+        showTradeOrderTransactionPendingDialog(
+          context,
+          txId: txId,
+          chain: outCoinInfo.chain ?? '',
+          getTransactionInfo: (txId) => viewModel.getTransactionInfo(
+            txId: txId,
+            chain: outCoinInfo.chain ?? '',
+            symbol: outCoinInfo.symbol ?? '',
+            fromAddress: outCoinInfo.address ?? '',
+            chainPrecision: outCoinInfo.chainPrecision ?? 0,
+          ),
+          onConfirmed: (txId) {
+            if (isReset == true) {
+              Toast.show(tr('swap:create_msg_approve_reset_success'));
+            } else {
+              Toast.show(tr('swap:create_msg_approve_success'));
+            }
+            onSuccessTransaction(txId);
+          },
+        );
+      },
+    )
         .catchError(
       (error) {
         LoadingDialog.dismiss(context);

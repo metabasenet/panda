@@ -13,83 +13,85 @@ abstract class ProjectInfo implements Built<ProjectInfo, ProjectInfoBuilder> {
 
 // Fields
   //@nullable
-  int get id;
+  int? get id;
 
   //@nullable
   @BuiltValueField(wireName: 'currency')
-  String get symbol;
+  String? get symbol;
 
   //@nullable
   @BuiltValueField(wireName: 'currency_price')
-  String get currencyPrice;
+  String? get currencyPrice;
 
   //@nullable
   @BuiltValueField(wireName: 'init_amount')
-  String get initAmount;
+  String? get initAmount;
 
   //@nullable
   @BuiltValueField(wireName: 'project_name')
-  String get projectName;
+  String? get projectName;
 
   //@nullable
   @BuiltValueField(wireName: 'target_number')
-  double get targetNumber;
+  double? get targetNumber;
 
   //@nullable
   @BuiltValueField(wireName: 'invite_number')
-  double get inviteNumber;
+  double? get inviteNumber;
 
   //@nullable
-  String get fork;
+  String? get fork;
 
   //@nullable
   @BuiltValueField(wireName: 'total_amount')
-  String get totalAmount;
+  String? get totalAmount;
 
   //@nullable
   @BuiltValueField(wireName: 'owner_website')
-  String get ownerWebsite;
+  String? get ownerWebsite;
 
   //@nullable
   @BuiltValueField(wireName: 'owner_name')
-  BuiltMap<String, String> get ownerName;
+  BuiltMap<String, String>? get ownerName;
 
   //@nullable
   @BuiltValueField(wireName: 'project_description')
-  BuiltMap<String, String> get projectDescription;
+  BuiltMap<String, String>? get projectDescription;
 
   //@nullable
-  int get status;
+  int? get status;
 
 //10-不显示矿池入口，11-显示矿池入口
   //@nullable
   @BuiltValueField(wireName: 'mining_pool_status')
-  int get miningPoolStatus;
+  int? get miningPoolStatus;
 
   //@nullable
-  String get iconUrl;
+  String? get iconUrl;
 
   //@nullable
-  bool get displayPoolBtn => miningPoolStatus != null && miningPoolStatus == 11;
+  bool? get displayPoolBtn =>
+      miningPoolStatus != null && miningPoolStatus == 11;
 
   //@nullable
-  String get displayPrice => NumberUtil.truncateDecimal(currencyPrice, 6);
+  String? get displayPrice => NumberUtil.truncateDecimal(currencyPrice, 6);
 
   //@nullable
-  String get displayInviteNumber => NumberUtil.truncateDecimal(inviteNumber, 2);
+  String? get displayInviteNumber =>
+      NumberUtil.truncateDecimal(inviteNumber, 2);
 
   //@nullable
-  String get displayTotalAmount => NumberUtil.truncateDecimal(totalAmount, 2);
+  String? get displayTotalAmount => NumberUtil.truncateDecimal(totalAmount, 2);
 
   //@nullable
-  String get displayInitAmount => NumberUtil.truncateDecimal(initAmount, 2);
+  String? get displayInitAmount => NumberUtil.truncateDecimal(initAmount, 2);
 
   //@nullable
-  String get displayProgressPair =>
-      '${inviteNumber.toInt()}/${targetNumber.toInt()}';
+  String? get displayProgressPair =>
+      '${(inviteNumber ?? 0).toInt()}/${(targetNumber ?? 0).toInt()}';
 
   //@nullable
-  double get displayProgress =>
+  double? get displayProgress =>
       NumberUtil.multiply(NumberUtil.divide(inviteNumber, targetNumber), 120) ??
       0;
 }

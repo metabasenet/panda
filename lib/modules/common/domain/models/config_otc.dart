@@ -9,23 +9,23 @@ abstract class ConfigOtc implements Built<ConfigOtc, ConfigOtcBuilder> {
 
 // Fields
   //@nullable
-  bool get enable;
+  bool? get enable;
 
   //@nullable
   @BuiltValueField(wireName: 'max_ads')
-  int get maxAds;
+  int? get maxAds;
 
   //@nullable
   @BuiltValueField(wireName: 'trade_pair')
-  BuiltMap<String, BuiltList<String>> get tradePairs;
+  BuiltMap<String, BuiltList<String>>? get tradePairs;
 
   //@nullable
   @BuiltValueField(wireName: 'deposit_fee')
-  String get depositAmount;
+  String? get depositAmount;
 
   //@nullable
   @BuiltValueField(wireName: 'deposit_currency')
-  String get depositCurrency;
+  String? get depositCurrency;
 
   @BuiltValueField(wireName: 'system_otc_address')
   BuiltMap<String, String> get systemOtcAddress;
@@ -34,5 +34,5 @@ abstract class ConfigOtc implements Built<ConfigOtc, ConfigOtcBuilder> {
   String get systemDepositAddress;
 
   //@nullable
-  List<String> get tradeCoins => tradePairs.keys.toList();
+  List<String>? get tradeCoins => tradePairs?.keys.toList();
 }

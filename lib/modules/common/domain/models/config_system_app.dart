@@ -12,5 +12,5 @@ abstract class ConfigSystemApp
 
 // Fields
   //@nullable
-  bool get enable;
+  bool? get enable;
 }

@@ -66,7 +66,7 @@ class _$InvitationStateSerializer
 
 class _$InvitationCreateVM extends InvitationCreateVM {
   @override
-  final String walletId;
+  final String? walletId;
   @override
   final Future<WalletWithdrawData> Function(
           WithdrawBeforeParams params, WalletWithdrawData previousData)
@@ -104,7 +104,7 @@ class _$InvitationCreateVM extends InvitationCreateVM {
       (new InvitationCreateVMBuilder()..update(updates))._build();
 
   _$InvitationCreateVM._(
-      {required this.walletId,
+      {this.walletId,
       required this.onWithdrawBefore,
       required this.submit,
       required this.doSubmitInvitation,
@@ -114,8 +114,6 @@ class _$InvitationCreateVM extends InvitationCreateVM {
       required this.checkDefiRelation,
       required this.getInvitationCoins})
       : super._() {
-    BuiltValueNullFieldError.checkNotNull(
-        walletId, 'InvitationCreateVM', 'walletId');
     BuiltValueNullFieldError.checkNotNull(
         onWithdrawBefore, 'InvitationCreateVM', 'onWithdrawBefore');
     BuiltValueNullFieldError.checkNotNull(
@@ -316,8 +314,7 @@ class InvitationCreateVMBuilder
   _$InvitationCreateVM _build() {
     final _$result = _$v ??
         new _$InvitationCreateVM._(
-            walletId: BuiltValueNullFieldError.checkNotNull(
-                walletId, 'InvitationCreateVM', 'walletId'),
+            walletId: walletId,
             onWithdrawBefore: BuiltValueNullFieldError.checkNotNull(
                 onWithdrawBefore, 'InvitationCreateVM', 'onWithdrawBefore'),
             submit: BuiltValueNullFieldError.checkNotNull(
@@ -332,7 +329,8 @@ class InvitationCreateVMBuilder
                 doUnlockWallet, 'InvitationCreateVM', 'doUnlockWallet'),
             checkDefiRelation: BuiltValueNullFieldError.checkNotNull(
                 checkDefiRelation, 'InvitationCreateVM', 'checkDefiRelation'),
-            getInvitationCoins: BuiltValueNullFieldError.checkNotNull(getInvitationCoins, 'InvitationCreateVM', 'getInvitationCoins'));
+            getInvitationCoins:
+                BuiltValueNullFieldError.checkNotNull(getInvitationCoins, 'InvitationCreateVM', 'getInvitationCoins'));
     replace(_$result);
     return _$result;
   }
@@ -492,7 +490,7 @@ class InvitationListVMBuilder
 
 class _$InvitationSelectVM extends InvitationSelectVM {
   @override
-  final String walletId;
+  final String? walletId;
   @override
   final BuiltList<InvitationCode> invitationCodes;
   @override
@@ -511,15 +509,13 @@ class _$InvitationSelectVM extends InvitationSelectVM {
       (new InvitationSelectVMBuilder()..update(updates))._build();
 
   _$InvitationSelectVM._(
-      {required this.walletId,
+      {this.walletId,
       required this.invitationCodes,
       required this.doUnlockWallet,
       required this.getInvitationCoins,
       required this.loadInvitationCode,
       required this.createInvitationCode})
       : super._() {
-    BuiltValueNullFieldError.checkNotNull(
-        walletId, 'InvitationSelectVM', 'walletId');
     BuiltValueNullFieldError.checkNotNull(
         invitationCodes, 'InvitationSelectVM', 'invitationCodes');
     BuiltValueNullFieldError.checkNotNull(
@@ -647,8 +643,7 @@ class InvitationSelectVMBuilder
     try {
       _$result = _$v ??
           new _$InvitationSelectVM._(
-              walletId: BuiltValueNullFieldError.checkNotNull(
-                  walletId, 'InvitationSelectVM', 'walletId'),
+              walletId: walletId,
               invitationCodes: invitationCodes.build(),
               doUnlockWallet: BuiltValueNullFieldError.checkNotNull(
                   doUnlockWallet, 'InvitationSelectVM', 'doUnlockWallet'),

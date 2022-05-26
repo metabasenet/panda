@@ -38,7 +38,7 @@ class NoticeListPage extends HookWidget {
               },
               itemCount: viewModel.listCount,
               itemBuilder: (context, index) {
-                return NoticeListItem(item: viewModel.noticeList[index]);
+                return NoticeListItem(item: viewModel.noticeList![index]);
               });
         },
       ),

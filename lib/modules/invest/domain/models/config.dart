@@ -17,11 +17,12 @@ abstract class InvestConfig
 
   //@nullable
   @BuiltValueField(wireName: 'mints')
-  BuiltList<MintItem> get mints;
+  BuiltList<MintItem>? get mints;
 
   //@nullable
   @BuiltValueField(wireName: 'airdrops')
-  BuiltList<MintItem> get airdrops;
+  BuiltList<MintItem>? get airdrops;
 
-  MintItem? get defaultMint => mints.isNotEmpty ? mints.first : null;
+  MintItem? get defaultMint =>
+      (mints?.isNotEmpty ?? false) ? mints!.first : null;
 }

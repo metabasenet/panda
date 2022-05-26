@@ -13,57 +13,60 @@ abstract class AdmissionCondition
   // Fields
   //@nullable
   @BuiltValueField(wireName: 'black_hole_address')
-  String get address;
+  String? get address;
 
   //@nullable
   @BuiltValueField(wireName: 'black_hole_transfer_data')
-  String get transferData;
+  String? get transferData;
 
   //@nullable
   @BuiltValueField(wireName: 'black_hole_transfer_count')
-  int get transferCount;
+  int? get transferCount;
 
   //@nullable
   @BuiltValueField(wireName: 'black_hole_transfer_progress')
-  int get transferProgress;
+  int? get transferProgress;
 
   //@nullable
   @BuiltValueField(wireName: 'black_hole_transfer_currency')
-  BuiltMap<String, BuiltMap<String, String>> get transferCurrency;
+  BuiltMap<String, BuiltMap<String, String>>? get transferCurrency;
 
   String get progressCountLbl {
     if (transferCount != null && transferProgress != null) {
-      return '${transferProgress >= transferCount ? transferCount : transferProgress}/$transferCount';
+      return '${(transferProgress ?? 0) >= (transferCount ?? 0) ? transferCount : transferProgress}/$transferCount';
     }
     return '';
   }
 
   double get progressPercent {
+    /*
     if (transferCount != null && transferProgress != null) {
       return NumberUtil.truncateDecimal(
-          (transferProgress >= transferCount
+          ((transferProgress ?? 0) >= (transferCount ?? 0)
                   ? transferCount
                   : transferProgress) /
-              transferCount,
+              (transferCount ?? 0),
           2);
-    }
+    }*/
     return 0;
   }
 
   String get transferAmount {
+    /*
     if (transferCurrency != null && transferCurrency.isNotEmpty) {
       final firstFork = transferCurrency[transferCurrency.keys.first];
       if (firstFork != null && firstFork.containsKey('amount')) {
         return firstFork['amount'] ?? '';
       }
-    }
+    }*/
     return '';
   }
 
   String get transferFork {
+    /*
     if (transferCurrency != null && transferCurrency.isNotEmpty) {
       return transferCurrency.keys.first;
-    }
+    }*/
     return '';
   }
 

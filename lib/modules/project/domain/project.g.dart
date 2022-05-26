@@ -80,14 +80,22 @@ class _$ProjectConfigSerializer implements StructuredSerializer<ProjectConfig> {
   @override
   Iterable<Object?> serialize(Serializers serializers, ProjectConfig object,
       {FullType specifiedType = FullType.unspecified}) {
-    final result = <Object?>[
-      'instructions',
-      serializers.serialize(object.instructions,
-          specifiedType: const FullType(String)),
-      'id',
-      serializers.serialize(object.id, specifiedType: const FullType(double)),
-    ];
-
+    final result = <Object?>[];
+    Object? value;
+    value = object.instructions;
+    if (value != null) {
+      result
+        ..add('instructions')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.id;
+    if (value != null) {
+      result
+        ..add('id')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(double)));
+    }
     return result;
   }
 
@@ -105,11 +113,11 @@ class _$ProjectConfigSerializer implements StructuredSerializer<ProjectConfig> {
       switch (key) {
         case 'instructions':
           result.instructions = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'id':
           result.id = serializers.deserialize(value,
-              specifiedType: const FullType(double))! as double;
+              specifiedType: const FullType(double)) as double?;
           break;
       }
     }
@@ -358,53 +366,112 @@ class _$ProjectInfoSerializer implements StructuredSerializer<ProjectInfo> {
   @override
   Iterable<Object?> serialize(Serializers serializers, ProjectInfo object,
       {FullType specifiedType = FullType.unspecified}) {
-    final result = <Object?>[
-      'id',
-      serializers.serialize(object.id, specifiedType: const FullType(int)),
-      'currency',
-      serializers.serialize(object.symbol,
-          specifiedType: const FullType(String)),
-      'currency_price',
-      serializers.serialize(object.currencyPrice,
-          specifiedType: const FullType(String)),
-      'init_amount',
-      serializers.serialize(object.initAmount,
-          specifiedType: const FullType(String)),
-      'project_name',
-      serializers.serialize(object.projectName,
-          specifiedType: const FullType(String)),
-      'target_number',
-      serializers.serialize(object.targetNumber,
-          specifiedType: const FullType(double)),
-      'invite_number',
-      serializers.serialize(object.inviteNumber,
-          specifiedType: const FullType(double)),
-      'fork',
-      serializers.serialize(object.fork, specifiedType: const FullType(String)),
-      'total_amount',
-      serializers.serialize(object.totalAmount,
-          specifiedType: const FullType(String)),
-      'owner_website',
-      serializers.serialize(object.ownerWebsite,
-          specifiedType: const FullType(String)),
-      'owner_name',
-      serializers.serialize(object.ownerName,
-          specifiedType: const FullType(BuiltMap,
-              const [const FullType(String), const FullType(String)])),
-      'project_description',
-      serializers.serialize(object.projectDescription,
-          specifiedType: const FullType(BuiltMap,
-              const [const FullType(String), const FullType(String)])),
-      'status',
-      serializers.serialize(object.status, specifiedType: const FullType(int)),
-      'mining_pool_status',
-      serializers.serialize(object.miningPoolStatus,
-          specifiedType: const FullType(int)),
-      'iconUrl',
-      serializers.serialize(object.iconUrl,
-          specifiedType: const FullType(String)),
-    ];
-
+    final result = <Object?>[];
+    Object? value;
+    value = object.id;
+    if (value != null) {
+      result
+        ..add('id')
+        ..add(serializers.serialize(value, specifiedType: const FullType(int)));
+    }
+    value = object.symbol;
+    if (value != null) {
+      result
+        ..add('currency')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.currencyPrice;
+    if (value != null) {
+      result
+        ..add('currency_price')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.initAmount;
+    if (value != null) {
+      result
+        ..add('init_amount')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.projectName;
+    if (value != null) {
+      result
+        ..add('project_name')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.targetNumber;
+    if (value != null) {
+      result
+        ..add('target_number')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(double)));
+    }
+    value = object.inviteNumber;
+    if (value != null) {
+      result
+        ..add('invite_number')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(double)));
+    }
+    value = object.fork;
+    if (value != null) {
+      result
+        ..add('fork')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.totalAmount;
+    if (value != null) {
+      result
+        ..add('total_amount')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.ownerWebsite;
+    if (value != null) {
+      result
+        ..add('owner_website')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.ownerName;
+    if (value != null) {
+      result
+        ..add('owner_name')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(BuiltMap,
+                const [const FullType(String), const FullType(String)])));
+    }
+    value = object.projectDescription;
+    if (value != null) {
+      result
+        ..add('project_description')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(BuiltMap,
+                const [const FullType(String), const FullType(String)])));
+    }
+    value = object.status;
+    if (value != null) {
+      result
+        ..add('status')
+        ..add(serializers.serialize(value, specifiedType: const FullType(int)));
+    }
+    value = object.miningPoolStatus;
+    if (value != null) {
+      result
+        ..add('mining_pool_status')
+        ..add(serializers.serialize(value, specifiedType: const FullType(int)));
+    }
+    value = object.iconUrl;
+    if (value != null) {
+      result
+        ..add('iconUrl')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
     return result;
   }
 
@@ -421,43 +488,43 @@ class _$ProjectInfoSerializer implements StructuredSerializer<ProjectInfo> {
       switch (key) {
         case 'id':
           result.id = serializers.deserialize(value,
-              specifiedType: const FullType(int))! as int;
+              specifiedType: const FullType(int)) as int?;
           break;
         case 'currency':
           result.symbol = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'currency_price':
           result.currencyPrice = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'init_amount':
           result.initAmount = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'project_name':
           result.projectName = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'target_number':
           result.targetNumber = serializers.deserialize(value,
-              specifiedType: const FullType(double))! as double;
+              specifiedType: const FullType(double)) as double?;
           break;
         case 'invite_number':
           result.inviteNumber = serializers.deserialize(value,
-              specifiedType: const FullType(double))! as double;
+              specifiedType: const FullType(double)) as double?;
           break;
         case 'fork':
           result.fork = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'total_amount':
           result.totalAmount = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'owner_website':
           result.ownerWebsite = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'owner_name':
           result.ownerName.replace(serializers.deserialize(value,
@@ -471,15 +538,15 @@ class _$ProjectInfoSerializer implements StructuredSerializer<ProjectInfo> {
           break;
         case 'status':
           result.status = serializers.deserialize(value,
-              specifiedType: const FullType(int))! as int;
+              specifiedType: const FullType(int)) as int?;
           break;
         case 'mining_pool_status':
           result.miningPoolStatus = serializers.deserialize(value,
-              specifiedType: const FullType(int))! as int;
+              specifiedType: const FullType(int)) as int?;
           break;
         case 'iconUrl':
           result.iconUrl = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
       }
     }
@@ -559,7 +626,7 @@ class _$ProjectApplyVM extends ProjectApplyVM {
   @override
   final ProjectCreateParams lastProjectCreateParams;
   @override
-  final String projectRules;
+  final String? projectRules;
   @override
   final double Function({required String chain, required String symbol})
       getCoinBalance;
@@ -587,7 +654,7 @@ class _$ProjectApplyVM extends ProjectApplyVM {
 
   _$ProjectApplyVM._(
       {required this.lastProjectCreateParams,
-      required this.projectRules,
+      this.projectRules,
       required this.getCoinBalance,
       required this.getCoinInfo,
       required this.doUnlockHDWallet,
@@ -598,8 +665,6 @@ class _$ProjectApplyVM extends ProjectApplyVM {
       : super._() {
     BuiltValueNullFieldError.checkNotNull(
         lastProjectCreateParams, 'ProjectApplyVM', 'lastProjectCreateParams');
-    BuiltValueNullFieldError.checkNotNull(
-        projectRules, 'ProjectApplyVM', 'projectRules');
     BuiltValueNullFieldError.checkNotNull(
         getCoinBalance, 'ProjectApplyVM', 'getCoinBalance');
     BuiltValueNullFieldError.checkNotNull(
@@ -779,8 +844,7 @@ class ProjectApplyVMBuilder
       _$result = _$v ??
           new _$ProjectApplyVM._(
               lastProjectCreateParams: lastProjectCreateParams.build(),
-              projectRules: BuiltValueNullFieldError.checkNotNull(
-                  projectRules, 'ProjectApplyVM', 'projectRules'),
+              projectRules: projectRules,
               getCoinBalance: BuiltValueNullFieldError.checkNotNull(
                   getCoinBalance, 'ProjectApplyVM', 'getCoinBalance'),
               getCoinInfo: BuiltValueNullFieldError.checkNotNull(
@@ -790,11 +854,13 @@ class ProjectApplyVMBuilder
               doSubmitProject: BuiltValueNullFieldError.checkNotNull(
                   doSubmitProject, 'ProjectApplyVM', 'doSubmitProject'),
               doSubmitCreateProject: BuiltValueNullFieldError.checkNotNull(
-                  doSubmitCreateProject, 'ProjectApplyVM', 'doSubmitCreateProject'),
+                  doSubmitCreateProject,
+                  'ProjectApplyVM',
+                  'doSubmitCreateProject'),
               doSaveToCache: BuiltValueNullFieldError.checkNotNull(
                   doSaveToCache, 'ProjectApplyVM', 'doSaveToCache'),
-              getProjectConfig:
-                  BuiltValueNullFieldError.checkNotNull(getProjectConfig, 'ProjectApplyVM', 'getProjectConfig'));
+              getProjectConfig: BuiltValueNullFieldError.checkNotNull(
+                  getProjectConfig, 'ProjectApplyVM', 'getProjectConfig'));
     } catch (_) {
       late String _$failedField;
       try {
@@ -1136,19 +1202,14 @@ class ProjectCreateMintBuilder
 
 class _$ProjectConfig extends ProjectConfig {
   @override
-  final String instructions;
+  final String? instructions;
   @override
-  final double id;
+  final double? id;
 
   factory _$ProjectConfig([void Function(ProjectConfigBuilder)? updates]) =>
       (new ProjectConfigBuilder()..update(updates))._build();
 
-  _$ProjectConfig._({required this.instructions, required this.id})
-      : super._() {
-    BuiltValueNullFieldError.checkNotNull(
-        instructions, 'ProjectConfig', 'instructions');
-    BuiltValueNullFieldError.checkNotNull(id, 'ProjectConfig', 'id');
-  }
+  _$ProjectConfig._({this.instructions, this.id}) : super._();
 
   @override
   ProjectConfig rebuild(void Function(ProjectConfigBuilder) updates) =>
@@ -1218,12 +1279,8 @@ class ProjectConfigBuilder
   ProjectConfig build() => _build();
 
   _$ProjectConfig _build() {
-    final _$result = _$v ??
-        new _$ProjectConfig._(
-            instructions: BuiltValueNullFieldError.checkNotNull(
-                instructions, 'ProjectConfig', 'instructions'),
-            id: BuiltValueNullFieldError.checkNotNull(
-                id, 'ProjectConfig', 'id'));
+    final _$result =
+        _$v ?? new _$ProjectConfig._(instructions: instructions, id: id);
     replace(_$result);
     return _$result;
   }
@@ -1656,82 +1713,56 @@ class ProjectCreateParamsBuilder
 
 class _$ProjectInfo extends ProjectInfo {
   @override
-  final int id;
+  final int? id;
   @override
-  final String symbol;
+  final String? symbol;
   @override
-  final String currencyPrice;
+  final String? currencyPrice;
   @override
-  final String initAmount;
+  final String? initAmount;
   @override
-  final String projectName;
+  final String? projectName;
   @override
-  final double targetNumber;
+  final double? targetNumber;
   @override
-  final double inviteNumber;
+  final double? inviteNumber;
   @override
-  final String fork;
+  final String? fork;
   @override
-  final String totalAmount;
+  final String? totalAmount;
   @override
-  final String ownerWebsite;
+  final String? ownerWebsite;
   @override
-  final BuiltMap<String, String> ownerName;
+  final BuiltMap<String, String>? ownerName;
   @override
-  final BuiltMap<String, String> projectDescription;
+  final BuiltMap<String, String>? projectDescription;
   @override
-  final int status;
+  final int? status;
   @override
-  final int miningPoolStatus;
+  final int? miningPoolStatus;
   @override
-  final String iconUrl;
+  final String? iconUrl;
 
   factory _$ProjectInfo([void Function(ProjectInfoBuilder)? updates]) =>
       (new ProjectInfoBuilder()..update(updates))._build();
 
   _$ProjectInfo._(
-      {required this.id,
-      required this.symbol,
-      required this.currencyPrice,
-      required this.initAmount,
-      required this.projectName,
-      required this.targetNumber,
-      required this.inviteNumber,
-      required this.fork,
-      required this.totalAmount,
-      required this.ownerWebsite,
-      required this.ownerName,
-      required this.projectDescription,
-      required this.status,
-      required this.miningPoolStatus,
-      required this.iconUrl})
-      : super._() {
-    BuiltValueNullFieldError.checkNotNull(id, 'ProjectInfo', 'id');
-    BuiltValueNullFieldError.checkNotNull(symbol, 'ProjectInfo', 'symbol');
-    BuiltValueNullFieldError.checkNotNull(
-        currencyPrice, 'ProjectInfo', 'currencyPrice');
-    BuiltValueNullFieldError.checkNotNull(
-        initAmount, 'ProjectInfo', 'initAmount');
-    BuiltValueNullFieldError.checkNotNull(
-        projectName, 'ProjectInfo', 'projectName');
-    BuiltValueNullFieldError.checkNotNull(
-        targetNumber, 'ProjectInfo', 'targetNumber');
-    BuiltValueNullFieldError.checkNotNull(
-        inviteNumber, 'ProjectInfo', 'inviteNumber');
-    BuiltValueNullFieldError.checkNotNull(fork, 'ProjectInfo', 'fork');
-    BuiltValueNullFieldError.checkNotNull(
-        totalAmount, 'ProjectInfo', 'totalAmount');
-    BuiltValueNullFieldError.checkNotNull(
-        ownerWebsite, 'ProjectInfo', 'ownerWebsite');
-    BuiltValueNullFieldError.checkNotNull(
-        ownerName, 'ProjectInfo', 'ownerName');
-    BuiltValueNullFieldError.checkNotNull(
-        projectDescription, 'ProjectInfo', 'projectDescription');
-    BuiltValueNullFieldError.checkNotNull(status, 'ProjectInfo', 'status');
-    BuiltValueNullFieldError.checkNotNull(
-        miningPoolStatus, 'ProjectInfo', 'miningPoolStatus');
-    BuiltValueNullFieldError.checkNotNull(iconUrl, 'ProjectInfo', 'iconUrl');
-  }
+      {this.id,
+      this.symbol,
+      this.currencyPrice,
+      this.initAmount,
+      this.projectName,
+      this.targetNumber,
+      this.inviteNumber,
+      this.fork,
+      this.totalAmount,
+      this.ownerWebsite,
+      this.ownerName,
+      this.projectDescription,
+      this.status,
+      this.miningPoolStatus,
+      this.iconUrl})
+      : super._();
 
   @override
   ProjectInfo rebuild(void Function(ProjectInfoBuilder) updates) =>
@@ -1899,8 +1930,8 @@ class ProjectInfoBuilder implements Builder<ProjectInfo, ProjectInfoBuilder> {
       _fork = $v.fork;
       _totalAmount = $v.totalAmount;
       _ownerWebsite = $v.ownerWebsite;
-      _ownerName = $v.ownerName.toBuilder();
-      _projectDescription = $v.projectDescription.toBuilder();
+      _ownerName = $v.ownerName?.toBuilder();
+      _projectDescription = $v.projectDescription?.toBuilder();
       _status = $v.status;
       _miningPoolStatus = $v.miningPoolStatus;
       _iconUrl = $v.iconUrl;
@@ -1928,37 +1959,28 @@ class ProjectInfoBuilder implements Builder<ProjectInfo, ProjectInfoBuilder> {
     try {
       _$result = _$v ??
           new _$ProjectInfo._(
-              id: BuiltValueNullFieldError.checkNotNull(
-                  id, 'ProjectInfo', 'id'),
-              symbol: BuiltValueNullFieldError.checkNotNull(
-                  symbol, 'ProjectInfo', 'symbol'),
-              currencyPrice: BuiltValueNullFieldError.checkNotNull(
-                  currencyPrice, 'ProjectInfo', 'currencyPrice'),
-              initAmount: BuiltValueNullFieldError.checkNotNull(
-                  initAmount, 'ProjectInfo', 'initAmount'),
-              projectName: BuiltValueNullFieldError.checkNotNull(
-                  projectName, 'ProjectInfo', 'projectName'),
-              targetNumber: BuiltValueNullFieldError.checkNotNull(
-                  targetNumber, 'ProjectInfo', 'targetNumber'),
-              inviteNumber: BuiltValueNullFieldError.checkNotNull(
-                  inviteNumber, 'ProjectInfo', 'inviteNumber'),
-              fork: BuiltValueNullFieldError.checkNotNull(
-                  fork, 'ProjectInfo', 'fork'),
-              totalAmount: BuiltValueNullFieldError.checkNotNull(
-                  totalAmount, 'ProjectInfo', 'totalAmount'),
-              ownerWebsite: BuiltValueNullFieldError.checkNotNull(ownerWebsite, 'ProjectInfo', 'ownerWebsite'),
-              ownerName: ownerName.build(),
-              projectDescription: projectDescription.build(),
-              status: BuiltValueNullFieldError.checkNotNull(status, 'ProjectInfo', 'status'),
-              miningPoolStatus: BuiltValueNullFieldError.checkNotNull(miningPoolStatus, 'ProjectInfo', 'miningPoolStatus'),
-              iconUrl: BuiltValueNullFieldError.checkNotNull(iconUrl, 'ProjectInfo', 'iconUrl'));
+              id: id,
+              symbol: symbol,
+              currencyPrice: currencyPrice,
+              initAmount: initAmount,
+              projectName: projectName,
+              targetNumber: targetNumber,
+              inviteNumber: inviteNumber,
+              fork: fork,
+              totalAmount: totalAmount,
+              ownerWebsite: ownerWebsite,
+              ownerName: _ownerName?.build(),
+              projectDescription: _projectDescription?.build(),
+              status: status,
+              miningPoolStatus: miningPoolStatus,
+              iconUrl: iconUrl);
     } catch (_) {
       late String _$failedField;
       try {
         _$failedField = 'ownerName';
-        ownerName.build();
+        _ownerName?.build();
         _$failedField = 'projectDescription';
-        projectDescription.build();
+        _projectDescription?.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
             'ProjectInfo', _$failedField, e.toString());

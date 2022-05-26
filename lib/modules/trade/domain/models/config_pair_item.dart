@@ -21,7 +21,7 @@ abstract class TradeConfigPairItem
   BuiltList<String> get spans;
 
   //@nullable
-  String get status;
+  String? get status;
 
   @BuiltValueField(wireName: 'buy')
   TradeConfigPairItemInfo get price;

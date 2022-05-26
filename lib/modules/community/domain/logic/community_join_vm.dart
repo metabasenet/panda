@@ -7,7 +7,7 @@ abstract class CommunityJoinVM
   CommunityJoinVM._();
 
   //@nullable
-  String get walletId;
+  String? get walletId;
 
   @BuiltValueField(compare: false)
   Future<CommunityMember> Function(String id) get getMyJoin;

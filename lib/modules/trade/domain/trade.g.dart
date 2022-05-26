@@ -108,12 +108,6 @@ class _$TradeConfigCoinSerializer
       'currency',
       serializers.serialize(object.symbol,
           specifiedType: const FullType(String)),
-      'deal_address',
-      serializers.serialize(object.dealAddress,
-          specifiedType: const FullType(String)),
-      'match_address',
-      serializers.serialize(object.matchAddress,
-          specifiedType: const FullType(String)),
       'default_fee',
       serializers.serialize(object.matchFee,
           specifiedType: const FullType(int)),
@@ -136,7 +130,21 @@ class _$TradeConfigCoinSerializer
       serializers.serialize(object.maxAmount,
           specifiedType: const FullType(double)),
     ];
-
+    Object? value;
+    value = object.dealAddress;
+    if (value != null) {
+      result
+        ..add('deal_address')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.matchAddress;
+    if (value != null) {
+      result
+        ..add('match_address')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
     return result;
   }
 
@@ -162,11 +170,11 @@ class _$TradeConfigCoinSerializer
           break;
         case 'deal_address':
           result.dealAddress = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'match_address':
           result.matchAddress = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'default_fee':
           result.matchFee = serializers.deserialize(value,
@@ -283,9 +291,6 @@ class _$TradeConfigPairItemSerializer
       serializers.serialize(object.spans,
           specifiedType:
               const FullType(BuiltList, const [const FullType(String)])),
-      'status',
-      serializers.serialize(object.status,
-          specifiedType: const FullType(String)),
       'buy',
       serializers.serialize(object.price,
           specifiedType: const FullType(TradeConfigPairItemInfo)),
@@ -293,7 +298,14 @@ class _$TradeConfigPairItemSerializer
       serializers.serialize(object.trade,
           specifiedType: const FullType(TradeConfigPairItemInfo)),
     ];
-
+    Object? value;
+    value = object.status;
+    if (value != null) {
+      result
+        ..add('status')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
     return result;
   }
 
@@ -329,7 +341,7 @@ class _$TradeConfigPairItemSerializer
           break;
         case 'status':
           result.status = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'buy':
           result.price.replace(serializers.deserialize(value,
@@ -527,20 +539,31 @@ class _$TradeOrderDetailSerializer
   @override
   Iterable<Object?> serialize(Serializers serializers, TradeOrderDetail object,
       {FullType specifiedType = FullType.unspecified}) {
-    final result = <Object?>[
-      'min_amount',
-      serializers.serialize(object.total,
-          specifiedType: const FullType(String)),
-      'match_list',
-      serializers.serialize(object.matchList,
-          specifiedType: const FullType(
-              BuiltList, const [const FullType(TradeOrderDetailItem)])),
-      'exchange_list',
-      serializers.serialize(object.exchangeList,
-          specifiedType: const FullType(
-              BuiltList, const [const FullType(TradeOrderDetailItem)])),
-    ];
-
+    final result = <Object?>[];
+    Object? value;
+    value = object.total;
+    if (value != null) {
+      result
+        ..add('min_amount')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.matchList;
+    if (value != null) {
+      result
+        ..add('match_list')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(
+                BuiltList, const [const FullType(TradeOrderDetailItem)])));
+    }
+    value = object.exchangeList;
+    if (value != null) {
+      result
+        ..add('exchange_list')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(
+                BuiltList, const [const FullType(TradeOrderDetailItem)])));
+    }
     return result;
   }
 
@@ -558,7 +581,7 @@ class _$TradeOrderDetailSerializer
       switch (key) {
         case 'min_amount':
           result.total = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'match_list':
           result.matchList.replace(serializers.deserialize(value,
@@ -593,25 +616,49 @@ class _$TradeOrderDetailItemSerializer
   Iterable<Object?> serialize(
       Serializers serializers, TradeOrderDetailItem object,
       {FullType specifiedType = FullType.unspecified}) {
-    final result = <Object?>[
-      'match_price',
-      serializers.serialize(object.matchPrice,
-          specifiedType: const FullType(String)),
-      'amount',
-      serializers.serialize(object.amount,
-          specifiedType: const FullType(String)),
-      'created_at',
-      serializers.serialize(object.createdAt,
-          specifiedType: const FullType(int)),
-      'fee',
-      serializers.serialize(object.fee, specifiedType: const FullType(String)),
-      'tx_id',
-      serializers.serialize(object.txId, specifiedType: const FullType(String)),
-      'template_match_address',
-      serializers.serialize(object.matchId,
-          specifiedType: const FullType(String)),
-    ];
-
+    final result = <Object?>[];
+    Object? value;
+    value = object.matchPrice;
+    if (value != null) {
+      result
+        ..add('match_price')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.amount;
+    if (value != null) {
+      result
+        ..add('amount')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.createdAt;
+    if (value != null) {
+      result
+        ..add('created_at')
+        ..add(serializers.serialize(value, specifiedType: const FullType(int)));
+    }
+    value = object.fee;
+    if (value != null) {
+      result
+        ..add('fee')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.txId;
+    if (value != null) {
+      result
+        ..add('tx_id')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.matchId;
+    if (value != null) {
+      result
+        ..add('template_match_address')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
     return result;
   }
 
@@ -629,27 +676,27 @@ class _$TradeOrderDetailItemSerializer
       switch (key) {
         case 'match_price':
           result.matchPrice = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'amount':
           result.amount = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'created_at':
           result.createdAt = serializers.deserialize(value,
-              specifiedType: const FullType(int))! as int;
+              specifiedType: const FullType(int)) as int?;
           break;
         case 'fee':
           result.fee = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'tx_id':
           result.txId = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'template_match_address':
           result.matchId = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
       }
     }
@@ -785,15 +832,29 @@ class _$TradeInfo24hSerializer implements StructuredSerializer<TradeInfo24h> {
   @override
   Iterable<Object?> serialize(Serializers serializers, TradeInfo24h object,
       {FullType specifiedType = FullType.unspecified}) {
-    final result = <Object?>[
-      'high',
-      serializers.serialize(object.high, specifiedType: const FullType(String)),
-      'low',
-      serializers.serialize(object.low, specifiedType: const FullType(String)),
-      'vol',
-      serializers.serialize(object.vol, specifiedType: const FullType(String)),
-    ];
-
+    final result = <Object?>[];
+    Object? value;
+    value = object.high;
+    if (value != null) {
+      result
+        ..add('high')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.low;
+    if (value != null) {
+      result
+        ..add('low')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.vol;
+    if (value != null) {
+      result
+        ..add('vol')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
     return result;
   }
 
@@ -811,15 +872,15 @@ class _$TradeInfo24hSerializer implements StructuredSerializer<TradeInfo24h> {
       switch (key) {
         case 'high':
           result.high = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'low':
           result.low = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'vol':
           result.vol = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
       }
     }
@@ -899,15 +960,6 @@ class _$TradeStateSerializer implements StructuredSerializer<TradeState> {
   Iterable<Object?> serialize(Serializers serializers, TradeState object,
       {FullType specifiedType = FullType.unspecified}) {
     final result = <Object?>[
-      'config',
-      serializers.serialize(object.config,
-          specifiedType: const FullType(TradeConfig)),
-      'configState',
-      serializers.serialize(object.configState,
-          specifiedType: const FullType(int)),
-      'tradePair',
-      serializers.serialize(object.tradePair,
-          specifiedType: const FullType(TradePair)),
       'tradeSide',
       serializers.serialize(object.tradeSide,
           specifiedType: const FullType(TradeSide)),
@@ -915,11 +967,35 @@ class _$TradeStateSerializer implements StructuredSerializer<TradeState> {
       serializers.serialize(object.hideSlowTradePairTip,
           specifiedType:
               const FullType(BuiltList, const [const FullType(String)])),
-      'currentOrderDetail',
-      serializers.serialize(object.currentOrderDetail,
-          specifiedType: const FullType(TradeOrderDetail)),
     ];
-
+    Object? value;
+    value = object.config;
+    if (value != null) {
+      result
+        ..add('config')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(TradeConfig)));
+    }
+    value = object.configState;
+    if (value != null) {
+      result
+        ..add('configState')
+        ..add(serializers.serialize(value, specifiedType: const FullType(int)));
+    }
+    value = object.tradePair;
+    if (value != null) {
+      result
+        ..add('tradePair')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(TradePair)));
+    }
+    value = object.currentOrderDetail;
+    if (value != null) {
+      result
+        ..add('currentOrderDetail')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(TradeOrderDetail)));
+    }
     return result;
   }
 
@@ -940,7 +1016,7 @@ class _$TradeStateSerializer implements StructuredSerializer<TradeState> {
           break;
         case 'configState':
           result.configState = serializers.deserialize(value,
-              specifiedType: const FullType(int))! as int;
+              specifiedType: const FullType(int)) as int?;
           break;
         case 'tradePair':
           result.tradePair.replace(serializers.deserialize(value,
@@ -970,9 +1046,9 @@ class _$TradeStateSerializer implements StructuredSerializer<TradeState> {
 
 class _$TradeOrderDetailVM extends TradeOrderDetailVM {
   @override
-  final TradeOrderDetail currentOrderDetail;
+  final TradeOrderDetail? currentOrderDetail;
   @override
-  final Future<TradeOrderDetail> Function(String txId) getOrderDetail;
+  final Future<TradeOrderDetail> Function(String txId)? getOrderDetail;
   @override
   final Future<double> Function(TradeOrder order) getOrderBalance;
   @override
@@ -983,15 +1059,11 @@ class _$TradeOrderDetailVM extends TradeOrderDetailVM {
       (new TradeOrderDetailVMBuilder()..update(updates))._build();
 
   _$TradeOrderDetailVM._(
-      {required this.currentOrderDetail,
-      required this.getOrderDetail,
+      {this.currentOrderDetail,
+      this.getOrderDetail,
       required this.getOrderBalance,
       required this.doOrderCheckStatus})
       : super._() {
-    BuiltValueNullFieldError.checkNotNull(
-        currentOrderDetail, 'TradeOrderDetailVM', 'currentOrderDetail');
-    BuiltValueNullFieldError.checkNotNull(
-        getOrderDetail, 'TradeOrderDetailVM', 'getOrderDetail');
     BuiltValueNullFieldError.checkNotNull(
         getOrderBalance, 'TradeOrderDetailVM', 'getOrderBalance');
     BuiltValueNullFieldError.checkNotNull(
@@ -1066,7 +1138,7 @@ class TradeOrderDetailVMBuilder
   TradeOrderDetailVMBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _currentOrderDetail = $v.currentOrderDetail.toBuilder();
+      _currentOrderDetail = $v.currentOrderDetail?.toBuilder();
       _getOrderDetail = $v.getOrderDetail;
       _getOrderBalance = $v.getOrderBalance;
       _doOrderCheckStatus = $v.doOrderCheckStatus;
@@ -1094,9 +1166,8 @@ class TradeOrderDetailVMBuilder
     try {
       _$result = _$v ??
           new _$TradeOrderDetailVM._(
-              currentOrderDetail: currentOrderDetail.build(),
-              getOrderDetail: BuiltValueNullFieldError.checkNotNull(
-                  getOrderDetail, 'TradeOrderDetailVM', 'getOrderDetail'),
+              currentOrderDetail: _currentOrderDetail?.build(),
+              getOrderDetail: getOrderDetail,
               getOrderBalance: BuiltValueNullFieldError.checkNotNull(
                   getOrderBalance, 'TradeOrderDetailVM', 'getOrderBalance'),
               doOrderCheckStatus: BuiltValueNullFieldError.checkNotNull(
@@ -1107,7 +1178,7 @@ class TradeOrderDetailVMBuilder
       late String _$failedField;
       try {
         _$failedField = 'currentOrderDetail';
-        currentOrderDetail.build();
+        _currentOrderDetail?.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
             'TradeOrderDetailVM', _$failedField, e.toString());
@@ -1233,15 +1304,15 @@ class _$TradeHomeVM extends TradeHomeVM {
   @override
   final String fiatCurrency;
   @override
-  final String activeWalletId;
+  final String? activeWalletId;
   @override
-  final AssetCoin priceCoinInfo;
+  final AssetCoin? priceCoinInfo;
   @override
-  final AssetCoin tradeCoinInfo;
+  final AssetCoin? tradeCoinInfo;
   @override
-  final AssetCoin sideCoinInfo;
+  final AssetCoin? sideCoinInfo;
   @override
-  final TradeConfigCoin sideCoinConfig;
+  final TradeConfigCoin? sideCoinConfig;
   @override
   final BuiltList<TradePair> allTradePairs;
   @override
@@ -1249,7 +1320,7 @@ class _$TradeHomeVM extends TradeHomeVM {
   @override
   final Future<double> Function(TradePair) getApproveBalance;
   @override
-  final Future<void> Function(TradeSide tradeSide) doChangeTradeSide;
+  final Future<void> Function(TradeSide tradeSide)? doChangeTradeSide;
   @override
   final Future<void> Function(TradePair tradePair) doChangeTradePair;
   @override
@@ -1314,15 +1385,15 @@ class _$TradeHomeVM extends TradeHomeVM {
       required this.tradePair,
       required this.tradeSide,
       required this.fiatCurrency,
-      required this.activeWalletId,
-      required this.priceCoinInfo,
-      required this.tradeCoinInfo,
-      required this.sideCoinInfo,
-      required this.sideCoinConfig,
+      this.activeWalletId,
+      this.priceCoinInfo,
+      this.tradeCoinInfo,
+      this.sideCoinInfo,
+      this.sideCoinConfig,
       required this.allTradePairs,
       required this.doUpdateCoinBalance,
       required this.getApproveBalance,
-      required this.doChangeTradeSide,
+      this.doChangeTradeSide,
       required this.doChangeTradePair,
       required this.doSubscribeMqtt,
       required this.getCoinInfo,
@@ -1347,23 +1418,11 @@ class _$TradeHomeVM extends TradeHomeVM {
     BuiltValueNullFieldError.checkNotNull(
         fiatCurrency, 'TradeHomeVM', 'fiatCurrency');
     BuiltValueNullFieldError.checkNotNull(
-        activeWalletId, 'TradeHomeVM', 'activeWalletId');
-    BuiltValueNullFieldError.checkNotNull(
-        priceCoinInfo, 'TradeHomeVM', 'priceCoinInfo');
-    BuiltValueNullFieldError.checkNotNull(
-        tradeCoinInfo, 'TradeHomeVM', 'tradeCoinInfo');
-    BuiltValueNullFieldError.checkNotNull(
-        sideCoinInfo, 'TradeHomeVM', 'sideCoinInfo');
-    BuiltValueNullFieldError.checkNotNull(
-        sideCoinConfig, 'TradeHomeVM', 'sideCoinConfig');
-    BuiltValueNullFieldError.checkNotNull(
         allTradePairs, 'TradeHomeVM', 'allTradePairs');
     BuiltValueNullFieldError.checkNotNull(
         doUpdateCoinBalance, 'TradeHomeVM', 'doUpdateCoinBalance');
     BuiltValueNullFieldError.checkNotNull(
         getApproveBalance, 'TradeHomeVM', 'getApproveBalance');
-    BuiltValueNullFieldError.checkNotNull(
-        doChangeTradeSide, 'TradeHomeVM', 'doChangeTradeSide');
     BuiltValueNullFieldError.checkNotNull(
         doChangeTradePair, 'TradeHomeVM', 'doChangeTradePair');
     BuiltValueNullFieldError.checkNotNull(
@@ -1738,10 +1797,10 @@ class TradeHomeVMBuilder implements Builder<TradeHomeVM, TradeHomeVMBuilder> {
       _tradeSide = $v.tradeSide;
       _fiatCurrency = $v.fiatCurrency;
       _activeWalletId = $v.activeWalletId;
-      _priceCoinInfo = $v.priceCoinInfo.toBuilder();
-      _tradeCoinInfo = $v.tradeCoinInfo.toBuilder();
-      _sideCoinInfo = $v.sideCoinInfo.toBuilder();
-      _sideCoinConfig = $v.sideCoinConfig.toBuilder();
+      _priceCoinInfo = $v.priceCoinInfo?.toBuilder();
+      _tradeCoinInfo = $v.tradeCoinInfo?.toBuilder();
+      _sideCoinInfo = $v.sideCoinInfo?.toBuilder();
+      _sideCoinConfig = $v.sideCoinConfig?.toBuilder();
       _allTradePairs = $v.allTradePairs.toBuilder();
       _doUpdateCoinBalance = $v.doUpdateCoinBalance;
       _getApproveBalance = $v.getApproveBalance;
@@ -1791,21 +1850,21 @@ class TradeHomeVMBuilder implements Builder<TradeHomeVM, TradeHomeVMBuilder> {
                   tradeSide, 'TradeHomeVM', 'tradeSide'),
               fiatCurrency: BuiltValueNullFieldError.checkNotNull(
                   fiatCurrency, 'TradeHomeVM', 'fiatCurrency'),
-              activeWalletId: BuiltValueNullFieldError.checkNotNull(
-                  activeWalletId, 'TradeHomeVM', 'activeWalletId'),
-              priceCoinInfo: priceCoinInfo.build(),
-              tradeCoinInfo: tradeCoinInfo.build(),
-              sideCoinInfo: sideCoinInfo.build(),
-              sideCoinConfig: sideCoinConfig.build(),
+              activeWalletId: activeWalletId,
+              priceCoinInfo: _priceCoinInfo?.build(),
+              tradeCoinInfo: _tradeCoinInfo?.build(),
+              sideCoinInfo: _sideCoinInfo?.build(),
+              sideCoinConfig: _sideCoinConfig?.build(),
               allTradePairs: allTradePairs.build(),
               doUpdateCoinBalance: BuiltValueNullFieldError.checkNotNull(
                   doUpdateCoinBalance, 'TradeHomeVM', 'doUpdateCoinBalance'),
               getApproveBalance: BuiltValueNullFieldError.checkNotNull(
                   getApproveBalance, 'TradeHomeVM', 'getApproveBalance'),
-              doChangeTradeSide: BuiltValueNullFieldError.checkNotNull(
-                  doChangeTradeSide, 'TradeHomeVM', 'doChangeTradeSide'),
-              doChangeTradePair: BuiltValueNullFieldError.checkNotNull(doChangeTradePair, 'TradeHomeVM', 'doChangeTradePair'),
-              doSubscribeMqtt: BuiltValueNullFieldError.checkNotNull(doSubscribeMqtt, 'TradeHomeVM', 'doSubscribeMqtt'),
+              doChangeTradeSide: doChangeTradeSide,
+              doChangeTradePair: BuiltValueNullFieldError.checkNotNull(
+                  doChangeTradePair, 'TradeHomeVM', 'doChangeTradePair'),
+              doSubscribeMqtt: BuiltValueNullFieldError.checkNotNull(
+                  doSubscribeMqtt, 'TradeHomeVM', 'doSubscribeMqtt'),
               getCoinInfo: BuiltValueNullFieldError.checkNotNull(getCoinInfo, 'TradeHomeVM', 'getCoinInfo'),
               doUnlockWallet: BuiltValueNullFieldError.checkNotNull(doUnlockWallet, 'TradeHomeVM', 'doUnlockWallet'),
               doApproveOrder: BuiltValueNullFieldError.checkNotNull(doApproveOrder, 'TradeHomeVM', 'doApproveOrder'),
@@ -1823,13 +1882,13 @@ class TradeHomeVMBuilder implements Builder<TradeHomeVM, TradeHomeVMBuilder> {
         tradePair.build();
 
         _$failedField = 'priceCoinInfo';
-        priceCoinInfo.build();
+        _priceCoinInfo?.build();
         _$failedField = 'tradeCoinInfo';
-        tradeCoinInfo.build();
+        _tradeCoinInfo?.build();
         _$failedField = 'sideCoinInfo';
-        sideCoinInfo.build();
+        _sideCoinInfo?.build();
         _$failedField = 'sideCoinConfig';
-        sideCoinConfig.build();
+        _sideCoinConfig?.build();
         _$failedField = 'allTradePairs';
         allTradePairs.build();
       } catch (e) {
@@ -2139,9 +2198,9 @@ class _$TradeConfigCoin extends TradeConfigCoin {
   @override
   final String symbol;
   @override
-  final String dealAddress;
+  final String? dealAddress;
   @override
-  final String matchAddress;
+  final String? matchAddress;
   @override
   final int matchFee;
   @override
@@ -2163,8 +2222,8 @@ class _$TradeConfigCoin extends TradeConfigCoin {
   _$TradeConfigCoin._(
       {required this.chain,
       required this.symbol,
-      required this.dealAddress,
-      required this.matchAddress,
+      this.dealAddress,
+      this.matchAddress,
       required this.matchFee,
       required this.dealPrecision,
       required this.networkFee,
@@ -2175,10 +2234,6 @@ class _$TradeConfigCoin extends TradeConfigCoin {
       : super._() {
     BuiltValueNullFieldError.checkNotNull(chain, 'TradeConfigCoin', 'chain');
     BuiltValueNullFieldError.checkNotNull(symbol, 'TradeConfigCoin', 'symbol');
-    BuiltValueNullFieldError.checkNotNull(
-        dealAddress, 'TradeConfigCoin', 'dealAddress');
-    BuiltValueNullFieldError.checkNotNull(
-        matchAddress, 'TradeConfigCoin', 'matchAddress');
     BuiltValueNullFieldError.checkNotNull(
         matchFee, 'TradeConfigCoin', 'matchFee');
     BuiltValueNullFieldError.checkNotNull(
@@ -2355,10 +2410,8 @@ class TradeConfigCoinBuilder
                 chain, 'TradeConfigCoin', 'chain'),
             symbol: BuiltValueNullFieldError.checkNotNull(
                 symbol, 'TradeConfigCoin', 'symbol'),
-            dealAddress: BuiltValueNullFieldError.checkNotNull(
-                dealAddress, 'TradeConfigCoin', 'dealAddress'),
-            matchAddress: BuiltValueNullFieldError.checkNotNull(
-                matchAddress, 'TradeConfigCoin', 'matchAddress'),
+            dealAddress: dealAddress,
+            matchAddress: matchAddress,
             matchFee: BuiltValueNullFieldError.checkNotNull(
                 matchFee, 'TradeConfigCoin', 'matchFee'),
             dealPrecision: BuiltValueNullFieldError.checkNotNull(
@@ -2367,10 +2420,12 @@ class TradeConfigCoinBuilder
                 networkFee, 'TradeConfigCoin', 'networkFee'),
             minBlockHeight: BuiltValueNullFieldError.checkNotNull(
                 minBlockHeight, 'TradeConfigCoin', 'minBlockHeight'),
-            maxBlockHeight:
-                BuiltValueNullFieldError.checkNotNull(maxBlockHeight, 'TradeConfigCoin', 'maxBlockHeight'),
-            minAmount: BuiltValueNullFieldError.checkNotNull(minAmount, 'TradeConfigCoin', 'minAmount'),
-            maxAmount: BuiltValueNullFieldError.checkNotNull(maxAmount, 'TradeConfigCoin', 'maxAmount'));
+            maxBlockHeight: BuiltValueNullFieldError.checkNotNull(
+                maxBlockHeight, 'TradeConfigCoin', 'maxBlockHeight'),
+            minAmount: BuiltValueNullFieldError.checkNotNull(
+                minAmount, 'TradeConfigCoin', 'minAmount'),
+            maxAmount:
+                BuiltValueNullFieldError.checkNotNull(maxAmount, 'TradeConfigCoin', 'maxAmount'));
     replace(_$result);
     return _$result;
   }
@@ -2497,7 +2552,7 @@ class _$TradeConfigPairItem extends TradeConfigPairItem {
   @override
   final BuiltList<String> spans;
   @override
-  final String status;
+  final String? status;
   @override
   final TradeConfigPairItemInfo price;
   @override
@@ -2512,7 +2567,7 @@ class _$TradeConfigPairItem extends TradeConfigPairItem {
       required this.name,
       required this.speed,
       required this.spans,
-      required this.status,
+      this.status,
       required this.price,
       required this.trade})
       : super._() {
@@ -2522,8 +2577,6 @@ class _$TradeConfigPairItem extends TradeConfigPairItem {
         speed, 'TradeConfigPairItem', 'speed');
     BuiltValueNullFieldError.checkNotNull(
         spans, 'TradeConfigPairItem', 'spans');
-    BuiltValueNullFieldError.checkNotNull(
-        status, 'TradeConfigPairItem', 'status');
     BuiltValueNullFieldError.checkNotNull(
         price, 'TradeConfigPairItem', 'price');
     BuiltValueNullFieldError.checkNotNull(
@@ -2657,8 +2710,7 @@ class TradeConfigPairItemBuilder
               speed: BuiltValueNullFieldError.checkNotNull(
                   speed, 'TradeConfigPairItem', 'speed'),
               spans: spans.build(),
-              status: BuiltValueNullFieldError.checkNotNull(
-                  status, 'TradeConfigPairItem', 'status'),
+              status: status,
               price: price.build(),
               trade: trade.build());
     } catch (_) {
@@ -3028,27 +3080,18 @@ class TradeDealBuilder implements Builder<TradeDeal, TradeDealBuilder> {
 
 class _$TradeOrderDetail extends TradeOrderDetail {
   @override
-  final String total;
+  final String? total;
   @override
-  final BuiltList<TradeOrderDetailItem> matchList;
+  final BuiltList<TradeOrderDetailItem>? matchList;
   @override
-  final BuiltList<TradeOrderDetailItem> exchangeList;
+  final BuiltList<TradeOrderDetailItem>? exchangeList;
 
   factory _$TradeOrderDetail(
           [void Function(TradeOrderDetailBuilder)? updates]) =>
       (new TradeOrderDetailBuilder()..update(updates))._build();
 
-  _$TradeOrderDetail._(
-      {required this.total,
-      required this.matchList,
-      required this.exchangeList})
-      : super._() {
-    BuiltValueNullFieldError.checkNotNull(total, 'TradeOrderDetail', 'total');
-    BuiltValueNullFieldError.checkNotNull(
-        matchList, 'TradeOrderDetail', 'matchList');
-    BuiltValueNullFieldError.checkNotNull(
-        exchangeList, 'TradeOrderDetail', 'exchangeList');
-  }
+  _$TradeOrderDetail._({this.total, this.matchList, this.exchangeList})
+      : super._();
 
   @override
   TradeOrderDetail rebuild(void Function(TradeOrderDetailBuilder) updates) =>
@@ -3109,8 +3152,8 @@ class TradeOrderDetailBuilder
     final $v = _$v;
     if ($v != null) {
       _total = $v.total;
-      _matchList = $v.matchList.toBuilder();
-      _exchangeList = $v.exchangeList.toBuilder();
+      _matchList = $v.matchList?.toBuilder();
+      _exchangeList = $v.exchangeList?.toBuilder();
       _$v = null;
     }
     return this;
@@ -3135,17 +3178,16 @@ class TradeOrderDetailBuilder
     try {
       _$result = _$v ??
           new _$TradeOrderDetail._(
-              total: BuiltValueNullFieldError.checkNotNull(
-                  total, 'TradeOrderDetail', 'total'),
-              matchList: matchList.build(),
-              exchangeList: exchangeList.build());
+              total: total,
+              matchList: _matchList?.build(),
+              exchangeList: _exchangeList?.build());
     } catch (_) {
       late String _$failedField;
       try {
         _$failedField = 'matchList';
-        matchList.build();
+        _matchList?.build();
         _$failedField = 'exchangeList';
-        exchangeList.build();
+        _exchangeList?.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
             'TradeOrderDetail', _$failedField, e.toString());
@@ -3159,41 +3201,30 @@ class TradeOrderDetailBuilder
 
 class _$TradeOrderDetailItem extends TradeOrderDetailItem {
   @override
-  final String matchPrice;
+  final String? matchPrice;
   @override
-  final String amount;
+  final String? amount;
   @override
-  final int createdAt;
+  final int? createdAt;
   @override
-  final String fee;
+  final String? fee;
   @override
-  final String txId;
+  final String? txId;
   @override
-  final String matchId;
+  final String? matchId;
 
   factory _$TradeOrderDetailItem(
           [void Function(TradeOrderDetailItemBuilder)? updates]) =>
       (new TradeOrderDetailItemBuilder()..update(updates))._build();
 
   _$TradeOrderDetailItem._(
-      {required this.matchPrice,
-      required this.amount,
-      required this.createdAt,
-      required this.fee,
-      required this.txId,
-      required this.matchId})
-      : super._() {
-    BuiltValueNullFieldError.checkNotNull(
-        matchPrice, 'TradeOrderDetailItem', 'matchPrice');
-    BuiltValueNullFieldError.checkNotNull(
-        amount, 'TradeOrderDetailItem', 'amount');
-    BuiltValueNullFieldError.checkNotNull(
-        createdAt, 'TradeOrderDetailItem', 'createdAt');
-    BuiltValueNullFieldError.checkNotNull(fee, 'TradeOrderDetailItem', 'fee');
-    BuiltValueNullFieldError.checkNotNull(txId, 'TradeOrderDetailItem', 'txId');
-    BuiltValueNullFieldError.checkNotNull(
-        matchId, 'TradeOrderDetailItem', 'matchId');
-  }
+      {this.matchPrice,
+      this.amount,
+      this.createdAt,
+      this.fee,
+      this.txId,
+      this.matchId})
+      : super._();
 
   @override
   TradeOrderDetailItem rebuild(
@@ -3302,18 +3333,12 @@ class TradeOrderDetailItemBuilder
   _$TradeOrderDetailItem _build() {
     final _$result = _$v ??
         new _$TradeOrderDetailItem._(
-            matchPrice: BuiltValueNullFieldError.checkNotNull(
-                matchPrice, 'TradeOrderDetailItem', 'matchPrice'),
-            amount: BuiltValueNullFieldError.checkNotNull(
-                amount, 'TradeOrderDetailItem', 'amount'),
-            createdAt: BuiltValueNullFieldError.checkNotNull(
-                createdAt, 'TradeOrderDetailItem', 'createdAt'),
-            fee: BuiltValueNullFieldError.checkNotNull(
-                fee, 'TradeOrderDetailItem', 'fee'),
-            txId: BuiltValueNullFieldError.checkNotNull(
-                txId, 'TradeOrderDetailItem', 'txId'),
-            matchId: BuiltValueNullFieldError.checkNotNull(
-                matchId, 'TradeOrderDetailItem', 'matchId'));
+            matchPrice: matchPrice,
+            amount: amount,
+            createdAt: createdAt,
+            fee: fee,
+            txId: txId,
+            matchId: matchId);
     replace(_$result);
     return _$result;
   }
@@ -3582,21 +3607,16 @@ class TradePairBuilder implements Builder<TradePair, TradePairBuilder> {
 
 class _$TradeInfo24h extends TradeInfo24h {
   @override
-  final String high;
+  final String? high;
   @override
-  final String low;
+  final String? low;
   @override
-  final String vol;
+  final String? vol;
 
   factory _$TradeInfo24h([void Function(TradeInfo24hBuilder)? updates]) =>
       (new TradeInfo24hBuilder()..update(updates))._build();
 
-  _$TradeInfo24h._({required this.high, required this.low, required this.vol})
-      : super._() {
-    BuiltValueNullFieldError.checkNotNull(high, 'TradeInfo24h', 'high');
-    BuiltValueNullFieldError.checkNotNull(low, 'TradeInfo24h', 'low');
-    BuiltValueNullFieldError.checkNotNull(vol, 'TradeInfo24h', 'vol');
-  }
+  _$TradeInfo24h._({this.high, this.low, this.vol}) : super._();
 
   @override
   TradeInfo24h rebuild(void Function(TradeInfo24hBuilder) updates) =>
@@ -3673,14 +3693,8 @@ class TradeInfo24hBuilder
   TradeInfo24h build() => _build();
 
   _$TradeInfo24h _build() {
-    final _$result = _$v ??
-        new _$TradeInfo24h._(
-            high: BuiltValueNullFieldError.checkNotNull(
-                high, 'TradeInfo24h', 'high'),
-            low: BuiltValueNullFieldError.checkNotNull(
-                low, 'TradeInfo24h', 'low'),
-            vol: BuiltValueNullFieldError.checkNotNull(
-                vol, 'TradeInfo24h', 'vol'));
+    final _$result =
+        _$v ?? new _$TradeInfo24h._(high: high, low: low, vol: vol);
     replace(_$result);
     return _$result;
   }
@@ -3814,38 +3828,32 @@ class TradeTickerBuilder implements Builder<TradeTicker, TradeTickerBuilder> {
 
 class _$TradeState extends TradeState {
   @override
-  final TradeConfig config;
+  final TradeConfig? config;
   @override
-  final int configState;
+  final int? configState;
   @override
-  final TradePair tradePair;
+  final TradePair? tradePair;
   @override
   final TradeSide tradeSide;
   @override
   final BuiltList<String> hideSlowTradePairTip;
   @override
-  final TradeOrderDetail currentOrderDetail;
+  final TradeOrderDetail? currentOrderDetail;
 
   factory _$TradeState([void Function(TradeStateBuilder)? updates]) =>
       (new TradeStateBuilder()..update(updates))._build();
 
   _$TradeState._(
-      {required this.config,
-      required this.configState,
-      required this.tradePair,
+      {this.config,
+      this.configState,
+      this.tradePair,
       required this.tradeSide,
       required this.hideSlowTradePairTip,
-      required this.currentOrderDetail})
+      this.currentOrderDetail})
       : super._() {
-    BuiltValueNullFieldError.checkNotNull(config, 'TradeState', 'config');
-    BuiltValueNullFieldError.checkNotNull(
-        configState, 'TradeState', 'configState');
-    BuiltValueNullFieldError.checkNotNull(tradePair, 'TradeState', 'tradePair');
     BuiltValueNullFieldError.checkNotNull(tradeSide, 'TradeState', 'tradeSide');
     BuiltValueNullFieldError.checkNotNull(
         hideSlowTradePairTip, 'TradeState', 'hideSlowTradePairTip');
-    BuiltValueNullFieldError.checkNotNull(
-        currentOrderDetail, 'TradeState', 'currentOrderDetail');
   }
 
   @override
@@ -3929,12 +3937,12 @@ class TradeStateBuilder implements Builder<TradeState, TradeStateBuilder> {
   TradeStateBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _config = $v.config.toBuilder();
+      _config = $v.config?.toBuilder();
       _configState = $v.configState;
-      _tradePair = $v.tradePair.toBuilder();
+      _tradePair = $v.tradePair?.toBuilder();
       _tradeSide = $v.tradeSide;
       _hideSlowTradePairTip = $v.hideSlowTradePairTip.toBuilder();
-      _currentOrderDetail = $v.currentOrderDetail.toBuilder();
+      _currentOrderDetail = $v.currentOrderDetail?.toBuilder();
       _$v = null;
     }
     return this;
@@ -3959,27 +3967,26 @@ class TradeStateBuilder implements Builder<TradeState, TradeStateBuilder> {
     try {
       _$result = _$v ??
           new _$TradeState._(
-              config: config.build(),
-              configState: BuiltValueNullFieldError.checkNotNull(
-                  configState, 'TradeState', 'configState'),
-              tradePair: tradePair.build(),
+              config: _config?.build(),
+              configState: configState,
+              tradePair: _tradePair?.build(),
               tradeSide: BuiltValueNullFieldError.checkNotNull(
                   tradeSide, 'TradeState', 'tradeSide'),
               hideSlowTradePairTip: hideSlowTradePairTip.build(),
-              currentOrderDetail: currentOrderDetail.build());
+              currentOrderDetail: _currentOrderDetail?.build());
     } catch (_) {
       late String _$failedField;
       try {
         _$failedField = 'config';
-        config.build();
+        _config?.build();
 
         _$failedField = 'tradePair';
-        tradePair.build();
+        _tradePair?.build();
 
         _$failedField = 'hideSlowTradePairTip';
         hideSlowTradePairTip.build();
         _$failedField = 'currentOrderDetail';
-        currentOrderDetail.build();
+        _currentOrderDetail?.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
             'TradeState', _$failedField, e.toString());

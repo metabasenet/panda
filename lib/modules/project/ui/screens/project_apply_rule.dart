@@ -50,7 +50,7 @@ class ProjectApplyRulePage extends HookWidget {
                 Padding(
                   padding: context.edgeVertical10,
                   child: Text(
-                    viewModel.projectRules,
+                    viewModel.projectRules ?? '',
                     style: context
                         .textBody(
                           color: Color(0xFF000000),

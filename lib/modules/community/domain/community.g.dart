@@ -31,23 +31,39 @@ class _$CommunityConfigSerializer
   @override
   Iterable<Object?> serialize(Serializers serializers, CommunityConfig object,
       {FullType specifiedType = FullType.unspecified}) {
-    final result = <Object?>[
-      'fork',
-      serializers.serialize(object.fork, specifiedType: const FullType(String)),
-      'home_list',
-      serializers.serialize(object.homeList,
-          specifiedType:
-              const FullType(BuiltList, const [const FullType(int)])),
-      'type',
-      serializers.serialize(object.types,
-          specifiedType:
-              const FullType(BuiltList, const [const FullType(CommunityInfo)])),
-      'ecological',
-      serializers.serialize(object.ecological,
-          specifiedType: const FullType(
-              BuiltList, const [const FullType(CommunityEcological)])),
-    ];
-
+    final result = <Object?>[];
+    Object? value;
+    value = object.fork;
+    if (value != null) {
+      result
+        ..add('fork')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.homeList;
+    if (value != null) {
+      result
+        ..add('home_list')
+        ..add(serializers.serialize(value,
+            specifiedType:
+                const FullType(BuiltList, const [const FullType(int)])));
+    }
+    value = object.types;
+    if (value != null) {
+      result
+        ..add('type')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(
+                BuiltList, const [const FullType(CommunityInfo)])));
+    }
+    value = object.ecological;
+    if (value != null) {
+      result
+        ..add('ecological')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(
+                BuiltList, const [const FullType(CommunityEcological)])));
+    }
     return result;
   }
 
@@ -65,7 +81,7 @@ class _$CommunityConfigSerializer
       switch (key) {
         case 'fork':
           result.fork = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'home_list':
           result.homeList.replace(serializers.deserialize(value,
@@ -105,32 +121,66 @@ class _$CommunityInfoSerializer implements StructuredSerializer<CommunityInfo> {
       'display_type',
       serializers.serialize(object.displayType,
           specifiedType: const FullType(String)),
-      'id',
-      serializers.serialize(object.id, specifiedType: const FullType(String)),
-      'name',
-      serializers.serialize(object.name, specifiedType: const FullType(String)),
-      'type',
-      serializers.serialize(object.type, specifiedType: const FullType(int)),
-      'describe',
-      serializers.serialize(object.describe,
-          specifiedType: const FullType(String)),
-      'image',
-      serializers.serialize(object.image,
-          specifiedType: const FullType(String)),
       'join_type',
       serializers.serialize(object.joinType,
           specifiedType: const FullType(String)),
-      'create_type',
-      serializers.serialize(object.createType,
-          specifiedType: const FullType(String)),
-      'join_apply_type',
-      serializers.serialize(object.joinApplyType,
-          specifiedType: const FullType(String)),
-      'home_quick_start',
-      serializers.serialize(object.homeQuickEntry,
-          specifiedType: const FullType(String)),
     ];
-
+    Object? value;
+    value = object.id;
+    if (value != null) {
+      result
+        ..add('id')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.name;
+    if (value != null) {
+      result
+        ..add('name')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.type;
+    if (value != null) {
+      result
+        ..add('type')
+        ..add(serializers.serialize(value, specifiedType: const FullType(int)));
+    }
+    value = object.describe;
+    if (value != null) {
+      result
+        ..add('describe')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.image;
+    if (value != null) {
+      result
+        ..add('image')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.createType;
+    if (value != null) {
+      result
+        ..add('create_type')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.joinApplyType;
+    if (value != null) {
+      result
+        ..add('join_apply_type')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.homeQuickEntry;
+    if (value != null) {
+      result
+        ..add('home_quick_start')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
     return result;
   }
 
@@ -152,23 +202,23 @@ class _$CommunityInfoSerializer implements StructuredSerializer<CommunityInfo> {
           break;
         case 'id':
           result.id = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'name':
           result.name = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'type':
           result.type = serializers.deserialize(value,
-              specifiedType: const FullType(int))! as int;
+              specifiedType: const FullType(int)) as int?;
           break;
         case 'describe':
           result.describe = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'image':
           result.image = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'join_type':
           result.joinType = serializers.deserialize(value,
@@ -176,15 +226,15 @@ class _$CommunityInfoSerializer implements StructuredSerializer<CommunityInfo> {
           break;
         case 'create_type':
           result.createType = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'join_apply_type':
           result.joinApplyType = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'home_quick_start':
           result.homeQuickEntry = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
       }
     }
@@ -202,49 +252,116 @@ class _$CommunityTeamSerializer implements StructuredSerializer<CommunityTeam> {
   @override
   Iterable<Object?> serialize(Serializers serializers, CommunityTeam object,
       {FullType specifiedType = FullType.unspecified}) {
-    final result = <Object?>[
-      'id',
-      serializers.serialize(object.id, specifiedType: const FullType(String)),
-      'status',
-      serializers.serialize(object.status, specifiedType: const FullType(int)),
-      'fork',
-      serializers.serialize(object.fork, specifiedType: const FullType(String)),
-      'type',
-      serializers.serialize(object.type, specifiedType: const FullType(int)),
-      'owner',
-      serializers.serialize(object.owner,
-          specifiedType: const FullType(String)),
-      'order',
-      serializers.serialize(object.order, specifiedType: const FullType(int)),
-      'black',
-      serializers.serialize(object.black, specifiedType: const FullType(bool)),
-      'is_mine',
-      serializers.serialize(object.isMine, specifiedType: const FullType(bool)),
-      'owner_wallet_hash',
-      serializers.serialize(object.ownerWalletHash,
-          specifiedType: const FullType(String)),
-      'telegram_account',
-      serializers.serialize(object.telegramAccount,
-          specifiedType: const FullType(String)),
-      'name',
-      serializers.serialize(object.name, specifiedType: const FullType(String)),
-      'options',
-      serializers.serialize(object.options,
-          specifiedType: const FullType(CommunityTeamOptions)),
-      'describe',
-      serializers.serialize(object.describe,
-          specifiedType: const FullType(String)),
-      'chain',
-      serializers.serialize(object.chain,
-          specifiedType: const FullType(String)),
-      'symbol',
-      serializers.serialize(object.symbol,
-          specifiedType: const FullType(String)),
-      'create_at',
-      serializers.serialize(object.createAt,
-          specifiedType: const FullType(int)),
-    ];
-
+    final result = <Object?>[];
+    Object? value;
+    value = object.id;
+    if (value != null) {
+      result
+        ..add('id')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.status;
+    if (value != null) {
+      result
+        ..add('status')
+        ..add(serializers.serialize(value, specifiedType: const FullType(int)));
+    }
+    value = object.fork;
+    if (value != null) {
+      result
+        ..add('fork')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.type;
+    if (value != null) {
+      result
+        ..add('type')
+        ..add(serializers.serialize(value, specifiedType: const FullType(int)));
+    }
+    value = object.owner;
+    if (value != null) {
+      result
+        ..add('owner')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.order;
+    if (value != null) {
+      result
+        ..add('order')
+        ..add(serializers.serialize(value, specifiedType: const FullType(int)));
+    }
+    value = object.black;
+    if (value != null) {
+      result
+        ..add('black')
+        ..add(
+            serializers.serialize(value, specifiedType: const FullType(bool)));
+    }
+    value = object.isMine;
+    if (value != null) {
+      result
+        ..add('is_mine')
+        ..add(
+            serializers.serialize(value, specifiedType: const FullType(bool)));
+    }
+    value = object.ownerWalletHash;
+    if (value != null) {
+      result
+        ..add('owner_wallet_hash')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.telegramAccount;
+    if (value != null) {
+      result
+        ..add('telegram_account')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.name;
+    if (value != null) {
+      result
+        ..add('name')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.options;
+    if (value != null) {
+      result
+        ..add('options')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(CommunityTeamOptions)));
+    }
+    value = object.describe;
+    if (value != null) {
+      result
+        ..add('describe')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.chain;
+    if (value != null) {
+      result
+        ..add('chain')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.symbol;
+    if (value != null) {
+      result
+        ..add('symbol')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.createAt;
+    if (value != null) {
+      result
+        ..add('create_at')
+        ..add(serializers.serialize(value, specifiedType: const FullType(int)));
+    }
     return result;
   }
 
@@ -262,47 +379,47 @@ class _$CommunityTeamSerializer implements StructuredSerializer<CommunityTeam> {
       switch (key) {
         case 'id':
           result.id = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'status':
           result.status = serializers.deserialize(value,
-              specifiedType: const FullType(int))! as int;
+              specifiedType: const FullType(int)) as int?;
           break;
         case 'fork':
           result.fork = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'type':
           result.type = serializers.deserialize(value,
-              specifiedType: const FullType(int))! as int;
+              specifiedType: const FullType(int)) as int?;
           break;
         case 'owner':
           result.owner = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'order':
           result.order = serializers.deserialize(value,
-              specifiedType: const FullType(int))! as int;
+              specifiedType: const FullType(int)) as int?;
           break;
         case 'black':
           result.black = serializers.deserialize(value,
-              specifiedType: const FullType(bool))! as bool;
+              specifiedType: const FullType(bool)) as bool?;
           break;
         case 'is_mine':
           result.isMine = serializers.deserialize(value,
-              specifiedType: const FullType(bool))! as bool;
+              specifiedType: const FullType(bool)) as bool?;
           break;
         case 'owner_wallet_hash':
           result.ownerWalletHash = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'telegram_account':
           result.telegramAccount = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'name':
           result.name = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'options':
           result.options.replace(serializers.deserialize(value,
@@ -311,19 +428,19 @@ class _$CommunityTeamSerializer implements StructuredSerializer<CommunityTeam> {
           break;
         case 'describe':
           result.describe = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'chain':
           result.chain = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'symbol':
           result.symbol = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'create_at':
           result.createAt = serializers.deserialize(value,
-              specifiedType: const FullType(int))! as int;
+              specifiedType: const FullType(int)) as int?;
           break;
       }
     }
@@ -346,32 +463,59 @@ class _$CommunityTeamOptionsSerializer
   Iterable<Object?> serialize(
       Serializers serializers, CommunityTeamOptions object,
       {FullType specifiedType = FullType.unspecified}) {
-    final result = <Object?>[
-      'valid_address_count',
-      serializers.serialize(object.addressCount,
-          specifiedType: const FullType(int)),
-      'valid_address_average_balance',
-      serializers.serialize(object.addressAverageBalance,
-          specifiedType: const FullType(BuiltMap,
-              const [const FullType(String), const FullType(String)])),
-      'business_info',
-      serializers.serialize(object.businessInfo,
-          specifiedType:
-              const FullType(BuiltList, const [const FullType(String)])),
-      'telegram_account',
-      serializers.serialize(object.telegramAccount,
-          specifiedType: const FullType(String)),
-      'icon',
-      serializers.serialize(object.icon, specifiedType: const FullType(String)),
-      'join_apply_type',
-      serializers.serialize(object.joinApplyType,
-          specifiedType: const FullType(String)),
-      'admin',
-      serializers.serialize(object.admin,
-          specifiedType: const FullType(BuiltMap,
-              const [const FullType(String), const FullType(String)])),
-    ];
-
+    final result = <Object?>[];
+    Object? value;
+    value = object.addressCount;
+    if (value != null) {
+      result
+        ..add('valid_address_count')
+        ..add(serializers.serialize(value, specifiedType: const FullType(int)));
+    }
+    value = object.addressAverageBalance;
+    if (value != null) {
+      result
+        ..add('valid_address_average_balance')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(BuiltMap,
+                const [const FullType(String), const FullType(String)])));
+    }
+    value = object.businessInfo;
+    if (value != null) {
+      result
+        ..add('business_info')
+        ..add(serializers.serialize(value,
+            specifiedType:
+                const FullType(BuiltList, const [const FullType(String)])));
+    }
+    value = object.telegramAccount;
+    if (value != null) {
+      result
+        ..add('telegram_account')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.icon;
+    if (value != null) {
+      result
+        ..add('icon')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.joinApplyType;
+    if (value != null) {
+      result
+        ..add('join_apply_type')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.admin;
+    if (value != null) {
+      result
+        ..add('admin')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(BuiltMap,
+                const [const FullType(String), const FullType(String)])));
+    }
     return result;
   }
 
@@ -389,7 +533,7 @@ class _$CommunityTeamOptionsSerializer
       switch (key) {
         case 'valid_address_count':
           result.addressCount = serializers.deserialize(value,
-              specifiedType: const FullType(int))! as int;
+              specifiedType: const FullType(int)) as int?;
           break;
         case 'valid_address_average_balance':
           result.addressAverageBalance.replace(serializers.deserialize(value,
@@ -404,15 +548,15 @@ class _$CommunityTeamOptionsSerializer
           break;
         case 'telegram_account':
           result.telegramAccount = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'icon':
           result.icon = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'join_apply_type':
           result.joinApplyType = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'admin':
           result.admin.replace(serializers.deserialize(value,
@@ -440,26 +584,51 @@ class _$CommunityMemberInfoSerializer
   Iterable<Object?> serialize(
       Serializers serializers, CommunityMemberInfo object,
       {FullType specifiedType = FullType.unspecified}) {
-    final result = <Object?>[
-      'name',
-      serializers.serialize(object.name, specifiedType: const FullType(String)),
-      'describe',
-      serializers.serialize(object.describe,
-          specifiedType: const FullType(String)),
-      'github',
-      serializers.serialize(object.github,
-          specifiedType: const FullType(String)),
-      'icon',
-      serializers.serialize(object.icon, specifiedType: const FullType(String)),
-      'telegram_account',
-      serializers.serialize(object.telegramAccount,
-          specifiedType: const FullType(String)),
-      'admin',
-      serializers.serialize(object.admin,
-          specifiedType: const FullType(BuiltMap,
-              const [const FullType(String), const FullType(String)])),
-    ];
-
+    final result = <Object?>[];
+    Object? value;
+    value = object.name;
+    if (value != null) {
+      result
+        ..add('name')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.describe;
+    if (value != null) {
+      result
+        ..add('describe')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.github;
+    if (value != null) {
+      result
+        ..add('github')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.icon;
+    if (value != null) {
+      result
+        ..add('icon')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.telegramAccount;
+    if (value != null) {
+      result
+        ..add('telegram_account')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.admin;
+    if (value != null) {
+      result
+        ..add('admin')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(BuiltMap,
+                const [const FullType(String), const FullType(String)])));
+    }
     return result;
   }
 
@@ -477,23 +646,23 @@ class _$CommunityMemberInfoSerializer
       switch (key) {
         case 'name':
           result.name = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'describe':
           result.describe = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'github':
           result.github = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'icon':
           result.icon = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'telegram_account':
           result.telegramAccount = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'admin':
           result.admin.replace(serializers.deserialize(value,
@@ -517,25 +686,55 @@ class _$CommunityMemberSerializer
   @override
   Iterable<Object?> serialize(Serializers serializers, CommunityMember object,
       {FullType specifiedType = FullType.unspecified}) {
-    final result = <Object?>[
-      'id',
-      serializers.serialize(object.id, specifiedType: const FullType(String)),
-      'status',
-      serializers.serialize(object.status, specifiedType: const FullType(int)),
-      'team',
-      serializers.serialize(object.team, specifiedType: const FullType(String)),
-      'mnt_address',
-      serializers.serialize(object.mntAddress,
-          specifiedType: const FullType(String)),
-      'order',
-      serializers.serialize(object.order, specifiedType: const FullType(int)),
-      'is_mine',
-      serializers.serialize(object.isMine, specifiedType: const FullType(bool)),
-      'info',
-      serializers.serialize(object.info,
-          specifiedType: const FullType(CommunityMemberInfo)),
-    ];
-
+    final result = <Object?>[];
+    Object? value;
+    value = object.id;
+    if (value != null) {
+      result
+        ..add('id')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.status;
+    if (value != null) {
+      result
+        ..add('status')
+        ..add(serializers.serialize(value, specifiedType: const FullType(int)));
+    }
+    value = object.team;
+    if (value != null) {
+      result
+        ..add('team')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.mntAddress;
+    if (value != null) {
+      result
+        ..add('mnt_address')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.order;
+    if (value != null) {
+      result
+        ..add('order')
+        ..add(serializers.serialize(value, specifiedType: const FullType(int)));
+    }
+    value = object.isMine;
+    if (value != null) {
+      result
+        ..add('is_mine')
+        ..add(
+            serializers.serialize(value, specifiedType: const FullType(bool)));
+    }
+    value = object.info;
+    if (value != null) {
+      result
+        ..add('info')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(CommunityMemberInfo)));
+    }
     return result;
   }
 
@@ -553,27 +752,27 @@ class _$CommunityMemberSerializer
       switch (key) {
         case 'id':
           result.id = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'status':
           result.status = serializers.deserialize(value,
-              specifiedType: const FullType(int))! as int;
+              specifiedType: const FullType(int)) as int?;
           break;
         case 'team':
           result.team = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'mnt_address':
           result.mntAddress = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'order':
           result.order = serializers.deserialize(value,
-              specifiedType: const FullType(int))! as int;
+              specifiedType: const FullType(int)) as int?;
           break;
         case 'is_mine':
           result.isMine = serializers.deserialize(value,
-              specifiedType: const FullType(bool))! as bool;
+              specifiedType: const FullType(bool)) as bool?;
           break;
         case 'info':
           result.info.replace(serializers.deserialize(value,
@@ -601,21 +800,43 @@ class _$CommunityEcologicalSerializer
   Iterable<Object?> serialize(
       Serializers serializers, CommunityEcological object,
       {FullType specifiedType = FullType.unspecified}) {
-    final result = <Object?>[
-      'chain',
-      serializers.serialize(object.chain,
-          specifiedType: const FullType(String)),
-      'currency',
-      serializers.serialize(object.symbol,
-          specifiedType: const FullType(String)),
-      'name',
-      serializers.serialize(object.name, specifiedType: const FullType(String)),
-      'fork',
-      serializers.serialize(object.fork, specifiedType: const FullType(String)),
-      'id',
-      serializers.serialize(object.id, specifiedType: const FullType(String)),
-    ];
-
+    final result = <Object?>[];
+    Object? value;
+    value = object.chain;
+    if (value != null) {
+      result
+        ..add('chain')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.symbol;
+    if (value != null) {
+      result
+        ..add('currency')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.name;
+    if (value != null) {
+      result
+        ..add('name')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.fork;
+    if (value != null) {
+      result
+        ..add('fork')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.id;
+    if (value != null) {
+      result
+        ..add('id')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
     return result;
   }
 
@@ -633,23 +854,23 @@ class _$CommunityEcologicalSerializer
       switch (key) {
         case 'chain':
           result.chain = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'currency':
           result.symbol = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'name':
           result.name = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'fork':
           result.fork = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'id':
           result.id = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
       }
     }
@@ -794,9 +1015,9 @@ class CommunityTeamVMBuilder
 
 class _$CommunityDetailVM extends CommunityDetailVM {
   @override
-  final BuiltList<CommunityTeam> communityTeamList;
+  final BuiltList<CommunityTeam>? communityTeamList;
   @override
-  final BuiltList<CommunityMember> communityMemberList;
+  final BuiltList<CommunityMember>? communityMemberList;
   @override
   final bool hasWallet;
   @override
@@ -824,8 +1045,8 @@ class _$CommunityDetailVM extends CommunityDetailVM {
       (new CommunityDetailVMBuilder()..update(updates))._build();
 
   _$CommunityDetailVM._(
-      {required this.communityTeamList,
-      required this.communityMemberList,
+      {this.communityTeamList,
+      this.communityMemberList,
       required this.hasWallet,
       required this.communityConfig,
       required this.loadData,
@@ -834,10 +1055,6 @@ class _$CommunityDetailVM extends CommunityDetailVM {
       required this.getHasHistory,
       required this.checkOnChainData})
       : super._() {
-    BuiltValueNullFieldError.checkNotNull(
-        communityTeamList, 'CommunityDetailVM', 'communityTeamList');
-    BuiltValueNullFieldError.checkNotNull(
-        communityMemberList, 'CommunityDetailVM', 'communityMemberList');
     BuiltValueNullFieldError.checkNotNull(
         hasWallet, 'CommunityDetailVM', 'hasWallet');
     BuiltValueNullFieldError.checkNotNull(
@@ -985,8 +1202,8 @@ class CommunityDetailVMBuilder
   CommunityDetailVMBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _communityTeamList = $v.communityTeamList.toBuilder();
-      _communityMemberList = $v.communityMemberList.toBuilder();
+      _communityTeamList = $v.communityTeamList?.toBuilder();
+      _communityMemberList = $v.communityMemberList?.toBuilder();
       _hasWallet = $v.hasWallet;
       _communityConfig = $v.communityConfig.toBuilder();
       _loadData = $v.loadData;
@@ -1018,8 +1235,8 @@ class CommunityDetailVMBuilder
     try {
       _$result = _$v ??
           new _$CommunityDetailVM._(
-              communityTeamList: communityTeamList.build(),
-              communityMemberList: communityMemberList.build(),
+              communityTeamList: _communityTeamList?.build(),
+              communityMemberList: _communityMemberList?.build(),
               hasWallet: BuiltValueNullFieldError.checkNotNull(
                   hasWallet, 'CommunityDetailVM', 'hasWallet'),
               communityConfig: communityConfig.build(),
@@ -1039,9 +1256,9 @@ class CommunityDetailVMBuilder
       late String _$failedField;
       try {
         _$failedField = 'communityTeamList';
-        communityTeamList.build();
+        _communityTeamList?.build();
         _$failedField = 'communityMemberList';
-        communityMemberList.build();
+        _communityMemberList?.build();
 
         _$failedField = 'communityConfig';
         communityConfig.build();
@@ -1058,9 +1275,9 @@ class CommunityDetailVMBuilder
 
 class _$CommunityCreateVM extends CommunityCreateVM {
   @override
-  final String walletId;
+  final String? walletId;
   @override
-  final BuiltList<AssetCoin> coinList;
+  final BuiltList<AssetCoin>? coinList;
   @override
   final Future<void> Function(TeamCreateParams params) createCommunity;
   @override
@@ -1071,15 +1288,11 @@ class _$CommunityCreateVM extends CommunityCreateVM {
       (new CommunityCreateVMBuilder()..update(updates))._build();
 
   _$CommunityCreateVM._(
-      {required this.walletId,
-      required this.coinList,
+      {this.walletId,
+      this.coinList,
       required this.createCommunity,
       required this.getMyTeam})
       : super._() {
-    BuiltValueNullFieldError.checkNotNull(
-        walletId, 'CommunityCreateVM', 'walletId');
-    BuiltValueNullFieldError.checkNotNull(
-        coinList, 'CommunityCreateVM', 'coinList');
     BuiltValueNullFieldError.checkNotNull(
         createCommunity, 'CommunityCreateVM', 'createCommunity');
     BuiltValueNullFieldError.checkNotNull(
@@ -1149,7 +1362,7 @@ class CommunityCreateVMBuilder
     final $v = _$v;
     if ($v != null) {
       _walletId = $v.walletId;
-      _coinList = $v.coinList.toBuilder();
+      _coinList = $v.coinList?.toBuilder();
       _createCommunity = $v.createCommunity;
       _getMyTeam = $v.getMyTeam;
       _$v = null;
@@ -1176,9 +1389,8 @@ class CommunityCreateVMBuilder
     try {
       _$result = _$v ??
           new _$CommunityCreateVM._(
-              walletId: BuiltValueNullFieldError.checkNotNull(
-                  walletId, 'CommunityCreateVM', 'walletId'),
-              coinList: coinList.build(),
+              walletId: walletId,
+              coinList: _coinList?.build(),
               createCommunity: BuiltValueNullFieldError.checkNotNull(
                   createCommunity, 'CommunityCreateVM', 'createCommunity'),
               getMyTeam: BuiltValueNullFieldError.checkNotNull(
@@ -1187,7 +1399,7 @@ class CommunityCreateVMBuilder
       late String _$failedField;
       try {
         _$failedField = 'coinList';
-        coinList.build();
+        _coinList?.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
             'CommunityCreateVM', _$failedField, e.toString());
@@ -1201,7 +1413,7 @@ class CommunityCreateVMBuilder
 
 class _$CommunityJoinVM extends CommunityJoinVM {
   @override
-  final String walletId;
+  final String? walletId;
   @override
   final Future<CommunityMember> Function(String id) getMyJoin;
   @override
@@ -1211,10 +1423,8 @@ class _$CommunityJoinVM extends CommunityJoinVM {
       (new CommunityJoinVMBuilder()..update(updates))._build();
 
   _$CommunityJoinVM._(
-      {required this.walletId, required this.getMyJoin, required this.joinTeam})
+      {this.walletId, required this.getMyJoin, required this.joinTeam})
       : super._() {
-    BuiltValueNullFieldError.checkNotNull(
-        walletId, 'CommunityJoinVM', 'walletId');
     BuiltValueNullFieldError.checkNotNull(
         getMyJoin, 'CommunityJoinVM', 'getMyJoin');
     BuiltValueNullFieldError.checkNotNull(
@@ -1300,8 +1510,7 @@ class CommunityJoinVMBuilder
   _$CommunityJoinVM _build() {
     final _$result = _$v ??
         new _$CommunityJoinVM._(
-            walletId: BuiltValueNullFieldError.checkNotNull(
-                walletId, 'CommunityJoinVM', 'walletId'),
+            walletId: walletId,
             getMyJoin: BuiltValueNullFieldError.checkNotNull(
                 getMyJoin, 'CommunityJoinVM', 'getMyJoin'),
             joinTeam: BuiltValueNullFieldError.checkNotNull(
@@ -1313,7 +1522,7 @@ class CommunityJoinVMBuilder
 
 class _$CommunityBlacklistVM extends CommunityBlacklistVM {
   @override
-  final BuiltList<CommunityTeam> communityBlacklist;
+  final BuiltList<CommunityTeam>? communityBlacklist;
   @override
   final bool hasWallet;
   @override
@@ -1330,13 +1539,11 @@ class _$CommunityBlacklistVM extends CommunityBlacklistVM {
       (new CommunityBlacklistVMBuilder()..update(updates))._build();
 
   _$CommunityBlacklistVM._(
-      {required this.communityBlacklist,
+      {this.communityBlacklist,
       required this.hasWallet,
       required this.loadData,
       required this.clearCommunityBlacklist})
       : super._() {
-    BuiltValueNullFieldError.checkNotNull(
-        communityBlacklist, 'CommunityBlacklistVM', 'communityBlacklist');
     BuiltValueNullFieldError.checkNotNull(
         hasWallet, 'CommunityBlacklistVM', 'hasWallet');
     BuiltValueNullFieldError.checkNotNull(
@@ -1423,7 +1630,7 @@ class CommunityBlacklistVMBuilder
   CommunityBlacklistVMBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _communityBlacklist = $v.communityBlacklist.toBuilder();
+      _communityBlacklist = $v.communityBlacklist?.toBuilder();
       _hasWallet = $v.hasWallet;
       _loadData = $v.loadData;
       _clearCommunityBlacklist = $v.clearCommunityBlacklist;
@@ -1451,7 +1658,7 @@ class CommunityBlacklistVMBuilder
     try {
       _$result = _$v ??
           new _$CommunityBlacklistVM._(
-              communityBlacklist: communityBlacklist.build(),
+              communityBlacklist: _communityBlacklist?.build(),
               hasWallet: BuiltValueNullFieldError.checkNotNull(
                   hasWallet, 'CommunityBlacklistVM', 'hasWallet'),
               loadData: BuiltValueNullFieldError.checkNotNull(
@@ -1464,7 +1671,7 @@ class CommunityBlacklistVMBuilder
       late String _$failedField;
       try {
         _$failedField = 'communityBlacklist';
-        communityBlacklist.build();
+        _communityBlacklist?.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
             'CommunityBlacklistVM', _$failedField, e.toString());
@@ -1478,30 +1685,19 @@ class CommunityBlacklistVMBuilder
 
 class _$CommunityConfig extends CommunityConfig {
   @override
-  final String fork;
+  final String? fork;
   @override
-  final BuiltList<int> homeList;
+  final BuiltList<int>? homeList;
   @override
-  final BuiltList<CommunityInfo> types;
+  final BuiltList<CommunityInfo>? types;
   @override
-  final BuiltList<CommunityEcological> ecological;
+  final BuiltList<CommunityEcological>? ecological;
 
   factory _$CommunityConfig([void Function(CommunityConfigBuilder)? updates]) =>
       (new CommunityConfigBuilder()..update(updates))._build();
 
-  _$CommunityConfig._(
-      {required this.fork,
-      required this.homeList,
-      required this.types,
-      required this.ecological})
-      : super._() {
-    BuiltValueNullFieldError.checkNotNull(fork, 'CommunityConfig', 'fork');
-    BuiltValueNullFieldError.checkNotNull(
-        homeList, 'CommunityConfig', 'homeList');
-    BuiltValueNullFieldError.checkNotNull(types, 'CommunityConfig', 'types');
-    BuiltValueNullFieldError.checkNotNull(
-        ecological, 'CommunityConfig', 'ecological');
-  }
+  _$CommunityConfig._({this.fork, this.homeList, this.types, this.ecological})
+      : super._();
 
   @override
   CommunityConfig rebuild(void Function(CommunityConfigBuilder) updates) =>
@@ -1568,9 +1764,9 @@ class CommunityConfigBuilder
     final $v = _$v;
     if ($v != null) {
       _fork = $v.fork;
-      _homeList = $v.homeList.toBuilder();
-      _types = $v.types.toBuilder();
-      _ecological = $v.ecological.toBuilder();
+      _homeList = $v.homeList?.toBuilder();
+      _types = $v.types?.toBuilder();
+      _ecological = $v.ecological?.toBuilder();
       _$v = null;
     }
     return this;
@@ -1595,20 +1791,19 @@ class CommunityConfigBuilder
     try {
       _$result = _$v ??
           new _$CommunityConfig._(
-              fork: BuiltValueNullFieldError.checkNotNull(
-                  fork, 'CommunityConfig', 'fork'),
-              homeList: homeList.build(),
-              types: types.build(),
-              ecological: ecological.build());
+              fork: fork,
+              homeList: _homeList?.build(),
+              types: _types?.build(),
+              ecological: _ecological?.build());
     } catch (_) {
       late String _$failedField;
       try {
         _$failedField = 'homeList';
-        homeList.build();
+        _homeList?.build();
         _$failedField = 'types';
-        types.build();
+        _types?.build();
         _$failedField = 'ecological';
-        ecological.build();
+        _ecological?.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
             'CommunityConfig', _$failedField, e.toString());
@@ -1624,55 +1819,43 @@ class _$CommunityInfo extends CommunityInfo {
   @override
   final String displayType;
   @override
-  final String id;
+  final String? id;
   @override
-  final String name;
+  final String? name;
   @override
-  final int type;
+  final int? type;
   @override
-  final String describe;
+  final String? describe;
   @override
-  final String image;
+  final String? image;
   @override
   final String joinType;
   @override
-  final String createType;
+  final String? createType;
   @override
-  final String joinApplyType;
+  final String? joinApplyType;
   @override
-  final String homeQuickEntry;
+  final String? homeQuickEntry;
 
   factory _$CommunityInfo([void Function(CommunityInfoBuilder)? updates]) =>
       (new CommunityInfoBuilder()..update(updates))._build();
 
   _$CommunityInfo._(
       {required this.displayType,
-      required this.id,
-      required this.name,
-      required this.type,
-      required this.describe,
-      required this.image,
+      this.id,
+      this.name,
+      this.type,
+      this.describe,
+      this.image,
       required this.joinType,
-      required this.createType,
-      required this.joinApplyType,
-      required this.homeQuickEntry})
+      this.createType,
+      this.joinApplyType,
+      this.homeQuickEntry})
       : super._() {
     BuiltValueNullFieldError.checkNotNull(
         displayType, 'CommunityInfo', 'displayType');
-    BuiltValueNullFieldError.checkNotNull(id, 'CommunityInfo', 'id');
-    BuiltValueNullFieldError.checkNotNull(name, 'CommunityInfo', 'name');
-    BuiltValueNullFieldError.checkNotNull(type, 'CommunityInfo', 'type');
-    BuiltValueNullFieldError.checkNotNull(
-        describe, 'CommunityInfo', 'describe');
-    BuiltValueNullFieldError.checkNotNull(image, 'CommunityInfo', 'image');
     BuiltValueNullFieldError.checkNotNull(
         joinType, 'CommunityInfo', 'joinType');
-    BuiltValueNullFieldError.checkNotNull(
-        createType, 'CommunityInfo', 'createType');
-    BuiltValueNullFieldError.checkNotNull(
-        joinApplyType, 'CommunityInfo', 'joinApplyType');
-    BuiltValueNullFieldError.checkNotNull(
-        homeQuickEntry, 'CommunityInfo', 'homeQuickEntry');
   }
 
   @override
@@ -1822,24 +2005,16 @@ class CommunityInfoBuilder
         new _$CommunityInfo._(
             displayType: BuiltValueNullFieldError.checkNotNull(
                 displayType, 'CommunityInfo', 'displayType'),
-            id: BuiltValueNullFieldError.checkNotNull(
-                id, 'CommunityInfo', 'id'),
-            name: BuiltValueNullFieldError.checkNotNull(
-                name, 'CommunityInfo', 'name'),
-            type: BuiltValueNullFieldError.checkNotNull(
-                type, 'CommunityInfo', 'type'),
-            describe: BuiltValueNullFieldError.checkNotNull(
-                describe, 'CommunityInfo', 'describe'),
-            image: BuiltValueNullFieldError.checkNotNull(
-                image, 'CommunityInfo', 'image'),
+            id: id,
+            name: name,
+            type: type,
+            describe: describe,
+            image: image,
             joinType: BuiltValueNullFieldError.checkNotNull(
                 joinType, 'CommunityInfo', 'joinType'),
-            createType: BuiltValueNullFieldError.checkNotNull(
-                createType, 'CommunityInfo', 'createType'),
-            joinApplyType: BuiltValueNullFieldError.checkNotNull(
-                joinApplyType, 'CommunityInfo', 'joinApplyType'),
-            homeQuickEntry: BuiltValueNullFieldError.checkNotNull(
-                homeQuickEntry, 'CommunityInfo', 'homeQuickEntry'));
+            createType: createType,
+            joinApplyType: joinApplyType,
+            homeQuickEntry: homeQuickEntry);
     replace(_$result);
     return _$result;
   }
@@ -1847,80 +2022,59 @@ class CommunityInfoBuilder
 
 class _$CommunityTeam extends CommunityTeam {
   @override
-  final String id;
+  final String? id;
   @override
-  final int status;
+  final int? status;
   @override
-  final String fork;
+  final String? fork;
   @override
-  final int type;
+  final int? type;
   @override
-  final String owner;
+  final String? owner;
   @override
-  final int order;
+  final int? order;
   @override
-  final bool black;
+  final bool? black;
   @override
-  final bool isMine;
+  final bool? isMine;
   @override
-  final String ownerWalletHash;
+  final String? ownerWalletHash;
   @override
-  final String telegramAccount;
+  final String? telegramAccount;
   @override
-  final String name;
+  final String? name;
   @override
-  final CommunityTeamOptions options;
+  final CommunityTeamOptions? options;
   @override
-  final String describe;
+  final String? describe;
   @override
-  final String chain;
+  final String? chain;
   @override
-  final String symbol;
+  final String? symbol;
   @override
-  final int createAt;
+  final int? createAt;
 
   factory _$CommunityTeam([void Function(CommunityTeamBuilder)? updates]) =>
       (new CommunityTeamBuilder()..update(updates))._build();
 
   _$CommunityTeam._(
-      {required this.id,
-      required this.status,
-      required this.fork,
-      required this.type,
-      required this.owner,
-      required this.order,
-      required this.black,
-      required this.isMine,
-      required this.ownerWalletHash,
-      required this.telegramAccount,
-      required this.name,
-      required this.options,
-      required this.describe,
-      required this.chain,
-      required this.symbol,
-      required this.createAt})
-      : super._() {
-    BuiltValueNullFieldError.checkNotNull(id, 'CommunityTeam', 'id');
-    BuiltValueNullFieldError.checkNotNull(status, 'CommunityTeam', 'status');
-    BuiltValueNullFieldError.checkNotNull(fork, 'CommunityTeam', 'fork');
-    BuiltValueNullFieldError.checkNotNull(type, 'CommunityTeam', 'type');
-    BuiltValueNullFieldError.checkNotNull(owner, 'CommunityTeam', 'owner');
-    BuiltValueNullFieldError.checkNotNull(order, 'CommunityTeam', 'order');
-    BuiltValueNullFieldError.checkNotNull(black, 'CommunityTeam', 'black');
-    BuiltValueNullFieldError.checkNotNull(isMine, 'CommunityTeam', 'isMine');
-    BuiltValueNullFieldError.checkNotNull(
-        ownerWalletHash, 'CommunityTeam', 'ownerWalletHash');
-    BuiltValueNullFieldError.checkNotNull(
-        telegramAccount, 'CommunityTeam', 'telegramAccount');
-    BuiltValueNullFieldError.checkNotNull(name, 'CommunityTeam', 'name');
-    BuiltValueNullFieldError.checkNotNull(options, 'CommunityTeam', 'options');
-    BuiltValueNullFieldError.checkNotNull(
-        describe, 'CommunityTeam', 'describe');
-    BuiltValueNullFieldError.checkNotNull(chain, 'CommunityTeam', 'chain');
-    BuiltValueNullFieldError.checkNotNull(symbol, 'CommunityTeam', 'symbol');
-    BuiltValueNullFieldError.checkNotNull(
-        createAt, 'CommunityTeam', 'createAt');
-  }
+      {this.id,
+      this.status,
+      this.fork,
+      this.type,
+      this.owner,
+      this.order,
+      this.black,
+      this.isMine,
+      this.ownerWalletHash,
+      this.telegramAccount,
+      this.name,
+      this.options,
+      this.describe,
+      this.chain,
+      this.symbol,
+      this.createAt})
+      : super._();
 
   @override
   CommunityTeam rebuild(void Function(CommunityTeamBuilder) updates) =>
@@ -2098,7 +2252,7 @@ class CommunityTeamBuilder
       _ownerWalletHash = $v.ownerWalletHash;
       _telegramAccount = $v.telegramAccount;
       _name = $v.name;
-      _options = $v.options.toBuilder();
+      _options = $v.options?.toBuilder();
       _describe = $v.describe;
       _chain = $v.chain;
       _symbol = $v.symbol;
@@ -2127,38 +2281,27 @@ class CommunityTeamBuilder
     try {
       _$result = _$v ??
           new _$CommunityTeam._(
-              id: BuiltValueNullFieldError.checkNotNull(
-                  id, 'CommunityTeam', 'id'),
-              status: BuiltValueNullFieldError.checkNotNull(
-                  status, 'CommunityTeam', 'status'),
-              fork: BuiltValueNullFieldError.checkNotNull(
-                  fork, 'CommunityTeam', 'fork'),
-              type: BuiltValueNullFieldError.checkNotNull(
-                  type, 'CommunityTeam', 'type'),
-              owner: BuiltValueNullFieldError.checkNotNull(
-                  owner, 'CommunityTeam', 'owner'),
-              order: BuiltValueNullFieldError.checkNotNull(
-                  order, 'CommunityTeam', 'order'),
-              black: BuiltValueNullFieldError.checkNotNull(
-                  black, 'CommunityTeam', 'black'),
-              isMine: BuiltValueNullFieldError.checkNotNull(
-                  isMine, 'CommunityTeam', 'isMine'),
-              ownerWalletHash: BuiltValueNullFieldError.checkNotNull(
-                  ownerWalletHash, 'CommunityTeam', 'ownerWalletHash'),
-              telegramAccount: BuiltValueNullFieldError.checkNotNull(
-                  telegramAccount, 'CommunityTeam', 'telegramAccount'),
-              name: BuiltValueNullFieldError.checkNotNull(
-                  name, 'CommunityTeam', 'name'),
-              options: options.build(),
-              describe: BuiltValueNullFieldError.checkNotNull(describe, 'CommunityTeam', 'describe'),
-              chain: BuiltValueNullFieldError.checkNotNull(chain, 'CommunityTeam', 'chain'),
-              symbol: BuiltValueNullFieldError.checkNotNull(symbol, 'CommunityTeam', 'symbol'),
-              createAt: BuiltValueNullFieldError.checkNotNull(createAt, 'CommunityTeam', 'createAt'));
+              id: id,
+              status: status,
+              fork: fork,
+              type: type,
+              owner: owner,
+              order: order,
+              black: black,
+              isMine: isMine,
+              ownerWalletHash: ownerWalletHash,
+              telegramAccount: telegramAccount,
+              name: name,
+              options: _options?.build(),
+              describe: describe,
+              chain: chain,
+              symbol: symbol,
+              createAt: createAt);
     } catch (_) {
       late String _$failedField;
       try {
         _$failedField = 'options';
-        options.build();
+        _options?.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
             'CommunityTeam', _$failedField, e.toString());
@@ -2172,47 +2315,33 @@ class CommunityTeamBuilder
 
 class _$CommunityTeamOptions extends CommunityTeamOptions {
   @override
-  final int addressCount;
+  final int? addressCount;
   @override
-  final BuiltMap<String, String> addressAverageBalance;
+  final BuiltMap<String, String>? addressAverageBalance;
   @override
-  final BuiltList<String> businessInfo;
+  final BuiltList<String>? businessInfo;
   @override
-  final String telegramAccount;
+  final String? telegramAccount;
   @override
-  final String icon;
+  final String? icon;
   @override
-  final String joinApplyType;
+  final String? joinApplyType;
   @override
-  final BuiltMap<String, String> admin;
+  final BuiltMap<String, String>? admin;
 
   factory _$CommunityTeamOptions(
           [void Function(CommunityTeamOptionsBuilder)? updates]) =>
       (new CommunityTeamOptionsBuilder()..update(updates))._build();
 
   _$CommunityTeamOptions._(
-      {required this.addressCount,
-      required this.addressAverageBalance,
-      required this.businessInfo,
-      required this.telegramAccount,
-      required this.icon,
-      required this.joinApplyType,
-      required this.admin})
-      : super._() {
-    BuiltValueNullFieldError.checkNotNull(
-        addressCount, 'CommunityTeamOptions', 'addressCount');
-    BuiltValueNullFieldError.checkNotNull(
-        addressAverageBalance, 'CommunityTeamOptions', 'addressAverageBalance');
-    BuiltValueNullFieldError.checkNotNull(
-        businessInfo, 'CommunityTeamOptions', 'businessInfo');
-    BuiltValueNullFieldError.checkNotNull(
-        telegramAccount, 'CommunityTeamOptions', 'telegramAccount');
-    BuiltValueNullFieldError.checkNotNull(icon, 'CommunityTeamOptions', 'icon');
-    BuiltValueNullFieldError.checkNotNull(
-        joinApplyType, 'CommunityTeamOptions', 'joinApplyType');
-    BuiltValueNullFieldError.checkNotNull(
-        admin, 'CommunityTeamOptions', 'admin');
-  }
+      {this.addressCount,
+      this.addressAverageBalance,
+      this.businessInfo,
+      this.telegramAccount,
+      this.icon,
+      this.joinApplyType,
+      this.admin})
+      : super._();
 
   @override
   CommunityTeamOptions rebuild(
@@ -2312,12 +2441,12 @@ class CommunityTeamOptionsBuilder
     final $v = _$v;
     if ($v != null) {
       _addressCount = $v.addressCount;
-      _addressAverageBalance = $v.addressAverageBalance.toBuilder();
-      _businessInfo = $v.businessInfo.toBuilder();
+      _addressAverageBalance = $v.addressAverageBalance?.toBuilder();
+      _businessInfo = $v.businessInfo?.toBuilder();
       _telegramAccount = $v.telegramAccount;
       _icon = $v.icon;
       _joinApplyType = $v.joinApplyType;
-      _admin = $v.admin.toBuilder();
+      _admin = $v.admin?.toBuilder();
       _$v = null;
     }
     return this;
@@ -2342,27 +2471,23 @@ class CommunityTeamOptionsBuilder
     try {
       _$result = _$v ??
           new _$CommunityTeamOptions._(
-              addressCount: BuiltValueNullFieldError.checkNotNull(
-                  addressCount, 'CommunityTeamOptions', 'addressCount'),
-              addressAverageBalance: addressAverageBalance.build(),
-              businessInfo: businessInfo.build(),
-              telegramAccount: BuiltValueNullFieldError.checkNotNull(
-                  telegramAccount, 'CommunityTeamOptions', 'telegramAccount'),
-              icon: BuiltValueNullFieldError.checkNotNull(
-                  icon, 'CommunityTeamOptions', 'icon'),
-              joinApplyType: BuiltValueNullFieldError.checkNotNull(
-                  joinApplyType, 'CommunityTeamOptions', 'joinApplyType'),
-              admin: admin.build());
+              addressCount: addressCount,
+              addressAverageBalance: _addressAverageBalance?.build(),
+              businessInfo: _businessInfo?.build(),
+              telegramAccount: telegramAccount,
+              icon: icon,
+              joinApplyType: joinApplyType,
+              admin: _admin?.build());
     } catch (_) {
       late String _$failedField;
       try {
         _$failedField = 'addressAverageBalance';
-        addressAverageBalance.build();
+        _addressAverageBalance?.build();
         _$failedField = 'businessInfo';
-        businessInfo.build();
+        _businessInfo?.build();
 
         _$failedField = 'admin';
-        admin.build();
+        _admin?.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
             'CommunityTeamOptions', _$failedField, e.toString());
@@ -2376,41 +2501,30 @@ class CommunityTeamOptionsBuilder
 
 class _$CommunityMemberInfo extends CommunityMemberInfo {
   @override
-  final String name;
+  final String? name;
   @override
-  final String describe;
+  final String? describe;
   @override
-  final String github;
+  final String? github;
   @override
-  final String icon;
+  final String? icon;
   @override
-  final String telegramAccount;
+  final String? telegramAccount;
   @override
-  final BuiltMap<String, String> admin;
+  final BuiltMap<String, String>? admin;
 
   factory _$CommunityMemberInfo(
           [void Function(CommunityMemberInfoBuilder)? updates]) =>
       (new CommunityMemberInfoBuilder()..update(updates))._build();
 
   _$CommunityMemberInfo._(
-      {required this.name,
-      required this.describe,
-      required this.github,
-      required this.icon,
-      required this.telegramAccount,
-      required this.admin})
-      : super._() {
-    BuiltValueNullFieldError.checkNotNull(name, 'CommunityMemberInfo', 'name');
-    BuiltValueNullFieldError.checkNotNull(
-        describe, 'CommunityMemberInfo', 'describe');
-    BuiltValueNullFieldError.checkNotNull(
-        github, 'CommunityMemberInfo', 'github');
-    BuiltValueNullFieldError.checkNotNull(icon, 'CommunityMemberInfo', 'icon');
-    BuiltValueNullFieldError.checkNotNull(
-        telegramAccount, 'CommunityMemberInfo', 'telegramAccount');
-    BuiltValueNullFieldError.checkNotNull(
-        admin, 'CommunityMemberInfo', 'admin');
-  }
+      {this.name,
+      this.describe,
+      this.github,
+      this.icon,
+      this.telegramAccount,
+      this.admin})
+      : super._();
 
   @override
   CommunityMemberInfo rebuild(
@@ -2498,7 +2612,7 @@ class CommunityMemberInfoBuilder
       _github = $v.github;
       _icon = $v.icon;
       _telegramAccount = $v.telegramAccount;
-      _admin = $v.admin.toBuilder();
+      _admin = $v.admin?.toBuilder();
       _$v = null;
     }
     return this;
@@ -2523,22 +2637,17 @@ class CommunityMemberInfoBuilder
     try {
       _$result = _$v ??
           new _$CommunityMemberInfo._(
-              name: BuiltValueNullFieldError.checkNotNull(
-                  name, 'CommunityMemberInfo', 'name'),
-              describe: BuiltValueNullFieldError.checkNotNull(
-                  describe, 'CommunityMemberInfo', 'describe'),
-              github: BuiltValueNullFieldError.checkNotNull(
-                  github, 'CommunityMemberInfo', 'github'),
-              icon: BuiltValueNullFieldError.checkNotNull(
-                  icon, 'CommunityMemberInfo', 'icon'),
-              telegramAccount: BuiltValueNullFieldError.checkNotNull(
-                  telegramAccount, 'CommunityMemberInfo', 'telegramAccount'),
-              admin: admin.build());
+              name: name,
+              describe: describe,
+              github: github,
+              icon: icon,
+              telegramAccount: telegramAccount,
+              admin: _admin?.build());
     } catch (_) {
       late String _$failedField;
       try {
         _$failedField = 'admin';
-        admin.build();
+        _admin?.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
             'CommunityMemberInfo', _$failedField, e.toString());
@@ -2552,41 +2661,32 @@ class CommunityMemberInfoBuilder
 
 class _$CommunityMember extends CommunityMember {
   @override
-  final String id;
+  final String? id;
   @override
-  final int status;
+  final int? status;
   @override
-  final String team;
+  final String? team;
   @override
-  final String mntAddress;
+  final String? mntAddress;
   @override
-  final int order;
+  final int? order;
   @override
-  final bool isMine;
+  final bool? isMine;
   @override
-  final CommunityMemberInfo info;
+  final CommunityMemberInfo? info;
 
   factory _$CommunityMember([void Function(CommunityMemberBuilder)? updates]) =>
       (new CommunityMemberBuilder()..update(updates))._build();
 
   _$CommunityMember._(
-      {required this.id,
-      required this.status,
-      required this.team,
-      required this.mntAddress,
-      required this.order,
-      required this.isMine,
-      required this.info})
-      : super._() {
-    BuiltValueNullFieldError.checkNotNull(id, 'CommunityMember', 'id');
-    BuiltValueNullFieldError.checkNotNull(status, 'CommunityMember', 'status');
-    BuiltValueNullFieldError.checkNotNull(team, 'CommunityMember', 'team');
-    BuiltValueNullFieldError.checkNotNull(
-        mntAddress, 'CommunityMember', 'mntAddress');
-    BuiltValueNullFieldError.checkNotNull(order, 'CommunityMember', 'order');
-    BuiltValueNullFieldError.checkNotNull(isMine, 'CommunityMember', 'isMine');
-    BuiltValueNullFieldError.checkNotNull(info, 'CommunityMember', 'info');
-  }
+      {this.id,
+      this.status,
+      this.team,
+      this.mntAddress,
+      this.order,
+      this.isMine,
+      this.info})
+      : super._();
 
   @override
   CommunityMember rebuild(void Function(CommunityMemberBuilder) updates) =>
@@ -2681,7 +2781,7 @@ class CommunityMemberBuilder
       _mntAddress = $v.mntAddress;
       _order = $v.order;
       _isMine = $v.isMine;
-      _info = $v.info.toBuilder();
+      _info = $v.info?.toBuilder();
       _$v = null;
     }
     return this;
@@ -2706,24 +2806,18 @@ class CommunityMemberBuilder
     try {
       _$result = _$v ??
           new _$CommunityMember._(
-              id: BuiltValueNullFieldError.checkNotNull(
-                  id, 'CommunityMember', 'id'),
-              status: BuiltValueNullFieldError.checkNotNull(
-                  status, 'CommunityMember', 'status'),
-              team: BuiltValueNullFieldError.checkNotNull(
-                  team, 'CommunityMember', 'team'),
-              mntAddress: BuiltValueNullFieldError.checkNotNull(
-                  mntAddress, 'CommunityMember', 'mntAddress'),
-              order: BuiltValueNullFieldError.checkNotNull(
-                  order, 'CommunityMember', 'order'),
-              isMine: BuiltValueNullFieldError.checkNotNull(
-                  isMine, 'CommunityMember', 'isMine'),
-              info: info.build());
+              id: id,
+              status: status,
+              team: team,
+              mntAddress: mntAddress,
+              order: order,
+              isMine: isMine,
+              info: _info?.build());
     } catch (_) {
       late String _$failedField;
       try {
         _$failedField = 'info';
-        info.build();
+        _info?.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
             'CommunityMember', _$failedField, e.toString());
@@ -2737,35 +2831,23 @@ class CommunityMemberBuilder
 
 class _$CommunityEcological extends CommunityEcological {
   @override
-  final String chain;
+  final String? chain;
   @override
-  final String symbol;
+  final String? symbol;
   @override
-  final String name;
+  final String? name;
   @override
-  final String fork;
+  final String? fork;
   @override
-  final String id;
+  final String? id;
 
   factory _$CommunityEcological(
           [void Function(CommunityEcologicalBuilder)? updates]) =>
       (new CommunityEcologicalBuilder()..update(updates))._build();
 
   _$CommunityEcological._(
-      {required this.chain,
-      required this.symbol,
-      required this.name,
-      required this.fork,
-      required this.id})
-      : super._() {
-    BuiltValueNullFieldError.checkNotNull(
-        chain, 'CommunityEcological', 'chain');
-    BuiltValueNullFieldError.checkNotNull(
-        symbol, 'CommunityEcological', 'symbol');
-    BuiltValueNullFieldError.checkNotNull(name, 'CommunityEcological', 'name');
-    BuiltValueNullFieldError.checkNotNull(fork, 'CommunityEcological', 'fork');
-    BuiltValueNullFieldError.checkNotNull(id, 'CommunityEcological', 'id');
-  }
+      {this.chain, this.symbol, this.name, this.fork, this.id})
+      : super._();
 
   @override
   CommunityEcological rebuild(
@@ -2863,16 +2945,7 @@ class CommunityEcologicalBuilder
   _$CommunityEcological _build() {
     final _$result = _$v ??
         new _$CommunityEcological._(
-            chain: BuiltValueNullFieldError.checkNotNull(
-                chain, 'CommunityEcological', 'chain'),
-            symbol: BuiltValueNullFieldError.checkNotNull(
-                symbol, 'CommunityEcological', 'symbol'),
-            name: BuiltValueNullFieldError.checkNotNull(
-                name, 'CommunityEcological', 'name'),
-            fork: BuiltValueNullFieldError.checkNotNull(
-                fork, 'CommunityEcological', 'fork'),
-            id: BuiltValueNullFieldError.checkNotNull(
-                id, 'CommunityEcological', 'id'));
+            chain: chain, symbol: symbol, name: name, fork: fork, id: id);
     replace(_$result);
     return _$result;
   }
@@ -2880,36 +2953,26 @@ class CommunityEcologicalBuilder
 
 class _$CommunityState extends CommunityState {
   @override
-  final CommunityConfig config;
+  final CommunityConfig? config;
   @override
-  final int configState;
+  final int? configState;
   @override
-  final BuiltList<CommunityTeam> communityTeamList;
+  final BuiltList<CommunityTeam>? communityTeamList;
   @override
-  final BuiltList<CommunityMember> communityMemberList;
+  final BuiltList<CommunityMember>? communityMemberList;
   @override
-  final BuiltList<CommunityTeam> communityBlacklist;
+  final BuiltList<CommunityTeam>? communityBlacklist;
 
   factory _$CommunityState([void Function(CommunityStateBuilder)? updates]) =>
       (new CommunityStateBuilder()..update(updates))._build();
 
   _$CommunityState._(
-      {required this.config,
-      required this.configState,
-      required this.communityTeamList,
-      required this.communityMemberList,
-      required this.communityBlacklist})
-      : super._() {
-    BuiltValueNullFieldError.checkNotNull(config, 'CommunityState', 'config');
-    BuiltValueNullFieldError.checkNotNull(
-        configState, 'CommunityState', 'configState');
-    BuiltValueNullFieldError.checkNotNull(
-        communityTeamList, 'CommunityState', 'communityTeamList');
-    BuiltValueNullFieldError.checkNotNull(
-        communityMemberList, 'CommunityState', 'communityMemberList');
-    BuiltValueNullFieldError.checkNotNull(
-        communityBlacklist, 'CommunityState', 'communityBlacklist');
-  }
+      {this.config,
+      this.configState,
+      this.communityTeamList,
+      this.communityMemberList,
+      this.communityBlacklist})
+      : super._();
 
   @override
   CommunityState rebuild(void Function(CommunityStateBuilder) updates) =>
@@ -2988,11 +3051,11 @@ class CommunityStateBuilder
   CommunityStateBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _config = $v.config.toBuilder();
+      _config = $v.config?.toBuilder();
       _configState = $v.configState;
-      _communityTeamList = $v.communityTeamList.toBuilder();
-      _communityMemberList = $v.communityMemberList.toBuilder();
-      _communityBlacklist = $v.communityBlacklist.toBuilder();
+      _communityTeamList = $v.communityTeamList?.toBuilder();
+      _communityMemberList = $v.communityMemberList?.toBuilder();
+      _communityBlacklist = $v.communityBlacklist?.toBuilder();
       _$v = null;
     }
     return this;
@@ -3017,24 +3080,23 @@ class CommunityStateBuilder
     try {
       _$result = _$v ??
           new _$CommunityState._(
-              config: config.build(),
-              configState: BuiltValueNullFieldError.checkNotNull(
-                  configState, 'CommunityState', 'configState'),
-              communityTeamList: communityTeamList.build(),
-              communityMemberList: communityMemberList.build(),
-              communityBlacklist: communityBlacklist.build());
+              config: _config?.build(),
+              configState: configState,
+              communityTeamList: _communityTeamList?.build(),
+              communityMemberList: _communityMemberList?.build(),
+              communityBlacklist: _communityBlacklist?.build());
     } catch (_) {
       late String _$failedField;
       try {
         _$failedField = 'config';
-        config.build();
+        _config?.build();
 
         _$failedField = 'communityTeamList';
-        communityTeamList.build();
+        _communityTeamList?.build();
         _$failedField = 'communityMemberList';
-        communityMemberList.build();
+        _communityMemberList?.build();
         _$failedField = 'communityBlacklist';
-        communityBlacklist.build();
+        _communityBlacklist?.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
             'CommunityState', _$failedField, e.toString());

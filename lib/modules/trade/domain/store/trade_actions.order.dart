@@ -100,11 +100,11 @@ class TradeActionGetApproveBalance extends _BaseAction {
       symbol: symbol,
     );
     final approveBalance = await WalletRepository().getDexApproveBalance(
-      chain: coinInfo.chain,
-      symbol: coinInfo.symbol,
-      contract: coinInfo.contract,
-      sellAddress: coinInfo.address,
-      chainPrecision: coinInfo.chainPrecision,
+      chain: coinInfo.chain ?? '',
+      symbol: coinInfo.symbol ?? '',
+      contract: coinInfo.contract ?? '',
+      sellAddress: coinInfo.address ?? '',
+      chainPrecision: coinInfo.chainPrecision ?? 0,
     );
     completer.complete(approveBalance);
     return null;
@@ -143,22 +143,23 @@ class TradeActionGetOrderBalance extends _BaseAction {
 
     if (order.isChainUseApiRawTx) {
       balance = await WalletRepository().getDexOrderBalance(
-        chain: coinInfo.chain,
-        symbol: coinInfo.symbol,
+        chain: coinInfo.chain ?? '',
+        symbol: coinInfo.symbol ?? '',
         primaryKey: order.templateHex,
-        sellAddress: coinInfo.address,
-        chainPrecision: coinInfo.chainPrecision,
+        sellAddress: coinInfo.address ?? '',
+        chainPrecision: coinInfo.chainPrecision ?? 0,
       );
     } else {
       final completer = Completer<double>();
-      store.dispatch(AssetActionGetCoinBalance(
-        wallet: store.state.walletState.activeWallet!,
-        chain: coinInfo.chain,
-        symbol: coinInfo.symbol,
-        address: order.templateAddress,
-        ignoreUnspent: true,
-        completer: completer,
-      ));
+      store.dispatch(
+        AssetActionGetCoinBalance(
+          wallet: store.state.walletState.activeWallet!,
+          chain: coinInfo.chain ?? '',
+          symbol: coinInfo.symbol ?? '',
+          address: order.templateAddress,
+          completer: completer,
+        ),
+      );
       balance = await completer.future;
     }
 
@@ -193,14 +194,16 @@ class TradeActionOrderCheckStatus extends _BaseAction {
     );
 
     final getTransInfo = Completer<Transaction>();
-    dispatch(AssetActionGetSingleTransaction(
-      txId: txId,
-      chain: coinInfo.chain,
-      symbol: coinInfo.symbol,
-      fromAddress: order.fromAddress,
-      chainPrecision: coinInfo.chainPrecision,
-      completer: getTransInfo,
-    ));
+    dispatch(
+      AssetActionGetSingleTransaction(
+        txId: txId,
+        chain: coinInfo.chain ?? '',
+        symbol: coinInfo.symbol ?? '',
+        fromAddress: order.fromAddress,
+        chainPrecision: coinInfo.chainPrecision ?? 0,
+        completer: getTransInfo,
+      ),
+    );
     final transInfo = await getTransInfo.future;
 
     final walletId = store.state.walletState.activeWalletId;

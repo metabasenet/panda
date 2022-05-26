@@ -2,7 +2,7 @@ part of trade_domain_module;
 
 abstract class _BaseAction extends ReduxAction<AppState> {
   String get walletId => store.state.walletState.activeWalletId!;
-  TradeConfig get tradeConfig => store.state.tradeState.config;
+  TradeConfig get tradeConfig => store.state.tradeState.config!;
 
   /// We need to fix the symbol for ERC20, TRC20, use only USDT
   /// The chain can only have one USDT

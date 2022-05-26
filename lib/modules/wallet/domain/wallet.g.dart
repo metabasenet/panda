@@ -17,12 +17,16 @@ class _$WalletStateSerializer implements StructuredSerializer<WalletState> {
   @override
   Iterable<Object?> serialize(Serializers serializers, WalletState object,
       {FullType specifiedType = FullType.unspecified}) {
-    final result = <Object?>[
-      'wallets',
-      serializers.serialize(object.wallets,
-          specifiedType: const FullType(List, const [const FullType(Wallet)])),
-    ];
+    final result = <Object?>[];
     Object? value;
+    value = object.wallets;
+    if (value != null) {
+      result
+        ..add('wallets')
+        ..add(serializers.serialize(value,
+            specifiedType:
+                const FullType(List, const [const FullType(Wallet)])));
+    }
     value = object.activeWallet;
     if (value != null) {
       result
@@ -61,8 +65,8 @@ class _$WalletStateSerializer implements StructuredSerializer<WalletState> {
         case 'wallets':
           result.wallets = serializers.deserialize(value,
                   specifiedType:
-                      const FullType(List, const [const FullType(Wallet)]))!
-              as List<Wallet>;
+                      const FullType(List, const [const FullType(Wallet)]))
+              as List<Wallet>?;
           break;
         case 'activeWallet':
           result.activeWallet = serializers.deserialize(value,
@@ -168,7 +172,7 @@ class WalletBackupVMBuilder
 
 class _$WalletManagementVM extends WalletManagementVM {
   @override
-  final Wallet activeWallet;
+  final Wallet? activeWallet;
   @override
   final Future<WalletPrivateData> Function(String password) doUnlockWallet;
   @override
@@ -188,7 +192,7 @@ class _$WalletManagementVM extends WalletManagementVM {
       (new WalletManagementVMBuilder()..update(updates))._build();
 
   _$WalletManagementVM._(
-      {required this.activeWallet,
+      {this.activeWallet,
       required this.doUnlockWallet,
       required this.createWallet,
       required this.changePassword,
@@ -196,8 +200,6 @@ class _$WalletManagementVM extends WalletManagementVM {
       required this.deleteWallet,
       required this.validateMnemonic})
       : super._() {
-    BuiltValueNullFieldError.checkNotNull(
-        activeWallet, 'WalletManagementVM', 'activeWallet');
     BuiltValueNullFieldError.checkNotNull(
         doUnlockWallet, 'WalletManagementVM', 'doUnlockWallet');
     BuiltValueNullFieldError.checkNotNull(
@@ -332,8 +334,7 @@ class WalletManagementVMBuilder
   _$WalletManagementVM _build() {
     final _$result = _$v ??
         new _$WalletManagementVM._(
-            activeWallet: BuiltValueNullFieldError.checkNotNull(
-                activeWallet, 'WalletManagementVM', 'activeWallet'),
+            activeWallet: activeWallet,
             doUnlockWallet: BuiltValueNullFieldError.checkNotNull(
                 doUnlockWallet, 'WalletManagementVM', 'doUnlockWallet'),
             createWallet: BuiltValueNullFieldError.checkNotNull(
@@ -353,7 +354,7 @@ class WalletManagementVMBuilder
 
 class _$WalletState extends WalletState {
   @override
-  final List<Wallet> wallets;
+  final List<Wallet>? wallets;
   @override
   final Wallet? activeWallet;
   @override
@@ -365,13 +366,11 @@ class _$WalletState extends WalletState {
       (new WalletStateBuilder()..update(updates))._build();
 
   _$WalletState._(
-      {required this.wallets,
+      {this.wallets,
       this.activeWallet,
       this.activeWalletId,
       this.activeWalletStatus})
-      : super._() {
-    BuiltValueNullFieldError.checkNotNull(wallets, 'WalletState', 'wallets');
-  }
+      : super._();
 
   @override
   WalletState rebuild(void Function(WalletStateBuilder) updates) =>
@@ -461,8 +460,7 @@ class WalletStateBuilder implements Builder<WalletState, WalletStateBuilder> {
   _$WalletState _build() {
     final _$result = _$v ??
         new _$WalletState._(
-            wallets: BuiltValueNullFieldError.checkNotNull(
-                wallets, 'WalletState', 'wallets'),
+            wallets: wallets,
             activeWallet: activeWallet,
             activeWalletId: activeWalletId,
             activeWalletStatus: activeWalletStatus);

@@ -35,13 +35,14 @@ abstract class TradeConfig implements Built<TradeConfig, TradeConfigBuilder> {
 
   List<TradePair> get allTradePairs {
     final allPairs = <TradePair>[];
-    if (tradePairs != null) {
-      for (final market in tradePairs.entries) {
-        for (final pair in market.value.pairs) {
-          final status = TradePair.mapTradePairStatus(pair.status);
-          // 关闭的，不显示了
-          if (status != TradePairStatus.close) {
-            allPairs.add(TradePair.fromConfig(
+
+    for (final market in tradePairs.entries) {
+      for (final pair in market.value.pairs) {
+        final status = TradePair.mapTradePairStatus(pair.status ?? '');
+        // 关闭的，不显示了
+        if (status != TradePairStatus.close) {
+          allPairs.add(
+            TradePair.fromConfig(
               speed: pair.speed,
               spans: pair.spans.toList(),
               pairId: pair.id,
@@ -52,9 +53,9 @@ abstract class TradeConfig implements Built<TradeConfig, TradeConfigBuilder> {
               priceSymbol: pair.price.symbol,
               tradeChain: pair.trade.chain,
               tradeSymbol: pair.trade.symbol,
-              apiStatus: pair.status,
-            ));
-          }
+              apiStatus: pair.status ?? '',
+            ),
+          );
         }
       }
     }

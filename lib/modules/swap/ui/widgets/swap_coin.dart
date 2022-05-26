@@ -41,7 +41,7 @@ class SwapCoin extends HookWidget {
 
     final options = configList
         .map((e) => CSOptionsItem(
-              label: e.key.name,
+              label: e.key.name ?? '',
               value: e.value,
               color: e.key.id == selectCoin.id ? context.primaryColor : null,
             ))
@@ -185,7 +185,7 @@ class SwapCoin extends HookWidget {
       margin: EdgeInsets.zero,
       width: itemWidth,
       child: Text(
-        coin.name,
+        coin.name ?? '',
         style: context.textBody(
           bold: true,
           fontWeight: FontWeight.normal,

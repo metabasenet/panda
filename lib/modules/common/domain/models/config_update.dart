@@ -15,10 +15,10 @@ abstract class ConfigUpdate
 // Fields
   //@nullable
   @BuiltValueField(wireName: 'update')
-  bool get needUpdate;
+  bool? get needUpdate;
 
   //@nullable
-  ConfigUpdateData get data;
+  ConfigUpdateData? get data;
 
-  bool get hasNewVersion => needUpdate == true && data.downloadUrl != null;
+  bool get hasNewVersion => needUpdate == true && data?.downloadUrl != null;
 }

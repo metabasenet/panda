@@ -20,7 +20,7 @@ class AssetAddressListPage extends HookWidget {
   }
 
   static Route<String> route(RouteSettings settings) {
-    final params = settings.arguments as Map<String, dynamic>;
+    final params = settings.arguments! as Map<String, dynamic>;
     final selectAddress = params['selectAddress'];
     final coinInfo = params['coinInfo'] as AssetCoin;
     return DefaultTransition<String>(
@@ -77,17 +77,19 @@ class AssetAddressListPage extends HookWidget {
   Widget build(BuildContext context) {
     final request = useBehaviorStreamController<CSListViewParams<bool>>();
     final select = useState(0);
-
+    /*
     void onSelect(int index, AssetAddressVM viewModel) {
       if (index != select.value) {
         select.value = index;
         viewModel.clearAddressList();
-        request.add(CSListViewParams.withParams(
-          index == 0,
-          delay: index == 0 ? 0 : 1,
-        ));
+        request.add(
+          CSListViewParams.withParams(
+            index == 0,
+            delay: index == 0 ? 0 : 1,
+          ),
+        );
       }
-    }
+    }*/
 
     return CSScaffold(
       title: tr('asset:address_list_title'),
@@ -140,10 +142,13 @@ class AssetAddressListPage extends HookWidget {
                     isLocal: params.params!,
                   );
                 },
-                itemCount: viewModel.addressList.length,
+                itemCount: viewModel.addressList?.length ?? 0,
                 itemBuilder: (context, index) {
                   return buildItem(
-                      context, viewModel, viewModel.addressList[index]);
+                    context,
+                    viewModel,
+                    viewModel.addressList![index],
+                  );
                 },
               ),
             ),
@@ -200,7 +205,7 @@ class AssetAddressListPage extends HookWidget {
     AssetAddress item,
   ) {
     final addressStr =
-        StringUtils.strCut(item.address, startKeep: 14, endKeep: 14);
+        StringUtils.strCut(item.address ?? '', startKeep: 14, endKeep: 14);
 
     final isSelect = item.address == selectAddress;
 
@@ -231,7 +236,7 @@ class AssetAddressListPage extends HookWidget {
                       ),
                     Expanded(
                       child: Text(
-                        item.comments,
+                        item.comments ?? '',
                         style: context.textBody(
                           bold: true,
                           fontWeight: FontWeight.normal,
@@ -250,7 +255,7 @@ class AssetAddressListPage extends HookWidget {
                       ),
                       padding: context.edgeAll5,
                       child: Text(
-                        coinInfo!.fullName,
+                        coinInfo?.fullName ?? '',
                         style: context.textSmall(
                           color: Color(0xFF94820d),
                           bold: true,
@@ -259,11 +264,13 @@ class AssetAddressListPage extends HookWidget {
                       ),
                     ),
                     SizedBox(width: context.edgeSizeHalf),
-                    Text(addressStr,
-                        style: context.textSmall(
-                          bold: true,
-                          fontWeight: FontWeight.normal,
-                        )),
+                    Text(
+                      addressStr,
+                      style: context.textSmall(
+                        bold: true,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
                   ],
                 ),
               ],

@@ -67,7 +67,7 @@ class InvestHomePage extends HookWidget {
           converter: InvestHomeVM.fromStore,
           builder: (context, viewModel) => MintSelectDrawer(
             mints: viewModel.mints.toList(),
-            activeMintId: viewModel.activeMint.id,
+            activeMintId: viewModel.activeMint?.id ?? 0,
             onLoadMint: (mint) {
               loadMint(viewModel, mint, selectedTab);
             },
@@ -82,7 +82,7 @@ class InvestHomePage extends HookWidget {
           if (viewModel.mints.isNotEmpty) {
             loadMint(
               viewModel,
-              viewModel.activeMint,
+              viewModel.activeMint!,
               selectedTab,
             );
           }
@@ -188,8 +188,6 @@ class InvestHomePage extends HookWidget {
       );
     }
 
-    final symbol = viewModel.activeMint.symbol;
-
     if (select == InvestTabs.loading) {
       return Expanded(
         child: CSContainer(
@@ -208,7 +206,7 @@ class InvestHomePage extends HookWidget {
             showButton: true,
             btnText: tr('global:btn_refresh'),
             onPressed: () {
-              loadMint(viewModel, viewModel.activeMint, selectedTab);
+              loadMint(viewModel, viewModel.activeMint!, selectedTab);
             },
           ),
         ),
@@ -216,8 +214,8 @@ class InvestHomePage extends HookWidget {
     }
 
     final coinInfo = viewModel.getCoinInfo(
-      chain: viewModel.activeMint.chain,
-      symbol: viewModel.activeMint.symbol,
+      chain: viewModel.activeMint?.chain ?? '',
+      symbol: viewModel.activeMint?.symbol ?? '',
     );
 
     if (select == InvestTabs.airdrop) {

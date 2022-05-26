@@ -31,7 +31,7 @@ class WalletManagementPage extends HookWidget {
   ) {
     AnalyticsReport().reportLog('Wallet_Management_Action', {
       'type': type.toString(),
-      'walletId': viewModel.activeWallet.id,
+      'walletId': viewModel.activeWallet?.id ?? '',
     });
     switch (type) {
       case _InvitationMenu.invitationCode:
@@ -58,11 +58,11 @@ class WalletManagementPage extends HookWidget {
       (data, password) {
         AnalyticsReport().reportLog('Wallet_Management_Action', {
           'type': type.toString(),
-          'walletId': viewModel.activeWallet.id,
+          'walletId': viewModel.activeWallet?.id ?? '',
         });
         switch (type) {
           case _WalletMenu.changeName:
-            WalletChangeNamePage.open(viewModel.activeWallet.name);
+            WalletChangeNamePage.open(viewModel.activeWallet?.name ?? '');
             break;
           case _WalletMenu.changePassword:
             WalletChangePasswordPage.open(password);
@@ -154,7 +154,7 @@ class WalletManagementPage extends HookWidget {
                   FormCell(
                     label: tr('wallet:management_btn_backup'),
                     showBorderTop: true,
-                    cmpRight: viewModel.activeWallet.hasBackup == false
+                    cmpRight: viewModel.activeWallet?.hasBackup == false
                         ? CSBadge(size: 8)
                         : null,
                     onPress: () {

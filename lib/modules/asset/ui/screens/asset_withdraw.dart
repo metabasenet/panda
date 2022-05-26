@@ -15,7 +15,7 @@ class AssetWithdrawPage extends HookWidget {
   static Route<dynamic> route(RouteSettings settings, [AssetCoin? coinInfo]) {
     return DefaultTransition(
       settings,
-      AssetWithdrawPage(coinInfo: coinInfo ?? settings.arguments as AssetCoin),
+      AssetWithdrawPage(coinInfo: coinInfo ?? settings.arguments! as AssetCoin),
     );
   }
 
@@ -47,7 +47,7 @@ class AssetWithdrawPage extends HookWidget {
       amount: NumberUtil.getDouble(amount),
       toAddress: address,
       withdrawData: withdrawInfo,
-      chainPrecision: coinInfo!.chainPrecision,
+      chainPrecision: coinInfo?.chainPrecision ?? 0,
       onWithdrawSuccess: (txId) {
         LoadingDialog.dismiss(context);
         Toast.show(tr('asset:withdraw_msg_success'));
@@ -175,8 +175,8 @@ class AssetWithdrawPage extends HookWidget {
 
     void handleWithdrawAll(AssetWithdrawVM viewModel) {
       final balance = viewModel.getCoinBalance(
-        chain: coinInfo!.chain,
-        symbol: coinInfo!.symbol,
+        chain: coinInfo?.chain ?? '',
+        symbol: coinInfo?.symbol ?? '',
       );
       if (withdrawInfo.value?.fee.feeSymbol == coinInfo?.symbol) {
         if ((withdrawInfo.value?.fee.feeValue ?? 0) > balance) {
@@ -189,9 +189,11 @@ class AssetWithdrawPage extends HookWidget {
         }
       } else {
         // 矿工费 扣的不是当前币 那可以把余额全转出去
-        amount.text =
-            NumberUtil.truncateDecimal(balance, coinInfo!.chainPrecision) ??
-                '0';
+        amount.text = NumberUtil.truncateDecimal(
+              balance,
+              coinInfo?.chainPrecision ?? 0,
+            ) ??
+            '0';
       }
     }
 
@@ -311,8 +313,8 @@ class AssetWithdrawPage extends HookWidget {
                         tr(
                           'asset:lbl_balance',
                           namedArgs: {
-                            'balance': balance!,
-                            'symbol': coinInfo!.name,
+                            'balance': balance ?? '',
+                            'symbol': coinInfo?.name ?? '',
                           },
                         ),
                         style: context.textSecondary(

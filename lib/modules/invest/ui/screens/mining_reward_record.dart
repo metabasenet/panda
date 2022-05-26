@@ -43,7 +43,7 @@ class MiningRewardRecordPage extends HookWidget {
             itemBuilder: (context, index) {
               return MiningRewardItem(
                 item: list[index],
-                mintItem: viewModel.activeMint,
+                mintItem: viewModel.activeMint!,
               );
             },
           );

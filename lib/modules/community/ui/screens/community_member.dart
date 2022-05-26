@@ -13,7 +13,7 @@ class CommunityMemberPage extends HookWidget {
   static Route<dynamic> route(RouteSettings settings) {
     return DefaultTransition(
       settings,
-      CommunityMemberPage(settings.arguments as CommunityMember),
+      CommunityMemberPage(settings.arguments! as CommunityMember),
     );
   }
 
@@ -21,7 +21,7 @@ class CommunityMemberPage extends HookWidget {
   Widget build(BuildContext context) {
     final list = [
       {
-        'value': item.info.describe,
+        'value': item.info?.describe ?? '',
       },
       {
         'label': tr('community:detail_lbl_address_mine'),
@@ -29,7 +29,7 @@ class CommunityMemberPage extends HookWidget {
       },
       {
         'label': tr('community:join_mars_develop_telegram_lbl'),
-        'value': item.info.telegramAccount,
+        'value': item.info?.telegramAccount ?? '',
       },
       if (item.statusRejected && item.rejectedMessage.isNotEmpty)
         {
@@ -54,7 +54,7 @@ class CommunityMemberPage extends HookWidget {
               children: [
                 Expanded(
                   child: SelectableText(
-                    item.info.name ?? '',
+                    item.info?.name ?? '',
                     style: context.textMedium(
                       bold: true,
                       lineHeight: 1.5,
@@ -64,7 +64,7 @@ class CommunityMemberPage extends HookWidget {
                 ),
                 SizedBox(width: context.edgeSize),
                 CSImage(
-                  item.info.displayIcon,
+                  item.info?.displayIcon ?? '',
                   fallbackUrl: 'assets/images/app_default_logo.png',
                   width: 80,
                   height: 80,

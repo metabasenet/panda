@@ -56,25 +56,27 @@ class TradeOrderListPage extends HookWidget {
     late String priceAddress;
     if (tradePair != null) {
       tradeAddress = viewModel
-          .getCoinInfo(
-            chain: tradePair.tradeChain,
-            symbol: tradePair.tradeSymbol,
-          )
-          .address;
+              .getCoinInfo(
+                chain: tradePair.tradeChain,
+                symbol: tradePair.tradeSymbol,
+              )
+              .address ??
+          '';
 
       priceAddress = viewModel
-          .getCoinInfo(
-            chain: tradePair.priceChain,
-            symbol: tradePair.priceSymbol,
-          )
-          .address;
+              .getCoinInfo(
+                chain: tradePair.priceChain,
+                symbol: tradePair.priceSymbol,
+              )
+              .address ??
+          '';
     }
     return cubit
         .loadAll(
       tradePairId: tradePair?.id ?? '',
       tradeAddress: tradeAddress,
       priceAddress: priceAddress,
-      walletId: viewModel.activeWalletId,
+      walletId: viewModel.activeWalletId ?? '',
       skip: params?.skip ?? 0,
       take: params?.take ?? 0,
       tradeSide: params?.params?.tradeSide ?? '',
@@ -84,7 +86,7 @@ class TradeOrderListPage extends HookWidget {
         .then((value) {
       // Refresh TradeOrder page data with cache
       GetIt.I<TradeOrdersPendingCubit>().loadPendingOrdersFromCache(
-        walletId: viewModel.activeWalletId,
+        walletId: viewModel.activeWalletId ?? '',
         tradePairId: viewModel.tradePair.id,
       );
       return value;
@@ -102,7 +104,7 @@ class TradeOrderListPage extends HookWidget {
     request.add(request.value.copyWith(isRefresh: true));
     // Refresh TradeOrder page data with cache
     GetIt.I<TradeOrdersPendingCubit>().loadPendingOrdersFromCache(
-      walletId: viewModel.activeWalletId,
+      walletId: viewModel.activeWalletId ?? '',
       tradePairId: viewModel.tradePair.id,
     );
   }

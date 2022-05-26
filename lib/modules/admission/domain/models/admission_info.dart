@@ -14,13 +14,13 @@ abstract class AdmissionInfo
 
   // Fields
   //@nullable
-  int get id;
+  int? get id;
 
   //@nullable
-  String get name;
+  String? get name;
 
   //@nullable
-  String get describe;
+  String? get describe;
 
   //@nullable
   @BuiltValueField(wireName: 'end_time')
@@ -31,12 +31,12 @@ abstract class AdmissionInfo
   int? get startTime;
 
   //@nullable
-  BuiltList<AdmissionCondition> get condition;
+  BuiltList<AdmissionCondition>? get condition;
 
   /// 第一个规则 现在只有一个
   AdmissionCondition? get transferCondition {
-    if (condition.isNotEmpty) {
-      return condition.first;
+    if (condition?.isNotEmpty ?? false) {
+      return condition?.first;
     } else {
       return null;
     }
@@ -48,13 +48,13 @@ abstract class AdmissionInfo
 //     "currency": "MNT"
 // },
   //@nullable
-  BuiltMap<String, String> get ecological;
+  BuiltMap<String, String>? get ecological;
 
-  String get chain => ecological['chain'] ?? '';
+  String get chain => ecological?['chain'] ?? '';
 
-  String get symbol => ecological['currency'] ?? '';
+  String get symbol => ecological?['currency'] ?? '';
 
-  String get fork => ecological['fork'] ?? '';
+  String get fork => ecological?['fork'] ?? '';
 
   bool get isRunning {
     if (startTime != null && endTime != null) {

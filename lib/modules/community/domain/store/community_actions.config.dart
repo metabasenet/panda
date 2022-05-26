@@ -24,9 +24,8 @@ class CommunityActionLoadConfig extends _BaseAction {
 class CommunityActionLoadConfigAfter extends _BaseAction {
   @override
   AppState? reduce() {
-    final isError = communityConfig == null ||
-        communityConfig.ecological == null ||
-        communityConfig.ecological.isEmpty;
+    final isError = communityConfig.ecological == null ||
+        (communityConfig.ecological?.isEmpty ?? false);
 
     return store.state.rebuild(
       (a) => a.communityState.configState =

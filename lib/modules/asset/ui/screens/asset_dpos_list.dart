@@ -17,7 +17,7 @@ class AssetDposList extends StatefulWidget {
   static Route<dynamic> route(RouteSettings settings, [AssetCoin? item]) {
     return DefaultTransition(
       settings,
-      AssetDposList(item ?? settings.arguments as AssetCoin),
+      AssetDposList(item ?? settings.arguments! as AssetCoin),
     );
   }
 
@@ -30,7 +30,7 @@ class AssetDposList extends StatefulWidget {
 class _AssetDposList extends State<AssetDposList> {
   var voteNodeList = []; // 节点列表
   void checkIfWalletHasBackup(BuildContext context, AssetDetailVM viewModel) {
-    if (!viewModel.activeWallet.hasBackup && !kDebugMode) {
+    if (!(viewModel.activeWallet?.hasBackup ?? false) && !kDebugMode) {
       showConfirmDialog(
         context,
         content: tr('asset:detail_msg_backup'),
@@ -61,8 +61,8 @@ class _AssetDposList extends State<AssetDposList> {
             SizedBox(height: 4),
             Text(
               tr('asset:detail_lbl_total', namedArgs: {
-                'name': widget.coinInfo.name,
-                'fullName': widget.coinInfo.fullName,
+                'name': widget.coinInfo.name ?? '',
+                'fullName': widget.coinInfo.fullName ?? '',
               }),
               style: context.textSecondary(
                 bold: true,
@@ -190,20 +190,8 @@ class _AssetDposList extends State<AssetDposList> {
     );
   }
 
-  @override
-  void initState() {
-    /*
-    AssetRepository().getVoteNode().then((res) => {
-          setState(() {
-            voteNodeList = res;
-          }),
-        });
-        */
-  }
-
-  @override
   void onChanged() {
-    initState();
+    //initState();
   }
 
   @override

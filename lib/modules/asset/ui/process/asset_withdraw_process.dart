@@ -15,12 +15,12 @@ class AssetWithdrawProcess {
     return viewModel
         .onWithdrawBefore(
       WithdrawBeforeParams(
-        chain: coinInfo.chain,
-        symbol: coinInfo.symbol,
+        chain: coinInfo.chain ?? '',
+        symbol: coinInfo.symbol ?? '',
         toAddress: toAddress,
-        chainPrecision: coinInfo.chainPrecision,
+        chainPrecision: coinInfo.chainPrecision ?? 0,
         amount: NumberUtil.getDouble(amount),
-        fromAddress: coinInfo.address,
+        fromAddress: coinInfo.address ?? '',
         contractOrForkId: coinInfo.contract,
       ),
       previousWithdrawData,
@@ -29,7 +29,7 @@ class AssetWithdrawProcess {
       return value;
     }).catchError((error) {
       Toast.showError(error);
-      return error;
+      //return error;
     });
   }
 

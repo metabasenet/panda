@@ -22,24 +22,28 @@ class _$AdmissionInfoSerializer implements StructuredSerializer<AdmissionInfo> {
   @override
   Iterable<Object?> serialize(Serializers serializers, AdmissionInfo object,
       {FullType specifiedType = FullType.unspecified}) {
-    final result = <Object?>[
-      'id',
-      serializers.serialize(object.id, specifiedType: const FullType(int)),
-      'name',
-      serializers.serialize(object.name, specifiedType: const FullType(String)),
-      'describe',
-      serializers.serialize(object.describe,
-          specifiedType: const FullType(String)),
-      'condition',
-      serializers.serialize(object.condition,
-          specifiedType: const FullType(
-              BuiltList, const [const FullType(AdmissionCondition)])),
-      'ecological',
-      serializers.serialize(object.ecological,
-          specifiedType: const FullType(BuiltMap,
-              const [const FullType(String), const FullType(String)])),
-    ];
+    final result = <Object?>[];
     Object? value;
+    value = object.id;
+    if (value != null) {
+      result
+        ..add('id')
+        ..add(serializers.serialize(value, specifiedType: const FullType(int)));
+    }
+    value = object.name;
+    if (value != null) {
+      result
+        ..add('name')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.describe;
+    if (value != null) {
+      result
+        ..add('describe')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
     value = object.endTime;
     if (value != null) {
       result
@@ -51,6 +55,22 @@ class _$AdmissionInfoSerializer implements StructuredSerializer<AdmissionInfo> {
       result
         ..add('start_time')
         ..add(serializers.serialize(value, specifiedType: const FullType(int)));
+    }
+    value = object.condition;
+    if (value != null) {
+      result
+        ..add('condition')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(
+                BuiltList, const [const FullType(AdmissionCondition)])));
+    }
+    value = object.ecological;
+    if (value != null) {
+      result
+        ..add('ecological')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(BuiltMap,
+                const [const FullType(String), const FullType(String)])));
     }
     return result;
   }
@@ -69,15 +89,15 @@ class _$AdmissionInfoSerializer implements StructuredSerializer<AdmissionInfo> {
       switch (key) {
         case 'id':
           result.id = serializers.deserialize(value,
-              specifiedType: const FullType(int))! as int;
+              specifiedType: const FullType(int)) as int?;
           break;
         case 'name':
           result.name = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'describe':
           result.describe = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'end_time':
           result.endTime = serializers.deserialize(value,
@@ -115,19 +135,31 @@ class _$AdmissionConfigSerializer
   @override
   Iterable<Object?> serialize(Serializers serializers, AdmissionConfig object,
       {FullType specifiedType = FullType.unspecified}) {
-    final result = <Object?>[
-      'fork',
-      serializers.serialize(object.fork, specifiedType: const FullType(String)),
-      'home_list',
-      serializers.serialize(object.homeList,
-          specifiedType:
-              const FullType(BuiltList, const [const FullType(int)])),
-      'ecological',
-      serializers.serialize(object.projects,
-          specifiedType:
-              const FullType(BuiltList, const [const FullType(AdmissionInfo)])),
-    ];
-
+    final result = <Object?>[];
+    Object? value;
+    value = object.fork;
+    if (value != null) {
+      result
+        ..add('fork')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.homeList;
+    if (value != null) {
+      result
+        ..add('home_list')
+        ..add(serializers.serialize(value,
+            specifiedType:
+                const FullType(BuiltList, const [const FullType(int)])));
+    }
+    value = object.projects;
+    if (value != null) {
+      result
+        ..add('ecological')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(
+                BuiltList, const [const FullType(AdmissionInfo)])));
+    }
     return result;
   }
 
@@ -145,7 +177,7 @@ class _$AdmissionConfigSerializer
       switch (key) {
         case 'fork':
           result.fork = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'home_list':
           result.homeList.replace(serializers.deserialize(value,
@@ -177,28 +209,45 @@ class _$AdmissionConditionSerializer
   Iterable<Object?> serialize(
       Serializers serializers, AdmissionCondition object,
       {FullType specifiedType = FullType.unspecified}) {
-    final result = <Object?>[
-      'black_hole_address',
-      serializers.serialize(object.address,
-          specifiedType: const FullType(String)),
-      'black_hole_transfer_data',
-      serializers.serialize(object.transferData,
-          specifiedType: const FullType(String)),
-      'black_hole_transfer_count',
-      serializers.serialize(object.transferCount,
-          specifiedType: const FullType(int)),
-      'black_hole_transfer_progress',
-      serializers.serialize(object.transferProgress,
-          specifiedType: const FullType(int)),
-      'black_hole_transfer_currency',
-      serializers.serialize(object.transferCurrency,
-          specifiedType: const FullType(BuiltMap, const [
-            const FullType(String),
-            const FullType(BuiltMap,
-                const [const FullType(String), const FullType(String)])
-          ])),
-    ];
-
+    final result = <Object?>[];
+    Object? value;
+    value = object.address;
+    if (value != null) {
+      result
+        ..add('black_hole_address')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.transferData;
+    if (value != null) {
+      result
+        ..add('black_hole_transfer_data')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.transferCount;
+    if (value != null) {
+      result
+        ..add('black_hole_transfer_count')
+        ..add(serializers.serialize(value, specifiedType: const FullType(int)));
+    }
+    value = object.transferProgress;
+    if (value != null) {
+      result
+        ..add('black_hole_transfer_progress')
+        ..add(serializers.serialize(value, specifiedType: const FullType(int)));
+    }
+    value = object.transferCurrency;
+    if (value != null) {
+      result
+        ..add('black_hole_transfer_currency')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(BuiltMap, const [
+              const FullType(String),
+              const FullType(BuiltMap,
+                  const [const FullType(String), const FullType(String)])
+            ])));
+    }
     return result;
   }
 
@@ -216,19 +265,19 @@ class _$AdmissionConditionSerializer
       switch (key) {
         case 'black_hole_address':
           result.address = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'black_hole_transfer_data':
           result.transferData = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'black_hole_transfer_count':
           result.transferCount = serializers.deserialize(value,
-              specifiedType: const FullType(int))! as int;
+              specifiedType: const FullType(int)) as int?;
           break;
         case 'black_hole_transfer_progress':
           result.transferProgress = serializers.deserialize(value,
-              specifiedType: const FullType(int))! as int;
+              specifiedType: const FullType(int)) as int?;
           break;
         case 'black_hole_transfer_currency':
           result.transferCurrency.replace(serializers.deserialize(value,
@@ -247,7 +296,7 @@ class _$AdmissionConditionSerializer
 
 class _$AdmissionCreateVM extends AdmissionCreateVM {
   @override
-  final String walletId;
+  final String? walletId;
   @override
   final Future<WalletWithdrawData> Function(
           WithdrawBeforeParams params, WalletWithdrawData previousData)
@@ -283,7 +332,7 @@ class _$AdmissionCreateVM extends AdmissionCreateVM {
       (new AdmissionCreateVMBuilder()..update(updates))._build();
 
   _$AdmissionCreateVM._(
-      {required this.walletId,
+      {this.walletId,
       required this.onWithdrawBefore,
       required this.submit,
       required this.doSubmitAdmission,
@@ -292,8 +341,6 @@ class _$AdmissionCreateVM extends AdmissionCreateVM {
       required this.getCoinInfoByFork,
       required this.doUnlockWallet})
       : super._() {
-    BuiltValueNullFieldError.checkNotNull(
-        walletId, 'AdmissionCreateVM', 'walletId');
     BuiltValueNullFieldError.checkNotNull(
         onWithdrawBefore, 'AdmissionCreateVM', 'onWithdrawBefore');
     BuiltValueNullFieldError.checkNotNull(
@@ -480,8 +527,7 @@ class AdmissionCreateVMBuilder
   _$AdmissionCreateVM _build() {
     final _$result = _$v ??
         new _$AdmissionCreateVM._(
-            walletId: BuiltValueNullFieldError.checkNotNull(
-                walletId, 'AdmissionCreateVM', 'walletId'),
+            walletId: walletId,
             onWithdrawBefore: BuiltValueNullFieldError.checkNotNull(
                 onWithdrawBefore, 'AdmissionCreateVM', 'onWithdrawBefore'),
             submit: BuiltValueNullFieldError.checkNotNull(
@@ -503,41 +549,32 @@ class AdmissionCreateVMBuilder
 
 class _$AdmissionInfo extends AdmissionInfo {
   @override
-  final int id;
+  final int? id;
   @override
-  final String name;
+  final String? name;
   @override
-  final String describe;
+  final String? describe;
   @override
   final int? endTime;
   @override
   final int? startTime;
   @override
-  final BuiltList<AdmissionCondition> condition;
+  final BuiltList<AdmissionCondition>? condition;
   @override
-  final BuiltMap<String, String> ecological;
+  final BuiltMap<String, String>? ecological;
 
   factory _$AdmissionInfo([void Function(AdmissionInfoBuilder)? updates]) =>
       (new AdmissionInfoBuilder()..update(updates))._build();
 
   _$AdmissionInfo._(
-      {required this.id,
-      required this.name,
-      required this.describe,
+      {this.id,
+      this.name,
+      this.describe,
       this.endTime,
       this.startTime,
-      required this.condition,
-      required this.ecological})
-      : super._() {
-    BuiltValueNullFieldError.checkNotNull(id, 'AdmissionInfo', 'id');
-    BuiltValueNullFieldError.checkNotNull(name, 'AdmissionInfo', 'name');
-    BuiltValueNullFieldError.checkNotNull(
-        describe, 'AdmissionInfo', 'describe');
-    BuiltValueNullFieldError.checkNotNull(
-        condition, 'AdmissionInfo', 'condition');
-    BuiltValueNullFieldError.checkNotNull(
-        ecological, 'AdmissionInfo', 'ecological');
-  }
+      this.condition,
+      this.ecological})
+      : super._();
 
   @override
   AdmissionInfo rebuild(void Function(AdmissionInfoBuilder) updates) =>
@@ -633,8 +670,8 @@ class AdmissionInfoBuilder
       _describe = $v.describe;
       _endTime = $v.endTime;
       _startTime = $v.startTime;
-      _condition = $v.condition.toBuilder();
-      _ecological = $v.ecological.toBuilder();
+      _condition = $v.condition?.toBuilder();
+      _ecological = $v.ecological?.toBuilder();
       _$v = null;
     }
     return this;
@@ -659,23 +696,20 @@ class AdmissionInfoBuilder
     try {
       _$result = _$v ??
           new _$AdmissionInfo._(
-              id: BuiltValueNullFieldError.checkNotNull(
-                  id, 'AdmissionInfo', 'id'),
-              name: BuiltValueNullFieldError.checkNotNull(
-                  name, 'AdmissionInfo', 'name'),
-              describe: BuiltValueNullFieldError.checkNotNull(
-                  describe, 'AdmissionInfo', 'describe'),
+              id: id,
+              name: name,
+              describe: describe,
               endTime: endTime,
               startTime: startTime,
-              condition: condition.build(),
-              ecological: ecological.build());
+              condition: _condition?.build(),
+              ecological: _ecological?.build());
     } catch (_) {
       late String _$failedField;
       try {
         _$failedField = 'condition';
-        condition.build();
+        _condition?.build();
         _$failedField = 'ecological';
-        ecological.build();
+        _ecological?.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
             'AdmissionInfo', _$failedField, e.toString());
@@ -689,24 +723,16 @@ class AdmissionInfoBuilder
 
 class _$AdmissionConfig extends AdmissionConfig {
   @override
-  final String fork;
+  final String? fork;
   @override
-  final BuiltList<int> homeList;
+  final BuiltList<int>? homeList;
   @override
-  final BuiltList<AdmissionInfo> projects;
+  final BuiltList<AdmissionInfo>? projects;
 
   factory _$AdmissionConfig([void Function(AdmissionConfigBuilder)? updates]) =>
       (new AdmissionConfigBuilder()..update(updates))._build();
 
-  _$AdmissionConfig._(
-      {required this.fork, required this.homeList, required this.projects})
-      : super._() {
-    BuiltValueNullFieldError.checkNotNull(fork, 'AdmissionConfig', 'fork');
-    BuiltValueNullFieldError.checkNotNull(
-        homeList, 'AdmissionConfig', 'homeList');
-    BuiltValueNullFieldError.checkNotNull(
-        projects, 'AdmissionConfig', 'projects');
-  }
+  _$AdmissionConfig._({this.fork, this.homeList, this.projects}) : super._();
 
   @override
   AdmissionConfig rebuild(void Function(AdmissionConfigBuilder) updates) =>
@@ -765,8 +791,8 @@ class AdmissionConfigBuilder
     final $v = _$v;
     if ($v != null) {
       _fork = $v.fork;
-      _homeList = $v.homeList.toBuilder();
-      _projects = $v.projects.toBuilder();
+      _homeList = $v.homeList?.toBuilder();
+      _projects = $v.projects?.toBuilder();
       _$v = null;
     }
     return this;
@@ -791,17 +817,16 @@ class AdmissionConfigBuilder
     try {
       _$result = _$v ??
           new _$AdmissionConfig._(
-              fork: BuiltValueNullFieldError.checkNotNull(
-                  fork, 'AdmissionConfig', 'fork'),
-              homeList: homeList.build(),
-              projects: projects.build());
+              fork: fork,
+              homeList: _homeList?.build(),
+              projects: _projects?.build());
     } catch (_) {
       late String _$failedField;
       try {
         _$failedField = 'homeList';
-        homeList.build();
+        _homeList?.build();
         _$failedField = 'projects';
-        projects.build();
+        _projects?.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
             'AdmissionConfig', _$failedField, e.toString());
@@ -815,38 +840,27 @@ class AdmissionConfigBuilder
 
 class _$AdmissionCondition extends AdmissionCondition {
   @override
-  final String address;
+  final String? address;
   @override
-  final String transferData;
+  final String? transferData;
   @override
-  final int transferCount;
+  final int? transferCount;
   @override
-  final int transferProgress;
+  final int? transferProgress;
   @override
-  final BuiltMap<String, BuiltMap<String, String>> transferCurrency;
+  final BuiltMap<String, BuiltMap<String, String>>? transferCurrency;
 
   factory _$AdmissionCondition(
           [void Function(AdmissionConditionBuilder)? updates]) =>
       (new AdmissionConditionBuilder()..update(updates))._build();
 
   _$AdmissionCondition._(
-      {required this.address,
-      required this.transferData,
-      required this.transferCount,
-      required this.transferProgress,
-      required this.transferCurrency})
-      : super._() {
-    BuiltValueNullFieldError.checkNotNull(
-        address, 'AdmissionCondition', 'address');
-    BuiltValueNullFieldError.checkNotNull(
-        transferData, 'AdmissionCondition', 'transferData');
-    BuiltValueNullFieldError.checkNotNull(
-        transferCount, 'AdmissionCondition', 'transferCount');
-    BuiltValueNullFieldError.checkNotNull(
-        transferProgress, 'AdmissionCondition', 'transferProgress');
-    BuiltValueNullFieldError.checkNotNull(
-        transferCurrency, 'AdmissionCondition', 'transferCurrency');
-  }
+      {this.address,
+      this.transferData,
+      this.transferCount,
+      this.transferProgress,
+      this.transferCurrency})
+      : super._();
 
   @override
   AdmissionCondition rebuild(
@@ -929,7 +943,7 @@ class AdmissionConditionBuilder
       _transferData = $v.transferData;
       _transferCount = $v.transferCount;
       _transferProgress = $v.transferProgress;
-      _transferCurrency = $v.transferCurrency.toBuilder();
+      _transferCurrency = $v.transferCurrency?.toBuilder();
       _$v = null;
     }
     return this;
@@ -954,20 +968,16 @@ class AdmissionConditionBuilder
     try {
       _$result = _$v ??
           new _$AdmissionCondition._(
-              address: BuiltValueNullFieldError.checkNotNull(
-                  address, 'AdmissionCondition', 'address'),
-              transferData: BuiltValueNullFieldError.checkNotNull(
-                  transferData, 'AdmissionCondition', 'transferData'),
-              transferCount: BuiltValueNullFieldError.checkNotNull(
-                  transferCount, 'AdmissionCondition', 'transferCount'),
-              transferProgress: BuiltValueNullFieldError.checkNotNull(
-                  transferProgress, 'AdmissionCondition', 'transferProgress'),
-              transferCurrency: transferCurrency.build());
+              address: address,
+              transferData: transferData,
+              transferCount: transferCount,
+              transferProgress: transferProgress,
+              transferCurrency: _transferCurrency?.build());
     } catch (_) {
       late String _$failedField;
       try {
         _$failedField = 'transferCurrency';
-        transferCurrency.build();
+        _transferCurrency?.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
             'AdmissionCondition', _$failedField, e.toString());
@@ -985,17 +995,13 @@ class _$AdmissionState extends AdmissionState {
   @override
   final int? configState;
   @override
-  final BuiltList<AdmissionInfo> admissionList;
+  final BuiltList<AdmissionInfo>? admissionList;
 
   factory _$AdmissionState([void Function(AdmissionStateBuilder)? updates]) =>
       (new AdmissionStateBuilder()..update(updates))._build();
 
-  _$AdmissionState._(
-      {this.config, this.configState, required this.admissionList})
-      : super._() {
-    BuiltValueNullFieldError.checkNotNull(
-        admissionList, 'AdmissionState', 'admissionList');
-  }
+  _$AdmissionState._({this.config, this.configState, this.admissionList})
+      : super._();
 
   @override
   AdmissionState rebuild(void Function(AdmissionStateBuilder) updates) =>
@@ -1056,7 +1062,7 @@ class AdmissionStateBuilder
     if ($v != null) {
       _config = $v.config?.toBuilder();
       _configState = $v.configState;
-      _admissionList = $v.admissionList.toBuilder();
+      _admissionList = $v.admissionList?.toBuilder();
       _$v = null;
     }
     return this;
@@ -1083,7 +1089,7 @@ class AdmissionStateBuilder
           new _$AdmissionState._(
               config: _config?.build(),
               configState: configState,
-              admissionList: admissionList.build());
+              admissionList: _admissionList?.build());
     } catch (_) {
       late String _$failedField;
       try {
@@ -1091,7 +1097,7 @@ class AdmissionStateBuilder
         _config?.build();
 
         _$failedField = 'admissionList';
-        admissionList.build();
+        _admissionList?.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
             'AdmissionState', _$failedField, e.toString());

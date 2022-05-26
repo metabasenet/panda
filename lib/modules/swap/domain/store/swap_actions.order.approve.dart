@@ -24,11 +24,11 @@ class SwapActionSwapApprove extends _BaseAction {
   Future<AppState?> reduce() async {
     // Get balance again to double check
     final currentBalance = await SwapRepository().getApproveBalance(
-      chain: outCoinInfo.chain,
-      symbol: outCoinInfo.symbol,
-      address: outCoinInfo.address,
-      contract: outCoinInfo.contract,
-      chainPrecision: outCoinInfo.chainPrecision,
+      chain: outCoinInfo.chain ?? '',
+      symbol: outCoinInfo.symbol ?? '',
+      address: outCoinInfo.address ?? '',
+      contract: outCoinInfo.contract ?? '',
+      chainPrecision: outCoinInfo.chainPrecision ?? 0,
     );
 
     // If I call this function and I have approve balance,
@@ -43,24 +43,24 @@ class SwapActionSwapApprove extends _BaseAction {
 
     final approveAmountInt = NumberUtil.getAmountAsInt(
       approveAmount,
-      outCoinInfo.chainPrecision,
+      outCoinInfo.chainPrecision ?? 0,
     );
 
     // TODO: need to check for ETH fee balance
 
     final transInfo = await SwapRepository().postApproveTransaction(
-      chain: outCoinInfo.chain,
-      symbol: outCoinInfo.symbol,
-      address: outCoinInfo.address,
-      contract: outCoinInfo.contract,
+      chain: outCoinInfo.chain ?? '',
+      symbol: outCoinInfo.symbol ?? '',
+      address: outCoinInfo.address ?? '',
+      contract: outCoinInfo.contract ?? '',
       amount: approveAmountInt,
     );
     final approveData = WalletTemplateData(
-      chain: outCoinInfo.chain,
-      symbol: outCoinInfo.symbol,
+      chain: outCoinInfo.chain ?? '',
+      symbol: outCoinInfo.symbol ?? '',
       templateHex: '', // No Hex for approve
       templateData: transInfo,
-      templateAddress: outCoinInfo.address,
+      templateAddress: outCoinInfo.address ?? '',
     );
 
     final canContinue = await onConfirmSubmit(
@@ -72,19 +72,14 @@ class SwapActionSwapApprove extends _BaseAction {
     if (canContinue != true) {
       return null;
     }
-
     final walletData = await onUnlockWallet();
-    if (walletData == null) {
-      return null;
-    }
-
     // ETH and TRX submit
     final submitTransaction = Completer<String>();
 
     dispatch(WalletActionSignAndSubmitRawTx(
-      chain: outCoinInfo.chain,
-      symbol: outCoinInfo.symbol,
-      fromAddress: outCoinInfo.address,
+      chain: outCoinInfo.chain ?? '',
+      symbol: outCoinInfo.symbol ?? '',
+      fromAddress: outCoinInfo.address ?? '',
       rawTx: approveData.rawTx,
       walletData: walletData,
       completer: submitTransaction,
@@ -92,20 +87,22 @@ class SwapActionSwapApprove extends _BaseAction {
     ));
     final txId = await submitTransaction.future;
 
-    dispatch(AssetActionAddTransaction(Transaction.fromRaw(
-      txId: txId,
-      chain: outCoinInfo.chain,
-      symbol: outCoinInfo.chain,
-      feeValue: approveData.feeValue,
-      feeSymbol: outCoinInfo.chain,
-      amount: approveAmount ?? 0,
-      toAddress: approveData.contract,
-      fromAddress: outCoinInfo.address,
-      type: TransactionType.approveCall,
-    )));
-
+    dispatch(
+      AssetActionAddTransaction(
+        Transaction.fromRaw(
+          txId: txId,
+          chain: outCoinInfo.chain ?? '',
+          symbol: outCoinInfo.chain ?? '',
+          feeValue: approveData.feeValue,
+          feeSymbol: outCoinInfo.chain ?? '',
+          amount: approveAmount ?? 0,
+          toAddress: approveData.contract,
+          fromAddress: outCoinInfo.address ?? '',
+          type: TransactionType.approveCall,
+        ),
+      ),
+    );
     onSuccessTransaction(txId);
-
     return null;
   }
 

@@ -9,7 +9,7 @@ abstract class NoticeDetailVM
 // UI Fields
 
   //@nullable
-  NoticeInfo get noticeDetail;
+  NoticeInfo? get noticeDetail;
 
 // UI Actions
 

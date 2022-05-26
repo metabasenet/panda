@@ -25,11 +25,11 @@ class SettingsDevPage extends HookWidget {
 
     useEffect(() {
       SettingsRepository().getSettings().then((value) {
-        apiAppVersion.text = value.apiAppVersion;
-        apiBaseUrl.text = value.apiBaseUrl;
-        mqttUseTls.text = value.mqttUseTls;
-        mqttDisabled.text = value.mqttDisabled;
-        proxyUrl.text = value.proxyUrl;
+        apiAppVersion.text = value.apiAppVersion ?? '';
+        apiBaseUrl.text = value.apiBaseUrl ?? '';
+        mqttUseTls.text = value.mqttUseTls ?? '';
+        mqttDisabled.text = value.mqttDisabled ?? '';
+        proxyUrl.text = value.proxyUrl ?? '';
         settings.value = value;
       });
 

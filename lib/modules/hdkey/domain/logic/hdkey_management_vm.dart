@@ -6,11 +6,11 @@ abstract class HDKeyManagementVM
       _$HDKeyManagementVM;
   HDKeyManagementVM._();
 
-// UI Fields
+  // UI Fields
   //@nullable
-  Wallet get activeWallet;
+  Wallet? get activeWallet;
   //@nullable
-  AssetCoin get invitationCoin;
+  AssetCoin? get invitationCoin;
 
   List<Wallet> get wallets;
 

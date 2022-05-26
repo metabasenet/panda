@@ -10,7 +10,7 @@ abstract class OpenWebviewVM
   String get fiatCurrency;
   bool get hasWallet;
   //@nullable
-  Wallet get activeWallet;
+  Wallet? get activeWallet;
   String get activeWalletId;
   WalletStatus get activeWalletStatus;
 
@@ -83,7 +83,7 @@ abstract class OpenWebviewVM
             store,
             chain: chain,
             symbol: symbol,
-          ).address;
+          ).address!;
         }
         ..getCoinBalance = ({required chain, required symbol}) {
           return VMWithAssetGetCoinBalanceImplement.getCoinBalance(

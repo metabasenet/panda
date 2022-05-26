@@ -19,24 +19,43 @@ class _$SettingsConfigSerializer
   @override
   Iterable<Object?> serialize(Serializers serializers, SettingsConfig object,
       {FullType specifiedType = FullType.unspecified}) {
-    final result = <Object?>[
-      'apiBaseUrl',
-      serializers.serialize(object.apiBaseUrl,
-          specifiedType: const FullType(String)),
-      'apiAppVersion',
-      serializers.serialize(object.apiAppVersion,
-          specifiedType: const FullType(String)),
-      'mqttUseTls',
-      serializers.serialize(object.mqttUseTls,
-          specifiedType: const FullType(String)),
-      'mqttDisabled',
-      serializers.serialize(object.mqttDisabled,
-          specifiedType: const FullType(String)),
-      'proxyUrl',
-      serializers.serialize(object.proxyUrl,
-          specifiedType: const FullType(String)),
-    ];
-
+    final result = <Object?>[];
+    Object? value;
+    value = object.apiBaseUrl;
+    if (value != null) {
+      result
+        ..add('apiBaseUrl')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.apiAppVersion;
+    if (value != null) {
+      result
+        ..add('apiAppVersion')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.mqttUseTls;
+    if (value != null) {
+      result
+        ..add('mqttUseTls')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.mqttDisabled;
+    if (value != null) {
+      result
+        ..add('mqttDisabled')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.proxyUrl;
+    if (value != null) {
+      result
+        ..add('proxyUrl')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
     return result;
   }
 
@@ -54,23 +73,23 @@ class _$SettingsConfigSerializer
       switch (key) {
         case 'apiBaseUrl':
           result.apiBaseUrl = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'apiAppVersion':
           result.apiAppVersion = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'mqttUseTls':
           result.mqttUseTls = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'mqttDisabled':
           result.mqttDisabled = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'proxyUrl':
           result.proxyUrl = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
       }
     }
@@ -81,37 +100,26 @@ class _$SettingsConfigSerializer
 
 class _$SettingsConfig extends SettingsConfig {
   @override
-  final String apiBaseUrl;
+  final String? apiBaseUrl;
   @override
-  final String apiAppVersion;
+  final String? apiAppVersion;
   @override
-  final String mqttUseTls;
+  final String? mqttUseTls;
   @override
-  final String mqttDisabled;
+  final String? mqttDisabled;
   @override
-  final String proxyUrl;
+  final String? proxyUrl;
 
   factory _$SettingsConfig([void Function(SettingsConfigBuilder)? updates]) =>
       (new SettingsConfigBuilder()..update(updates))._build();
 
   _$SettingsConfig._(
-      {required this.apiBaseUrl,
-      required this.apiAppVersion,
-      required this.mqttUseTls,
-      required this.mqttDisabled,
-      required this.proxyUrl})
-      : super._() {
-    BuiltValueNullFieldError.checkNotNull(
-        apiBaseUrl, 'SettingsConfig', 'apiBaseUrl');
-    BuiltValueNullFieldError.checkNotNull(
-        apiAppVersion, 'SettingsConfig', 'apiAppVersion');
-    BuiltValueNullFieldError.checkNotNull(
-        mqttUseTls, 'SettingsConfig', 'mqttUseTls');
-    BuiltValueNullFieldError.checkNotNull(
-        mqttDisabled, 'SettingsConfig', 'mqttDisabled');
-    BuiltValueNullFieldError.checkNotNull(
-        proxyUrl, 'SettingsConfig', 'proxyUrl');
-  }
+      {this.apiBaseUrl,
+      this.apiAppVersion,
+      this.mqttUseTls,
+      this.mqttDisabled,
+      this.proxyUrl})
+      : super._();
 
   @override
   SettingsConfig rebuild(void Function(SettingsConfigBuilder) updates) =>
@@ -211,16 +219,11 @@ class SettingsConfigBuilder
   _$SettingsConfig _build() {
     final _$result = _$v ??
         new _$SettingsConfig._(
-            apiBaseUrl: BuiltValueNullFieldError.checkNotNull(
-                apiBaseUrl, 'SettingsConfig', 'apiBaseUrl'),
-            apiAppVersion: BuiltValueNullFieldError.checkNotNull(
-                apiAppVersion, 'SettingsConfig', 'apiAppVersion'),
-            mqttUseTls: BuiltValueNullFieldError.checkNotNull(
-                mqttUseTls, 'SettingsConfig', 'mqttUseTls'),
-            mqttDisabled: BuiltValueNullFieldError.checkNotNull(
-                mqttDisabled, 'SettingsConfig', 'mqttDisabled'),
-            proxyUrl: BuiltValueNullFieldError.checkNotNull(
-                proxyUrl, 'SettingsConfig', 'proxyUrl'));
+            apiBaseUrl: apiBaseUrl,
+            apiAppVersion: apiAppVersion,
+            mqttUseTls: mqttUseTls,
+            mqttDisabled: mqttDisabled,
+            proxyUrl: proxyUrl);
     replace(_$result);
     return _$result;
   }

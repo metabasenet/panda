@@ -17,15 +17,6 @@ class AssetBalanceListener extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (item == null) {
-      return builder(
-        context,
-        balance: '0.0',
-        unconfirmed: '0.0',
-        data: null,
-      );
-    }
-
     final uniqueId = '${item.symbol}:${item.address}';
 
     final cubit = GetIt.I<AssetBalanceCubit>();
@@ -36,8 +27,8 @@ class AssetBalanceListener extends StatelessWidget {
         builder: (context, balanceInfo) {
           final data = balanceInfo.data?.getBalanceInfo(uniqueId) ??
               AssetBalanceInfo(
-                symbol: item.symbol,
-                address: item.address,
+                symbol: item.symbol ?? '',
+                address: item.address ?? '',
               );
 
           // I unconfirmed is equal to balance,

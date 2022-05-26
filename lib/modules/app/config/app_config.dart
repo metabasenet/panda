@@ -28,21 +28,21 @@ class AppConfig {
       ? AppConstants.appCenterAndroidDist
       : AppConstants.appCenterIOsDist;
 
-// Methods
+  // Methods
   void setImageUrl(String url, String key, String policy, String signature) {
-    _imageUrl = url ?? AppConstants.imageUrl;
+    _imageUrl = url;
     _imageUrlKey = key;
     _imageUrlPolicy = policy;
     _imageUrlSignature = signature;
   }
 
   String getImageUrlFor(String path) {
-    if (_imageUrl == null) {
+    if (_imageUrl == '') {
       return 'assets/images/error_image.png';
     }
-    if (_imageUrlKey != null &&
-        _imageUrlPolicy != null &&
-        _imageUrlSignature != null) {
+    if (_imageUrlKey != '' &&
+        _imageUrlPolicy != '' &&
+        _imageUrlSignature != '') {
       return '''$_imageUrl$path?Key-Pair-Id=$_imageUrlKey&Policy=$_imageUrlPolicy&Signature=$_imageUrlSignature''';
     }
     return '$_imageUrl$path';

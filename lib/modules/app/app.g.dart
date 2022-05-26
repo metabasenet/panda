@@ -8,19 +8,19 @@ part of app_module;
 
 class _$ModulePermissionVM extends ModulePermissionVM {
   @override
-  final int configState;
+  final int? configState;
   @override
-  final int tradeConfigState;
+  final int? tradeConfigState;
   @override
-  final int investConfigState;
+  final int? investConfigState;
   @override
-  final int swapConfigState;
+  final int? swapConfigState;
   @override
-  final int communityConfigState;
+  final int? communityConfigState;
   @override
-  final ConfigUpdateData newVersionData;
+  final ConfigUpdateData? newVersionData;
   @override
-  final BuiltMap<String, String> disabledModules;
+  final BuiltMap<String, String>? disabledModules;
   @override
   final Future<bool> Function(
           String moduleName, ModulePermissionState permission)
@@ -33,30 +33,16 @@ class _$ModulePermissionVM extends ModulePermissionVM {
       (new ModulePermissionVMBuilder()..update(updates))._build();
 
   _$ModulePermissionVM._(
-      {required this.configState,
-      required this.tradeConfigState,
-      required this.investConfigState,
-      required this.swapConfigState,
-      required this.communityConfigState,
-      required this.newVersionData,
-      required this.disabledModules,
+      {this.configState,
+      this.tradeConfigState,
+      this.investConfigState,
+      this.swapConfigState,
+      this.communityConfigState,
+      this.newVersionData,
+      this.disabledModules,
       required this.doRefreshModulePermission,
       required this.getModulePermission})
       : super._() {
-    BuiltValueNullFieldError.checkNotNull(
-        configState, 'ModulePermissionVM', 'configState');
-    BuiltValueNullFieldError.checkNotNull(
-        tradeConfigState, 'ModulePermissionVM', 'tradeConfigState');
-    BuiltValueNullFieldError.checkNotNull(
-        investConfigState, 'ModulePermissionVM', 'investConfigState');
-    BuiltValueNullFieldError.checkNotNull(
-        swapConfigState, 'ModulePermissionVM', 'swapConfigState');
-    BuiltValueNullFieldError.checkNotNull(
-        communityConfigState, 'ModulePermissionVM', 'communityConfigState');
-    BuiltValueNullFieldError.checkNotNull(
-        newVersionData, 'ModulePermissionVM', 'newVersionData');
-    BuiltValueNullFieldError.checkNotNull(
-        disabledModules, 'ModulePermissionVM', 'disabledModules');
     BuiltValueNullFieldError.checkNotNull(doRefreshModulePermission,
         'ModulePermissionVM', 'doRefreshModulePermission');
     BuiltValueNullFieldError.checkNotNull(
@@ -185,8 +171,8 @@ class ModulePermissionVMBuilder
       _investConfigState = $v.investConfigState;
       _swapConfigState = $v.swapConfigState;
       _communityConfigState = $v.communityConfigState;
-      _newVersionData = $v.newVersionData.toBuilder();
-      _disabledModules = $v.disabledModules.toBuilder();
+      _newVersionData = $v.newVersionData?.toBuilder();
+      _disabledModules = $v.disabledModules?.toBuilder();
       _doRefreshModulePermission = $v.doRefreshModulePermission;
       _getModulePermission = $v.getModulePermission;
       _$v = null;
@@ -213,29 +199,28 @@ class ModulePermissionVMBuilder
     try {
       _$result = _$v ??
           new _$ModulePermissionVM._(
-              configState: BuiltValueNullFieldError.checkNotNull(
-                  configState, 'ModulePermissionVM', 'configState'),
-              tradeConfigState: BuiltValueNullFieldError.checkNotNull(
-                  tradeConfigState, 'ModulePermissionVM', 'tradeConfigState'),
-              investConfigState: BuiltValueNullFieldError.checkNotNull(
-                  investConfigState, 'ModulePermissionVM', 'investConfigState'),
-              swapConfigState: BuiltValueNullFieldError.checkNotNull(
-                  swapConfigState, 'ModulePermissionVM', 'swapConfigState'),
-              communityConfigState: BuiltValueNullFieldError.checkNotNull(
-                  communityConfigState, 'ModulePermissionVM', 'communityConfigState'),
-              newVersionData: newVersionData.build(),
-              disabledModules: disabledModules.build(),
+              configState: configState,
+              tradeConfigState: tradeConfigState,
+              investConfigState: investConfigState,
+              swapConfigState: swapConfigState,
+              communityConfigState: communityConfigState,
+              newVersionData: _newVersionData?.build(),
+              disabledModules: _disabledModules?.build(),
               doRefreshModulePermission: BuiltValueNullFieldError.checkNotNull(
-                  doRefreshModulePermission, 'ModulePermissionVM', 'doRefreshModulePermission'),
+                  doRefreshModulePermission,
+                  'ModulePermissionVM',
+                  'doRefreshModulePermission'),
               getModulePermission: BuiltValueNullFieldError.checkNotNull(
-                  getModulePermission, 'ModulePermissionVM', 'getModulePermission'));
+                  getModulePermission,
+                  'ModulePermissionVM',
+                  'getModulePermission'));
     } catch (_) {
       late String _$failedField;
       try {
         _$failedField = 'newVersionData';
-        newVersionData.build();
+        _newVersionData?.build();
         _$failedField = 'disabledModules';
-        disabledModules.build();
+        _disabledModules?.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
             'ModulePermissionVM', _$failedField, e.toString());

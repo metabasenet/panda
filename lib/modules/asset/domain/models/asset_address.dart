@@ -36,21 +36,21 @@ abstract class AssetAddress
 
   // Fields
   //@nullable
-  String get id;
+  String? get id;
 
   //@nullable
-  String get address;
+  String? get address;
 
   //@nullable
-  String get chain;
+  String? get chain;
 
   //@nullable
-  String get comments;
+  String? get comments;
 
   //@nullable
   @BuiltValueField(wireName: 'currency')
-  String get symbol;
+  String? get symbol;
 
   //@nullable
-  bool get isLocal;
+  bool? get isLocal;
 }

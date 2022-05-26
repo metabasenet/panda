@@ -53,13 +53,13 @@ class TradeOrderSubmitProcess {
         showTradeOrderTransactionPendingDialog(
           context,
           txId: txId,
-          chain: coinInfo.chain,
+          chain: coinInfo.chain ?? '',
           getTransactionInfo: (txId) => viewModel.getTransactionInfo(
             txId: txId,
-            chain: coinInfo.chain,
-            symbol: coinInfo.symbol,
-            fromAddress: coinInfo.address,
-            chainPrecision: coinInfo.chainPrecision,
+            chain: coinInfo.chain ?? '',
+            symbol: coinInfo.symbol ?? '',
+            fromAddress: coinInfo.address ?? '',
+            chainPrecision: coinInfo.chainPrecision ?? 0,
           ),
           onConfirmed: (txId) {
             if (isReset == true) {

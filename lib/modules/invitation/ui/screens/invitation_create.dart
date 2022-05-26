@@ -14,7 +14,7 @@ class InvitationCreatePage extends HookWidget {
     final arg = settings.arguments;
     return DefaultTransition(
       settings,
-      InvitationCreatePage(arg as AssetCoin),
+      InvitationCreatePage(arg! as AssetCoin),
     );
   }
 
@@ -133,8 +133,8 @@ class InvitationCreatePage extends HookWidget {
       QRScannerPage.open().then((qrStr) {
         if (qrStr != null && qrStr.isNotEmpty) {
           InvitationCodeUtils.decodeQRCodeData(
-            chain: coinInfo.value.chain,
-            symbol: coinInfo.value.symbol,
+            chain: coinInfo.value.chain ?? '',
+            symbol: coinInfo.value.symbol ?? '',
             data: qrStr,
           ).then((value) {
             address.text = value[0];

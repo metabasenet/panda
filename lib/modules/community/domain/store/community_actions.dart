@@ -2,7 +2,7 @@ part of community_domain_module;
 
 abstract class _BaseAction extends ReduxAction<AppState> {
   String get walletId => store.state.walletState.activeWalletId!;
-  CommunityConfig get communityConfig => store.state.communityState.config;
+  CommunityConfig get communityConfig => store.state.communityState.config!;
 }
 
 class CommunityActionGetList extends _BaseAction {
@@ -22,31 +22,14 @@ class CommunityActionGetList extends _BaseAction {
   @override
   Future<AppState?> reduce() async {
     final config = store.state.communityState.config;
-    final hasWallet = state.walletState.hasWallet;
-
-    final walletId = state.walletState.activeWalletId;
-    CommunityTeam myItem;
-    CommunityMember myMember;
-    if (skip == 0 && searchName == '' && hasWallet) {
-      if (isTeamList ?? false) {
-        myItem = await CommunityRepository().getOwnCommunity(
-          walletId: walletId,
-          type: type,
-        );
-      } else {
-        myMember = await CommunityRepository().getOwnMember(
-          walletId: walletId,
-          type: type,
-        );
-      }
-    }
+    //final hasWallet = state.walletState.hasWallet;
 
     if (isTeamList == true) {
       final list = await CommunityRepository().getCommunityTeamList(
         skip: skip ?? 0,
         take: 10,
         searchName: searchName,
-        fork: config.fork,
+        fork: config?.fork ?? '',
         type: type ?? '',
       );
 
@@ -101,7 +84,7 @@ class CommunityActionCreate extends _BaseAction {
     final typeInfo = params.type;
     await CommunityRepository().submitCommunity(
       walletId: walletId!,
-      type: typeInfo.type,
+      type: typeInfo.type ?? 0,
       name: params.name,
       desc: params.desc,
       fork: params.fork,
@@ -153,8 +136,8 @@ class CommunityActionGetBlacklist extends _BaseAction {
       skip: skip,
       take: 20,
       searchName: searchName,
-      type: type!,
-      fork: config.fork,
+      type: type ?? '',
+      fork: config?.fork ?? '',
     );
 
     return state.rebuild(

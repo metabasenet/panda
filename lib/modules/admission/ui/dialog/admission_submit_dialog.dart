@@ -40,21 +40,21 @@ Future<bool> showAdmissionConfirmDialog({
     CSConfirmItem(
       label: tr(
         'admission:create_dialog_amount',
-        namedArgs: {'symbol': coinInfo.name},
+        namedArgs: {'symbol': coinInfo.name ?? ''},
       ),
       value: amount,
     ),
     CSConfirmItem(
       label: tr(
         'admission:create_dialog_fee',
-        namedArgs: {'symbol': feeCoin.name},
+        namedArgs: {'symbol': feeCoin.name ?? ''},
       ),
       value: '${withdrawData.fee.feeValue}',
     ),
     CSConfirmItem(
       label: tr(
         'admission:create_dialog_total_amount',
-        namedArgs: {'symbol': coinInfo.name},
+        namedArgs: {'symbol': coinInfo.name ?? ''},
       ),
       value: totalAmount ?? '',
     ),
@@ -62,7 +62,7 @@ Future<bool> showAdmissionConfirmDialog({
       CSConfirmItem(
         label: tr(
           'admission:create_dialog_total_fee',
-          namedArgs: {'symbol': feeCoin.name},
+          namedArgs: {'symbol': feeCoin.name ?? ''},
         ),
         value: '${withdrawData.fee.feeValue}',
       ),
@@ -71,12 +71,12 @@ Future<bool> showAdmissionConfirmDialog({
   final errorText = payBalanceNotEnough
       ? tr(
           'admission:create_dialog_pay_balance_not_enough',
-          namedArgs: {'symbol': coinInfo.name},
+          namedArgs: {'symbol': coinInfo.name ?? ''},
         )
       : feeBalanceNotEnough
           ? tr(
               'admission:create_dialog_fee_balance_not_enough',
-              namedArgs: {'symbol': feeCoin.name},
+              namedArgs: {'symbol': feeCoin.name ?? ''},
             )
           : '';
 

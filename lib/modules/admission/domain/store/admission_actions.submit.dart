@@ -24,18 +24,15 @@ class AdmissionActionCreateSubmit extends _BaseAction {
   @override
   Future<AppState?> reduce() async {
     final walletData = await onUnlockWallet();
-    if (walletData == null) {
-      return null;
-    }
 
     final withdrawDataRequest = Completer<WalletWithdrawData>();
     dispatch(WalletActionWithdrawBefore(
       params: WithdrawBeforeParams(
-        chain: coinInfo.chain,
-        symbol: coinInfo.symbol,
-        fromAddress: coinInfo.address,
+        chain: coinInfo.chain ?? '',
+        symbol: coinInfo.symbol ?? '',
+        fromAddress: coinInfo.address ?? '',
         amount: NumberUtil.getDouble(amount),
-        chainPrecision: coinInfo.chainPrecision,
+        chainPrecision: coinInfo.chainPrecision ?? 0,
         contractOrForkId: coinInfo.contract,
         toAddress: toAddress,
         txData: AppConstants.admissionUUID +
@@ -55,7 +52,7 @@ class AdmissionActionCreateSubmit extends _BaseAction {
       params: WithdrawSubmitParams(
         withdrawData: withdrawData,
         amount: NumberUtil.getDouble(amount),
-        chainPrecision: coinInfo.chainPrecision,
+        chainPrecision: coinInfo.chainPrecision ?? 0,
         toAddress: toAddress,
         txData: txData,
         txDataUUID: AppConstants.admissionUUID,

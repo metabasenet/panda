@@ -4,7 +4,7 @@ class AssetListItem extends HookWidget {
   const AssetListItem({
     required this.item,
     required this.onPressed,
-  }) : assert(item != null);
+  }); //: assert(item != null);
 
   final AssetCoin item;
   final void Function() onPressed;
@@ -20,7 +20,7 @@ class AssetListItem extends HookWidget {
       child: Row(
         children: [
           CSImage(
-            item.iconLocal,
+            item.iconLocal ?? '',
             fallbackUrl: item.iconLocal,
             height: 36,
             width: 36,

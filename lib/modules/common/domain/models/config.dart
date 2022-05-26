@@ -20,7 +20,7 @@ abstract class Config implements Built<Config, ConfigBuilder> {
 
   //@nullable
   @BuiltValueField(wireName: 'system_store')
-  ConfigSystem get system;
+  ConfigSystem? get system;
 
   ConfigUpdate get version;
 }

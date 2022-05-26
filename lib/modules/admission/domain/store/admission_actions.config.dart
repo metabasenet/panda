@@ -26,11 +26,9 @@ class AdmissionActionLoadConfig extends _BaseAction {
 class AdmissionActionLoadConfigAfter extends _BaseAction {
   @override
   AppState reduce() {
-    final isError = admissionConfig == null;
-
+    //final isError = admissionConfig == null;
     return store.state.rebuild(
-      (a) => a.admissionState.configState =
-          isError ? ConfigState.error.index : ConfigState.success.index,
+      (a) => a.admissionState.configState = ConfigState.success.index,
     );
   }
 }

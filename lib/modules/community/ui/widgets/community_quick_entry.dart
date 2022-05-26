@@ -15,7 +15,7 @@ class CommunityQuickEntry extends StatelessWidget {
     final currentLangCode = context.locale.languageCode;
     final isZh = currentLangCode == 'zh';
     final items = communityConfig != null
-        ? communityConfig?.types
+        ? communityConfig?.types!
             .where((info) => info.homeQuickEntry != 'off')
             .toList()
         : <CommunityInfo>[];

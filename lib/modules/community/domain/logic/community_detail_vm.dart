@@ -7,10 +7,10 @@ abstract class CommunityDetailVM
   CommunityDetailVM._();
 // UI Fields
   //@nullable
-  BuiltList<CommunityTeam> get communityTeamList;
+  BuiltList<CommunityTeam>? get communityTeamList;
 
   //@nullable
-  BuiltList<CommunityMember> get communityMemberList;
+  BuiltList<CommunityMember>? get communityMemberList;
 
   bool get hasWallet;
 
@@ -45,72 +45,78 @@ abstract class CommunityDetailVM
 
   // UI Logic
   static CommunityDetailVM fromStore(Store<AppState> store) {
-    return CommunityDetailVM((viewModel) => viewModel
-      ..communityTeamList =
-          store.state.communityState.communityTeamList?.toBuilder()
-      ..communityMemberList =
-          store.state.communityState.communityMemberList?.toBuilder()
-      ..communityConfig = store.state.communityState.config?.toBuilder()
-      ..hasWallet = store.state.walletState.hasWallet
-      ..loadData = ({
-        required isRefresh,
-        required skip,
-        required searchName,
-        required type,
-        required isTeamList,
-      }) async {
-        await store.dispatchAsync(CommunityActionGetList(
-          isRefresh: isRefresh,
-          skip: skip,
-          searchName: searchName,
-          type: type,
-          isTeamList: isTeamList,
-        ));
-        final length = isTeamList
-            ? store.state.communityState.communityTeamList.length
-            : store.state.communityState.communityMemberList.length;
-        return Future.value(length);
-      }
-      ..clearCommunityList = ({required isTeamList}) {
-        return store.dispatchAsync(
-          CommunityActionClearList(isTeamList: isTeamList),
-        );
-      }
-      ..getHasHistory = ({required isTeam, required type}) async {
-        if (isTeam) {
-          final completer = Completer<CommunityTeam>();
-          store.dispatch(CommunityActionGetMyTeam(
-            type: int.tryParse(type) ?? 0,
-            completer: completer,
-          ));
-          final data = await completer.future;
-          return data?.id != null;
-        } else {
-          final completer = Completer<CommunityMember>();
-          store.dispatch(CommunityActionGetMyJoin(
-            id: type,
-            completer: completer,
-          ));
-          final data = await completer.future;
-          return data?.id != null;
+    return CommunityDetailVM(
+      (viewModel) => viewModel
+        ..communityTeamList =
+            store.state.communityState.communityTeamList?.toBuilder()
+        ..communityMemberList =
+            store.state.communityState.communityMemberList?.toBuilder()
+        ..communityConfig = store.state.communityState.config?.toBuilder()
+        ..hasWallet = store.state.walletState.hasWallet
+        ..loadData = ({
+          required isRefresh,
+          required skip,
+          required searchName,
+          required type,
+          required isTeamList,
+        }) async {
+          await store.dispatchAsync(
+            CommunityActionGetList(
+              isRefresh: isRefresh,
+              skip: skip,
+              searchName: searchName,
+              type: type,
+              isTeamList: isTeamList,
+            ),
+          );
+          final length = isTeamList
+              ? store.state.communityState.communityTeamList?.length
+              : store.state.communityState.communityMemberList?.length;
+          return Future.value(length);
         }
-      }
-      ..getCommunityTeam = (teamId) {
-        final completer = Completer<CommunityTeam>();
-        store.dispatch(CommunityActionGetTeamInfo(
-          completer: completer,
-          teamId: teamId,
-        ));
-        return completer.future;
-      }
-      ..checkOnChainData = ({required fork, required fromAddress}) {
-        final completer = Completer<bool>();
-        store.dispatch(InvitationActionCheckRelationChild(
-          fork: fork,
-          fromAddress: fromAddress,
-          completer: completer,
-        ));
-        return completer.future;
-      });
+        ..clearCommunityList = ({required isTeamList}) {
+          return store.dispatchAsync(
+            CommunityActionClearList(isTeamList: isTeamList),
+          );
+        }
+        ..getHasHistory = ({required isTeam, required type}) async {
+          if (isTeam) {
+            final completer = Completer<CommunityTeam>();
+            store.dispatch(CommunityActionGetMyTeam(
+              type: int.tryParse(type) ?? 0,
+              completer: completer,
+            ));
+            final data = await completer.future;
+            return data.id != null;
+          } else {
+            final completer = Completer<CommunityMember>();
+            store.dispatch(CommunityActionGetMyJoin(
+              id: type,
+              completer: completer,
+            ));
+            final data = await completer.future;
+            return data.id != null;
+          }
+        }
+        ..getCommunityTeam = (teamId) {
+          final completer = Completer<CommunityTeam>();
+          store.dispatch(CommunityActionGetTeamInfo(
+            completer: completer,
+            teamId: teamId,
+          ));
+          return completer.future;
+        }
+        ..checkOnChainData = ({required fork, required fromAddress}) {
+          final completer = Completer<bool>();
+          store.dispatch(
+            InvitationActionCheckRelationChild(
+              fork: fork,
+              fromAddress: fromAddress,
+              completer: completer,
+            ),
+          );
+          return completer.future;
+        },
+    );
   }
 }

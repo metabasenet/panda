@@ -34,7 +34,7 @@ class _LineChartHoldState extends State<MiningRewardChart> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.chartList == null || widget.chartList.isEmpty) {
+    if (widget.chartList.isEmpty) {
       return Container();
     }
 
@@ -48,7 +48,8 @@ class _LineChartHoldState extends State<MiningRewardChart> {
           ),
         )
         .toList();
-    final showIndex = (widget.chartList ?? []).indexWhere((e) => e.isBalance);
+    final showIndex =
+        (widget.chartList).indexWhere((e) => e.isBalance ?? false);
     return Stack(
       children: <Widget>[
         Padding(

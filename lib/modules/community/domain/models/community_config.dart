@@ -16,17 +16,17 @@ abstract class CommunityConfig
 
 // Fields
   //@nullable
-  String get fork;
+  String? get fork;
 
   //@nullable
   @BuiltValueField(wireName: 'home_list')
-  BuiltList<int> get homeList;
+  BuiltList<int>? get homeList;
 
   //@nullable
   @BuiltValueField(wireName: 'type')
-  BuiltList<CommunityInfo> get types;
+  BuiltList<CommunityInfo>? get types;
 
   //@nullable
   @BuiltValueField(wireName: 'ecological')
-  BuiltList<CommunityEcological> get ecological;
+  BuiltList<CommunityEcological>? get ecological;
 }

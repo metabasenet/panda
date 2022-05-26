@@ -31,12 +31,9 @@ class InvitationActionCreateSubmit extends _BaseAction {
     }
 
     final walletData = await onUnlockWallet();
-    if (walletData == null) {
-      return null;
-    }
 
     final parentPubKey =
-        await WalletMNT.addressMNTToPublicKey(address: coinInfo.address);
+        await WalletMNT.addressMNTToPublicKey(address: coinInfo.address ?? '');
 
     final sharedKeyInfo =
         await WalletMNT.createMNTFromPrivateKey(privateKey: sharePrvKey);
@@ -58,11 +55,11 @@ class InvitationActionCreateSubmit extends _BaseAction {
     final withdrawDataRequest = Completer<WalletWithdrawData>();
     dispatch(WalletActionWithdrawBefore(
       params: WithdrawBeforeParams(
-        chain: coinInfo.chain,
-        symbol: coinInfo.symbol,
-        fromAddress: coinInfo.address,
+        chain: coinInfo.chain ?? '',
+        symbol: coinInfo.symbol ?? '',
+        fromAddress: coinInfo.address ?? '',
         amount: NumberUtil.getDouble(amount),
-        chainPrecision: coinInfo.chainPrecision,
+        chainPrecision: coinInfo.chainPrecision ?? 0,
         contractOrForkId: coinInfo.contract,
         toAddress: toAddress,
         txData: '010000a0${ByteUtils.bytesToHex(vchData)}',
@@ -81,7 +78,7 @@ class InvitationActionCreateSubmit extends _BaseAction {
       params: WithdrawSubmitParams(
         withdrawData: withdrawData,
         amount: NumberUtil.getDouble(amount),
-        chainPrecision: coinInfo.chainPrecision,
+        chainPrecision: coinInfo.chainPrecision ?? 0,
         toAddress: toAddress,
         type: 2, // Invitation Type
         txData: ByteUtils.bytesToHex(vchData),

@@ -6,6 +6,7 @@ import 'dart:convert';
 // Package imports:
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
+import 'package:flutter/material.dart' hide Builder;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 // Project imports:

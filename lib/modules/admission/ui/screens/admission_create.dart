@@ -12,7 +12,7 @@ class AdmissionCreatePage extends HookWidget {
   static Route<dynamic> route(RouteSettings settings) {
     return DefaultTransition(
       settings,
-      AdmissionCreatePage(settings.arguments as AdmissionInfo),
+      AdmissionCreatePage(settings.arguments! as AdmissionInfo),
     );
   }
 
@@ -94,7 +94,7 @@ class AdmissionCreatePage extends HookWidget {
                         margin: EdgeInsets.zero,
                         child: SingleChildScrollView(
                           child: Text(
-                            info.describe,
+                            info.describe ?? '',
                             style: context.textSecondary(
                               color: context.bodyColor,
                               lineHeight: 1.61,
@@ -139,7 +139,7 @@ class AdmissionCreatePage extends HookWidget {
                               'asset:lbl_balance',
                               namedArgs: {
                                 'balance': balance ?? '0',
-                                'symbol': coinInfo.value!.name,
+                                'symbol': coinInfo.value?.name ?? '',
                               },
                             ),
                             style: context.textSmall(
@@ -158,7 +158,7 @@ class AdmissionCreatePage extends HookWidget {
                         child: Align(
                           alignment: Alignment.centerLeft,
                           child: Text(
-                            condition.value!.address,
+                            condition.value?.address ?? '',
                             style: context.textBody(
                               bold: true,
                               fontWeight: FontWeight.normal,

@@ -15,7 +15,7 @@ class ProjectApplySubmitPage extends HookWidget {
   static Route<dynamic> route(RouteSettings settings) {
     return DefaultTransition(
       settings,
-      ProjectApplySubmitPage(settings.arguments as ProjectCreateParams),
+      ProjectApplySubmitPage(settings.arguments! as ProjectCreateParams),
     );
   }
 
@@ -210,7 +210,8 @@ class ProjectApplySubmitPage extends HookWidget {
                           ),
                         ),
                         validator: RequiredValidator(
-                            errorText: tr('project:create_input_init_amount')),
+                          errorText: tr('project:create_input_init_amount'),
+                        ),
                         inputFormatters: [
                           NumberTextInputFormatter(
                             maxInteger: 20,
@@ -238,7 +239,8 @@ class ProjectApplySubmitPage extends HookWidget {
                           ),
                         ],
                         validator: RequiredValidator(
-                            errorText: tr('project:create_input_min_amount')),
+                          errorText: tr('project:create_input_min_amount'),
+                        ),
                       ),
                       FormBox(
                         type: FormBoxType.inputNumber,
@@ -263,7 +265,8 @@ class ProjectApplySubmitPage extends HookWidget {
                           ),
                         ],
                         validator: RequiredValidator(
-                            errorText: tr('project:create_input_pool_cycle')),
+                          errorText: tr('project:create_input_pool_cycle'),
+                        ),
                       ),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,

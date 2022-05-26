@@ -35,7 +35,7 @@ class InvitationSubmitProcess {
         );
       },
       onConfirmSubmit: () => viewModel
-          .checkDefiRelation(coinInfo.contract, toAddress)
+          .checkDefiRelation(coinInfo.contract ?? '', toAddress)
           .then((_) => true)
           .catchError((error) {
         //LoadingDialog.dismiss(context);

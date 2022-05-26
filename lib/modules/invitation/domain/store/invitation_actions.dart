@@ -21,8 +21,8 @@ class InvitationActionGetList extends _BaseAction {
 
     final data = await InvitationRepository().getInvitationList(
       walletId: walletId!,
-      address: coin.address,
-      contract: coin.contract,
+      address: coin.address ?? '',
+      contract: coin.contract ?? '',
       skip: skip,
       take: 10,
     );
@@ -155,8 +155,8 @@ class InvitationActionCreateCode extends _BaseAction {
     // My Coin Chain private key
     final privateKey = await WalletRepository().exportPrivateKey(
       mnemonic: mnemonic,
-      chain: coinInfo.chain,
-      forkId: coinInfo.contract,
+      chain: coinInfo.chain ?? '',
+      forkId: coinInfo.contract ?? '',
     );
 
     final sharedKeyPair = await WalletRepository().createMNTPairKey();
@@ -166,7 +166,7 @@ class InvitationActionCreateCode extends _BaseAction {
       signPrivateKey: privateKey!,
       codePublicKey: sharedKeyPair.publicKey,
       codePrivateKey: sharedKeyPair.privateKey,
-      codeForkId: coinInfo.contract,
+      codeForkId: coinInfo.contract ?? '',
     );
 
     //获取全部缓存
@@ -183,10 +183,10 @@ class InvitationActionCreateCode extends _BaseAction {
 
     if (existingCode == null) {
       newCode = InvitationCode.create(
-        chain: coinInfo.chain,
-        symbol: coinInfo.symbol,
-        fork: coinInfo.contract,
-        address: coinInfo.address,
+        chain: coinInfo.chain ?? '',
+        symbol: coinInfo.symbol ?? '',
+        fork: coinInfo.contract ?? '',
+        address: coinInfo.address ?? '',
         subSign: invitationData.subSign,
         sharePrvKey: invitationData.sharePrvKey,
       );

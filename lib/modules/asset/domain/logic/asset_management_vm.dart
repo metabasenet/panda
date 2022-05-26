@@ -27,14 +27,14 @@ abstract class AssetManagementVM
     final coins = store.state.assetState.coins.toList();
     if (store.state.assetState.coinsSearchTerm.isNotEmpty) {
       coins.retainWhere(
-        (element) => element.name.toLowerCase().contains(
+        (element) => element.name!.toLowerCase().contains(
               store.state.assetState.coinsSearchTerm.toLowerCase(),
             ),
       );
     }
 
-    final coinsEnabled = coins.where((e) => e.isEnabled).toList();
-    final coinsDisabled = coins.where((e) => !e.isEnabled).toList();
+    final coinsEnabled = coins.where((e) => e.isEnabled ?? false).toList();
+    final coinsDisabled = coins.where((e) => !(e.isEnabled ?? false)).toList();
 
     return AssetManagementVM(
       (viewModel) => viewModel

@@ -33,11 +33,11 @@ Future<bool> showProjectConfirmDialog(
       ? NumberUtil.plus<double>(params.withdrawData?.fee, payAmount)
       : payAmount;
 
-  if (payCoin.balance < (totalToPayFromBalance ?? 0)) {
+  if ((payCoin.balance ?? 0) < (totalToPayFromBalance ?? 0)) {
     canSubmit = false;
   }
 
-  if (feeCoin.balance < (params.withdrawData?.fee.feeValue ?? 0)) {
+  if ((feeCoin.balance ?? 0) < (params.withdrawData?.fee.feeValue ?? 0)) {
     canSubmit = false;
     isFeeNeedDeposit = true;
   }
@@ -46,8 +46,10 @@ Future<bool> showProjectConfirmDialog(
 
   final confirmList = [
     {
-      'label': tr('swap:confirm_dialog_lbl_pay_amount',
-          namedArgs: {'symbol': outCoinName ?? ''}),
+      'label': tr(
+        'swap:confirm_dialog_lbl_pay_amount',
+        namedArgs: {'symbol': outCoinName ?? ''},
+      ),
       'value': payAmount,
     },
     {
@@ -58,8 +60,10 @@ Future<bool> showProjectConfirmDialog(
       'value': params.withdrawData?.displayFee ?? '',
     },
     {
-      'label': tr('swap:confirm_dialog_lbl_real_amount',
-          namedArgs: {'symbol': 'payCoin'}),
+      'label': tr(
+        'swap:confirm_dialog_lbl_real_amount',
+        namedArgs: {'symbol': 'payCoin'},
+      ),
       'value': (realAmount ?? 0) > 0 ? realAmount : '-',
     },
   ];

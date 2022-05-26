@@ -19,20 +19,29 @@ Future<bool> showSwapConfirmDialog(
   final isFeeSameChain = feeCoin.symbol == params.outCoinInfo.symbol;
   final payAmount = NumberUtil.getDouble(params.amount);
 
-  final outCoinName = tr('asset:lbl_coin_name', namedArgs: {
-    'name': params.outCoinInfo.symbol,
-    'fullName': params.outCoinInfo.fullName,
-  });
+  final outCoinName = tr(
+    'asset:lbl_coin_name',
+    namedArgs: {
+      'name': params.outCoinInfo.symbol ?? '',
+      'fullName': params.outCoinInfo.fullName ?? '',
+    },
+  );
 
-  final inCoinName = tr('asset:lbl_coin_name', namedArgs: {
-    'name': params.inCoinInfo.symbol,
-    'fullName': params.inCoinInfo.fullName,
-  });
+  final inCoinName = tr(
+    'asset:lbl_coin_name',
+    namedArgs: {
+      'name': params.inCoinInfo.symbol ?? '',
+      'fullName': params.inCoinInfo.fullName ?? '',
+    },
+  );
 
-  final feeCoinName = tr('asset:lbl_coin_name', namedArgs: {
-    'name': feeCoin.symbol,
-    'fullName': feeCoin.fullName,
-  });
+  final feeCoinName = tr(
+    'asset:lbl_coin_name',
+    namedArgs: {
+      'name': feeCoin.symbol ?? '',
+      'fullName': feeCoin.fullName ?? '',
+    },
+  );
 
   var payBalanceNotEnough = false;
   var feeBalanceNotEnough = false;

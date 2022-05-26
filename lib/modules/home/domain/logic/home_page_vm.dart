@@ -7,19 +7,19 @@ abstract class HomePageVM implements Built<HomePageVM, HomePageVMBuilder> {
 // Fields
 
   //@nullable
-  BuiltList<AssetPrice> get homePrices;
+  BuiltList<AssetPrice>? get homePrices;
   //@nullable
-  BuiltList<HomeBanner> get homeBanners;
+  BuiltList<HomeBanner>? get homeBanners;
   //@nullable
-  BuiltList<NoticeInfo> get homeNotices;
+  BuiltList<NoticeInfo>? get homeNotices;
 
   //@nullable
-  BuiltList<AdmissionInfo> get admissionList;
+  BuiltList<AdmissionInfo>? get admissionList;
 
   //@nullable
-  bool get hasNewVersion;
+  bool? get hasNewVersion;
   //@nullable
-  ConfigUpdateData get newVersionData;
+  ConfigUpdateData? get newVersionData;
 
   BuiltList<TradePair> get allTradePairs;
   BuiltList<TradeMarket> get allTradeMarkets;
@@ -27,10 +27,10 @@ abstract class HomePageVM implements Built<HomePageVM, HomePageVMBuilder> {
   bool get hasWallet;
 
   //@nullable
-  CommunityConfig get communityConfig;
+  CommunityConfig? get communityConfig;
 
   //@nullable
-  int get communityConfigState;
+  int? get communityConfigState;
 
 // Methods
 
@@ -64,8 +64,8 @@ abstract class HomePageVM implements Built<HomePageVM, HomePageVMBuilder> {
         ..hasWallet = store.state.walletState.hasWallet
         ..homePrices =
             store.state.homeState.homePrices?.toBuilder() ?? ListBuilder()
-        ..homeBanners = ListBuilder(store.state.homeState.homeBanners)
-        ..homeNotices = ListBuilder(store.state.noticeState.noticeLatest)
+        ..homeBanners = ListBuilder(store.state.homeState.homeBanners!)
+        ..homeNotices = ListBuilder(store.state.noticeState.noticeLatest!)
         ..allTradePairs = ListBuilder(tradeState.config?.allTradePairs ?? [])
         ..admissionList =
             store.state.admissionState.admissionList?.toBuilder() ??

@@ -21,53 +21,111 @@ class _$AssetCoinSerializer implements StructuredSerializer<AssetCoin> {
   @override
   Iterable<Object?> serialize(Serializers serializers, AssetCoin object,
       {FullType specifiedType = FullType.unspecified}) {
-    final result = <Object?>[
-      'name',
-      serializers.serialize(object.name, specifiedType: const FullType(String)),
-      'fullName',
-      serializers.serialize(object.fullName,
-          specifiedType: const FullType(String)),
-      'chain',
-      serializers.serialize(object.chain,
-          specifiedType: const FullType(String)),
-      'symbol',
-      serializers.serialize(object.symbol,
-          specifiedType: const FullType(String)),
-      'address',
-      serializers.serialize(object.address,
-          specifiedType: const FullType(String)),
-      'iconOnline',
-      serializers.serialize(object.iconOnline,
-          specifiedType: const FullType(String)),
-      'iconLocal',
-      serializers.serialize(object.iconLocal,
-          specifiedType: const FullType(String)),
-      'chainPrecision',
-      serializers.serialize(object.chainPrecision,
-          specifiedType: const FullType(int)),
-      'displayPrecision',
-      serializers.serialize(object.displayPrecision,
-          specifiedType: const FullType(int)),
-      'balance',
-      serializers.serialize(object.balance,
-          specifiedType: const FullType(double)),
-      'balanceUnconfirmed',
-      serializers.serialize(object.balanceUnconfirmed,
-          specifiedType: const FullType(double)),
-      'balanceUpdateFailed',
-      serializers.serialize(object.balanceUpdateFailed,
-          specifiedType: const FullType(bool)),
-      'isEnabled',
-      serializers.serialize(object.isEnabled,
-          specifiedType: const FullType(bool)),
-      'isFixed',
-      serializers.serialize(object.isFixed,
-          specifiedType: const FullType(bool)),
-      'contract',
-      serializers.serialize(object.contract,
-          specifiedType: const FullType(String)),
-    ];
-
+    final result = <Object?>[];
+    Object? value;
+    value = object.name;
+    if (value != null) {
+      result
+        ..add('name')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.fullName;
+    if (value != null) {
+      result
+        ..add('fullName')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.chain;
+    if (value != null) {
+      result
+        ..add('chain')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.symbol;
+    if (value != null) {
+      result
+        ..add('symbol')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.address;
+    if (value != null) {
+      result
+        ..add('address')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.iconOnline;
+    if (value != null) {
+      result
+        ..add('iconOnline')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.iconLocal;
+    if (value != null) {
+      result
+        ..add('iconLocal')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.chainPrecision;
+    if (value != null) {
+      result
+        ..add('chainPrecision')
+        ..add(serializers.serialize(value, specifiedType: const FullType(int)));
+    }
+    value = object.displayPrecision;
+    if (value != null) {
+      result
+        ..add('displayPrecision')
+        ..add(serializers.serialize(value, specifiedType: const FullType(int)));
+    }
+    value = object.balance;
+    if (value != null) {
+      result
+        ..add('balance')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(double)));
+    }
+    value = object.balanceUnconfirmed;
+    if (value != null) {
+      result
+        ..add('balanceUnconfirmed')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(double)));
+    }
+    value = object.balanceUpdateFailed;
+    if (value != null) {
+      result
+        ..add('balanceUpdateFailed')
+        ..add(
+            serializers.serialize(value, specifiedType: const FullType(bool)));
+    }
+    value = object.isEnabled;
+    if (value != null) {
+      result
+        ..add('isEnabled')
+        ..add(
+            serializers.serialize(value, specifiedType: const FullType(bool)));
+    }
+    value = object.isFixed;
+    if (value != null) {
+      result
+        ..add('isFixed')
+        ..add(
+            serializers.serialize(value, specifiedType: const FullType(bool)));
+    }
+    value = object.contract;
+    if (value != null) {
+      result
+        ..add('contract')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
     return result;
   }
 
@@ -84,63 +142,63 @@ class _$AssetCoinSerializer implements StructuredSerializer<AssetCoin> {
       switch (key) {
         case 'name':
           result.name = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'fullName':
           result.fullName = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'chain':
           result.chain = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'symbol':
           result.symbol = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'address':
           result.address = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'iconOnline':
           result.iconOnline = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'iconLocal':
           result.iconLocal = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'chainPrecision':
           result.chainPrecision = serializers.deserialize(value,
-              specifiedType: const FullType(int))! as int;
+              specifiedType: const FullType(int)) as int?;
           break;
         case 'displayPrecision':
           result.displayPrecision = serializers.deserialize(value,
-              specifiedType: const FullType(int))! as int;
+              specifiedType: const FullType(int)) as int?;
           break;
         case 'balance':
           result.balance = serializers.deserialize(value,
-              specifiedType: const FullType(double))! as double;
+              specifiedType: const FullType(double)) as double?;
           break;
         case 'balanceUnconfirmed':
           result.balanceUnconfirmed = serializers.deserialize(value,
-              specifiedType: const FullType(double))! as double;
+              specifiedType: const FullType(double)) as double?;
           break;
         case 'balanceUpdateFailed':
           result.balanceUpdateFailed = serializers.deserialize(value,
-              specifiedType: const FullType(bool))! as bool;
+              specifiedType: const FullType(bool)) as bool?;
           break;
         case 'isEnabled':
           result.isEnabled = serializers.deserialize(value,
-              specifiedType: const FullType(bool))! as bool;
+              specifiedType: const FullType(bool)) as bool?;
           break;
         case 'isFixed':
           result.isFixed = serializers.deserialize(value,
-              specifiedType: const FullType(bool))! as bool;
+              specifiedType: const FullType(bool)) as bool?;
           break;
         case 'contract':
           result.contract = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
       }
     }
@@ -219,26 +277,50 @@ class _$AssetAddressSerializer implements StructuredSerializer<AssetAddress> {
   @override
   Iterable<Object?> serialize(Serializers serializers, AssetAddress object,
       {FullType specifiedType = FullType.unspecified}) {
-    final result = <Object?>[
-      'id',
-      serializers.serialize(object.id, specifiedType: const FullType(String)),
-      'address',
-      serializers.serialize(object.address,
-          specifiedType: const FullType(String)),
-      'chain',
-      serializers.serialize(object.chain,
-          specifiedType: const FullType(String)),
-      'comments',
-      serializers.serialize(object.comments,
-          specifiedType: const FullType(String)),
-      'currency',
-      serializers.serialize(object.symbol,
-          specifiedType: const FullType(String)),
-      'isLocal',
-      serializers.serialize(object.isLocal,
-          specifiedType: const FullType(bool)),
-    ];
-
+    final result = <Object?>[];
+    Object? value;
+    value = object.id;
+    if (value != null) {
+      result
+        ..add('id')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.address;
+    if (value != null) {
+      result
+        ..add('address')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.chain;
+    if (value != null) {
+      result
+        ..add('chain')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.comments;
+    if (value != null) {
+      result
+        ..add('comments')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.symbol;
+    if (value != null) {
+      result
+        ..add('currency')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.isLocal;
+    if (value != null) {
+      result
+        ..add('isLocal')
+        ..add(
+            serializers.serialize(value, specifiedType: const FullType(bool)));
+    }
     return result;
   }
 
@@ -256,27 +338,27 @@ class _$AssetAddressSerializer implements StructuredSerializer<AssetAddress> {
       switch (key) {
         case 'id':
           result.id = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'address':
           result.address = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'chain':
           result.chain = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'comments':
           result.comments = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'currency':
           result.symbol = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'isLocal':
           result.isLocal = serializers.deserialize(value,
-              specifiedType: const FullType(bool))! as bool;
+              specifiedType: const FullType(bool)) as bool?;
           break;
       }
     }
@@ -324,11 +406,15 @@ class _$AssetStateSerializer implements StructuredSerializer<AssetState> {
       serializers.serialize(object.addressList,
           specifiedType:
               const FullType(BuiltList, const [const FullType(AssetAddress)])),
-      'addressRequestId',
-      serializers.serialize(object.addressRequestId,
-          specifiedType: const FullType(String)),
     ];
-
+    Object? value;
+    value = object.addressRequestId;
+    if (value != null) {
+      result
+        ..add('addressRequestId')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
     return result;
   }
 
@@ -385,7 +471,7 @@ class _$AssetStateSerializer implements StructuredSerializer<AssetState> {
           break;
         case 'addressRequestId':
           result.addressRequestId = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
       }
     }
@@ -454,7 +540,7 @@ class AssetDepositVMBuilder
 
 class _$AssetDetailVM extends AssetDetailVM {
   @override
-  final Wallet activeWallet;
+  final Wallet? activeWallet;
   @override
   final Future<void> Function(AssetCoin coin, bool isRefresh) doLoadDetail;
   @override
@@ -464,12 +550,10 @@ class _$AssetDetailVM extends AssetDetailVM {
       (new AssetDetailVMBuilder()..update(updates))._build();
 
   _$AssetDetailVM._(
-      {required this.activeWallet,
+      {this.activeWallet,
       required this.doLoadDetail,
       required this.doUnlockWallet})
       : super._() {
-    BuiltValueNullFieldError.checkNotNull(
-        activeWallet, 'AssetDetailVM', 'activeWallet');
     BuiltValueNullFieldError.checkNotNull(
         doLoadDetail, 'AssetDetailVM', 'doLoadDetail');
     BuiltValueNullFieldError.checkNotNull(
@@ -558,8 +642,7 @@ class AssetDetailVMBuilder
   _$AssetDetailVM _build() {
     final _$result = _$v ??
         new _$AssetDetailVM._(
-            activeWallet: BuiltValueNullFieldError.checkNotNull(
-                activeWallet, 'AssetDetailVM', 'activeWallet'),
+            activeWallet: activeWallet,
             doLoadDetail: BuiltValueNullFieldError.checkNotNull(
                 doLoadDetail, 'AssetDetailVM', 'doLoadDetail'),
             doUnlockWallet: BuiltValueNullFieldError.checkNotNull(
@@ -571,7 +654,7 @@ class AssetDetailVMBuilder
 
 class _$AssetAddressVM extends AssetAddressVM {
   @override
-  final BuiltList<AssetAddress> addressList;
+  final BuiltList<AssetAddress>? addressList;
   @override
   final Future<int> Function(
       {required AssetCoin coin,
@@ -593,15 +676,13 @@ class _$AssetAddressVM extends AssetAddressVM {
       (new AssetAddressVMBuilder()..update(updates))._build();
 
   _$AssetAddressVM._(
-      {required this.addressList,
+      {this.addressList,
       required this.loadAddressList,
       required this.clearAddressList,
       required this.submitAddressAdd,
       required this.submitAddressDelete,
       required this.validateAddress})
       : super._() {
-    BuiltValueNullFieldError.checkNotNull(
-        addressList, 'AssetAddressVM', 'addressList');
     BuiltValueNullFieldError.checkNotNull(
         loadAddressList, 'AssetAddressVM', 'loadAddressList');
     BuiltValueNullFieldError.checkNotNull(
@@ -710,7 +791,7 @@ class AssetAddressVMBuilder
   AssetAddressVMBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _addressList = $v.addressList.toBuilder();
+      _addressList = $v.addressList?.toBuilder();
       _loadAddressList = $v.loadAddressList;
       _clearAddressList = $v.clearAddressList;
       _submitAddressAdd = $v.submitAddressAdd;
@@ -740,7 +821,7 @@ class AssetAddressVMBuilder
     try {
       _$result = _$v ??
           new _$AssetAddressVM._(
-              addressList: addressList.build(),
+              addressList: _addressList?.build(),
               loadAddressList: BuiltValueNullFieldError.checkNotNull(
                   loadAddressList, 'AssetAddressVM', 'loadAddressList'),
               clearAddressList: BuiltValueNullFieldError.checkNotNull(
@@ -755,7 +836,7 @@ class AssetAddressVMBuilder
       late String _$failedField;
       try {
         _$failedField = 'addressList';
-        addressList.build();
+        _addressList?.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
             'AssetAddressVM', _$failedField, e.toString());
@@ -777,9 +858,9 @@ class _$AssetListVM extends AssetListVM {
   @override
   final List<Wallet> wallets;
   @override
-  final bool hasWallet;
+  final bool? hasWallet;
   @override
-  final Wallet activeWallet;
+  final Wallet? activeWallet;
   @override
   final String activeWalletId;
   @override
@@ -801,8 +882,8 @@ class _$AssetListVM extends AssetListVM {
       required this.coins,
       required this.isBalanceUpdating,
       required this.wallets,
-      required this.hasWallet,
-      required this.activeWallet,
+      this.hasWallet,
+      this.activeWallet,
       required this.activeWalletId,
       required this.activeWalletStatus,
       required this.doRefreshList,
@@ -816,10 +897,6 @@ class _$AssetListVM extends AssetListVM {
     BuiltValueNullFieldError.checkNotNull(
         isBalanceUpdating, 'AssetListVM', 'isBalanceUpdating');
     BuiltValueNullFieldError.checkNotNull(wallets, 'AssetListVM', 'wallets');
-    BuiltValueNullFieldError.checkNotNull(
-        hasWallet, 'AssetListVM', 'hasWallet');
-    BuiltValueNullFieldError.checkNotNull(
-        activeWallet, 'AssetListVM', 'activeWallet');
     BuiltValueNullFieldError.checkNotNull(
         activeWalletId, 'AssetListVM', 'activeWalletId');
     BuiltValueNullFieldError.checkNotNull(
@@ -999,18 +1076,18 @@ class AssetListVMBuilder implements Builder<AssetListVM, AssetListVMBuilder> {
                   isBalanceUpdating, 'AssetListVM', 'isBalanceUpdating'),
               wallets: BuiltValueNullFieldError.checkNotNull(
                   wallets, 'AssetListVM', 'wallets'),
-              hasWallet: BuiltValueNullFieldError.checkNotNull(
-                  hasWallet, 'AssetListVM', 'hasWallet'),
-              activeWallet: BuiltValueNullFieldError.checkNotNull(
-                  activeWallet, 'AssetListVM', 'activeWallet'),
+              hasWallet: hasWallet,
+              activeWallet: activeWallet,
               activeWalletId: BuiltValueNullFieldError.checkNotNull(
                   activeWalletId, 'AssetListVM', 'activeWalletId'),
               activeWalletStatus: BuiltValueNullFieldError.checkNotNull(
                   activeWalletStatus, 'AssetListVM', 'activeWalletStatus'),
               doRefreshList: BuiltValueNullFieldError.checkNotNull(
                   doRefreshList, 'AssetListVM', 'doRefreshList'),
-              doSwitchWallet: BuiltValueNullFieldError.checkNotNull(doSwitchWallet, 'AssetListVM', 'doSwitchWallet'),
-              doSyncWallet: BuiltValueNullFieldError.checkNotNull(doSyncWallet, 'AssetListVM', 'doSyncWallet'),
+              doSwitchWallet: BuiltValueNullFieldError.checkNotNull(
+                  doSwitchWallet, 'AssetListVM', 'doSwitchWallet'),
+              doSyncWallet: BuiltValueNullFieldError.checkNotNull(
+                  doSyncWallet, 'AssetListVM', 'doSyncWallet'),
               doHideSmallAssets: BuiltValueNullFieldError.checkNotNull(doHideSmallAssets, 'AssetListVM', 'doHideSmallAssets'));
     } catch (_) {
       late String _$failedField;
@@ -1510,77 +1587,56 @@ class AssetWithdrawVMBuilder
 
 class _$AssetCoin extends AssetCoin {
   @override
-  final String name;
+  final String? name;
   @override
-  final String fullName;
+  final String? fullName;
   @override
-  final String chain;
+  final String? chain;
   @override
-  final String symbol;
+  final String? symbol;
   @override
-  final String address;
+  final String? address;
   @override
-  final String iconOnline;
+  final String? iconOnline;
   @override
-  final String iconLocal;
+  final String? iconLocal;
   @override
-  final int chainPrecision;
+  final int? chainPrecision;
   @override
-  final int displayPrecision;
+  final int? displayPrecision;
   @override
-  final double balance;
+  final double? balance;
   @override
-  final double balanceUnconfirmed;
+  final double? balanceUnconfirmed;
   @override
-  final bool balanceUpdateFailed;
+  final bool? balanceUpdateFailed;
   @override
-  final bool isEnabled;
+  final bool? isEnabled;
   @override
-  final bool isFixed;
+  final bool? isFixed;
   @override
-  final String contract;
+  final String? contract;
 
   factory _$AssetCoin([void Function(AssetCoinBuilder)? updates]) =>
       (new AssetCoinBuilder()..update(updates))._build();
 
   _$AssetCoin._(
-      {required this.name,
-      required this.fullName,
-      required this.chain,
-      required this.symbol,
-      required this.address,
-      required this.iconOnline,
-      required this.iconLocal,
-      required this.chainPrecision,
-      required this.displayPrecision,
-      required this.balance,
-      required this.balanceUnconfirmed,
-      required this.balanceUpdateFailed,
-      required this.isEnabled,
-      required this.isFixed,
-      required this.contract})
-      : super._() {
-    BuiltValueNullFieldError.checkNotNull(name, 'AssetCoin', 'name');
-    BuiltValueNullFieldError.checkNotNull(fullName, 'AssetCoin', 'fullName');
-    BuiltValueNullFieldError.checkNotNull(chain, 'AssetCoin', 'chain');
-    BuiltValueNullFieldError.checkNotNull(symbol, 'AssetCoin', 'symbol');
-    BuiltValueNullFieldError.checkNotNull(address, 'AssetCoin', 'address');
-    BuiltValueNullFieldError.checkNotNull(
-        iconOnline, 'AssetCoin', 'iconOnline');
-    BuiltValueNullFieldError.checkNotNull(iconLocal, 'AssetCoin', 'iconLocal');
-    BuiltValueNullFieldError.checkNotNull(
-        chainPrecision, 'AssetCoin', 'chainPrecision');
-    BuiltValueNullFieldError.checkNotNull(
-        displayPrecision, 'AssetCoin', 'displayPrecision');
-    BuiltValueNullFieldError.checkNotNull(balance, 'AssetCoin', 'balance');
-    BuiltValueNullFieldError.checkNotNull(
-        balanceUnconfirmed, 'AssetCoin', 'balanceUnconfirmed');
-    BuiltValueNullFieldError.checkNotNull(
-        balanceUpdateFailed, 'AssetCoin', 'balanceUpdateFailed');
-    BuiltValueNullFieldError.checkNotNull(isEnabled, 'AssetCoin', 'isEnabled');
-    BuiltValueNullFieldError.checkNotNull(isFixed, 'AssetCoin', 'isFixed');
-    BuiltValueNullFieldError.checkNotNull(contract, 'AssetCoin', 'contract');
-  }
+      {this.name,
+      this.fullName,
+      this.chain,
+      this.symbol,
+      this.address,
+      this.iconOnline,
+      this.iconLocal,
+      this.chainPrecision,
+      this.displayPrecision,
+      this.balance,
+      this.balanceUnconfirmed,
+      this.balanceUpdateFailed,
+      this.isEnabled,
+      this.isFixed,
+      this.contract})
+      : super._();
 
   @override
   AssetCoin rebuild(void Function(AssetCoinBuilder) updates) =>
@@ -1775,33 +1831,21 @@ class AssetCoinBuilder implements Builder<AssetCoin, AssetCoinBuilder> {
   _$AssetCoin _build() {
     final _$result = _$v ??
         new _$AssetCoin._(
-            name: BuiltValueNullFieldError.checkNotNull(
-                name, 'AssetCoin', 'name'),
-            fullName: BuiltValueNullFieldError.checkNotNull(
-                fullName, 'AssetCoin', 'fullName'),
-            chain: BuiltValueNullFieldError.checkNotNull(
-                chain, 'AssetCoin', 'chain'),
-            symbol: BuiltValueNullFieldError.checkNotNull(
-                symbol, 'AssetCoin', 'symbol'),
-            address: BuiltValueNullFieldError.checkNotNull(
-                address, 'AssetCoin', 'address'),
-            iconOnline: BuiltValueNullFieldError.checkNotNull(
-                iconOnline, 'AssetCoin', 'iconOnline'),
-            iconLocal: BuiltValueNullFieldError.checkNotNull(
-                iconLocal, 'AssetCoin', 'iconLocal'),
-            chainPrecision: BuiltValueNullFieldError.checkNotNull(
-                chainPrecision, 'AssetCoin', 'chainPrecision'),
-            displayPrecision: BuiltValueNullFieldError.checkNotNull(
-                displayPrecision, 'AssetCoin', 'displayPrecision'),
-            balance: BuiltValueNullFieldError.checkNotNull(
-                balance, 'AssetCoin', 'balance'),
-            balanceUnconfirmed: BuiltValueNullFieldError.checkNotNull(
-                balanceUnconfirmed, 'AssetCoin', 'balanceUnconfirmed'),
-            balanceUpdateFailed:
-                BuiltValueNullFieldError.checkNotNull(balanceUpdateFailed, 'AssetCoin', 'balanceUpdateFailed'),
-            isEnabled: BuiltValueNullFieldError.checkNotNull(isEnabled, 'AssetCoin', 'isEnabled'),
-            isFixed: BuiltValueNullFieldError.checkNotNull(isFixed, 'AssetCoin', 'isFixed'),
-            contract: BuiltValueNullFieldError.checkNotNull(contract, 'AssetCoin', 'contract'));
+            name: name,
+            fullName: fullName,
+            chain: chain,
+            symbol: symbol,
+            address: address,
+            iconOnline: iconOnline,
+            iconLocal: iconLocal,
+            chainPrecision: chainPrecision,
+            displayPrecision: displayPrecision,
+            balance: balance,
+            balanceUnconfirmed: balanceUnconfirmed,
+            balanceUpdateFailed: balanceUpdateFailed,
+            isEnabled: isEnabled,
+            isFixed: isFixed,
+            contract: contract);
     replace(_$result);
     return _$result;
   }
@@ -1934,36 +1978,29 @@ class AssetPriceBuilder implements Builder<AssetPrice, AssetPriceBuilder> {
 
 class _$AssetAddress extends AssetAddress {
   @override
-  final String id;
+  final String? id;
   @override
-  final String address;
+  final String? address;
   @override
-  final String chain;
+  final String? chain;
   @override
-  final String comments;
+  final String? comments;
   @override
-  final String symbol;
+  final String? symbol;
   @override
-  final bool isLocal;
+  final bool? isLocal;
 
   factory _$AssetAddress([void Function(AssetAddressBuilder)? updates]) =>
       (new AssetAddressBuilder()..update(updates))._build();
 
   _$AssetAddress._(
-      {required this.id,
-      required this.address,
-      required this.chain,
-      required this.comments,
-      required this.symbol,
-      required this.isLocal})
-      : super._() {
-    BuiltValueNullFieldError.checkNotNull(id, 'AssetAddress', 'id');
-    BuiltValueNullFieldError.checkNotNull(address, 'AssetAddress', 'address');
-    BuiltValueNullFieldError.checkNotNull(chain, 'AssetAddress', 'chain');
-    BuiltValueNullFieldError.checkNotNull(comments, 'AssetAddress', 'comments');
-    BuiltValueNullFieldError.checkNotNull(symbol, 'AssetAddress', 'symbol');
-    BuiltValueNullFieldError.checkNotNull(isLocal, 'AssetAddress', 'isLocal');
-  }
+      {this.id,
+      this.address,
+      this.chain,
+      this.comments,
+      this.symbol,
+      this.isLocal})
+      : super._();
 
   @override
   AssetAddress rebuild(void Function(AssetAddressBuilder) updates) =>
@@ -2068,17 +2105,12 @@ class AssetAddressBuilder
   _$AssetAddress _build() {
     final _$result = _$v ??
         new _$AssetAddress._(
-            id: BuiltValueNullFieldError.checkNotNull(id, 'AssetAddress', 'id'),
-            address: BuiltValueNullFieldError.checkNotNull(
-                address, 'AssetAddress', 'address'),
-            chain: BuiltValueNullFieldError.checkNotNull(
-                chain, 'AssetAddress', 'chain'),
-            comments: BuiltValueNullFieldError.checkNotNull(
-                comments, 'AssetAddress', 'comments'),
-            symbol: BuiltValueNullFieldError.checkNotNull(
-                symbol, 'AssetAddress', 'symbol'),
-            isLocal: BuiltValueNullFieldError.checkNotNull(
-                isLocal, 'AssetAddress', 'isLocal'));
+            id: id,
+            address: address,
+            chain: chain,
+            comments: comments,
+            symbol: symbol,
+            isLocal: isLocal);
     replace(_$result);
     return _$result;
   }
@@ -2104,7 +2136,7 @@ class _$AssetState extends AssetState {
   @override
   final BuiltList<AssetAddress> addressList;
   @override
-  final String addressRequestId;
+  final String? addressRequestId;
 
   factory _$AssetState([void Function(AssetStateBuilder)? updates]) =>
       (new AssetStateBuilder()..update(updates))._build();
@@ -2119,7 +2151,7 @@ class _$AssetState extends AssetState {
       required this.hideWithdrawShowcase,
       required this.coinsSearchTerm,
       required this.addressList,
-      required this.addressRequestId})
+      this.addressRequestId})
       : super._() {
     BuiltValueNullFieldError.checkNotNull(coins, 'AssetState', 'coins');
     BuiltValueNullFieldError.checkNotNull(
@@ -2138,8 +2170,6 @@ class _$AssetState extends AssetState {
         coinsSearchTerm, 'AssetState', 'coinsSearchTerm');
     BuiltValueNullFieldError.checkNotNull(
         addressList, 'AssetState', 'addressList');
-    BuiltValueNullFieldError.checkNotNull(
-        addressRequestId, 'AssetState', 'addressRequestId');
   }
 
   @override
@@ -2313,7 +2343,7 @@ class AssetStateBuilder implements Builder<AssetState, AssetStateBuilder> {
               coinsSearchTerm: BuiltValueNullFieldError.checkNotNull(
                   coinsSearchTerm, 'AssetState', 'coinsSearchTerm'),
               addressList: addressList.build(),
-              addressRequestId: BuiltValueNullFieldError.checkNotNull(addressRequestId, 'AssetState', 'addressRequestId'));
+              addressRequestId: addressRequestId);
     } catch (_) {
       late String _$failedField;
       try {

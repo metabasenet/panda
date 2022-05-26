@@ -50,9 +50,9 @@ class _$HDKeyStateSerializer implements StructuredSerializer<HDKeyState> {
 
 class _$HDKeyManagementVM extends HDKeyManagementVM {
   @override
-  final Wallet activeWallet;
+  final Wallet? activeWallet;
   @override
-  final AssetCoin invitationCoin;
+  final AssetCoin? invitationCoin;
   @override
   final List<Wallet> wallets;
   @override
@@ -71,8 +71,8 @@ class _$HDKeyManagementVM extends HDKeyManagementVM {
       (new HDKeyManagementVMBuilder()..update(updates))._build();
 
   _$HDKeyManagementVM._(
-      {required this.activeWallet,
-      required this.invitationCoin,
+      {this.activeWallet,
+      this.invitationCoin,
       required this.wallets,
       required this.localIds,
       required this.changePassword,
@@ -80,10 +80,6 @@ class _$HDKeyManagementVM extends HDKeyManagementVM {
       required this.deleteWallet,
       required this.validateMnemonic})
       : super._() {
-    BuiltValueNullFieldError.checkNotNull(
-        activeWallet, 'HDKeyManagementVM', 'activeWallet');
-    BuiltValueNullFieldError.checkNotNull(
-        invitationCoin, 'HDKeyManagementVM', 'invitationCoin');
     BuiltValueNullFieldError.checkNotNull(
         wallets, 'HDKeyManagementVM', 'wallets');
     BuiltValueNullFieldError.checkNotNull(
@@ -192,7 +188,7 @@ class HDKeyManagementVMBuilder
     final $v = _$v;
     if ($v != null) {
       _activeWallet = $v.activeWallet;
-      _invitationCoin = $v.invitationCoin.toBuilder();
+      _invitationCoin = $v.invitationCoin?.toBuilder();
       _wallets = $v.wallets;
       _localIds = $v.localIds;
       _changePassword = $v.changePassword;
@@ -223,9 +219,8 @@ class HDKeyManagementVMBuilder
     try {
       _$result = _$v ??
           new _$HDKeyManagementVM._(
-              activeWallet: BuiltValueNullFieldError.checkNotNull(
-                  activeWallet, 'HDKeyManagementVM', 'activeWallet'),
-              invitationCoin: invitationCoin.build(),
+              activeWallet: activeWallet,
+              invitationCoin: _invitationCoin?.build(),
               wallets: BuiltValueNullFieldError.checkNotNull(
                   wallets, 'HDKeyManagementVM', 'wallets'),
               localIds: BuiltValueNullFieldError.checkNotNull(
@@ -242,7 +237,7 @@ class HDKeyManagementVMBuilder
       late String _$failedField;
       try {
         _$failedField = 'invitationCoin';
-        invitationCoin.build();
+        _invitationCoin?.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
             'HDKeyManagementVM', _$failedField, e.toString());

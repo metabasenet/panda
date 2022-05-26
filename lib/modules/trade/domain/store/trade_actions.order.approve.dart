@@ -30,17 +30,17 @@ class TradeActionOrderApprove extends _BaseAction {
 
     // Trade Coin Config for templateData
     final coinConfig = store.state.tradeState.getCoinConfig(
-      chain: sellCoinInfo.chain,
-      symbol: sellCoinInfo.symbol,
+      chain: sellCoinInfo.chain ?? '',
+      symbol: sellCoinInfo.symbol ?? '',
     );
 
     // Get balance again to double check
     final currentBalance = await WalletRepository().getDexApproveBalance(
-      chain: sellCoinInfo.chain,
-      symbol: sellCoinInfo.symbol,
-      sellAddress: sellCoinInfo.address,
-      contract: sellCoinInfo.contract,
-      chainPrecision: sellCoinInfo.chainPrecision,
+      chain: sellCoinInfo.chain ?? '',
+      symbol: sellCoinInfo.symbol ?? '',
+      sellAddress: sellCoinInfo.address ?? '',
+      contract: sellCoinInfo.contract ?? '',
+      chainPrecision: sellCoinInfo.chainPrecision ?? 0,
     );
 
     // If I call this function and I have approve balance,
@@ -55,24 +55,24 @@ class TradeActionOrderApprove extends _BaseAction {
 
     final approveAmountInt = NumberUtil.getAmountAsInt(
       approveAmount,
-      sellCoinInfo.chainPrecision,
+      sellCoinInfo.chainPrecision ?? 0,
     );
 
     // TODO: need to check for ETH fee balance
 
     final transInfo = await WalletRepository().dexCreateApproveTransaction(
-      chain: sellCoinInfo.chain,
-      symbol: sellCoinInfo.symbol,
+      chain: sellCoinInfo.chain ?? '',
+      symbol: sellCoinInfo.symbol ?? '',
       sellAmount: approveAmountInt,
-      sellAddress: sellCoinInfo.address,
-      sellContract: sellCoinInfo.contract,
+      sellAddress: sellCoinInfo.address ?? '',
+      sellContract: sellCoinInfo.contract ?? '',
     );
     final approveData = WalletTemplateData(
-      chain: sellCoinInfo.chain,
-      symbol: sellCoinInfo.symbol,
+      chain: sellCoinInfo.chain ?? '',
+      symbol: sellCoinInfo.symbol ?? '',
       templateHex: '', // No Hex for approve
       templateData: transInfo,
-      templateAddress: sellCoinInfo.address,
+      templateAddress: sellCoinInfo.address ?? '',
     );
 
     final canContinue = await onConfirmSubmit(
@@ -86,17 +86,13 @@ class TradeActionOrderApprove extends _BaseAction {
     }
 
     final walletData = await onUnlockWallet();
-    if (walletData == null) {
-      return null;
-    }
-
     // ETH and TRX submit
     final submitTransaction = Completer<String>();
 
     dispatch(WalletActionSignAndSubmitRawTx(
-      chain: sellCoinInfo.chain,
-      symbol: sellCoinInfo.symbol,
-      fromAddress: sellCoinInfo.address,
+      chain: sellCoinInfo.chain ?? '',
+      symbol: sellCoinInfo.symbol ?? '',
+      fromAddress: sellCoinInfo.address ?? '',
       rawTx: approveData.rawTx,
       walletData: walletData,
       completer: submitTransaction,
@@ -104,20 +100,22 @@ class TradeActionOrderApprove extends _BaseAction {
     ));
     final txId = await submitTransaction.future;
 
-    dispatch(AssetActionAddTransaction(Transaction.fromRaw(
-      txId: txId,
-      chain: sellCoinInfo.chain,
-      symbol: sellCoinInfo.chain,
-      feeValue: approveData.feeValue,
-      feeSymbol: sellCoinInfo.chain,
-      amount: approveAmount,
-      toAddress: approveData.contract,
-      fromAddress: sellCoinInfo.address,
-      type: TransactionType.approveCall,
-    )));
-
+    dispatch(
+      AssetActionAddTransaction(
+        Transaction.fromRaw(
+          txId: txId,
+          chain: sellCoinInfo.chain ?? '',
+          symbol: sellCoinInfo.chain ?? '',
+          feeValue: approveData.feeValue,
+          feeSymbol: sellCoinInfo.chain ?? '',
+          amount: approveAmount,
+          toAddress: approveData.contract,
+          fromAddress: sellCoinInfo.address ?? '',
+          type: TransactionType.approveCall,
+        ),
+      ),
+    );
     onSuccessTransaction(txId);
-
     return null;
   }
 

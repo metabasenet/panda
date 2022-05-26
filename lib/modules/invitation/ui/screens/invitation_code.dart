@@ -13,7 +13,7 @@ class InvitationCodePage extends HookWidget {
   static Route<dynamic> route(RouteSettings settings) {
     return DefaultTransition(
       settings,
-      InvitationCodePage(settings.arguments as InvitationCode),
+      InvitationCodePage(settings.arguments! as InvitationCode),
     );
   }
 
@@ -86,7 +86,7 @@ class InvitationCodePage extends HookWidget {
             chain: inviteCode.chain,
             symbol: inviteCode.symbol,
           );
-          coinName.value = coinInfo.name;
+          coinName.value = coinInfo.name ?? '';
         },
         builder: (context, viewModel) {
           return Stack(

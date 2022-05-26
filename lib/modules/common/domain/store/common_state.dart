@@ -16,7 +16,7 @@ abstract class CommonState implements Built<CommonState, CommonStateBuilder> {
   Config? get config;
 
   //@nullable
-  int get configState;
+  int? get configState;
 
   //@nullable
   PackageInfo? get appInfo;
@@ -37,5 +37,5 @@ abstract class CommonState implements Built<CommonState, CommonStateBuilder> {
   ConfigUpdate? get newVersion;
 
   BuiltMap<String, String>? get disabledModules =>
-      config?.version.data.disabledModules;
+      config?.version.data?.disabledModules;
 }

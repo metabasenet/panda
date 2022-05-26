@@ -24,7 +24,7 @@ class ModulePermissionUtils {
 
   void updateFromConfig(Config config, String version) {
     _currentVersion = version;
-    _disabledModules = config?.version?.data?.disabledModules?.toMap() ?? {};
+    _disabledModules = config.version.data?.disabledModules?.toMap() ?? {};
   }
 
   /// Return True If the config min version is higher then this app version

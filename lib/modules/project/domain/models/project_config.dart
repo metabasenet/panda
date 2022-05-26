@@ -13,8 +13,8 @@ abstract class ProjectConfig
   }
 
   //@nullable
-  String get instructions;
+  String? get instructions;
 
   //@nullable
-  double get id;
+  double? get id;
 }

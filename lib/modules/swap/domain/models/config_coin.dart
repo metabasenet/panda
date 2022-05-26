@@ -13,13 +13,13 @@ abstract class SwapConfigCoin
 // Fields
 
   //@nullable
-  String get address;
+  String? get address;
 
   //@nullable
-  String get chain;
+  String? get chain;
 
   //@nullable
-  String get symbol;
+  String? get symbol;
 
   @BuiltValueField(wireName: 'transfer_min')
   double get transferMin;
@@ -29,13 +29,13 @@ abstract class SwapConfigCoin
 
   //@nullable
   @BuiltValueField(wireName: 'transfer_fee')
-  double get transferFee;
+  double? get transferFee;
 
   //@nullable
-  bool get enabled;
+  bool? get enabled;
 
   //@nullable
-  String get name;
+  String? get name;
 
   String get id => '$chain:$symbol';
 

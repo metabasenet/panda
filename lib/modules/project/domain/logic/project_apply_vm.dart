@@ -11,7 +11,7 @@ abstract class ProjectApplyVM
   ProjectCreateParams get lastProjectCreateParams;
 
   //@nullable
-  String get projectRules;
+  String? get projectRules;
 
   //  Methods
 

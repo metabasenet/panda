@@ -60,15 +60,15 @@ class Swap extends HiveObject {
       Swap()
         ..txId = txId
         ..status = SwapStatus.noTxid
-        ..outSymbol = params.outCoinConfig.symbol
-        ..outChain = params.outCoinConfig.chain
+        ..outSymbol = params.outCoinConfig.symbol ?? ''
+        ..outChain = params.outCoinConfig.chain ?? ''
         ..outAmount = params.amount.toString()
-        ..inSymbol = params.inCoinConfig.symbol
-        ..inChain = params.inCoinConfig.chain
+        ..inSymbol = params.inCoinConfig.symbol ?? ''
+        ..inChain = params.inCoinConfig.chain ?? ''
         ..inAmount = params.amount.toString()
         ..toAddress = ' params.toAddress'
-        ..fromAddress = params.outCoinInfo.address
-        ..transferFee = params.outCoinConfig.transferFee
+        ..fromAddress = params.outCoinInfo.address ?? ''
+        ..transferFee = params.outCoinConfig.transferFee ?? 0
         ..createdAt = SystemDate.getTime()
         ..updatedAt = SystemDate.getTime();
 

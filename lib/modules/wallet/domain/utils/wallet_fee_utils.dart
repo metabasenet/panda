@@ -185,7 +185,7 @@ class WalletFeeUtils {
         final feeValue = getETHFeeValue(
           gasPrice: gasPrice!,
           gasLimit: defaultFee.gasLimit!,
-          chainPrecision: coinInfo.chainPrecision,
+          chainPrecision: coinInfo.chainPrecision ?? 0,
         );
         final feeRate = getETHFeeRate(gasPrice);
         return defaultFee.copyWith(
@@ -198,7 +198,7 @@ class WalletFeeUtils {
         final sun = NumberUtil.multiply<int>(defaultFee.feeRate, ratio);
         final feeValue = getTRXFeeValue(
           sun: sun!,
-          chainPrecision: coinInfo.chainPrecision,
+          chainPrecision: coinInfo.chainPrecision ?? 0,
         );
         final feeRate = getTRXFeeRate(sun);
         return defaultFee.copyWith(
@@ -211,7 +211,7 @@ class WalletFeeUtils {
         final mnt = NumberUtil.multiply<double>(defaultFee.feeRate, ratio);
         final feeValue = getMNTFeeValue(
           mnt: mnt!,
-          chainPrecision: coinInfo.chainPrecision,
+          chainPrecision: coinInfo.chainPrecision ?? 0,
         );
         final feeRate = getMNTFeeRate(mnt);
         return defaultFee.copyWith(

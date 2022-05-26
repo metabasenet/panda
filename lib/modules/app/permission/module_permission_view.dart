@@ -116,9 +116,9 @@ class ModelPermissionView extends StatelessWidget {
                 if (permission == ModulePermissionState.needUpdate) {
                   showUpdateAppDialog(
                     context,
-                    downloadUrl: viewModel.newVersionData.downloadUrl,
-                    description: viewModel.newVersionData.description,
-                    version: viewModel.newVersionData.version,
+                    downloadUrl: viewModel.newVersionData?.downloadUrl ?? '',
+                    description: viewModel.newVersionData?.description ?? '',
+                    version: viewModel.newVersionData?.version ?? '',
                   );
                   return;
                 }

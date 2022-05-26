@@ -43,7 +43,7 @@ class AssetDetailPage extends HookWidget {
   }
 
   void checkIfWalletHasBackup(BuildContext context, AssetDetailVM viewModel) {
-    if (!viewModel.activeWallet.hasBackup && !kDebugMode) {
+    if (!(viewModel.activeWallet?.hasBackup ?? false) && !kDebugMode) {
       showConfirmDialog(
         context,
         content: tr('asset:detail_msg_backup'),
@@ -74,7 +74,7 @@ class AssetDetailPage extends HookWidget {
           .doLoadDetail(coinInfo, params!.isRefresh)
           .catchError((error) {
         Toast.showError(error);
-        throw error as Object;
+        //throw error as Object;
       });
     }
 
@@ -88,7 +88,7 @@ class AssetDetailPage extends HookWidget {
     )
         .catchError((error) {
       Toast.showError(error);
-      throw error as Object;
+      //throw error as Object;
     });
   }
 
@@ -105,8 +105,8 @@ class AssetDetailPage extends HookWidget {
               tr(
                 'asset:detail_lbl_total',
                 namedArgs: {
-                  'name': coinInfo.name,
-                  'fullName': coinInfo.fullName,
+                  'name': coinInfo.name ?? '',
+                  'fullName': coinInfo.fullName ?? '',
                 },
               ),
               style: context.textSecondary(

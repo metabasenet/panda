@@ -8,7 +8,7 @@ class HomePage extends StatelessWidget {
   void handleOpenBannerPage(HomeBanner bannerItem) {
     switch (bannerItem.type) {
       case 'URL':
-        WebViewPage.open(bannerItem.content, bannerItem.title);
+        WebViewPage.open(bannerItem.content ?? '', bannerItem.title);
         break;
       case 'SYSTEM_NOTICE':
         //NoticeDetailPage.open(
@@ -24,9 +24,9 @@ class HomePage extends StatelessWidget {
     if (data != null) {
       showUpdateAppDialog(
         context,
-        downloadUrl: data.downloadUrl,
-        description: data.description,
-        version: data.version,
+        downloadUrl: data.downloadUrl ?? '',
+        description: data.description ?? '',
+        version: data.version ?? '',
       );
       _hasShownNewVersionDialog = true;
     }
@@ -82,14 +82,14 @@ class HomePage extends StatelessWidget {
               handleShowNewVersion(context, value);
             });
           }
-          if (viewModel.hasNewVersion && !_hasShownNewVersionDialog) {
-            handleShowNewVersion(context, viewModel.newVersionData);
+          if ((viewModel.hasNewVersion ?? false) &&
+              !_hasShownNewVersionDialog) {
+            handleShowNewVersion(context, viewModel.newVersionData!);
           } else {
             viewModel.doCheckLanguage().then((lang) async {
               if (lang != null) {
                 final newLangTr =
                     await AppLocalizations.getTranslationsByLocale(lang.locale);
-
                 showConfirmDialog(
                   context,
                   title: newLangTr.get('global:dialog_alert_title'),
@@ -113,8 +113,9 @@ class HomePage extends StatelessWidget {
           }
         },
         onDidChange: (_, __, viewModel) {
-          if (viewModel.hasNewVersion && !_hasShownNewVersionDialog) {
-            handleShowNewVersion(context, viewModel.newVersionData);
+          if ((viewModel.hasNewVersion ?? false) &&
+              !_hasShownNewVersionDialog) {
+            handleShowNewVersion(context, viewModel.newVersionData!);
           }
         },
         builder: (context, viewModel) => CSRefresher(
@@ -176,7 +177,7 @@ class HomePage extends StatelessWidget {
                 ),
               ),
               HomeBanners(
-                viewModel.homeBanners.toList(),
+                viewModel.homeBanners?.toList() ?? [],
                 handleOpenBannerPage,
               ),
               /*
@@ -201,11 +202,11 @@ class HomePage extends StatelessWidget {
                 communityConfig: viewModel.communityConfig,
               ),*/
               AdmissionLatest(
-                list: viewModel.admissionList.toList(),
+                list: viewModel.admissionList?.toList() ?? [],
                 hasWallet: viewModel.hasWallet,
               ),
               HomePricesCard(
-                prices: viewModel.homePrices.toList(),
+                prices: viewModel.homePrices?.toList() ?? [],
                 doChangeTradePair: (tradePair) {
                   return handleOpenTrade(viewModel, tradePair);
                 },

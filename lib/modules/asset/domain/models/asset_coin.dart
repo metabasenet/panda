@@ -14,63 +14,63 @@ abstract class AssetCoin implements Built<AssetCoin, AssetCoinBuilder> {
 
   // Fields
   //@nullable
-  String get name;
+  String? get name;
 
   //@nullable
-  String get fullName;
+  String? get fullName;
 
   //@nullable
-  String get chain;
+  String? get chain;
 
   //@nullable
-  String get symbol;
+  String? get symbol;
 
   //@nullable
-  String get address;
+  String? get address;
 
   //@nullable
-  String get iconOnline;
+  String? get iconOnline;
 
   //@nullable
-  String get iconLocal;
+  String? get iconLocal;
 
   //@nullable
-  int get chainPrecision;
+  int? get chainPrecision;
 
   //@nullable
-  int get displayPrecision;
+  int? get displayPrecision;
 
   //@nullable
-  double get balance;
+  double? get balance;
 
   //@nullable
-  double get balanceUnconfirmed;
+  double? get balanceUnconfirmed;
 
   //@nullable
-  bool get balanceUpdateFailed;
+  bool? get balanceUpdateFailed;
 
   //@nullable
-  bool get isEnabled;
+  bool? get isEnabled;
 
   //@nullable
-  bool get isFixed;
+  bool? get isFixed;
 
   //@nullable
-  String get contract;
+  String? get contract;
 
   String get id => '$chain:$symbol';
 
-  String get iconUrl => iconOnline.startsWith('assets')
-      ? iconOnline
-      : AppConfig().getImageUrlFor(iconOnline);
+  String get iconUrl => (iconOnline?.startsWith('assets') ?? false)
+      ? (iconOnline ?? '')
+      : AppConfig().getImageUrlFor(iconOnline ?? '');
 
   String get displayBalance => NumberUtil.truncateDecimal<String>(balance);
 
-  String get displayName => name;
+  String get displayName => name ?? '';
 
-  String get displayFullName => fullName;
+  String get displayFullName => fullName ?? '';
 
   /// Display the given amount using this Coin displayPrecision
   String displayAmountWithPrecision(dynamic amount) =>
-      NumberUtil.truncateDecimal<String>(amount, displayPrecision);
+      NumberUtil.truncateDecimal<String>(amount, displayPrecision ?? 0);
 }

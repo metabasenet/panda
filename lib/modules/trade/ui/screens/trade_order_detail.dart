@@ -18,7 +18,7 @@ class TradeOrderDetailPage extends HookWidget {
   static Route<bool> route(RouteSettings settings) {
     return DefaultTransition(
       settings,
-      TradeOrderDetailPage(settings.arguments as TradeOrder),
+      TradeOrderDetailPage(settings.arguments! as TradeOrder),
     );
   }
 
@@ -66,13 +66,17 @@ class TradeOrderDetailPage extends HookWidget {
         'value': NumberUtil.truncateDecimal<String>(detail.avgPrice, 8),
       },
       {
-        'label': tr('trade:order_lbl_trade_total',
-            namedArgs: {'symbol': detail.tradeSymbol}),
+        'label': tr(
+          'trade:order_lbl_trade_total',
+          namedArgs: {'symbol': detail.tradeSymbol},
+        ),
         'value': NumberUtil.truncateDecimal<String>(detail.filled, 8),
       },
       {
-        'label': tr('trade:order_lbl_remaining',
-            namedArgs: {'symbol': detail.symbol}),
+        'label': tr(
+          'trade:order_lbl_remaining',
+          namedArgs: {'symbol': detail.symbol},
+        ),
         'value': (balance ?? 0) >= 0
             ? NumberUtil.truncateDecimal<String>(balance, precision)
             : '-',
@@ -81,13 +85,13 @@ class TradeOrderDetailPage extends HookWidget {
         'label': detail.isChainUseApiRawTx
             ? tr('trade:order_lbl_template_key')
             : tr('trade:order_lbl_template_address'),
-        'value': detail.templateId ?? '',
+        'value': detail.templateId,
         'showCopyBtn': true,
         'fullWidth': true,
       },
       {
         'label': tr('trade:order_lbl_txid'),
-        'value': detail.txId ?? '-',
+        'value': detail.txId,
         'showCopyBtn': true,
         'fullWidth': true,
       },
@@ -299,7 +303,7 @@ class TradeOrderDetailPage extends HookWidget {
     void getOrderDetail(TradeOrderDetailVM viewModel, TradeOrder order) {
       if (order.isConfirming == false && order.isFailed == false) {
         LoadingDialog.show(context);
-        viewModel.getOrderDetail(order.txId).then((value) {
+        viewModel.getOrderDetail?.call(order.txId).then((value) {
           LoadingDialog.dismiss(context);
           orderDetailInfo.value = value;
         }).catchError((error) {
@@ -393,7 +397,7 @@ class TradeOrderDetailPage extends HookWidget {
                               fontWeight: FontWeight.normal,
                             ),
                           ),
-                          ...orderDetailInfo.value.matchList
+                          ...orderDetailInfo.value.matchList!
                               .asMap()
                               .entries
                               .map(
@@ -403,7 +407,9 @@ class TradeOrderDetailPage extends HookWidget {
                                   viewModel,
                                   data: entry.value,
                                   isLast: (entry.key + 1) ==
-                                      orderDetailInfo.value.matchList.length,
+                                      (orderDetailInfo
+                                              .value.matchList?.length ??
+                                          0),
                                   isExchange: false,
                                 ),
                               ),
@@ -430,7 +436,7 @@ class TradeOrderDetailPage extends HookWidget {
                               color: context.bodyColor,
                             ),
                           ),
-                          ...orderDetailInfo.value.exchangeList
+                          ...orderDetailInfo.value.exchangeList!
                               .asMap()
                               .entries
                               .map(
@@ -440,7 +446,9 @@ class TradeOrderDetailPage extends HookWidget {
                                   viewModel,
                                   data: entry.value,
                                   isLast: entry.key + 1 ==
-                                      orderDetailInfo.value.exchangeList.length,
+                                      (orderDetailInfo
+                                              .value.exchangeList?.length ??
+                                          0),
                                   isExchange: true,
                                 ),
                               ),

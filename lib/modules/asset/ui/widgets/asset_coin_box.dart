@@ -28,7 +28,7 @@ class AssetCoinBox extends StatelessWidget {
           key: ValueKey('$onPress'),
           children: [
             CSImage(
-              coinInfo.iconLocal,
+              coinInfo.iconLocal ?? '',
               fallbackUrl: coinInfo.iconLocal,
               width: 30,
               height: 30,
@@ -45,16 +45,16 @@ class AssetCoinBox extends StatelessWidget {
               ),
             ),
             SizedBox(width: 10),
-            if (coinInfo?.fullName != null)
+            if (coinInfo.fullName != null)
               Text(
-                coinInfo.fullName,
+                coinInfo.fullName ?? '',
                 style: context.textSecondary(
                   bold: true,
                   fontWeight: FontWeight.normal,
                 ),
               ),
             Spacer(),
-            if (coinInfo != null && onPress != null)
+            if (onPress != null)
               Padding(
                 padding: context.edgeLeft8,
                 child: Icon(

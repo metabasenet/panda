@@ -37,7 +37,7 @@ class ProjectItem extends HookWidget {
                   width: context.mediaWidth * 0.8,
                   padding: context.edgeLeft10,
                   child: Text(
-                    item.projectName,
+                    item.projectName ?? '',
                     style: context.textBody(
                       bold: true,
                       fontWeight: FontWeight.normal,
@@ -60,10 +60,10 @@ class ProjectItem extends HookWidget {
             projectLabel(
               context,
               name: tr('project:list_lbl_progress'),
-              label: item.displayProgressPair,
+              label: item.displayProgressPair ?? '',
               child: projectProgress(
                 context,
-                item.displayProgress,
+                item.displayProgress ?? 0,
               ),
             ),
           ],

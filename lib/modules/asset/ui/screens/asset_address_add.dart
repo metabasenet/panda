@@ -20,7 +20,7 @@ class AssetAddressAddPage extends HookWidget {
   }
 
   static Route<dynamic> route(RouteSettings settings) {
-    final params = settings.arguments as Map<String, dynamic>;
+    final params = settings.arguments! as Map<String, dynamic>;
     final item = params['item'];
     final coinInfo = params['coinInfo'] as AssetCoin;
 
@@ -51,26 +51,32 @@ class AssetAddressAddPage extends HookWidget {
       }
 
       final addressValid = await viewModel.validateAddress(
-        chain: coinInfo!.chain,
+        chain: coinInfo?.chain ?? '',
         address: address.text,
       );
-      if (addressValid == null || addressValid == false) {
+      if (addressValid == false) {
         return Toast.show(tr('wallet:wallet_error_invalid_address'));
       }
 
+      // ignore: use_build_context_synchronously
       LoadingDialog.show(context);
       viewModel
           .submitAddressAdd(
-              coinInfo!,
-              AssetAddress.fromAdd(
-                id: item?.id,
-                address: address.text,
-                comments: name.text,
-              ))
+        coinInfo!,
+        AssetAddress.fromAdd(
+          id: item?.id,
+          address: address.text,
+          comments: name.text,
+        ),
+      )
           .then((_) {
-        Toast.show(tr(isEdit
-            ? 'asset:address_msg_edit_success'
-            : 'asset:address_msg_add_success'));
+        Toast.show(
+          tr(
+            isEdit
+                ? 'asset:address_msg_edit_success'
+                : 'asset:address_msg_add_success',
+          ),
+        );
         LoadingDialog.dismiss(context);
         AppNavigator.goBack();
       }).catchError((e) {

@@ -15,24 +15,24 @@ abstract class CommunityMemberInfo
   }
 
   //@nullable
-  String get name;
+  String? get name;
 
   //@nullable
-  String get describe;
+  String? get describe;
 
   //@nullable
-  String get github;
+  String? get github;
 
   //@nullable
-  String get icon;
+  String? get icon;
 
   //@nullable
   @BuiltValueField(wireName: 'telegram_account')
-  String get telegramAccount;
+  String? get telegramAccount;
 
   //@nullable
   @BuiltValueField(wireName: 'admin')
-  BuiltMap<String, String> get admin;
+  BuiltMap<String, String>? get admin;
 
-  String get displayIcon => AppConfig().getImageUrlFor(icon);
+  String get displayIcon => AppConfig().getImageUrlFor(icon ?? '');
 }

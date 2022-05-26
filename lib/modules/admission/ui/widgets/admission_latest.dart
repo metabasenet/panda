@@ -50,7 +50,7 @@ class AdmissionLatest extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            item.name,
+            item.name ?? '',
             style: context.textMedium(
               bold: true,
               fontWeight: FontWeight.normal,
@@ -78,11 +78,13 @@ class AdmissionLatest extends StatelessWidget {
                 ),
               ),
               Spacer(),
-              Text(progressRightLbl,
-                  style: context.textSmall(
-                    bold: true,
-                    fontWeight: FontWeight.normal,
-                  )),
+              Text(
+                progressRightLbl,
+                style: context.textSmall(
+                  bold: true,
+                  fontWeight: FontWeight.normal,
+                ),
+              ),
             ],
           ),
           SizedBox(height: 20),
@@ -136,11 +138,13 @@ class AdmissionLatest extends StatelessWidget {
             )
           else
             Center(
-              child: Text(timeLbl,
-                  style: context.textSmall(
-                    bold: true,
-                    fontWeight: FontWeight.normal,
-                  )),
+              child: Text(
+                timeLbl,
+                style: context.textSmall(
+                  bold: true,
+                  fontWeight: FontWeight.normal,
+                ),
+              ),
             ),
         ],
       ),

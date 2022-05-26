@@ -8,7 +8,7 @@ abstract class WalletManagementVM
 
 // UI Fields
   //@nullable
-  Wallet get activeWallet;
+  Wallet? get activeWallet;
 
 // Actions
   @BuiltValueField(compare: false)

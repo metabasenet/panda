@@ -7,10 +7,10 @@ abstract class CommunityCreateVM
   CommunityCreateVM._();
 
   //@nullable
-  String get walletId;
+  String? get walletId;
 
   //@nullable
-  BuiltList<AssetCoin> get coinList;
+  BuiltList<AssetCoin>? get coinList;
 
 // UI Actions、
   @BuiltValueField(compare: false)
@@ -21,13 +21,13 @@ abstract class CommunityCreateVM
 
 // UI Logic
   static CommunityCreateVM fromStore(Store<AppState> store) {
-    final ecological = store.state.communityState?.config?.ecological;
+    final ecological = store.state.communityState.config?.ecological;
     final coins = <AssetCoin>[];
     if (ecological != null && ecological.isNotEmpty) {
       for (final item in ecological) {
         coins.add(store.state.assetState.getCoinInfo(
-          chain: item.chain,
-          symbol: item.symbol,
+          chain: item.chain ?? '',
+          symbol: item.symbol ?? '',
         ));
       }
     }

@@ -33,27 +33,27 @@ abstract class CommunityState
   List<dynamic> toCache() {
     try {
       return [
-        serialize<CommunityConfig>(config),
+        serialize<CommunityConfig>(config!),
       ];
     } catch (_) {
       return [];
     }
   }
 
-// Config
+  // Config
   //@nullable
-  CommunityConfig get config;
+  CommunityConfig? get config;
 
   //@nullable
-  int get configState;
+  int? get configState;
 
 // Fields
   //@nullable
-  BuiltList<CommunityTeam> get communityTeamList;
+  BuiltList<CommunityTeam>? get communityTeamList;
 
   //@nullable
-  BuiltList<CommunityMember> get communityMemberList;
+  BuiltList<CommunityMember>? get communityMemberList;
 
   //@nullable
-  BuiltList<CommunityTeam> get communityBlacklist;
+  BuiltList<CommunityTeam>? get communityBlacklist;
 }

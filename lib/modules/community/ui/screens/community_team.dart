@@ -15,7 +15,7 @@ class CommunityTeamPage extends HookWidget {
   }
 
   static Route<dynamic> route(RouteSettings settings) {
-    final item = settings.arguments as MapEntry<CommunityInfo, CommunityTeam>;
+    final item = settings.arguments! as MapEntry<CommunityInfo, CommunityTeam>;
     return DefaultTransition(
       settings,
       CommunityTeamPage(item.key, item.value),
@@ -36,11 +36,11 @@ class CommunityTeamPage extends HookWidget {
       if (!info.joinIsOnChain)
         {
           'label': tr('community:join_mars_develop_telegram_lbl'),
-          'value': team.options.telegramAccount,
+          'value': team.options?.telegramAccount,
         },
       {
         'label': tr('community:detail_lbl_address'),
-        'value': team.options.addressCount,
+        'value': team.options?.addressCount,
       },
       if (team.displayAverageSymbol.isNotEmpty)
         {
@@ -88,7 +88,7 @@ class CommunityTeamPage extends HookWidget {
                   children: [
                     Expanded(
                       child: SelectableText(
-                        team.name,
+                        team.name ?? '',
                         style: context.textMedium(
                           bold: true,
                           lineHeight: 1.5,

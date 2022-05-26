@@ -34,22 +34,34 @@ Future<bool> showTradeOrderConfirmDialog(
     symbol: tradePair.tradeSymbol,
   );
 
-  final priceName = tr('asset:lbl_coin_name', namedArgs: {
-    'name': priceCoin.symbol,
-    'fullName': priceCoin.fullName,
-  });
-  final tradeName = tr('asset:lbl_coin_name', namedArgs: {
-    'name': tradeCoin.symbol,
-    'fullName': tradeCoin.fullName,
-  });
-  final amountName = tr('asset:lbl_coin_name', namedArgs: {
-    'name': amountCoin.symbol,
-    'fullName': amountCoin.fullName,
-  });
-  final feeName = tr('asset:lbl_coin_name', namedArgs: {
-    'name': feeCoin.symbol,
-    'fullName': feeCoin.fullName,
-  });
+  final priceName = tr(
+    'asset:lbl_coin_name',
+    namedArgs: {
+      'name': priceCoin.symbol ?? '',
+      'fullName': priceCoin.fullName ?? '',
+    },
+  );
+  final tradeName = tr(
+    'asset:lbl_coin_name',
+    namedArgs: {
+      'name': tradeCoin.symbol ?? '',
+      'fullName': tradeCoin.fullName ?? '',
+    },
+  );
+  final amountName = tr(
+    'asset:lbl_coin_name',
+    namedArgs: {
+      'name': amountCoin.symbol ?? '',
+      'fullName': amountCoin.fullName ?? '',
+    },
+  );
+  final feeName = tr(
+    'asset:lbl_coin_name',
+    namedArgs: {
+      'name': feeCoin.symbol ?? '',
+      'fullName': feeCoin.fullName ?? '',
+    },
+  );
 
   var canSubmit = true;
   var isFeeNeedDeposit = false;
@@ -106,11 +118,11 @@ Future<bool> showTradeOrderConfirmDialog(
           orderParams.withdrawData.fee.feeValue, payAmount)
       : payAmount;
 
-  if (amountCoin.balance < (totalToPayFromBalance ?? 0)) {
+  if ((amountCoin.balance ?? 0) < (totalToPayFromBalance ?? 0)) {
     canSubmit = false;
   }
 
-  if (feeCoin.balance < orderParams.withdrawData.fee.feeValue) {
+  if ((feeCoin.balance ?? 0) < orderParams.withdrawData.fee.feeValue) {
     canSubmit = false;
     isFeeNeedDeposit = true;
   }
@@ -124,7 +136,9 @@ Future<bool> showTradeOrderConfirmDialog(
         : tr(
             'trade:order_confirm_dialog_msg_balance',
             namedArgs: {
-              'symbol': isFeeNeedDeposit ? feeCoin.symbol : amountCoin.symbol
+              'symbol': isFeeNeedDeposit
+                  ? feeCoin.symbol.toString()
+                  : amountCoin.symbol.toString()
             },
           ),
     confirmBtnText: canSubmit
@@ -170,19 +184,25 @@ Future<bool> showTradeOrderApproveDialog(
     symbol: approveData.feeSymbol,
   );
   final amountCoin = getCoinInfo(
-    chain: coinInfo.chain,
-    symbol: coinInfo.symbol,
+    chain: coinInfo.chain ?? '',
+    symbol: coinInfo.symbol ?? '',
   );
 
-  final amountName = tr('asset:lbl_coin_name', namedArgs: {
-    'name': amountCoin.symbol,
-    'fullName': amountCoin.fullName,
-  });
+  final amountName = tr(
+    'asset:lbl_coin_name',
+    namedArgs: {
+      'name': amountCoin.symbol ?? '',
+      'fullName': amountCoin.fullName ?? '',
+    },
+  );
 
-  final feeName = tr('asset:lbl_coin_name', namedArgs: {
-    'name': feeCoin.symbol,
-    'fullName': feeCoin.fullName,
-  });
+  final feeName = tr(
+    'asset:lbl_coin_name',
+    namedArgs: {
+      'name': feeCoin.symbol ?? '',
+      'fullName': feeCoin.fullName ?? '',
+    },
+  );
 
   var canSubmit = true;
   var isFeeNeedDeposit = false;
@@ -208,11 +228,11 @@ Future<bool> showTradeOrderApproveDialog(
   // Check if I have enough balance to pay the total and the network fee
   final totalToPayFromBalance = approveData.feeValue;
 
-  if (amountCoin.balance < totalToPayFromBalance) {
+  if ((amountCoin.balance ?? 0) < totalToPayFromBalance) {
     canSubmit = false;
   }
 
-  if (feeCoin.balance < approveData.feeValue) {
+  if ((feeCoin.balance ?? 0) < approveData.feeValue) {
     canSubmit = false;
     isFeeNeedDeposit = true;
   }

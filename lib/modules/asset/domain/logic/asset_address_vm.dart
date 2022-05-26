@@ -8,7 +8,7 @@ abstract class AssetAddressVM
 
   // Fields
   //@nullable
-  BuiltList<AssetAddress> get addressList;
+  BuiltList<AssetAddress>? get addressList;
 // Methods
 
   @BuiltValueField(compare: false)

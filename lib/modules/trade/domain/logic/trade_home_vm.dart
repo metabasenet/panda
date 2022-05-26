@@ -13,16 +13,16 @@ abstract class TradeHomeVM implements Built<TradeHomeVM, TradeHomeVMBuilder> {
   TradeSide get tradeSide;
   String get fiatCurrency;
   //@nullable
-  String get activeWalletId;
+  String? get activeWalletId;
 
   //@nullable
-  AssetCoin get priceCoinInfo;
+  AssetCoin? get priceCoinInfo;
   //@nullable
-  AssetCoin get tradeCoinInfo;
+  AssetCoin? get tradeCoinInfo;
   //@nullable
-  AssetCoin get sideCoinInfo;
+  AssetCoin? get sideCoinInfo;
   //@nullable
-  TradeConfigCoin get sideCoinConfig;
+  TradeConfigCoin? get sideCoinConfig;
 
   BuiltList<TradePair> get allTradePairs;
 // Methods
@@ -35,7 +35,7 @@ abstract class TradeHomeVM implements Built<TradeHomeVM, TradeHomeVMBuilder> {
 
   //@nullable
   @BuiltValueField(compare: false)
-  Future<void> Function(TradeSide tradeSide) get doChangeTradeSide;
+  Future<void> Function(TradeSide tradeSide)? get doChangeTradeSide;
 
   @BuiltValueField(compare: false)
   Future<void> Function(TradePair tradePair) get doChangeTradePair;
@@ -119,25 +119,25 @@ abstract class TradeHomeVM implements Built<TradeHomeVM, TradeHomeVMBuilder> {
 
     final tradeCoinInfo = VMWithWalletGetCoinInfoImplement.getCoinInfo(
       store,
-      chain: tradePair.tradeChain,
-      symbol: tradePair.tradeSymbol,
+      chain: tradePair?.tradeChain ?? '',
+      symbol: tradePair?.tradeSymbol ?? '',
     );
     final priceCoinInfo = VMWithWalletGetCoinInfoImplement.getCoinInfo(
       store,
-      chain: tradePair.priceChain,
-      symbol: tradePair.priceSymbol,
+      chain: tradePair?.priceChain ?? '',
+      symbol: tradePair?.priceSymbol ?? '',
     );
     final sideCoinInfo =
         tradeState.tradeSide == TradeSide.buy ? priceCoinInfo : tradeCoinInfo;
     final sideCoinConfig = tradeState.getCoinConfig(
-      chain: sideCoinInfo.chain,
-      symbol: sideCoinInfo.symbol,
+      chain: sideCoinInfo.chain ?? '',
+      symbol: sideCoinInfo.symbol ?? '',
     );
 
     return TradeHomeVM((viewModel) => viewModel
       ..hasWallet = store.state.walletState.hasWallet
       ..ethAddress = store.state.walletState.activeWallet!.ethAddress
-      ..tradePair = tradePair.toBuilder()
+      ..tradePair = tradePair!.toBuilder()
       ..tradeSide = tradeState.tradeSide
       ..fiatCurrency = fiatCurrency
       ..activeWalletId = activeWalletId
@@ -145,7 +145,7 @@ abstract class TradeHomeVM implements Built<TradeHomeVM, TradeHomeVMBuilder> {
       ..priceCoinInfo = priceCoinInfo.toBuilder()
       ..sideCoinInfo = sideCoinInfo.toBuilder()
       ..sideCoinConfig = sideCoinConfig.toBuilder()
-      ..allTradePairs = ListBuilder(tradeState.config.allTradePairs)
+      ..allTradePairs = ListBuilder(tradeState.config?.allTradePairs ?? [])
       ..getCoinInfo = ({required chain, required symbol}) {
         return VMWithWalletGetCoinInfoImplement.getCoinInfo(
           store,
@@ -180,15 +180,12 @@ abstract class TradeHomeVM implements Built<TradeHomeVM, TradeHomeVMBuilder> {
           chain: tradePair.sideChain(tradeSide),
           symbol: tradePair.sideSymbol(tradeSide),
         );
-        if (coinInfo == null) {
-          return Future.value();
-        }
         return store.dispatchAsync(
           AssetActionGetCoinBalance(
             wallet: store.state.walletState.activeWallet!,
-            chain: coinInfo.chain,
-            symbol: coinInfo.symbol,
-            address: coinInfo.address,
+            chain: coinInfo.chain ?? '',
+            symbol: coinInfo.symbol ?? '',
+            address: coinInfo.address ?? '',
             ignoreBalanceLock: !kChainsNeedLockBalance.contains(coinInfo.chain),
           ),
         );
@@ -200,14 +197,12 @@ abstract class TradeHomeVM implements Built<TradeHomeVM, TradeHomeVMBuilder> {
           chain: tradePair.sideChain(tradeSide),
           symbol: tradePair.sideSymbol(tradeSide),
         );
-        if (coinInfo == null) {
-          return Future.value(0.0);
-        }
+
         final completer = Completer<double>();
         store.dispatch(
           TradeActionGetApproveBalance(
-            chain: coinInfo.chain,
-            symbol: coinInfo.symbol,
+            chain: coinInfo.chain ?? '',
+            symbol: coinInfo.symbol ?? '',
             completer: completer,
           ),
         );

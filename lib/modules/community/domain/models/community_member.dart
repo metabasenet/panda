@@ -16,34 +16,34 @@ abstract class CommunityMember
 
 // Fields
   //@nullable
-  String get id;
+  String? get id;
 
   //@nullable
-  int get status;
+  int? get status;
 
   //@nullable
-  String get team;
+  String? get team;
 
   //@nullable
   @BuiltValueField(wireName: 'mnt_address')
-  String get mntAddress;
+  String? get mntAddress;
 
   //@nullable
-  int get order;
+  int? get order;
 
   //@nullable
   @BuiltValueField(wireName: 'is_mine')
-  bool get isMine;
+  bool? get isMine;
 
   //@nullable
-  CommunityMemberInfo get info;
+  CommunityMemberInfo? get info;
 
   /// 拒绝理由
   String get rejectedMessage {
     if (info != null &&
-        info.admin != null &&
-        info.admin['rejected_message'] != null) {
-      return info.admin['rejected_message'].toString();
+        info?.admin != null &&
+        info?.admin?['rejected_message'] != null) {
+      return info?.admin?['rejected_message'].toString() ?? '';
     }
     return '';
   }
@@ -51,9 +51,9 @@ abstract class CommunityMember
   /// 禁用理由
   String get blackMessage {
     if (info != null &&
-        info.admin != null &&
-        info.admin['black_message'] != null) {
-      return info.admin['black_message'].toString();
+        info?.admin != null &&
+        info?.admin?['black_message'] != null) {
+      return info?.admin?['black_message'].toString() ?? '';
     }
     return '';
   }

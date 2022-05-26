@@ -10,8 +10,8 @@ abstract class ConfigSystem
 
 // Fields
   //@nullable
-  BuiltMap<String, ConfigSystemApp> get config;
+  BuiltMap<String, ConfigSystemApp>? get config;
 
   bool get isIOSAppStore =>
-      config['pg'] == null || config['pg']?.enable == true;
+      config?['pg'] == null || config?['pg']?.enable == true;
 }

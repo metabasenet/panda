@@ -23,7 +23,7 @@ class ProjectDetailPage extends HookWidget {
   static Route<dynamic> route(RouteSettings settings) {
     return DefaultTransition(
       settings,
-      ProjectDetailPage(settings.arguments as ProjectDetailParams),
+      ProjectDetailPage(settings.arguments! as ProjectDetailParams),
     );
   }
 
@@ -37,37 +37,36 @@ class ProjectDetailPage extends HookWidget {
     final detailList = [
       {
         'name': tr('project:detail_lbl_id'),
-        'label': projectInfo.value?.fork ?? '',
+        'label': projectInfo.value.fork ?? '',
       },
       {
         'name': tr('project:detail_lbl_coin_name'),
-        'label': projectInfo.value?.symbol ?? '',
+        'label': projectInfo.value.symbol ?? '',
       },
       {
         'name': tr('project:detail_lbl_price', namedArgs: {'symbol': 'USDT'}),
-        'label': projectInfo.value?.displayPrice ?? '',
+        'label': projectInfo.value.displayPrice ?? '',
       },
       {
         'name': tr('project:detail_lbl_total_amount'),
         'label':
-            '''${projectInfo.value?.displayTotalAmount ?? ''} ${projectInfo.value?.symbol ?? ''}''',
+            '''${projectInfo.value.displayTotalAmount ?? ''} ${projectInfo.value.symbol ?? ''}''',
       },
       {
         'name': tr('project:detail_lbl_init_amount'),
         'label':
-            '''${projectInfo.value?.displayInitAmount ?? ''} ${projectInfo.value?.symbol ?? ''}''',
+            '''${projectInfo.value.displayInitAmount ?? ''} ${projectInfo.value.symbol ?? ''}''',
       },
       {
         'name': tr('project:detail_lbl_owner_name'),
-        'label': projectInfo.value != null &&
-                projectInfo.value.ownerName != null &&
-                projectInfo.value.ownerName.isNotEmpty
-            ? projectInfo.value?.ownerName['default'].toString()
+        'label': projectInfo.value.ownerName != null &&
+                (projectInfo.value.ownerName?.isNotEmpty ?? false)
+            ? projectInfo.value.ownerName!['default']
             : '',
       },
       {
         'name': tr('project:detail_detail_web'),
-        'label': projectInfo.value?.ownerWebsite ?? '',
+        'label': projectInfo.value.ownerWebsite ?? '',
         'isWebAddress': true,
       },
     ];
@@ -106,7 +105,7 @@ class ProjectDetailPage extends HookWidget {
                         width: context.mediaWidth * 0.8,
                         padding: context.edgeLeft10,
                         child: Text(
-                          projectInfo.value.projectName,
+                          projectInfo.value.projectName ?? '',
                           style: context.textBody(
                             bold: true,
                             fontWeight: FontWeight.normal,
@@ -206,13 +205,11 @@ class ProjectDetailPage extends HookWidget {
                             bottom: 30,
                           ),
                           child: Text(
-                            projectInfo.value != null &&
-                                    projectInfo.value.projectDescription !=
-                                        null &&
+                            projectInfo.value.projectDescription != null &&
                                     projectInfo
-                                        .value.projectDescription.isNotEmpty
+                                        .value.projectDescription!.isNotEmpty
                                 ? projectInfo
-                                    .value.projectDescription['default']
+                                    .value.projectDescription!['default']
                                     .toString()
                                 : '',
                             style: context
@@ -228,7 +225,7 @@ class ProjectDetailPage extends HookWidget {
                   ),
               ],
             ),
-            if (projectInfo.value.displayPoolBtn)
+            if (projectInfo.value.displayPoolBtn ?? false)
               Positioned(
                 right: 0,
                 left: 0,
@@ -241,12 +238,12 @@ class ProjectDetailPage extends HookWidget {
                     borderRadius: 0,
                     onPressed: () {
                       LoadingDialog.show(context);
-                      viewModel.setActivePool(projectInfo.value.id).then(
+                      viewModel.setActivePool(projectInfo.value.id ?? 0).then(
                         (value) {
                           LoadingDialog.dismiss(context);
                           AppNavigator.gotoTabBar();
                           //todo go pool
-                          // AppNavigator.gotoTabBarPage(1);
+                          //AppNavigator.gotoTabBarPage(1);
                         },
                       ).catchError(
                         (e) {

@@ -33,10 +33,10 @@ class ProjectActionCreateSubmit extends _BaseAction {
     final withdrawDataRequest = Completer<WalletWithdrawData>();
     dispatch(WalletActionWithdrawBefore(
       params: WithdrawBeforeParams(
-        chain: payCoin.chain,
-        symbol: payCoin.symbol,
-        fromAddress: payCoin.address,
-        chainPrecision: payCoin.chainPrecision,
+        chain: payCoin.chain ?? '',
+        symbol: payCoin.symbol ?? '',
+        fromAddress: payCoin.address ?? '',
+        chainPrecision: payCoin.chainPrecision ?? 0,
         contractOrForkId: payCoin.contract,
         toAddress: 'projectConfig.toAddress',
       ),
@@ -65,7 +65,7 @@ class ProjectActionCreateSubmit extends _BaseAction {
       params: WithdrawSubmitParams(
         withdrawData: params.withdrawData!,
         amount: params.withdrawAmount!,
-        chainPrecision: payCoin.chainPrecision,
+        chainPrecision: payCoin.chainPrecision ?? 0,
         toAddress: params.withdrawData!.toAddress!,
       ),
       walletData: walletData,

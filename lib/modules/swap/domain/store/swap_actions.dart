@@ -2,7 +2,7 @@ part of swap_domain_module;
 
 abstract class _BaseAction extends ReduxAction<AppState> {
   String get walletId => store.state.walletState.activeWalletId!;
-  SwapConfig get swapConfig => store.state.swapState.config;
+  SwapConfig get swapConfig => store.state.swapState.config!;
 }
 
 class SwapActionGetApproveBalance extends _BaseAction {
@@ -22,11 +22,11 @@ class SwapActionGetApproveBalance extends _BaseAction {
       symbol: symbol,
     );
     final approveBalance = await SwapRepository().getApproveBalance(
-      chain: coinInfo.chain,
-      symbol: coinInfo.symbol,
-      address: coinInfo.address,
-      contract: coinInfo.contract,
-      chainPrecision: coinInfo.chainPrecision,
+      chain: coinInfo.chain ?? '',
+      symbol: coinInfo.symbol ?? '',
+      address: coinInfo.address ?? '',
+      contract: coinInfo.contract ?? '',
+      chainPrecision: coinInfo.chainPrecision ?? 0,
     );
     completer.complete(approveBalance);
     return null;

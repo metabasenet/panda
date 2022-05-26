@@ -26,17 +26,17 @@ abstract class ConfigUpdateData
       _$configUpdateDataSerializer;
 
   //@nullable
-  String get version;
+  String? get version;
   //@nullable
-  String get description;
+  String? get description;
   //@nullable
   @BuiltValueField(wireName: 'force_update')
-  bool get forceUpdate;
+  bool? get forceUpdate;
   //@nullable
   @BuiltValueField(wireName: 'download_url')
-  String get downloadUrl;
+  String? get downloadUrl;
 
   //@nullable
   @BuiltValueField(wireName: 'disable_functions')
-  BuiltMap<String, String> get disabledModules;
+  BuiltMap<String, String>? get disabledModules;
 }

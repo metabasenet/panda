@@ -21,7 +21,7 @@ class CommunityJoinProcess {
 
     try {
       LoadingDialog.show(context);
-      final newTeam = team ?? await onGetTeamInfo(info.id);
+      final newTeam = team ?? await onGetTeamInfo(info.id ?? '');
 
       if (info.joinIsOnChain) {
         // Check again
@@ -35,8 +35,8 @@ class CommunityJoinProcess {
         }
 
         final success = await onCheckOnChain(
-          fork: newTeam.fork,
-          fromAddress: newTeam.owner,
+          fork: newTeam.fork ?? '',
+          fromAddress: newTeam.owner ?? '',
         );
 
         LoadingDialog.dismiss(context);

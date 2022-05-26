@@ -12,9 +12,9 @@ abstract class AssetListVM implements Built<AssetListVM, AssetListVMBuilder> {
 
   List<Wallet> get wallets;
   //@nullable
-  bool get hasWallet;
+  bool? get hasWallet;
   //@nullable
-  Wallet get activeWallet;
+  Wallet? get activeWallet;
   String get activeWalletId;
   WalletStatus get activeWalletStatus;
 

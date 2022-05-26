@@ -13,33 +13,33 @@ abstract class NoticeInfo implements Built<NoticeInfo, NoticeInfoBuilder> {
 
 // Fields
   //@nullable
-  int get id;
+  int? get id;
 
   //@nullable
-  String get title;
+  String? get title;
 
   @BuiltValueField(wireName: 'cover_img')
   //@nullable
-  String get coverImg;
+  String? get coverImg;
 
   @BuiltValueField(wireName: 'created_at')
   //@nullable
-  int get createdAt;
+  int? get createdAt;
 
   @BuiltValueField(wireName: 'share_img')
   //@nullable
-  BuiltList<String> get shareImg;
+  BuiltList<String>? get shareImg;
 
   @memoized
-  String get image => AppConfig().getImageUrlFor(coverImg);
+  String get image => AppConfig().getImageUrlFor(coverImg ?? '');
 
   @memoized
   List<String> get shareImgWithUrl => shareImg != null
-      ? shareImg
+      ? shareImg!
           .map<String>((item) => AppConfig().getImageUrlFor(item))
           .toList()
       : [];
 
   String get displayCreatedAt =>
-      formatDate(DateTime.fromMillisecondsSinceEpoch(createdAt * 1000));
+      formatDate(DateTime.fromMillisecondsSinceEpoch((createdAt ?? 0) * 1000));
 }

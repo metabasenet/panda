@@ -97,7 +97,7 @@ class AssetListPage extends StatelessWidget {
       padding: EdgeInsets.zero,
       child: AssetWalletCard(
         fiatCurrency: viewModel.fiatCurrency,
-        wallet: viewModel.activeWallet,
+        wallet: viewModel.activeWallet!,
         walletStatus: viewModel.activeWalletStatus,
         onSync: (wallet) {
           LoadingDialog.show(context);
@@ -199,7 +199,7 @@ class AssetListPage extends StatelessWidget {
                       (coin) => AssetListItem(
                         item: coin,
                         onPressed: () {
-                          if (viewModel.hasWallet) {
+                          if (viewModel.hasWallet ?? false) {
                             AssetDetailPage.open(coin);
                           } else {
                             Toast.show(tr('wallet:msg_create_wallet_tips'));

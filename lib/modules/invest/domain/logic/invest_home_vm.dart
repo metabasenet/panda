@@ -16,12 +16,12 @@ abstract class InvestHomeVM
   String get fiatCurrency;
 
   //@nullable
-  MintItem get activeMint;
+  MintItem? get activeMint;
 
   BuiltList<MintItem> get mints;
 
   //@nullable
-  MintInfo get mintInfo;
+  MintInfo? get mintInfo;
 
   BuiltList<MintChart> get chartList;
 
@@ -67,11 +67,11 @@ abstract class InvestHomeVM
         ..profitRecordList =
             store.state.investState.profitRecordList.toBuilder()
         ..fiatCurrency = store.state.commonState.fiatCurrency ?? ''
-        ..mints = ListBuilder(store.state.investState.mints)
+        ..mints = ListBuilder(store.state.investState.mints ?? [])
         ..activeMint = store.state.investState.activeMint?.toBuilder()
         ..getDefaultMint = () {
-          if (store.state.investState.mints.isNotEmpty) {
-            return store.state.investState.mints.first;
+          if (store.state.investState.mints?.isNotEmpty ?? false) {
+            return store.state.investState.mints!.first;
           }
           return null;
         }

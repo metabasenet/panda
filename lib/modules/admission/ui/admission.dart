@@ -3,14 +3,11 @@ library admission_ui_module;
 // Dart imports:
 import 'dart:async';
 
-// Flutter imports:
-import 'package:flutter/material.dart';
-
 // Package imports:
 import 'package:async_redux/async_redux.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-
 // Project imports:
 import 'package:mars/dialogs/dialogs.dart';
 import 'package:mars/modules/admission/domain/admission.dart';
@@ -26,9 +23,9 @@ import 'package:mars/utils/utils.dart';
 import 'package:mars/widgets/widgets.dart';
 
 part 'dialog/admission_submit_dialog.dart';
+part 'process/admission_submit_process.dart';
 part 'screens/admission_create.dart';
 part 'widgets/admission_latest.dart';
-part 'process/admission_submit_process.dart';
 
 Route<dynamic>? moduleAdmissionInitRoutes(RouteSettings settings) {
   switch (settings.name) {

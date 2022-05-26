@@ -128,7 +128,7 @@ void updateCoinAddress({
     (password) => viewModel.doUnlockWallet(password),
     (data, _) {
       LoadingDialog.show(context);
-      viewModel.updateCoinAddress(data, coin.chain).then((value) {
+      viewModel.updateCoinAddress(data, coin.chain ?? '').then((value) {
         viewModel.doToggleCoin(coin, isEnabled);
       }).catchError((e) {
         Toast.showError(e);
@@ -162,13 +162,13 @@ Widget buildAssetItem(
         radius: 27,
         backgroundColor: context.whiteColor,
       ),
-      trailing: !item.isFixed
+      trailing: !(item.isFixed ?? false)
           ? CSSwitch(
-              value: item.isEnabled,
+              value: item.isEnabled ?? false,
               onChangedBack: (isEnabled) {
                 // 关闭币种，可以不管他是不是有地址
-                if ((item.address == null || item.address.isEmpty) &&
-                    isEnabled) {
+                if (item.address == null ||
+                    (item.address?.isEmpty ?? true) && isEnabled) {
                   updateCoinAddress(
                     context: context,
                     viewModel: viewModel,
@@ -186,7 +186,7 @@ Widget buildAssetItem(
       title: Transform.translate(
         offset: Offset(-10, 0),
         child: Text(
-          item.symbol,
+          item.symbol ?? '',
           style: context.textBody(
             bold: true,
             fontWeight: FontWeight.normal,
@@ -196,7 +196,7 @@ Widget buildAssetItem(
       subtitle: Transform.translate(
         offset: Offset(-10, 0),
         child: Text(
-          item.name,
+          item.name ?? '',
           style: context.textSecondary(
             bold: true,
             fontWeight: FontWeight.normal,

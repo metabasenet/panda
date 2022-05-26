@@ -39,5 +39,5 @@ abstract class AdmissionState
 
   // Fields
   //@nullable
-  BuiltList<AdmissionInfo> get admissionList;
+  BuiltList<AdmissionInfo>? get admissionList;
 }

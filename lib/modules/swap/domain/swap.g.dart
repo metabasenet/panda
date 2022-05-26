@@ -20,14 +20,17 @@ class _$SwapConfigSerializer implements StructuredSerializer<SwapConfig> {
   @override
   Iterable<Object?> serialize(Serializers serializers, SwapConfig object,
       {FullType specifiedType = FullType.unspecified}) {
-    final result = <Object?>[
-      'tradePairs',
-      serializers.serialize(object.tradePairs,
-          specifiedType: const FullType(BuiltList, const [
-            const FullType(BuiltList, const [const FullType(SwapConfigCoin)])
-          ])),
-    ];
-
+    final result = <Object?>[];
+    Object? value;
+    value = object.tradePairs;
+    if (value != null) {
+      result
+        ..add('tradePairs')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(BuiltList, const [
+              const FullType(BuiltList, const [const FullType(SwapConfigCoin)])
+            ])));
+    }
     return result;
   }
 
@@ -67,31 +70,56 @@ class _$SwapConfigCoinSerializer
   Iterable<Object?> serialize(Serializers serializers, SwapConfigCoin object,
       {FullType specifiedType = FullType.unspecified}) {
     final result = <Object?>[
-      'address',
-      serializers.serialize(object.address,
-          specifiedType: const FullType(String)),
-      'chain',
-      serializers.serialize(object.chain,
-          specifiedType: const FullType(String)),
-      'symbol',
-      serializers.serialize(object.symbol,
-          specifiedType: const FullType(String)),
       'transfer_min',
       serializers.serialize(object.transferMin,
           specifiedType: const FullType(double)),
       'transfer_max',
       serializers.serialize(object.transferMax,
           specifiedType: const FullType(double)),
-      'transfer_fee',
-      serializers.serialize(object.transferFee,
-          specifiedType: const FullType(double)),
-      'enabled',
-      serializers.serialize(object.enabled,
-          specifiedType: const FullType(bool)),
-      'name',
-      serializers.serialize(object.name, specifiedType: const FullType(String)),
     ];
-
+    Object? value;
+    value = object.address;
+    if (value != null) {
+      result
+        ..add('address')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.chain;
+    if (value != null) {
+      result
+        ..add('chain')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.symbol;
+    if (value != null) {
+      result
+        ..add('symbol')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.transferFee;
+    if (value != null) {
+      result
+        ..add('transfer_fee')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(double)));
+    }
+    value = object.enabled;
+    if (value != null) {
+      result
+        ..add('enabled')
+        ..add(
+            serializers.serialize(value, specifiedType: const FullType(bool)));
+    }
+    value = object.name;
+    if (value != null) {
+      result
+        ..add('name')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
     return result;
   }
 
@@ -109,15 +137,15 @@ class _$SwapConfigCoinSerializer
       switch (key) {
         case 'address':
           result.address = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'chain':
           result.chain = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'symbol':
           result.symbol = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'transfer_min':
           result.transferMin = serializers.deserialize(value,
@@ -129,15 +157,15 @@ class _$SwapConfigCoinSerializer
           break;
         case 'transfer_fee':
           result.transferFee = serializers.deserialize(value,
-              specifiedType: const FullType(double))! as double;
+              specifiedType: const FullType(double)) as double?;
           break;
         case 'enabled':
           result.enabled = serializers.deserialize(value,
-              specifiedType: const FullType(bool))! as bool;
+              specifiedType: const FullType(bool)) as bool?;
           break;
         case 'name':
           result.name = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
       }
     }
@@ -155,19 +183,29 @@ class _$SwapStateSerializer implements StructuredSerializer<SwapState> {
   @override
   Iterable<Object?> serialize(Serializers serializers, SwapState object,
       {FullType specifiedType = FullType.unspecified}) {
-    final result = <Object?>[
-      'config',
-      serializers.serialize(object.config,
-          specifiedType: const FullType(SwapConfig)),
-      'configState',
-      serializers.serialize(object.configState,
-          specifiedType: const FullType(int)),
-      'swaps',
-      serializers.serialize(object.swaps,
-          specifiedType:
-              const FullType(BuiltList, const [const FullType(Swap)])),
-    ];
-
+    final result = <Object?>[];
+    Object? value;
+    value = object.config;
+    if (value != null) {
+      result
+        ..add('config')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(SwapConfig)));
+    }
+    value = object.configState;
+    if (value != null) {
+      result
+        ..add('configState')
+        ..add(serializers.serialize(value, specifiedType: const FullType(int)));
+    }
+    value = object.swaps;
+    if (value != null) {
+      result
+        ..add('swaps')
+        ..add(serializers.serialize(value,
+            specifiedType:
+                const FullType(BuiltList, const [const FullType(Swap)])));
+    }
     return result;
   }
 
@@ -188,7 +226,7 @@ class _$SwapStateSerializer implements StructuredSerializer<SwapState> {
           break;
         case 'configState':
           result.configState = serializers.deserialize(value,
-              specifiedType: const FullType(int))! as int;
+              specifiedType: const FullType(int)) as int?;
           break;
         case 'swaps':
           result.swaps.replace(serializers.deserialize(value,
@@ -638,15 +676,12 @@ class SwapListVMBuilder implements Builder<SwapListVM, SwapListVMBuilder> {
 
 class _$SwapConfig extends SwapConfig {
   @override
-  final BuiltList<BuiltList<SwapConfigCoin>> tradePairs;
+  final BuiltList<BuiltList<SwapConfigCoin>>? tradePairs;
 
   factory _$SwapConfig([void Function(SwapConfigBuilder)? updates]) =>
       (new SwapConfigBuilder()..update(updates))._build();
 
-  _$SwapConfig._({required this.tradePairs}) : super._() {
-    BuiltValueNullFieldError.checkNotNull(
-        tradePairs, 'SwapConfig', 'tradePairs');
-  }
+  _$SwapConfig._({this.tradePairs}) : super._();
 
   @override
   SwapConfig rebuild(void Function(SwapConfigBuilder) updates) =>
@@ -688,7 +723,7 @@ class SwapConfigBuilder implements Builder<SwapConfig, SwapConfigBuilder> {
   SwapConfigBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _tradePairs = $v.tradePairs.toBuilder();
+      _tradePairs = $v.tradePairs?.toBuilder();
       _$v = null;
     }
     return this;
@@ -711,12 +746,12 @@ class SwapConfigBuilder implements Builder<SwapConfig, SwapConfigBuilder> {
   _$SwapConfig _build() {
     _$SwapConfig _$result;
     try {
-      _$result = _$v ?? new _$SwapConfig._(tradePairs: tradePairs.build());
+      _$result = _$v ?? new _$SwapConfig._(tradePairs: _tradePairs?.build());
     } catch (_) {
       late String _$failedField;
       try {
         _$failedField = 'tradePairs';
-        tradePairs.build();
+        _tradePairs?.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
             'SwapConfig', _$failedField, e.toString());
@@ -730,46 +765,39 @@ class SwapConfigBuilder implements Builder<SwapConfig, SwapConfigBuilder> {
 
 class _$SwapConfigCoin extends SwapConfigCoin {
   @override
-  final String address;
+  final String? address;
   @override
-  final String chain;
+  final String? chain;
   @override
-  final String symbol;
+  final String? symbol;
   @override
   final double transferMin;
   @override
   final double transferMax;
   @override
-  final double transferFee;
+  final double? transferFee;
   @override
-  final bool enabled;
+  final bool? enabled;
   @override
-  final String name;
+  final String? name;
 
   factory _$SwapConfigCoin([void Function(SwapConfigCoinBuilder)? updates]) =>
       (new SwapConfigCoinBuilder()..update(updates))._build();
 
   _$SwapConfigCoin._(
-      {required this.address,
-      required this.chain,
-      required this.symbol,
+      {this.address,
+      this.chain,
+      this.symbol,
       required this.transferMin,
       required this.transferMax,
-      required this.transferFee,
-      required this.enabled,
-      required this.name})
+      this.transferFee,
+      this.enabled,
+      this.name})
       : super._() {
-    BuiltValueNullFieldError.checkNotNull(address, 'SwapConfigCoin', 'address');
-    BuiltValueNullFieldError.checkNotNull(chain, 'SwapConfigCoin', 'chain');
-    BuiltValueNullFieldError.checkNotNull(symbol, 'SwapConfigCoin', 'symbol');
     BuiltValueNullFieldError.checkNotNull(
         transferMin, 'SwapConfigCoin', 'transferMin');
     BuiltValueNullFieldError.checkNotNull(
         transferMax, 'SwapConfigCoin', 'transferMax');
-    BuiltValueNullFieldError.checkNotNull(
-        transferFee, 'SwapConfigCoin', 'transferFee');
-    BuiltValueNullFieldError.checkNotNull(enabled, 'SwapConfigCoin', 'enabled');
-    BuiltValueNullFieldError.checkNotNull(name, 'SwapConfigCoin', 'name');
   }
 
   @override
@@ -896,22 +924,16 @@ class SwapConfigCoinBuilder
   _$SwapConfigCoin _build() {
     final _$result = _$v ??
         new _$SwapConfigCoin._(
-            address: BuiltValueNullFieldError.checkNotNull(
-                address, 'SwapConfigCoin', 'address'),
-            chain: BuiltValueNullFieldError.checkNotNull(
-                chain, 'SwapConfigCoin', 'chain'),
-            symbol: BuiltValueNullFieldError.checkNotNull(
-                symbol, 'SwapConfigCoin', 'symbol'),
+            address: address,
+            chain: chain,
+            symbol: symbol,
             transferMin: BuiltValueNullFieldError.checkNotNull(
                 transferMin, 'SwapConfigCoin', 'transferMin'),
             transferMax: BuiltValueNullFieldError.checkNotNull(
                 transferMax, 'SwapConfigCoin', 'transferMax'),
-            transferFee: BuiltValueNullFieldError.checkNotNull(
-                transferFee, 'SwapConfigCoin', 'transferFee'),
-            enabled: BuiltValueNullFieldError.checkNotNull(
-                enabled, 'SwapConfigCoin', 'enabled'),
-            name: BuiltValueNullFieldError.checkNotNull(
-                name, 'SwapConfigCoin', 'name'));
+            transferFee: transferFee,
+            enabled: enabled,
+            name: name);
     replace(_$result);
     return _$result;
   }
@@ -919,23 +941,16 @@ class SwapConfigCoinBuilder
 
 class _$SwapState extends SwapState {
   @override
-  final SwapConfig config;
+  final SwapConfig? config;
   @override
-  final int configState;
+  final int? configState;
   @override
-  final BuiltList<Swap> swaps;
+  final BuiltList<Swap>? swaps;
 
   factory _$SwapState([void Function(SwapStateBuilder)? updates]) =>
       (new SwapStateBuilder()..update(updates))._build();
 
-  _$SwapState._(
-      {required this.config, required this.configState, required this.swaps})
-      : super._() {
-    BuiltValueNullFieldError.checkNotNull(config, 'SwapState', 'config');
-    BuiltValueNullFieldError.checkNotNull(
-        configState, 'SwapState', 'configState');
-    BuiltValueNullFieldError.checkNotNull(swaps, 'SwapState', 'swaps');
-  }
+  _$SwapState._({this.config, this.configState, this.swaps}) : super._();
 
   @override
   SwapState rebuild(void Function(SwapStateBuilder) updates) =>
@@ -989,9 +1004,9 @@ class SwapStateBuilder implements Builder<SwapState, SwapStateBuilder> {
   SwapStateBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _config = $v.config.toBuilder();
+      _config = $v.config?.toBuilder();
       _configState = $v.configState;
-      _swaps = $v.swaps.toBuilder();
+      _swaps = $v.swaps?.toBuilder();
       _$v = null;
     }
     return this;
@@ -1016,18 +1031,17 @@ class SwapStateBuilder implements Builder<SwapState, SwapStateBuilder> {
     try {
       _$result = _$v ??
           new _$SwapState._(
-              config: config.build(),
-              configState: BuiltValueNullFieldError.checkNotNull(
-                  configState, 'SwapState', 'configState'),
-              swaps: swaps.build());
+              config: _config?.build(),
+              configState: configState,
+              swaps: _swaps?.build());
     } catch (_) {
       late String _$failedField;
       try {
         _$failedField = 'config';
-        config.build();
+        _config?.build();
 
         _$failedField = 'swaps';
-        swaps.build();
+        _swaps?.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
             'SwapState', _$failedField, e.toString());

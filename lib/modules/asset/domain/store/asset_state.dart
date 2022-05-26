@@ -70,7 +70,7 @@ abstract class AssetState implements Built<AssetState, AssetStateBuilder> {
   BuiltList<AssetAddress> get addressList;
 
   //@nullable
-  String get addressRequestId;
+  String? get addressRequestId;
 
 // Methods
   AssetCoin getCoinInfo({

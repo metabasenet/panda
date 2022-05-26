@@ -7,12 +7,8 @@ class TradeActionLoadMqtt extends _BaseAction {
   Future<AppState?> reduce() async {
     final mqtt = GetIt.I<TradeMqtt>();
 
-    final mqttHost = store.state.tradeState.config.randomMqttHost;
+    final mqttHost = store.state.tradeState.config!.randomMqttHost;
     final settings = await SettingsRepository().getSettings();
-
-    if (mqttHost == null) {
-      return null;
-    }
 
     var username = 'dex';
     var password = 'KXe7Br9obJlyuGc2';
