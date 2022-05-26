@@ -26,9 +26,11 @@ class AssetTransactionCubit extends AssetDetailCubit {
     );
 
     if (onlyCache == true) {
-      allTransactions.sort((a, b) => b.timestamp == a.timestamp
-          ? b.txId.compareTo(b.txId)
-          : (b.timestamp ?? 0).compareTo(a.timestamp ?? 0));
+      allTransactions.sort(
+        (a, b) => b.timestamp == a.timestamp
+            ? b.txId.compareTo(b.txId)
+            : (b.timestamp).compareTo(a.timestamp),
+      );
       emit(allTransactions);
       return allTransactions.length;
     }

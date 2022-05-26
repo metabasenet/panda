@@ -28,7 +28,7 @@ class InvitationListPage extends HookWidget {
 
     void loadDefaultCoin(InvitationListVM viewModel) {
       final coins = viewModel.getInvitationCoins();
-      if (coins?.isNotEmpty == true) {
+      if (coins.isNotEmpty == true) {
         final defaultCoin = coinInfo.value ?? coins.first;
         coinInfo.value = defaultCoin;
         request.add(
@@ -114,9 +114,9 @@ class InvitationListPage extends HookWidget {
 
   Widget _buildItem(BuildContext context, Invitation item) {
     final date = formatDate(
-      DateTime.fromMillisecondsSinceEpoch((item.createAt ?? 0) * 1000),
+      DateTime.fromMillisecondsSinceEpoch((item.createAt) * 1000),
     );
-    final address = item.address ?? '';
+    final address = item.address;
 
     return CSContainer(
       margin: context.edgeAll.copyWith(bottom: 0),

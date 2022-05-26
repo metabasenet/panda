@@ -26,7 +26,7 @@ class WebViewPage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final title = useState(defaultTitle ?? tr('global:webview_title'));
+    final title = useState(defaultTitle);
     final loading = useState(true);
     final controller = useState<WebViewController?>(null);
     final openUrl = useState<String>(url);

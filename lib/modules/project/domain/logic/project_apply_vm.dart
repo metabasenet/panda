@@ -51,7 +51,7 @@ abstract class ProjectApplyVM
     return ProjectApplyVM(
       (viewModel) => viewModel
         ..projectRules =
-            store.state.projectState?.projectConfig?.instructions ?? ''
+            store.state.projectState.projectConfig?.instructions ?? ''
         ..lastProjectCreateParams =
             store.state.projectState.lastProjectCreateParams?.toBuilder()
         ..doUnlockHDWallet = (password) {

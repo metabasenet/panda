@@ -43,9 +43,11 @@ class _SwapActionLoadSwaps extends _BaseAction {
     final walletId = state.walletState.activeWalletId;
     final swaps = await SwapRepository().getSwapsFromCache(walletId!);
 
-    swaps.sort((a, b) => b.createdAt == a.createdAt
-        ? b.txId.compareTo(b.txId)
-        : (b.createdAt ?? 0).compareTo(a.createdAt ?? 0));
+    swaps.sort(
+      (a, b) => b.createdAt == a.createdAt
+          ? b.txId.compareTo(b.txId)
+          : (b.createdAt).compareTo(a.createdAt),
+    );
 
     final skip = (page + 1) * 10;
     final allLength = swaps.length;
@@ -95,14 +97,14 @@ class SwapActionGetSwaps extends _BaseAction {
     final ids = newSwaps.map((e) => e.txId).toSet();
 
     // cache
-    allSwaps.retainWhere((x) => !ids.contains(x.txId ?? ''));
+    allSwaps.retainWhere((x) => !ids.contains(x.txId));
 
     allSwaps.addAll(newSwaps);
 
     allSwaps.sort(
       (a, b) => b.createdAt == a.createdAt
           ? b.txId.compareTo(b.txId)
-          : (b.createdAt ?? 0).compareTo(a.createdAt ?? 0),
+          : (b.createdAt).compareTo(a.createdAt),
     );
 
     await SwapRepository().saveSwapsToCache(

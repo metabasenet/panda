@@ -130,7 +130,7 @@ class Swap extends HiveObject {
   String get displayInAmount => NumberUtil.truncateDecimal<String>(inAmount);
 
   String get displayTime => formatDate(
-        DateTime.fromMillisecondsSinceEpoch((createdAt ?? 0) * 1000),
+        DateTime.fromMillisecondsSinceEpoch(createdAt * 1000),
       );
 
   String get displayActualAmount => NumberUtil.truncateDecimal<String>(

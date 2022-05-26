@@ -6,10 +6,10 @@ class CommonActionLoadCache extends _BaseAction {
   @override
   Future<AppState?> reduce() async {
     // Load Env
-    await DotEnv().load();
-    AppConstants.isBeta = DotEnv().env['IS_BETA'] == 'true';
-    AppConstants.buildId = DotEnv().env['BUILD_ID'] ?? '';
-    AppConstants.commitHash = DotEnv().env['COMMIT_HASH'] ?? '';
+    //await DotEnv().load();
+    AppConstants.isBeta = false; //DotEnv().env['IS_BETA'] == 'true';
+    AppConstants.buildId = '1'; //DotEnv().env['BUILD_ID'] ?? '';
+    AppConstants.commitHash = '2'; // DotEnv().env['COMMIT_HASH'] ?? '';
 
     // Check if is a new installation
     if (Platform.isIOS) {
@@ -60,7 +60,7 @@ class CommonActionLoadSettings extends _BaseAction {
   Future<AppState?> reduce() async {
     final settings = CommonRepository().getSettings();
 
-    settings.installId = settings.installId ?? generateUuidV4();
+    settings.installId = settings.installId;
     AppConfig().installId = settings.installId;
 
     return state.rebuild(

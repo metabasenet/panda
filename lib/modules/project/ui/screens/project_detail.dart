@@ -169,7 +169,7 @@ class ProjectDetailPage extends HookWidget {
                                             }
                                           : null,
                                       child: Text(
-                                        item['label'].toString() ?? '',
+                                        item['label'].toString(),
                                         textAlign: TextAlign.end,
                                         style: context
                                             .textBody(

@@ -36,7 +36,7 @@ class MiningRewardItem extends StatelessWidget {
                     tr(
                       'invest:mining_record_lbl_block_height',
                       namedArgs: {
-                        'height': item.height?.toString() ?? '10',
+                        'height': item.height.toString(),
                       },
                     ),
                     style: context.textSmall(

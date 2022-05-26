@@ -39,7 +39,7 @@ class SwapActionSwapApprove extends _BaseAction {
         ? 0.0
         : AppConstants.isBeta
             ? 100.0
-            : NumberUtil.multiply<double>(outCoinConfig.transferMax ?? 100, 2);
+            : NumberUtil.multiply<double>(outCoinConfig.transferMax, 2);
 
     final approveAmountInt = NumberUtil.getAmountAsInt(
       approveAmount,

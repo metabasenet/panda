@@ -26,7 +26,7 @@ class WalletCreatePage extends HookWidget {
       settings,
       WalletCreatePage(
         importMnemonic,
-        type ?? WalletType.mnemonicBip44,
+        type,
       ),
     );
   }

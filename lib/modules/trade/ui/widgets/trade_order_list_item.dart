@@ -30,21 +30,21 @@ class TradeOrderItem extends StatelessWidget {
           'trade:order_lbl_price',
           namedArgs: {'symbol': order.priceSymbol},
         ),
-        'value': NumberUtil.truncateDecimal<String>(order.price, 8) ?? '0',
+        'value': NumberUtil.truncateDecimal<String>(order.price, 8),
       },
       {
         'label': tr(
           'trade:order_lbl_amount',
           namedArgs: {'symbol': order.tradeSymbol},
         ),
-        'value': NumberUtil.truncateDecimal<String>(order.amount, 8) ?? '0',
+        'value': NumberUtil.truncateDecimal<String>(order.amount, 8),
       },
       {
         'label': tr(
           'trade:order_lbl_entire_total',
           namedArgs: {'symbol': order.priceSymbol},
         ),
-        'value': NumberUtil.truncateDecimal<String>(order.dealAmount, 8) ?? '0',
+        'value': NumberUtil.truncateDecimal<String>(order.dealAmount, 8),
       },
       if (isHistory) // 均价
         {
@@ -52,7 +52,7 @@ class TradeOrderItem extends StatelessWidget {
             'trade:order_lbl_average_price',
             namedArgs: {'symbol': order.priceSymbol},
           ),
-          'value': NumberUtil.truncateDecimal<String>(order.avgPrice, 8) ?? '0',
+          'value': NumberUtil.truncateDecimal<String>(order.avgPrice, 8),
         },
       if (isHistory)
         {
@@ -60,8 +60,7 @@ class TradeOrderItem extends StatelessWidget {
             'trade:order_lbl_miner_fee_all',
             namedArgs: {'symbol': order.feeSymbol},
           ),
-          'value':
-              NumberUtil.truncateDecimal<String>(order.networkFee, 8) ?? '0',
+          'value': NumberUtil.truncateDecimal<String>(order.networkFee, 8),
         },
       {
         'label': tr('trade:order_lbl_trade_time'),

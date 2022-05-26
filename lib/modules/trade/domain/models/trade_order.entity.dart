@@ -313,7 +313,7 @@ class TradeOrder extends HiveObject {
 
   /// Use order confirmed time (when the transaction is confirmed),
   /// otherwise use local submitted time
-  int get displayTime => (confirmedAt ?? submitAt) * 1000;
+  int get displayTime => confirmedAt * 1000;
 
   /// Map the api number status to our enum
   /// - If api status is [pending] (10) but our status is [cancelling],

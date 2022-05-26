@@ -94,7 +94,7 @@ class HomeInputCard extends HookWidget {
     final ratioChanges = useStreamController<String>();
     final totalChanges = useStreamController<String>();
     final priceFiatValue = useStreamController<String>();
-    final dealPrecision = sideCoinConfig?.dealPrecision ?? 6;
+    final dealPrecision = sideCoinConfig.dealPrecision;
     final approveBalance = useStream(updateApproveEvent);
     final tickersCubit = BlocProvider.of<TradeTickersCubit>(context);
 
@@ -160,10 +160,10 @@ class HomeInputCard extends HookWidget {
           final maxAmount = NumberUtil.divide<double>(
             NumberUtil.minus<double>(
               priceCoinInfo.balance,
-              sideCoinConfig.inputNetworkFee ?? 0,
+              sideCoinConfig.inputNetworkFee,
             ),
             price,
-            sideCoinConfig.dealPrecision ?? 6,
+            sideCoinConfig.dealPrecision,
           );
           //maxChanges.add(maxAmount > 0 ? maxAmount : 0);
         } else {
@@ -172,7 +172,7 @@ class HomeInputCard extends HookWidget {
       } else {
         final maxAmount = NumberUtil.minus<double>(
           tradeCoinInfo.balance,
-          sideCoinConfig.inputNetworkFee ?? 0,
+          sideCoinConfig.inputNetworkFee,
         );
         // maxChanges.add(maxAmount > 0 ? maxAmount : 0);
       }
@@ -198,7 +198,7 @@ class HomeInputCard extends HookWidget {
     useEffect(() {
       updateMaxBuySell();
       return null;
-    }, [tradeCoinInfo?.balance, priceCoinInfo?.balance]);
+    }, [tradeCoinInfo.balance, priceCoinInfo.balance]);
 
     useEffect(() {
       isBuy.value = tradeSide == TradeSide.buy;
@@ -296,7 +296,7 @@ class HomeInputCard extends HookWidget {
                 ),
                 SizedBox(height: context.edgeSize),
                 AssetBalanceListener(
-                  key: ValueKey(sideCoinInfo?.symbol),
+                  key: ValueKey(sideCoinInfo.symbol),
                   item: sideCoinInfo,
                   builder: (context, {balance, unconfirmed, data}) => Column(
                     children: [
@@ -323,7 +323,7 @@ class HomeInputCard extends HookWidget {
                       SizedBox(height: 6),
                       RowItemBar(
                         tr('trade:order_lbl_available'),
-                        '''$balance ${sideCoinInfo?.symbol ?? ''}''',
+                        '''$balance ${sideCoinInfo.symbol ?? ''}''',
                         key: Key(balance!),
                         valueFlex: 2,
                         textStyle: context.textSmall(
@@ -359,7 +359,7 @@ class HomeInputCard extends HookWidget {
                     sideCoinConfig.inputNetworkFee > 0)
                   RowItemBar(
                     tr('trade:order_lbl_miner_fee_order'),
-                    '''${sideCoinConfig.networkFee ?? '-'} ${sideCoinConfig.symbol ?? ''}''',
+                    '''${sideCoinConfig.networkFee} ${sideCoinConfig.symbol}''',
                     valueStyle: context.textSmall(
                       bold: true,
                       fontWeight: FontWeight.normal,
@@ -416,7 +416,7 @@ class HomeInputCard extends HookWidget {
                   initialData: '-',
                   builder: (context, snapshot) => RowItemBar(
                     tr('trade:order_lbl_total'),
-                    '${snapshot.data} ${priceCoinInfo?.symbol ?? ''}',
+                    '${snapshot.data} ${priceCoinInfo.symbol ?? ''}',
                     valueStyle: context.textSmall(
                       color: context.bodyColor,
                       bold: true,
@@ -447,7 +447,7 @@ class HomeInputCard extends HookWidget {
                         ? tr('trade:order_btn_approve')
                         : tr(
                             'trade:order_btn_${isBuy.value ? 'buy' : 'sell'}',
-                            namedArgs: {'symbol': tradeCoinInfo?.symbol ?? ''},
+                            namedArgs: {'symbol': tradeCoinInfo.symbol ?? ''},
                           )
                     : tr('trade:order_btn_create_wallet'),
                 textColor: needApprove ? buttonColor : context.whiteColor,

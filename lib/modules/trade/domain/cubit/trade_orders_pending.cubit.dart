@@ -43,8 +43,8 @@ class TradeOrdersPendingCubit extends TradeOrdersCubit {
       walletId: walletId,
       type: TradeOrderApiStatus.all,
       tradePairId: tradePairId,
-      tradeAddress: tradeAddress ?? 'all',
-      priceAddress: priceAddress ?? 'all',
+      tradeAddress: tradeAddress,
+      priceAddress: priceAddress,
       take: 50,
       tradeSide: 'all',
       orderBy: 'latest_deal',
@@ -121,9 +121,9 @@ class TradeOrdersPendingCubit extends TradeOrdersCubit {
       recordType: 'record',
       walletId: walletId,
       type: TradeOrderApiStatus.pending,
-      tradePairId: tradePairId ?? 'all',
-      tradeAddress: tradeAddress ?? 'all',
-      priceAddress: priceAddress ?? 'all',
+      tradePairId: tradePairId,
+      tradeAddress: tradeAddress,
+      priceAddress: priceAddress,
       skip: skip,
       take: take,
       tradeSide: tradeSide,
@@ -154,7 +154,7 @@ class TradeOrdersPendingCubit extends TradeOrdersCubit {
     });
 
     final ids = result.map((e) => e.txId).toSet();
-    result.retainWhere((x) => ids.remove(x.txId ?? ''));
+    result.retainWhere((x) => ids.remove(x.txId));
 
     emit(result);
 

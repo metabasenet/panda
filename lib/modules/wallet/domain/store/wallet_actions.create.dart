@@ -206,7 +206,7 @@ class WalletActionUpdateAddress extends _BaseAction {
         .toList();
 
     final item = addresses.firstWhere((e) => e.chain == chain);
-    wallet?.updateCoinAddress(
+    wallet.updateCoinAddress(
       chain: chain,
       address: item.address,
       publicKey: item.publicKey,
@@ -214,7 +214,7 @@ class WalletActionUpdateAddress extends _BaseAction {
 
     final allWallets = await WalletRepository().saveWallet(
       walletId!,
-      wallet!,
+      wallet,
     );
 
     dispatch(AppActionLoadWallet(wallet));

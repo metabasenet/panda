@@ -82,8 +82,8 @@ class AssetActionSyncWalletCoins extends _BaseAction {
           ..fullName = e.fullName
           ..iconLocal = e.iconLocal
           ..iconOnline = e.iconOnline
-          ..chainPrecision = e.chainPrecision ?? 18
-          ..displayPrecision = e.displayPrecision ?? 8
+          ..chainPrecision = e.chainPrecision
+          ..displayPrecision = e.displayPrecision
           ..address = wallet.getCoinAddressByChain(e.chain)
           ..balance = wallet.getCoinBalance(
             chain: e.chain,

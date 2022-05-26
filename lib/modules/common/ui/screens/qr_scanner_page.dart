@@ -215,7 +215,7 @@ class _QRScannerPage extends State<QRScannerPage>
   @override
   void dispose() {
     super.dispose();
-    qrSubscription?.cancel();
-    qrController?.dispose();
+    qrSubscription.cancel();
+    qrController.dispose();
   }
 }

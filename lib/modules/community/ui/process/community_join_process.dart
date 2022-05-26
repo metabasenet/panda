@@ -53,7 +53,7 @@ class CommunityJoinProcess {
       if (info.joinIsOnChain) {
         showJoinOnChainDialog(
           context,
-          newTeam?.options?.telegramAccount ?? '-',
+          newTeam.options?.telegramAccount ?? '-',
         );
       } else {
         CommunityJoinPage.open(info, newTeam).then((value) {

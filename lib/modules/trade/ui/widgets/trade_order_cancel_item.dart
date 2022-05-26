@@ -20,9 +20,7 @@ class TradeOrderCancelItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final amount = orderAmount ??
-        NumberUtil.truncateDecimal<String>(order.withdrawAmount, 8) ??
-        '0';
+    final amount = orderAmount;
     final List<Map<String, String>> infoList = [
       {
         'label': tr(
@@ -37,7 +35,7 @@ class TradeOrderCancelItem extends StatelessWidget {
             ? tr('trade:order_lbl_template_key')
             : tr('trade:order_lbl_match_address'),
         'value': StringUtils.strCut(
-          order.templateId ?? '',
+          order.templateId,
           startKeep: 6,
           endKeep: 6,
         ),
@@ -147,7 +145,7 @@ class TradeOrderCancelItem extends StatelessWidget {
                 ),
                 autoWidth: true,
                 onPressed: () {
-                  copyTextToClipboard(order.templateId ?? '');
+                  copyTextToClipboard(order.templateId);
                   Toast.show(tr('global:msg_copy_success'));
                 },
               ),

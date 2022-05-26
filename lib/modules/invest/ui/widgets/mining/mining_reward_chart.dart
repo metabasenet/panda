@@ -40,7 +40,7 @@ class _LineChartHoldState extends State<MiningRewardChart> {
 
     selectSort(widget.chartList);
 
-    final data = (widget.chartList ?? [])
+    final data = (widget.chartList)
         .map(
           (e) => FlSpot(
             NumberUtil.getDouble(e.balance),

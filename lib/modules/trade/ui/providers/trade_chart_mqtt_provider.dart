@@ -50,11 +50,7 @@ class TradeChartMqttProvider extends TradeBaseMqttProvider {
 
       final subMessages = mqtt.messages.listen((event) {
         try {
-          final tradePairId = event.topicArgs?.split('/')?.reversed?.join('/');
-
-          if (tradePairId == null) {
-            return;
-          }
+          final tradePairId = event.topicArgs.split('/').reversed.join('/');
 
           switch (event.type) {
             case TradeMqttMsgTypes.deep:

@@ -329,7 +329,7 @@ class TradeOrderDetailPage extends HookWidget {
             LoadingDialog.show(context);
             viewModel.doOrderCheckStatus(order).then((value) {
               LoadingDialog.dismiss(context);
-              orderInfo.value = value ?? order;
+              orderInfo.value = value;
               getOrderDetail(viewModel, orderInfo.value);
             }).catchError((error) {
               LoadingDialog.dismiss(context);
@@ -379,7 +379,7 @@ class TradeOrderDetailPage extends HookWidget {
                       ],
                     ),
                   ),
-                  if (orderDetailInfo.value?.hasMatchList == true)
+                  if (orderDetailInfo.value.hasMatchList == true)
                     CSContainer(
                       margin: context.edgeAll.copyWith(top: 0),
                       padding: context.edgeAll8.copyWith(
@@ -416,7 +416,7 @@ class TradeOrderDetailPage extends HookWidget {
                         ],
                       ),
                     ),
-                  if (orderDetailInfo.value?.hasExchangeList == true)
+                  if (orderDetailInfo.value.hasExchangeList == true)
                     CSContainer(
                       margin: context.edgeAll.copyWith(
                         top: 0,

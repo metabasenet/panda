@@ -9,7 +9,7 @@ abstract class TradeState implements Built<TradeState, TradeStateBuilder> {
       hideSlowTradePairTip: BuiltList(),
       configState: ConfigState.loading.index,
       config: TradeConfig(),
-      tradePair: TradePair(),
+      //tradePair: TradePair(),
       currentOrderDetail: TradeOrderDetail(),
     );
   }
@@ -25,7 +25,7 @@ abstract class TradeState implements Built<TradeState, TradeStateBuilder> {
             BuiltList.from(data.length > 1 ? data[1] as List : []),
         tradeSide: TradeSide.buy,
         configState: ConfigState.loading.index,
-        tradePair: TradePair(),
+        //tradePair: TradePair(),
         currentOrderDetail: TradeOrderDetail(),
       );
     } catch (_) {
@@ -54,7 +54,7 @@ abstract class TradeState implements Built<TradeState, TradeStateBuilder> {
   int? get configState;
 
   //@nullable
-  TradePair? get tradePair;
+  //TradePair? get tradePair;
 
   TradeSide get tradeSide;
 
@@ -63,7 +63,8 @@ abstract class TradeState implements Built<TradeState, TradeStateBuilder> {
   //@nullable
   TradeOrderDetail? get currentOrderDetail;
 
-// Methods
+  //Methods
+  /*
   TradePair getDefaultTradePair() => (config?.allTradePairs ?? []).firstWhere(
         (e) => e.id == AppConstants.defaultTradePair,
         orElse: () => TradePair.fromConfig(
@@ -79,6 +80,7 @@ abstract class TradeState implements Built<TradeState, TradeStateBuilder> {
           apiStatus: 'NOT_ONLINE',
         ),
       );
+*/
 
   TradeConfigCoin getCoinConfig({
     required String symbol,

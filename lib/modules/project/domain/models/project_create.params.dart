@@ -97,7 +97,7 @@ abstract class ProjectCreateParams
       'owner_email': email,
       'project_name': projectName,
       'project_description': projectDescription,
-      'currency': coinName?.toUpperCase(),
+      'currency': coinName.toUpperCase(),
       'currency_price': price,
       'currency_issuing_amount': amount,
       'currency_issuing_initial_amount': poolInitAmount,
@@ -222,7 +222,7 @@ abstract class ProjectCreateParams
             NumberUtil.minus(
                 amount,
                 NumberUtil.multiply(
-                  poolInitAmount ?? 0,
+                  poolInitAmount,
                   mintTotalAmount,
                 )),
             2) ??

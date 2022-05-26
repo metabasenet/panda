@@ -27,7 +27,7 @@ class NoticeListItem extends StatelessWidget {
           Padding(
             padding: context.edgeAll,
             child: Text(
-              item.displayCreatedAt ?? '',
+              item.displayCreatedAt,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: context.textSecondary(

@@ -480,7 +480,7 @@ class WalletRepository {
     );
     return balance != null
         ? NumberUtil.getIntAmountAsDouble(
-            balance ?? 0,
+            balance,
             chainPrecision,
           )
         : 0.0;

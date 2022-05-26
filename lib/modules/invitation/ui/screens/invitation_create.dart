@@ -127,7 +127,7 @@ class InvitationCreatePage extends HookWidget {
     final autovalidate = useState(false);
     final feeIsRefreshing = useState(false);
     final miniAmount = useState<double>(0);
-    final coinName = coinInfo.value?.name ?? '';
+    final coinName = coinInfo.value.name ?? '';
 
     void openQrScan() {
       QRScannerPage.open().then((qrStr) {
@@ -180,8 +180,8 @@ class InvitationCreatePage extends HookWidget {
 
     void loadDefaultCoin(InvitationCreateVM viewModel) {
       final coins = viewModel.getInvitationCoins();
-      if (coins?.isNotEmpty == true) {
-        final defaultCoin = coinInfo.value ?? coins.first;
+      if (coins.isNotEmpty == true) {
+        final defaultCoin = coinInfo.value;
         final mini = GetIt.I<CoinConfig>().getTransferMinQuota(
           chain: defaultCoin.chain,
           symbol: defaultCoin.symbol,

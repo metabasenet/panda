@@ -44,7 +44,7 @@ class WalletChangeNamePage extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final autovalidate = useState(false);
-    final newName = useTextEditingController(text: oldName ?? '');
+    final newName = useTextEditingController(text: oldName);
 
     return CSScaffold(
       title: tr('wallet:change_name_title'),

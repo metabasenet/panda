@@ -50,7 +50,7 @@ class SwapListPage extends StatelessWidget {
                 10,
               );
             },
-            itemCount: viewModel.swapList.length ?? 0,
+            itemCount: viewModel.swapList.length,
             itemBuilder: (context, index) {
               return SwapItem(
                 item: viewModel.swapList[index],

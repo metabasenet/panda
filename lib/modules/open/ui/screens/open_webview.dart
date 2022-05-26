@@ -86,7 +86,7 @@ class OpenWebViewPage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final title = useState(appTitle ?? tr('global:webview_title'));
+    final title = useState(appTitle);
     //final webViewCtrl = useValueNotifier<InAppWebViewController>();
 
     final canGoBack = useState(false);

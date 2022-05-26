@@ -38,7 +38,7 @@ class AssetCoinBox extends StatelessWidget {
             ),
             SizedBox(width: 10),
             Text(
-              coinInfo?.name ?? '',
+              coinInfo.name ?? '',
               style: context.textBody(
                 bold: true,
                 fontWeight: FontWeight.normal,

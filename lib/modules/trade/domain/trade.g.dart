@@ -982,13 +982,6 @@ class _$TradeStateSerializer implements StructuredSerializer<TradeState> {
         ..add('configState')
         ..add(serializers.serialize(value, specifiedType: const FullType(int)));
     }
-    value = object.tradePair;
-    if (value != null) {
-      result
-        ..add('tradePair')
-        ..add(serializers.serialize(value,
-            specifiedType: const FullType(TradePair)));
-    }
     value = object.currentOrderDetail;
     if (value != null) {
       result
@@ -1017,10 +1010,6 @@ class _$TradeStateSerializer implements StructuredSerializer<TradeState> {
         case 'configState':
           result.configState = serializers.deserialize(value,
               specifiedType: const FullType(int)) as int?;
-          break;
-        case 'tradePair':
-          result.tradePair.replace(serializers.deserialize(value,
-              specifiedType: const FullType(TradePair))! as TradePair);
           break;
         case 'tradeSide':
           result.tradeSide = serializers.deserialize(value,
@@ -3832,8 +3821,6 @@ class _$TradeState extends TradeState {
   @override
   final int? configState;
   @override
-  final TradePair? tradePair;
-  @override
   final TradeSide tradeSide;
   @override
   final BuiltList<String> hideSlowTradePairTip;
@@ -3846,7 +3833,6 @@ class _$TradeState extends TradeState {
   _$TradeState._(
       {this.config,
       this.configState,
-      this.tradePair,
       required this.tradeSide,
       required this.hideSlowTradePairTip,
       this.currentOrderDetail})
@@ -3869,7 +3855,6 @@ class _$TradeState extends TradeState {
     return other is TradeState &&
         config == other.config &&
         configState == other.configState &&
-        tradePair == other.tradePair &&
         tradeSide == other.tradeSide &&
         hideSlowTradePairTip == other.hideSlowTradePairTip &&
         currentOrderDetail == other.currentOrderDetail;
@@ -3879,9 +3864,7 @@ class _$TradeState extends TradeState {
   int get hashCode {
     return $jf($jc(
         $jc(
-            $jc(
-                $jc($jc($jc(0, config.hashCode), configState.hashCode),
-                    tradePair.hashCode),
+            $jc($jc($jc(0, config.hashCode), configState.hashCode),
                 tradeSide.hashCode),
             hideSlowTradePairTip.hashCode),
         currentOrderDetail.hashCode));
@@ -3892,7 +3875,6 @@ class _$TradeState extends TradeState {
     return (newBuiltValueToStringHelper('TradeState')
           ..add('config', config)
           ..add('configState', configState)
-          ..add('tradePair', tradePair)
           ..add('tradeSide', tradeSide)
           ..add('hideSlowTradePairTip', hideSlowTradePairTip)
           ..add('currentOrderDetail', currentOrderDetail))
@@ -3910,11 +3892,6 @@ class TradeStateBuilder implements Builder<TradeState, TradeStateBuilder> {
   int? _configState;
   int? get configState => _$this._configState;
   set configState(int? configState) => _$this._configState = configState;
-
-  TradePairBuilder? _tradePair;
-  TradePairBuilder get tradePair =>
-      _$this._tradePair ??= new TradePairBuilder();
-  set tradePair(TradePairBuilder? tradePair) => _$this._tradePair = tradePair;
 
   TradeSide? _tradeSide;
   TradeSide? get tradeSide => _$this._tradeSide;
@@ -3939,7 +3916,6 @@ class TradeStateBuilder implements Builder<TradeState, TradeStateBuilder> {
     if ($v != null) {
       _config = $v.config?.toBuilder();
       _configState = $v.configState;
-      _tradePair = $v.tradePair?.toBuilder();
       _tradeSide = $v.tradeSide;
       _hideSlowTradePairTip = $v.hideSlowTradePairTip.toBuilder();
       _currentOrderDetail = $v.currentOrderDetail?.toBuilder();
@@ -3969,7 +3945,6 @@ class TradeStateBuilder implements Builder<TradeState, TradeStateBuilder> {
           new _$TradeState._(
               config: _config?.build(),
               configState: configState,
-              tradePair: _tradePair?.build(),
               tradeSide: BuiltValueNullFieldError.checkNotNull(
                   tradeSide, 'TradeState', 'tradeSide'),
               hideSlowTradePairTip: hideSlowTradePairTip.build(),
@@ -3979,9 +3954,6 @@ class TradeStateBuilder implements Builder<TradeState, TradeStateBuilder> {
       try {
         _$failedField = 'config';
         _config?.build();
-
-        _$failedField = 'tradePair';
-        _tradePair?.build();
 
         _$failedField = 'hideSlowTradePairTip';
         hideSlowTradePairTip.build();

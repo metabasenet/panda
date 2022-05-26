@@ -43,7 +43,7 @@ class ProjectListPage extends HookWidget {
               skip: params.skip,
             );
           },
-          itemCount: viewModel.listCount ?? 0,
+          itemCount: viewModel.listCount,
           itemBuilder: (context, index) {
             return ProjectItem(
               item: viewModel.projectsList[index],

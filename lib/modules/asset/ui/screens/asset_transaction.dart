@@ -56,17 +56,17 @@ class AssetTransactionPage extends HookWidget {
       {
         'canCopy': 'true',
         'title': tr('asset:trans_lbl_to_address'),
-        'value': info.toAddress ?? '',
+        'value': info.toAddress,
       },
       {
         'canCopy': 'true',
         'title': tr('asset:trans_lbl_from_address'),
-        'value': info.fromAddress ?? '',
+        'value': info.fromAddress,
       },
       {
         'canCopy': 'true',
         'title': tr('asset:trans_lbl_txid'),
-        'value': info.txId ?? '',
+        'value': info.txId,
       },
       {
         'title': tr('asset:trans_lbl_confirmations'),
@@ -185,7 +185,7 @@ class AssetTransactionPage extends HookWidget {
             LoadingDialog.show(context);
             viewModel.getSingleTransaction(info).then((result) {
               LoadingDialog.dismiss(context);
-              infoState.value = result ?? transactionInfo;
+              infoState.value = result;
             }).catchError((error) {
               LoadingDialog.dismiss(context);
               Toast.showError(error);

@@ -71,7 +71,7 @@ class DexCreateOrderParams {
 
   int get validHeight => currentHeight + maxBlockHeight;
 
-  double get payAmount => (isBuy ? total : amount) ?? 0.0;
+  double get payAmount => isBuy ? total : amount;
 
   /// If true, this chain used API to create Order transaction RawTx
   bool get isChainUseApiRawTx => ['ETH', 'TRX'].contains(chain);

@@ -226,7 +226,7 @@ class WalletBackupPage extends HookWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              text!.split('_')[0] ?? '',
+              text!.split('_')[0],
               style: context.textBody(
                 color: context.secondaryColor,
                 bold: true,

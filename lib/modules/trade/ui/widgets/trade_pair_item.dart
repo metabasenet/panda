@@ -27,8 +27,8 @@ class TradePairItem extends StatelessWidget {
         fiatCurrency,
         data,
       ) {
-        final price = isClosing ? '-' : data?.displayPrice ?? '-';
-        final change = data?.change ?? 0;
+        final price = isClosing ? '-' : data.displayPrice;
+        final change = data.change;
 
         final textColor = change == 0
             ? context.bodyColor
@@ -37,7 +37,7 @@ class TradePairItem extends StatelessWidget {
                 : context.redColor;
 
         final fiatPriceValid =
-            !isClosing && NumberUtil.getDouble(fiatPrice ?? 0) > 0;
+            !isClosing && NumberUtil.getDouble(fiatPrice) > 0;
 
         return Container(
           constraints: BoxConstraints(minHeight: 55),

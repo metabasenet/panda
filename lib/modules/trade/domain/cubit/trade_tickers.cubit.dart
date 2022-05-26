@@ -44,7 +44,7 @@ class TradeTickersCubit extends Cubit<TradeTickersState> {
         .where((element) => element.tradeSideId == TradeSide.buy.index)
         .toList();
     tickers.sort((a, b) => b.price.compareTo(a.price));
-    return tickers.isNotEmpty ? tickers.first.price?.toString() ?? '' : '';
+    return tickers.isNotEmpty ? tickers.first.price : '';
   }
 
   String get latestSellPrice {
@@ -52,7 +52,7 @@ class TradeTickersCubit extends Cubit<TradeTickersState> {
         .where((element) => element.tradeSideId == TradeSide.sell.index)
         .toList();
     tickers.sort((a, b) => a.price.compareTo(b.price));
-    return tickers.isNotEmpty ? tickers.first.price?.toString() ?? '' : '';
+    return tickers.isNotEmpty ? tickers.first.price : '';
   }
 
   MapEntry<double, List<TradeTicker>> byTradePair(

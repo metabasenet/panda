@@ -115,7 +115,7 @@ class RevealRoute extends PageRouteBuilder {
               clipper: CircularRevealClipper(
                 fraction: animation.value,
                 centerAlignment: centerAlignment,
-                centerOffset: centerOffset!,
+                centerOffset: centerOffset,
                 minRadius: minRadius,
                 maxRadius: maxRadius,
               ),

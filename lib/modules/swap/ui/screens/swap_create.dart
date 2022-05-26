@@ -312,7 +312,7 @@ class SwapCreatePage extends HookWidget {
                           builder: (context, value, _) {
                             final total = NumberUtil.minus<double>(
                               NumberUtil.getDouble(value.text),
-                              toCoinConfig?.value?.transferFee ?? 0,
+                              toCoinConfig.value?.transferFee ?? 0,
                             );
                             return FormBox(
                               key: ValueKey(value),

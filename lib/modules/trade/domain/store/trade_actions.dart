@@ -17,10 +17,12 @@ class TradeActionOrderChangePair extends _BaseAction {
   final TradePair tradePair;
 
   @override
-  AppState reduce() {
+  AppState? reduce() {
+    /*
     return store.state.rebuild(
       (a) => a.tradeState.tradePair = tradePair.toBuilder(),
-    );
+    );*/
+    return null;
   }
 }
 

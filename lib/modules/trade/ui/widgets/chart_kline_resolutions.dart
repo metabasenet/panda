@@ -21,7 +21,7 @@ class ChartKLineResolutions extends HookWidget {
 
     useEffect(() {
       scrollController.scrollToIndex(
-        kChartResolutions.indexWhere((e) => e.id == selected?.id),
+        kChartResolutions.indexWhere((e) => e.id == selected.id),
         preferPosition: AutoScrollPosition.begin,
       );
 

@@ -71,7 +71,7 @@ class WalletActionChangeName extends _BaseAction {
     return state.rebuild(
       (b) => b.walletState
         ..activeWallet = activeWallet
-        ..wallets = allWallets ?? [],
+        ..wallets = allWallets,
     );
   }
 }

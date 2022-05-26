@@ -133,7 +133,7 @@ class Wallet extends HiveObject {
       total += double.parse(strTotal);
     }
 
-    return NumberUtil.truncateDecimal(total ?? 0, AppConstants.fiatPrecision);
+    return NumberUtil.truncateDecimal(total, AppConstants.fiatPrecision);
   }
 
   String getTotalPrice(String symbol, double balance) {
@@ -180,7 +180,7 @@ class Wallet extends HiveObject {
   }) {
     assert(chain != null, symbol != null);
     final data =
-        balances?.firstWhere((e) => e.symbol == symbol && e.chain == chain);
+        balances.firstWhere((e) => e.symbol == symbol && e.chain == chain);
     return data == null ? 0 : data.unconfirmed;
   }
 

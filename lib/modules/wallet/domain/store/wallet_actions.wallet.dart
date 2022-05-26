@@ -15,7 +15,7 @@ class WalletActionWalletLoadAll extends _BaseAction {
 
     return state.rebuild(
       (b) => b.walletState
-        ..wallets = allWallets ?? []
+        ..wallets = allWallets
         ..activeWallet = activeWallet
         ..activeWalletId = activeWalletId,
     );
@@ -87,7 +87,7 @@ class WalletActionWalletUnlock extends _BaseAction {
     WalletPrivateData data;
     if (activeWallet!.isDevice) {
       data = await getWalletDevicePrivateData(
-        walletId: activeWallet!.id,
+        walletId: activeWallet.id,
       );
     } else {
       data = await getWalletPrivateData(

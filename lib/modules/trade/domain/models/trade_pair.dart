@@ -39,7 +39,7 @@ abstract class TradePair implements Built<TradePair, TradePairBuilder> {
         ..speed = speed
         ..spans = ListBuilder(spans)
         ..marketId = marketId
-        ..apiStatus = apiStatus ?? ''
+        ..apiStatus = apiStatus
         ..tradeName = names.first
         ..tradeChain = tradeChain
         ..tradeSymbol = tradeSymbol

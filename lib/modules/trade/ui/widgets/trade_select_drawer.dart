@@ -28,7 +28,7 @@ class TradeSelectDrawer extends HookWidget {
             if (viewModel.allTradeMarkets != null &&
                 viewModel.allTradeMarkets.isNotEmpty) {
               final item = viewModel.allTradeMarkets.firstWhere(
-                (e) => (selected.priceName ?? '').contains(e.id),
+                (e) => (selected.priceName).contains(e.id),
               );
               selectedMarket.value = item.id;
             }

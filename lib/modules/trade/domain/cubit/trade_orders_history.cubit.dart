@@ -34,9 +34,9 @@ class TradeOrdersHistoryCubit extends TradeOrdersCubit {
       walletId: walletId,
       tradeSide: tradeSide,
       recordType: 'record',
-      tradePairId: tradePairId ?? 'all',
-      tradeAddress: tradeAddress ?? 'all',
-      priceAddress: priceAddress ?? 'all',
+      tradePairId: tradePairId,
+      tradeAddress: tradeAddress,
+      priceAddress: priceAddress,
     );
     final result = skip > 0 ? [...state, ...apiOrders] : [...apiOrders];
 

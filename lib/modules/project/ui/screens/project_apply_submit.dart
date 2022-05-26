@@ -324,7 +324,7 @@ class ProjectApplySubmitPage extends HookWidget {
                       labelItem(
                         context,
                         name: tr('project:create_lbl_pool_amount'),
-                        label: remainAmount.value ?? '0.00',
+                        label: remainAmount.value,
                       ),
                       labelItem(
                         context,
