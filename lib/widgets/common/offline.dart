@@ -74,12 +74,12 @@ class OfflineBuilder extends StatefulWidget {
     WidgetBuilder? errorBuilder,
   }) {
     return OfflineBuilder.initialize(
-      key: key!,
+      key: key,
       connectivityService: Connectivity(),
       debounceDuration: debounceDuration,
-      builder: builder!,
-      errorBuilder: errorBuilder!,
-      child: child!,
+      builder: builder,
+      errorBuilder: errorBuilder,
+      child: child,
     );
   }
 
@@ -136,6 +136,8 @@ class OfflineBuilderState extends State<OfflineBuilder> {
 
   @override
   Widget build(BuildContext context) {
+    //return Text('OfflineBuilderState');
+
     return StreamBuilder<ConnectivityResult>(
       stream: _connectivityStream,
       builder: (context, snapshot) {

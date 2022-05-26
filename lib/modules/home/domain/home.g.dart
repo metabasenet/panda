@@ -188,10 +188,6 @@ class _$HomePageVM extends HomePageVM {
   @override
   final ConfigUpdateData? newVersionData;
   @override
-  final BuiltList<TradePair> allTradePairs;
-  @override
-  final BuiltList<TradeMarket> allTradeMarkets;
-  @override
   final bool hasWallet;
   @override
   final CommunityConfig? communityConfig;
@@ -205,8 +201,6 @@ class _$HomePageVM extends HomePageVM {
   final Future<AppLanguage> Function() doCheckLanguage;
   @override
   final Future<void> Function(String language) doChangeLanguage;
-  @override
-  final Future<void> Function(TradePair tradePair) doChangeTradePair;
   @override
   final Future<void> Function() doRefreshHomeData;
   @override
@@ -222,8 +216,6 @@ class _$HomePageVM extends HomePageVM {
       this.admissionList,
       this.hasNewVersion,
       this.newVersionData,
-      required this.allTradePairs,
-      required this.allTradeMarkets,
       required this.hasWallet,
       this.communityConfig,
       this.communityConfigState,
@@ -231,14 +223,9 @@ class _$HomePageVM extends HomePageVM {
       required this.doCheckForBetaUpdates,
       required this.doCheckLanguage,
       required this.doChangeLanguage,
-      required this.doChangeTradePair,
       required this.doRefreshHomeData,
       required this.doRefreshCommunity})
       : super._() {
-    BuiltValueNullFieldError.checkNotNull(
-        allTradePairs, 'HomePageVM', 'allTradePairs');
-    BuiltValueNullFieldError.checkNotNull(
-        allTradeMarkets, 'HomePageVM', 'allTradeMarkets');
     BuiltValueNullFieldError.checkNotNull(hasWallet, 'HomePageVM', 'hasWallet');
     BuiltValueNullFieldError.checkNotNull(
         doLoadHomeData, 'HomePageVM', 'doLoadHomeData');
@@ -248,8 +235,6 @@ class _$HomePageVM extends HomePageVM {
         doCheckLanguage, 'HomePageVM', 'doCheckLanguage');
     BuiltValueNullFieldError.checkNotNull(
         doChangeLanguage, 'HomePageVM', 'doChangeLanguage');
-    BuiltValueNullFieldError.checkNotNull(
-        doChangeTradePair, 'HomePageVM', 'doChangeTradePair');
     BuiltValueNullFieldError.checkNotNull(
         doRefreshHomeData, 'HomePageVM', 'doRefreshHomeData');
     BuiltValueNullFieldError.checkNotNull(
@@ -273,8 +258,6 @@ class _$HomePageVM extends HomePageVM {
         admissionList == other.admissionList &&
         hasNewVersion == other.hasNewVersion &&
         newVersionData == other.newVersionData &&
-        allTradePairs == other.allTradePairs &&
-        allTradeMarkets == other.allTradeMarkets &&
         hasWallet == other.hasWallet &&
         communityConfig == other.communityConfig &&
         communityConfigState == other.communityConfigState;
@@ -289,16 +272,12 @@ class _$HomePageVM extends HomePageVM {
                     $jc(
                         $jc(
                             $jc(
-                                $jc(
-                                    $jc(
-                                        $jc($jc(0, homePrices.hashCode),
-                                            homeBanners.hashCode),
-                                        homeNotices.hashCode),
-                                    admissionList.hashCode),
-                                hasNewVersion.hashCode),
-                            newVersionData.hashCode),
-                        allTradePairs.hashCode),
-                    allTradeMarkets.hashCode),
+                                $jc($jc(0, homePrices.hashCode),
+                                    homeBanners.hashCode),
+                                homeNotices.hashCode),
+                            admissionList.hashCode),
+                        hasNewVersion.hashCode),
+                    newVersionData.hashCode),
                 hasWallet.hashCode),
             communityConfig.hashCode),
         communityConfigState.hashCode));
@@ -313,8 +292,6 @@ class _$HomePageVM extends HomePageVM {
           ..add('admissionList', admissionList)
           ..add('hasNewVersion', hasNewVersion)
           ..add('newVersionData', newVersionData)
-          ..add('allTradePairs', allTradePairs)
-          ..add('allTradeMarkets', allTradeMarkets)
           ..add('hasWallet', hasWallet)
           ..add('communityConfig', communityConfig)
           ..add('communityConfigState', communityConfigState)
@@ -322,7 +299,6 @@ class _$HomePageVM extends HomePageVM {
           ..add('doCheckForBetaUpdates', doCheckForBetaUpdates)
           ..add('doCheckLanguage', doCheckLanguage)
           ..add('doChangeLanguage', doChangeLanguage)
-          ..add('doChangeTradePair', doChangeTradePair)
           ..add('doRefreshHomeData', doRefreshHomeData)
           ..add('doRefreshCommunity', doRefreshCommunity))
         .toString();
@@ -367,18 +343,6 @@ class HomePageVMBuilder implements Builder<HomePageVM, HomePageVMBuilder> {
   set newVersionData(ConfigUpdateDataBuilder? newVersionData) =>
       _$this._newVersionData = newVersionData;
 
-  ListBuilder<TradePair>? _allTradePairs;
-  ListBuilder<TradePair> get allTradePairs =>
-      _$this._allTradePairs ??= new ListBuilder<TradePair>();
-  set allTradePairs(ListBuilder<TradePair>? allTradePairs) =>
-      _$this._allTradePairs = allTradePairs;
-
-  ListBuilder<TradeMarket>? _allTradeMarkets;
-  ListBuilder<TradeMarket> get allTradeMarkets =>
-      _$this._allTradeMarkets ??= new ListBuilder<TradeMarket>();
-  set allTradeMarkets(ListBuilder<TradeMarket>? allTradeMarkets) =>
-      _$this._allTradeMarkets = allTradeMarkets;
-
   bool? _hasWallet;
   bool? get hasWallet => _$this._hasWallet;
   set hasWallet(bool? hasWallet) => _$this._hasWallet = hasWallet;
@@ -419,13 +383,6 @@ class HomePageVMBuilder implements Builder<HomePageVM, HomePageVMBuilder> {
           Future<void> Function(String language)? doChangeLanguage) =>
       _$this._doChangeLanguage = doChangeLanguage;
 
-  Future<void> Function(TradePair tradePair)? _doChangeTradePair;
-  Future<void> Function(TradePair tradePair)? get doChangeTradePair =>
-      _$this._doChangeTradePair;
-  set doChangeTradePair(
-          Future<void> Function(TradePair tradePair)? doChangeTradePair) =>
-      _$this._doChangeTradePair = doChangeTradePair;
-
   Future<void> Function()? _doRefreshHomeData;
   Future<void> Function()? get doRefreshHomeData => _$this._doRefreshHomeData;
   set doRefreshHomeData(Future<void> Function()? doRefreshHomeData) =>
@@ -447,8 +404,6 @@ class HomePageVMBuilder implements Builder<HomePageVM, HomePageVMBuilder> {
       _admissionList = $v.admissionList?.toBuilder();
       _hasNewVersion = $v.hasNewVersion;
       _newVersionData = $v.newVersionData?.toBuilder();
-      _allTradePairs = $v.allTradePairs.toBuilder();
-      _allTradeMarkets = $v.allTradeMarkets.toBuilder();
       _hasWallet = $v.hasWallet;
       _communityConfig = $v.communityConfig?.toBuilder();
       _communityConfigState = $v.communityConfigState;
@@ -456,7 +411,6 @@ class HomePageVMBuilder implements Builder<HomePageVM, HomePageVMBuilder> {
       _doCheckForBetaUpdates = $v.doCheckForBetaUpdates;
       _doCheckLanguage = $v.doCheckLanguage;
       _doChangeLanguage = $v.doChangeLanguage;
-      _doChangeTradePair = $v.doChangeTradePair;
       _doRefreshHomeData = $v.doRefreshHomeData;
       _doRefreshCommunity = $v.doRefreshCommunity;
       _$v = null;
@@ -489,8 +443,6 @@ class HomePageVMBuilder implements Builder<HomePageVM, HomePageVMBuilder> {
               admissionList: _admissionList?.build(),
               hasNewVersion: hasNewVersion,
               newVersionData: _newVersionData?.build(),
-              allTradePairs: allTradePairs.build(),
-              allTradeMarkets: allTradeMarkets.build(),
               hasWallet: BuiltValueNullFieldError.checkNotNull(
                   hasWallet, 'HomePageVM', 'hasWallet'),
               communityConfig: _communityConfig?.build(),
@@ -503,12 +455,10 @@ class HomePageVMBuilder implements Builder<HomePageVM, HomePageVMBuilder> {
                   doCheckLanguage, 'HomePageVM', 'doCheckLanguage'),
               doChangeLanguage: BuiltValueNullFieldError.checkNotNull(
                   doChangeLanguage, 'HomePageVM', 'doChangeLanguage'),
-              doChangeTradePair: BuiltValueNullFieldError.checkNotNull(
-                  doChangeTradePair, 'HomePageVM', 'doChangeTradePair'),
               doRefreshHomeData: BuiltValueNullFieldError.checkNotNull(
                   doRefreshHomeData, 'HomePageVM', 'doRefreshHomeData'),
-              doRefreshCommunity:
-                  BuiltValueNullFieldError.checkNotNull(doRefreshCommunity, 'HomePageVM', 'doRefreshCommunity'));
+              doRefreshCommunity: BuiltValueNullFieldError.checkNotNull(
+                  doRefreshCommunity, 'HomePageVM', 'doRefreshCommunity'));
     } catch (_) {
       late String _$failedField;
       try {
@@ -523,10 +473,6 @@ class HomePageVMBuilder implements Builder<HomePageVM, HomePageVMBuilder> {
 
         _$failedField = 'newVersionData';
         _newVersionData?.build();
-        _$failedField = 'allTradePairs';
-        allTradePairs.build();
-        _$failedField = 'allTradeMarkets';
-        allTradeMarkets.build();
 
         _$failedField = 'communityConfig';
         _communityConfig?.build();

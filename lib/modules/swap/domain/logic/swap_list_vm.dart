@@ -18,7 +18,7 @@ abstract class SwapListVM implements Built<SwapListVM, SwapListVMBuilder> {
   static SwapListVM fromStore(Store<AppState> store) {
     return SwapListVM(
       (viewModel) => viewModel
-        ..swapList = store.state.swapState.swaps?.toBuilder()
+        //..swapList = store.state.swapState.swaps?.toBuilder()
         ..loadData = (page, skip) async {
           final completer = Completer<int>();
           store.dispatchAsync(

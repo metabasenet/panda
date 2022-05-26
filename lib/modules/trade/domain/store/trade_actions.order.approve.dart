@@ -22,6 +22,7 @@ class TradeActionOrderApprove extends _BaseAction {
 
   @override
   Future<AppState?> reduce() async {
+    /*
     // Coin to use for creating templateData
     final sellCoinInfo = store.state.assetState.getCoinInfo(
       chain: tradePair.sideChain(tradeSide),
@@ -116,6 +117,7 @@ class TradeActionOrderApprove extends _BaseAction {
       ),
     );
     onSuccessTransaction(txId);
+    */
     return null;
   }
 

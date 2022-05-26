@@ -17,6 +17,7 @@ class TradeActionOrderCancel extends _BaseAction {
 
   @override
   Future<AppState?> reduce() async {
+    /*
     final walletId = store.state.walletState.activeWalletId;
 
     final coinInfo = store.state.assetState.getCoinInfo(
@@ -260,7 +261,7 @@ class TradeActionOrderCancel extends _BaseAction {
     }
 
     onSuccessTransaction(txId);
-
+*/
     return null;
   }
 

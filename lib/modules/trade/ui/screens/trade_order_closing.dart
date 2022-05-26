@@ -49,18 +49,7 @@ class TradeOrderClosingPage extends HookWidget {
     TradeHomeVM viewModel,
     TradeOrder order,
     ValueNotifier<Map<String, double>> orderAmounts,
-  ) {
-    LoadingDialog.show(context);
-    viewModel.getOrderBalance(order).then((value) {
-      LoadingDialog.dismiss(context);
-      final map = orderAmounts.value;
-      map[order.templateId] = value;
-      orderAmounts.value = {...map};
-    }).catchError((error) {
-      LoadingDialog.dismiss(context);
-      Toast.showError(error);
-    });
-  }
+  ) {}
 
   @override
   Widget build(BuildContext context) {

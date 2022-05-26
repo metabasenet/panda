@@ -49,8 +49,8 @@ abstract class ModulePermissionVM
         ..disabledModules = store.state.commonState.disabledModules?.toBuilder()
         ..configState = store.state.commonState.configState
         ..investConfigState = store.state.investState.configState
-        ..tradeConfigState = store.state.tradeState.configState
-        ..swapConfigState = store.state.swapState.configState
+        //..tradeConfigState = store.state.tradeState.configState
+        //..swapConfigState = store.state.swapState.configState
         ..communityConfigState = store.state.communityState.configState
         ..doRefreshModulePermission = (moduleName, permission) async {
           final state = store.state;
@@ -62,10 +62,10 @@ abstract class ModulePermissionVM
           }
 
           // 特定页面 参数判断
-          if (moduleName == ModuleName.trade &&
-              state.tradeState.configState != ConfigState.success.index) {
-            await store.dispatch(TradeActionLoadConfig());
-          }
+          //if (moduleName == ModuleName.trade &&
+          //    state.tradeState.configState != ConfigState.success.index) {
+          //  await store.dispatch(TradeActionLoadConfig());
+          //}
 
           // 特定页面 参数判断
           if (moduleName == ModuleName.mint &&
@@ -73,10 +73,10 @@ abstract class ModulePermissionVM
             await store.dispatch(InvestActionLoadConfig());
           }
 
-          if (moduleName == ModuleName.swap &&
-              state.swapState.configState != ConfigState.success.index) {
-            await store.dispatch(SwapActionLoadConfig());
-          }
+          //if (moduleName == ModuleName.swap &&
+          //    state.swapState.configState != ConfigState.success.index) {
+          //  await store.dispatch(SwapActionLoadConfig());
+          //}
 
           if (moduleName == ModuleName.community &&
               state.communityState.configState != ConfigState.success.index) {

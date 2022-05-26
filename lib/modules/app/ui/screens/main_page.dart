@@ -52,7 +52,8 @@ class AppMainPage extends HookWidget {
 
   final tabBarItems = [
     TabBarItem(
-      HomeMainTab(),
+      //HomeMainTab(),
+      Center(),
       'global:main_tab_home',
       '',
       '',
@@ -60,7 +61,8 @@ class AppMainPage extends HookWidget {
       'Home',
     ),
     TabBarItem(
-      TradeMainTab(),
+      //TradeMainTab(),
+      Center(),
       'global:main_tab_trade',
       '',
       '',
@@ -68,7 +70,8 @@ class AppMainPage extends HookWidget {
       'Trading',
     ),
     TabBarItem(
-      AssetMainTab(),
+      //AssetMainTab(),
+      Center(),
       'global:main_tab_wallet',
       '',
       '',
@@ -77,7 +80,8 @@ class AppMainPage extends HookWidget {
     ),
     if (AppConstants.isBeta)
       TabBarItem(
-        InvestMainTab(),
+        //InvestMainTab(),
+        Center(),
         'global:main_tab_invest',
         '',
         '',
@@ -236,14 +240,17 @@ class AppMainPage extends HookWidget {
             PageStorage(
               // key: pageKey,
               bucket: pageBucket,
-              child: IndexedStack(index: currentTab.value, children: [
-                tabBarItems[0].screen,
-                tabBarItems[1].screen,
-                tabBarItems[2].screen,
-                tabBarItems[3].screen
-              ]), //tabBarItems[currentTab.value].screen,
+              child: IndexedStack(
+                index: currentTab.value,
+                children: [
+                  tabBarItems[0].screen,
+                  tabBarItems[1].screen,
+                  tabBarItems[2].screen,
+                  tabBarItems[3].screen
+                ],
+              ), //tabBarItems[currentTab.value].screen,
             ),
-            OfflineBuilder(
+            /*OfflineBuilder(
               builder: (context, status) => Positioned(
                 right: 0,
                 left: 0,
@@ -272,7 +279,7 @@ class AppMainPage extends HookWidget {
                       : SizedBox(),
                 ),
               ),
-            ),
+            ),*/
           ],
         ),
         bottomNavigationBar: BottomAppBar(

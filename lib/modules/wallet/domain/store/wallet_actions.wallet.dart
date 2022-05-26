@@ -4,15 +4,16 @@ part of wallet_domain_module;
 
 class WalletActionWalletLoadAll extends _BaseAction {
   @override
-  Future<AppState> reduce() async {
+  Future<AppState?> reduce() async {
     final settings = CommonRepository().getSettings();
-    final allWallets = await WalletRepository().getAllWallets();
-
     final activeWalletId = settings?.activeWalletId;
+    if (activeWalletId == null) {
+      return null;
+    }
+    final allWallets = await WalletRepository().getAllWallets();
     final activeWallet = await WalletRepository().getWalletById(
-      activeWalletId!,
+      activeWalletId,
     );
-
     return state.rebuild(
       (b) => b.walletState
         ..wallets = allWallets

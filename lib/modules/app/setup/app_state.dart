@@ -16,8 +16,8 @@ abstract class AppState implements Built<AppState, AppStateBuilder> {
           ..assetState.replace(AssetState())
           ..walletState.replace(WalletState())
           ..homeState.replace(HomeState())
-          ..swapState.replace(SwapState())
-          ..tradeState.replace(TradeState())
+          //..swapState.replace(SwapState())
+          //..tradeState.replace(TradeState())
           ..noticeState.replace(NoticeState())
           ..invitationState.replace(InvitationState())
           ..communityState.replace(CommunityState())
@@ -29,7 +29,7 @@ abstract class AppState implements Built<AppState, AppStateBuilder> {
 
   factory AppState.fromCache({
     HomeState? homeState,
-    TradeState? tradeState,
+    //TradeState? tradeState,
     NoticeState? noticeState,
     AssetState? assetState,
     WalletState? walletState,
@@ -42,8 +42,8 @@ abstract class AppState implements Built<AppState, AppStateBuilder> {
           ..assetState.replace(assetState ?? AssetState())
           ..walletState.replace(walletState ?? WalletState())
           ..homeState.replace(homeState ?? HomeState())
-          ..swapState.replace(SwapState())
-          ..tradeState.replace(tradeState ?? TradeState())
+          //..swapState.replace(SwapState())
+          //..tradeState.replace(tradeState ?? TradeState())
           ..noticeState.replace(noticeState ?? NoticeState())
           ..invitationState.replace(InvitationState())
           ..communityState.replace(communityState ?? CommunityState())
@@ -60,8 +60,8 @@ abstract class AppState implements Built<AppState, AppStateBuilder> {
   WalletState get walletState;
   NoticeState get noticeState;
   HomeState get homeState;
-  SwapState get swapState;
-  TradeState get tradeState;
+  //SwapState get swapState;
+  //TradeState get tradeState;
   InvitationState get invitationState;
   CommunityState get communityState;
   HDKeyState get hdkeyState;

@@ -3,10 +3,12 @@ part of swap_domain_module;
 class SwapActionLoadConfig extends _BaseAction {
   @override
   Future<AppState?> reduce() async {
+    /*
     final config = await SwapRepository().getConfig();
     return store.state.rebuild(
       (a) => a.swapState.config = config?.toBuilder(),
-    );
+    );*/
+    return null;
   }
 
   @override
@@ -23,13 +25,15 @@ class SwapActionLoadConfig extends _BaseAction {
 
 class SwapActionLoadConfigAfter extends _BaseAction {
   @override
-  AppState reduce() {
+  AppState? reduce() {
+    /*
     final isError = swapConfig.tradePairs == null ||
         (swapConfig.tradePairs?.isEmpty ?? true);
 
     return store.state.rebuild(
       (a) => a.swapState.configState =
           isError ? ConfigState.error.index : ConfigState.success.index,
-    );
+    );*/
+    return null;
   }
 }

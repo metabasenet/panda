@@ -5,6 +5,8 @@ class TradeActionLoadMqtt extends _BaseAction {
 
   @override
   Future<AppState?> reduce() async {
+    return null;
+    /*
     final mqtt = GetIt.I<TradeMqtt>();
 
     final mqttHost = store.state.tradeState.config!.randomMqttHost;
@@ -40,6 +42,7 @@ class TradeActionLoadMqtt extends _BaseAction {
     );
 
     return null;
+    */
   }
 
   @override

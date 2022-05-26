@@ -244,10 +244,6 @@ class _$AppState extends AppState {
   @override
   final HomeState homeState;
   @override
-  final SwapState swapState;
-  @override
-  final TradeState tradeState;
-  @override
   final InvitationState invitationState;
   @override
   final CommunityState communityState;
@@ -269,8 +265,6 @@ class _$AppState extends AppState {
       required this.walletState,
       required this.noticeState,
       required this.homeState,
-      required this.swapState,
-      required this.tradeState,
       required this.invitationState,
       required this.communityState,
       required this.hdkeyState,
@@ -286,8 +280,6 @@ class _$AppState extends AppState {
     BuiltValueNullFieldError.checkNotNull(
         noticeState, 'AppState', 'noticeState');
     BuiltValueNullFieldError.checkNotNull(homeState, 'AppState', 'homeState');
-    BuiltValueNullFieldError.checkNotNull(swapState, 'AppState', 'swapState');
-    BuiltValueNullFieldError.checkNotNull(tradeState, 'AppState', 'tradeState');
     BuiltValueNullFieldError.checkNotNull(
         invitationState, 'AppState', 'invitationState');
     BuiltValueNullFieldError.checkNotNull(
@@ -317,8 +309,6 @@ class _$AppState extends AppState {
         walletState == other.walletState &&
         noticeState == other.noticeState &&
         homeState == other.homeState &&
-        swapState == other.swapState &&
-        tradeState == other.tradeState &&
         invitationState == other.invitationState &&
         communityState == other.communityState &&
         hdkeyState == other.hdkeyState &&
@@ -338,17 +328,11 @@ class _$AppState extends AppState {
                             $jc(
                                 $jc(
                                     $jc(
-                                        $jc(
-                                            $jc(
-                                                $jc(
-                                                    $jc(0,
-                                                        commonState.hashCode),
-                                                    assetState.hashCode),
-                                                walletState.hashCode),
-                                            noticeState.hashCode),
-                                        homeState.hashCode),
-                                    swapState.hashCode),
-                                tradeState.hashCode),
+                                        $jc($jc(0, commonState.hashCode),
+                                            assetState.hashCode),
+                                        walletState.hashCode),
+                                    noticeState.hashCode),
+                                homeState.hashCode),
                             invitationState.hashCode),
                         communityState.hashCode),
                     hdkeyState.hashCode),
@@ -365,8 +349,6 @@ class _$AppState extends AppState {
           ..add('walletState', walletState)
           ..add('noticeState', noticeState)
           ..add('homeState', homeState)
-          ..add('swapState', swapState)
-          ..add('tradeState', tradeState)
           ..add('invitationState', invitationState)
           ..add('communityState', communityState)
           ..add('hdkeyState', hdkeyState)
@@ -408,17 +390,6 @@ class AppStateBuilder implements Builder<AppState, AppStateBuilder> {
   HomeStateBuilder get homeState =>
       _$this._homeState ??= new HomeStateBuilder();
   set homeState(HomeStateBuilder? homeState) => _$this._homeState = homeState;
-
-  SwapStateBuilder? _swapState;
-  SwapStateBuilder get swapState =>
-      _$this._swapState ??= new SwapStateBuilder();
-  set swapState(SwapStateBuilder? swapState) => _$this._swapState = swapState;
-
-  TradeStateBuilder? _tradeState;
-  TradeStateBuilder get tradeState =>
-      _$this._tradeState ??= new TradeStateBuilder();
-  set tradeState(TradeStateBuilder? tradeState) =>
-      _$this._tradeState = tradeState;
 
   InvitationStateBuilder? _invitationState;
   InvitationStateBuilder get invitationState =>
@@ -466,8 +437,6 @@ class AppStateBuilder implements Builder<AppState, AppStateBuilder> {
       _walletState = $v.walletState.toBuilder();
       _noticeState = $v.noticeState.toBuilder();
       _homeState = $v.homeState.toBuilder();
-      _swapState = $v.swapState.toBuilder();
-      _tradeState = $v.tradeState.toBuilder();
       _invitationState = $v.invitationState.toBuilder();
       _communityState = $v.communityState.toBuilder();
       _hdkeyState = $v.hdkeyState.toBuilder();
@@ -503,8 +472,6 @@ class AppStateBuilder implements Builder<AppState, AppStateBuilder> {
               walletState: walletState.build(),
               noticeState: noticeState.build(),
               homeState: homeState.build(),
-              swapState: swapState.build(),
-              tradeState: tradeState.build(),
               invitationState: invitationState.build(),
               communityState: communityState.build(),
               hdkeyState: hdkeyState.build(),
@@ -524,10 +491,6 @@ class AppStateBuilder implements Builder<AppState, AppStateBuilder> {
         noticeState.build();
         _$failedField = 'homeState';
         homeState.build();
-        _$failedField = 'swapState';
-        swapState.build();
-        _$failedField = 'tradeState';
-        tradeState.build();
         _$failedField = 'invitationState';
         invitationState.build();
         _$failedField = 'communityState';

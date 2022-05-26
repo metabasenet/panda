@@ -76,24 +76,6 @@ abstract class SwapCreateVM
           store.dispatch(WalletActionWalletUnlock(password, completer));
           return completer.future;
         }
-        ..getEnabledTradePairs = () {
-          final enabledTradePairs =
-              store.state.swapState.config?.enabledTradePairs ?? [];
-
-          enabledTradePairs.retainWhere((item) {
-            final fromCoin = store.state.assetState.getCoinInfo(
-              chain: item.key.chain ?? '',
-              symbol: item.key.symbol ?? '',
-            );
-            final toCoin = store.state.assetState.getCoinInfo(
-              chain: item.value.chain ?? '',
-              symbol: item.value.symbol ?? '',
-            );
-            return fromCoin.address?.isNotEmpty == true &&
-                toCoin.address?.isNotEmpty == true;
-          });
-          return enabledTradePairs;
-        }
         ..getCoinInfo = ({required chain, required symbol}) {
           return VMWithWalletGetCoinInfoImplement.getCoinInfo(
             store,

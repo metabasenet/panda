@@ -58,14 +58,14 @@ class AppActionInitApp extends _BaseAction {
     store
         .dispatchAsync(WalletActionWalletLoadAll(), notify: false)
         .whenComplete(() {
-      store.dispatch(AppActionLoadWallet(state.walletState.activeWallet!));
+      store.dispatch(AppActionLoadWallet(state.walletState.activeWallet));
     });
     store.dispatch(CommonActionLoadConfig(), notify: false);
-    store.dispatch(CommonActionLoadImageConfig(), notify: false);
-    store.dispatch(TradeActionLoadConfig(), notify: false);
-    store.dispatch(CommunityActionLoadConfig(), notify: false);
-    store.dispatch(AdmissionActionLoadConfig(), notify: false);
-    store.dispatch(SwapActionLoadConfig(), notify: false);
+    //store.dispatch(CommonActionLoadImageConfig(), notify: false);
+    //store.dispatch(TradeActionLoadConfig(), notify: false);
+    //store.dispatch(CommunityActionLoadConfig(), notify: false);
+    //store.dispatch(AdmissionActionLoadConfig(), notify: false);
+    //store.dispatch(SwapActionLoadConfig(), notify: false);
     if (AppConstants.isBeta) {
       store.dispatch(InvestActionLoadConfig(), notify: false);
     }
@@ -98,32 +98,37 @@ class AppActionInitApp extends _BaseAction {
 // /// - We will create AssetCoin to display to our asset list
 class AppActionLoadWallet extends _BaseAction {
   AppActionLoadWallet(this.wallet);
-  final Wallet wallet;
+  final Wallet? wallet;
 
   @override
   Future<AppState?> reduce() async {
-    // Make sure I set the current wallet
-    await dispatchAsync(WalletActionWalletSetActive(wallet));
-
-    await dispatchAsync(AssetActionSyncWalletCoins(wallet));
-    // Action to be perform after we load the wallet
     if (wallet != null) {
+      // Make sure I set the current wallet
+      await dispatchAsync(WalletActionWalletSetActive(wallet!));
+
+      await dispatchAsync(AssetActionSyncWalletCoins(wallet!));
+      // Action to be perform after we load the wallet
+
       // Update prices
-      dispatch(AssetActionUpdatePrices(
-        store.state.commonState.fiatCurrency ?? '',
-      ));
+      dispatch(
+        AssetActionUpdatePrices(
+          store.state.commonState.fiatCurrency ?? '',
+        ),
+      );
       // Update balances
-      dispatch(AssetActionUpdateWalletBalances(
-        wallet: wallet,
-        skipFrequentUpdate: true,
-      ));
+      dispatch(
+        AssetActionUpdateWalletBalances(
+          wallet: wallet!,
+          skipFrequentUpdate: true,
+        ),
+      );
 
       dispatch(InvestActionClear());
       dispatch(InvitationActionClear());
       dispatch(TradeActionReSubmitCancelTxid());
 
       // Check wallet status and register
-      dispatch(WalletActionWalletRegister(wallet));
+      dispatch(WalletActionWalletRegister(wallet!));
     }
     return null;
   }
@@ -173,7 +178,9 @@ class AppActionAfterCommonConfig extends _BaseAction {
   @override
   AppState? reduce() {
     // NOTE: Add Actions that need execute after get the main config
-    dispatch(AssetActionSyncWalletCoins(state.walletState.activeWallet!));
+    if (state.walletState.activeWallet != null) {
+      dispatch(AssetActionSyncWalletCoins(state.walletState.activeWallet!));
+    }
 
     return null;
   }

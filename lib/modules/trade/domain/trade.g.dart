@@ -1287,83 +1287,13 @@ class _$TradeHomeVM extends TradeHomeVM {
   @override
   final String ethAddress;
   @override
-  final TradePair tradePair;
-  @override
-  final TradeSide tradeSide;
-  @override
-  final String fiatCurrency;
-  @override
   final String? activeWalletId;
-  @override
-  final AssetCoin? priceCoinInfo;
-  @override
-  final AssetCoin? tradeCoinInfo;
-  @override
-  final AssetCoin? sideCoinInfo;
-  @override
-  final TradeConfigCoin? sideCoinConfig;
-  @override
-  final BuiltList<TradePair> allTradePairs;
-  @override
-  final Future<void> Function(TradePair tradePair) doUpdateCoinBalance;
-  @override
-  final Future<double> Function(TradePair) getApproveBalance;
-  @override
-  final Future<void> Function(TradeSide tradeSide)? doChangeTradeSide;
-  @override
-  final Future<void> Function(TradePair tradePair) doChangeTradePair;
-  @override
-  final Future<void> Function(TradePair tradePair) doSubscribeMqtt;
-  @override
-  final AssetCoin Function({required String chain, required String symbol})
-      getCoinInfo;
   @override
   final Future<WalletPrivateData> Function(String password) doUnlockWallet;
   @override
   final Future<void> Function(
-      {required TradeSide tradeSide,
-      required TradePair tradePair,
-      required Future<bool> Function(
-              {required WalletTemplateData approveData,
-              required double currentBalance,
-              required double approveAmount,
-              required bool needReset})
-          onConfirmSubmit,
-      required Future<WalletPrivateData> Function() onUnlockWallet,
-      required void Function(String) onSuccessTransaction}) doApproveOrder;
-  @override
-  final Future<void> Function(
-      {required TradeSide tradeSide,
-      required TradePair tradePair,
-      required String price,
-      required String amount,
-      required String total,
-      required Future<bool> Function(DexCreateOrderParams) onConfirmSubmit,
-      required Future<WalletPrivateData> Function() onUnlockWallet,
-      required void Function(String) onSuccessTransaction}) doCreateOrder;
-  @override
-  final Future<void> Function(
-      {required TradeOrder order,
-      required Future<bool> Function(double) onConfirmCancel,
-      required Future<WalletPrivateData> Function() onUnlockWallet,
-      required void Function(String) onSuccessTransaction}) doCancelOrder;
-  @override
-  final Future<Transaction> Function(
-      {required String chain,
-      required String symbol,
-      required String fromAddress,
-      required int chainPrecision,
-      required String txId}) getTransactionInfo;
-  @override
-  final Future<void> Function(
       {required WithdrawSubmitParams param,
       required String txId}) transferResult;
-  @override
-  final bool Function(TradePair) needShowSlowTradePair;
-  @override
-  final void Function(TradePair) doHideSlowTradePair;
-  @override
-  final Future<double> Function(TradeOrder order) getOrderBalance;
 
   factory _$TradeHomeVM([void Function(TradeHomeVMBuilder)? updates]) =>
       (new TradeHomeVMBuilder()..update(updates))._build();
@@ -1371,71 +1301,18 @@ class _$TradeHomeVM extends TradeHomeVM {
   _$TradeHomeVM._(
       {required this.hasWallet,
       required this.ethAddress,
-      required this.tradePair,
-      required this.tradeSide,
-      required this.fiatCurrency,
       this.activeWalletId,
-      this.priceCoinInfo,
-      this.tradeCoinInfo,
-      this.sideCoinInfo,
-      this.sideCoinConfig,
-      required this.allTradePairs,
-      required this.doUpdateCoinBalance,
-      required this.getApproveBalance,
-      this.doChangeTradeSide,
-      required this.doChangeTradePair,
-      required this.doSubscribeMqtt,
-      required this.getCoinInfo,
       required this.doUnlockWallet,
-      required this.doApproveOrder,
-      required this.doCreateOrder,
-      required this.doCancelOrder,
-      required this.getTransactionInfo,
-      required this.transferResult,
-      required this.needShowSlowTradePair,
-      required this.doHideSlowTradePair,
-      required this.getOrderBalance})
+      required this.transferResult})
       : super._() {
     BuiltValueNullFieldError.checkNotNull(
         hasWallet, 'TradeHomeVM', 'hasWallet');
     BuiltValueNullFieldError.checkNotNull(
         ethAddress, 'TradeHomeVM', 'ethAddress');
     BuiltValueNullFieldError.checkNotNull(
-        tradePair, 'TradeHomeVM', 'tradePair');
-    BuiltValueNullFieldError.checkNotNull(
-        tradeSide, 'TradeHomeVM', 'tradeSide');
-    BuiltValueNullFieldError.checkNotNull(
-        fiatCurrency, 'TradeHomeVM', 'fiatCurrency');
-    BuiltValueNullFieldError.checkNotNull(
-        allTradePairs, 'TradeHomeVM', 'allTradePairs');
-    BuiltValueNullFieldError.checkNotNull(
-        doUpdateCoinBalance, 'TradeHomeVM', 'doUpdateCoinBalance');
-    BuiltValueNullFieldError.checkNotNull(
-        getApproveBalance, 'TradeHomeVM', 'getApproveBalance');
-    BuiltValueNullFieldError.checkNotNull(
-        doChangeTradePair, 'TradeHomeVM', 'doChangeTradePair');
-    BuiltValueNullFieldError.checkNotNull(
-        doSubscribeMqtt, 'TradeHomeVM', 'doSubscribeMqtt');
-    BuiltValueNullFieldError.checkNotNull(
-        getCoinInfo, 'TradeHomeVM', 'getCoinInfo');
-    BuiltValueNullFieldError.checkNotNull(
         doUnlockWallet, 'TradeHomeVM', 'doUnlockWallet');
     BuiltValueNullFieldError.checkNotNull(
-        doApproveOrder, 'TradeHomeVM', 'doApproveOrder');
-    BuiltValueNullFieldError.checkNotNull(
-        doCreateOrder, 'TradeHomeVM', 'doCreateOrder');
-    BuiltValueNullFieldError.checkNotNull(
-        doCancelOrder, 'TradeHomeVM', 'doCancelOrder');
-    BuiltValueNullFieldError.checkNotNull(
-        getTransactionInfo, 'TradeHomeVM', 'getTransactionInfo');
-    BuiltValueNullFieldError.checkNotNull(
         transferResult, 'TradeHomeVM', 'transferResult');
-    BuiltValueNullFieldError.checkNotNull(
-        needShowSlowTradePair, 'TradeHomeVM', 'needShowSlowTradePair');
-    BuiltValueNullFieldError.checkNotNull(
-        doHideSlowTradePair, 'TradeHomeVM', 'doHideSlowTradePair');
-    BuiltValueNullFieldError.checkNotNull(
-        getOrderBalance, 'TradeHomeVM', 'getOrderBalance');
   }
 
   @override
@@ -1451,39 +1328,13 @@ class _$TradeHomeVM extends TradeHomeVM {
     return other is TradeHomeVM &&
         hasWallet == other.hasWallet &&
         ethAddress == other.ethAddress &&
-        tradePair == other.tradePair &&
-        tradeSide == other.tradeSide &&
-        fiatCurrency == other.fiatCurrency &&
-        activeWalletId == other.activeWalletId &&
-        priceCoinInfo == other.priceCoinInfo &&
-        tradeCoinInfo == other.tradeCoinInfo &&
-        sideCoinInfo == other.sideCoinInfo &&
-        sideCoinConfig == other.sideCoinConfig &&
-        allTradePairs == other.allTradePairs;
+        activeWalletId == other.activeWalletId;
   }
 
   @override
   int get hashCode {
-    return $jf($jc(
-        $jc(
-            $jc(
-                $jc(
-                    $jc(
-                        $jc(
-                            $jc(
-                                $jc(
-                                    $jc(
-                                        $jc($jc(0, hasWallet.hashCode),
-                                            ethAddress.hashCode),
-                                        tradePair.hashCode),
-                                    tradeSide.hashCode),
-                                fiatCurrency.hashCode),
-                            activeWalletId.hashCode),
-                        priceCoinInfo.hashCode),
-                    tradeCoinInfo.hashCode),
-                sideCoinInfo.hashCode),
-            sideCoinConfig.hashCode),
-        allTradePairs.hashCode));
+    return $jf($jc($jc($jc(0, hasWallet.hashCode), ethAddress.hashCode),
+        activeWalletId.hashCode));
   }
 
   @override
@@ -1491,30 +1342,9 @@ class _$TradeHomeVM extends TradeHomeVM {
     return (newBuiltValueToStringHelper('TradeHomeVM')
           ..add('hasWallet', hasWallet)
           ..add('ethAddress', ethAddress)
-          ..add('tradePair', tradePair)
-          ..add('tradeSide', tradeSide)
-          ..add('fiatCurrency', fiatCurrency)
           ..add('activeWalletId', activeWalletId)
-          ..add('priceCoinInfo', priceCoinInfo)
-          ..add('tradeCoinInfo', tradeCoinInfo)
-          ..add('sideCoinInfo', sideCoinInfo)
-          ..add('sideCoinConfig', sideCoinConfig)
-          ..add('allTradePairs', allTradePairs)
-          ..add('doUpdateCoinBalance', doUpdateCoinBalance)
-          ..add('getApproveBalance', getApproveBalance)
-          ..add('doChangeTradeSide', doChangeTradeSide)
-          ..add('doChangeTradePair', doChangeTradePair)
-          ..add('doSubscribeMqtt', doSubscribeMqtt)
-          ..add('getCoinInfo', getCoinInfo)
           ..add('doUnlockWallet', doUnlockWallet)
-          ..add('doApproveOrder', doApproveOrder)
-          ..add('doCreateOrder', doCreateOrder)
-          ..add('doCancelOrder', doCancelOrder)
-          ..add('getTransactionInfo', getTransactionInfo)
-          ..add('transferResult', transferResult)
-          ..add('needShowSlowTradePair', needShowSlowTradePair)
-          ..add('doHideSlowTradePair', doHideSlowTradePair)
-          ..add('getOrderBalance', getOrderBalance))
+          ..add('transferResult', transferResult))
         .toString();
   }
 }
@@ -1530,97 +1360,10 @@ class TradeHomeVMBuilder implements Builder<TradeHomeVM, TradeHomeVMBuilder> {
   String? get ethAddress => _$this._ethAddress;
   set ethAddress(String? ethAddress) => _$this._ethAddress = ethAddress;
 
-  TradePairBuilder? _tradePair;
-  TradePairBuilder get tradePair =>
-      _$this._tradePair ??= new TradePairBuilder();
-  set tradePair(TradePairBuilder? tradePair) => _$this._tradePair = tradePair;
-
-  TradeSide? _tradeSide;
-  TradeSide? get tradeSide => _$this._tradeSide;
-  set tradeSide(TradeSide? tradeSide) => _$this._tradeSide = tradeSide;
-
-  String? _fiatCurrency;
-  String? get fiatCurrency => _$this._fiatCurrency;
-  set fiatCurrency(String? fiatCurrency) => _$this._fiatCurrency = fiatCurrency;
-
   String? _activeWalletId;
   String? get activeWalletId => _$this._activeWalletId;
   set activeWalletId(String? activeWalletId) =>
       _$this._activeWalletId = activeWalletId;
-
-  AssetCoinBuilder? _priceCoinInfo;
-  AssetCoinBuilder get priceCoinInfo =>
-      _$this._priceCoinInfo ??= new AssetCoinBuilder();
-  set priceCoinInfo(AssetCoinBuilder? priceCoinInfo) =>
-      _$this._priceCoinInfo = priceCoinInfo;
-
-  AssetCoinBuilder? _tradeCoinInfo;
-  AssetCoinBuilder get tradeCoinInfo =>
-      _$this._tradeCoinInfo ??= new AssetCoinBuilder();
-  set tradeCoinInfo(AssetCoinBuilder? tradeCoinInfo) =>
-      _$this._tradeCoinInfo = tradeCoinInfo;
-
-  AssetCoinBuilder? _sideCoinInfo;
-  AssetCoinBuilder get sideCoinInfo =>
-      _$this._sideCoinInfo ??= new AssetCoinBuilder();
-  set sideCoinInfo(AssetCoinBuilder? sideCoinInfo) =>
-      _$this._sideCoinInfo = sideCoinInfo;
-
-  TradeConfigCoinBuilder? _sideCoinConfig;
-  TradeConfigCoinBuilder get sideCoinConfig =>
-      _$this._sideCoinConfig ??= new TradeConfigCoinBuilder();
-  set sideCoinConfig(TradeConfigCoinBuilder? sideCoinConfig) =>
-      _$this._sideCoinConfig = sideCoinConfig;
-
-  ListBuilder<TradePair>? _allTradePairs;
-  ListBuilder<TradePair> get allTradePairs =>
-      _$this._allTradePairs ??= new ListBuilder<TradePair>();
-  set allTradePairs(ListBuilder<TradePair>? allTradePairs) =>
-      _$this._allTradePairs = allTradePairs;
-
-  Future<void> Function(TradePair tradePair)? _doUpdateCoinBalance;
-  Future<void> Function(TradePair tradePair)? get doUpdateCoinBalance =>
-      _$this._doUpdateCoinBalance;
-  set doUpdateCoinBalance(
-          Future<void> Function(TradePair tradePair)? doUpdateCoinBalance) =>
-      _$this._doUpdateCoinBalance = doUpdateCoinBalance;
-
-  Future<double> Function(TradePair)? _getApproveBalance;
-  Future<double> Function(TradePair)? get getApproveBalance =>
-      _$this._getApproveBalance;
-  set getApproveBalance(
-          Future<double> Function(TradePair)? getApproveBalance) =>
-      _$this._getApproveBalance = getApproveBalance;
-
-  Future<void> Function(TradeSide tradeSide)? _doChangeTradeSide;
-  Future<void> Function(TradeSide tradeSide)? get doChangeTradeSide =>
-      _$this._doChangeTradeSide;
-  set doChangeTradeSide(
-          Future<void> Function(TradeSide tradeSide)? doChangeTradeSide) =>
-      _$this._doChangeTradeSide = doChangeTradeSide;
-
-  Future<void> Function(TradePair tradePair)? _doChangeTradePair;
-  Future<void> Function(TradePair tradePair)? get doChangeTradePair =>
-      _$this._doChangeTradePair;
-  set doChangeTradePair(
-          Future<void> Function(TradePair tradePair)? doChangeTradePair) =>
-      _$this._doChangeTradePair = doChangeTradePair;
-
-  Future<void> Function(TradePair tradePair)? _doSubscribeMqtt;
-  Future<void> Function(TradePair tradePair)? get doSubscribeMqtt =>
-      _$this._doSubscribeMqtt;
-  set doSubscribeMqtt(
-          Future<void> Function(TradePair tradePair)? doSubscribeMqtt) =>
-      _$this._doSubscribeMqtt = doSubscribeMqtt;
-
-  AssetCoin Function({required String chain, required String symbol})?
-      _getCoinInfo;
-  AssetCoin Function({required String chain, required String symbol})?
-      get getCoinInfo => _$this._getCoinInfo;
-  set getCoinInfo(
-          AssetCoin Function({required String chain, required String symbol})?
-              getCoinInfo) =>
-      _$this._getCoinInfo = getCoinInfo;
 
   Future<WalletPrivateData> Function(String password)? _doUnlockWallet;
   Future<WalletPrivateData> Function(String password)? get doUnlockWallet =>
@@ -1629,120 +1372,6 @@ class TradeHomeVMBuilder implements Builder<TradeHomeVM, TradeHomeVMBuilder> {
           Future<WalletPrivateData> Function(String password)?
               doUnlockWallet) =>
       _$this._doUnlockWallet = doUnlockWallet;
-
-  Future<void> Function(
-      {required TradeSide tradeSide,
-      required TradePair tradePair,
-      required Future<bool> Function(
-              {required WalletTemplateData approveData,
-              required double currentBalance,
-              required double approveAmount,
-              required bool needReset})
-          onConfirmSubmit,
-      required Future<WalletPrivateData> Function() onUnlockWallet,
-      required void Function(String) onSuccessTransaction})? _doApproveOrder;
-  Future<void> Function(
-          {required TradeSide tradeSide,
-          required TradePair tradePair,
-          required Future<bool> Function(
-                  {required WalletTemplateData approveData,
-                  required double currentBalance,
-                  required double approveAmount,
-                  required bool needReset})
-              onConfirmSubmit,
-          required Future<WalletPrivateData> Function() onUnlockWallet,
-          required void Function(String) onSuccessTransaction})?
-      get doApproveOrder => _$this._doApproveOrder;
-  set doApproveOrder(
-          Future<void> Function(
-                  {required TradeSide tradeSide,
-                  required TradePair tradePair,
-                  required Future<bool> Function(
-                          {required WalletTemplateData approveData,
-                          required double currentBalance,
-                          required double approveAmount,
-                          required bool needReset})
-                      onConfirmSubmit,
-                  required Future<WalletPrivateData> Function() onUnlockWallet,
-                  required void Function(String) onSuccessTransaction})?
-              doApproveOrder) =>
-      _$this._doApproveOrder = doApproveOrder;
-
-  Future<void> Function(
-      {required TradeSide tradeSide,
-      required TradePair tradePair,
-      required String price,
-      required String amount,
-      required String total,
-      required Future<bool> Function(DexCreateOrderParams) onConfirmSubmit,
-      required Future<WalletPrivateData> Function() onUnlockWallet,
-      required void Function(String) onSuccessTransaction})? _doCreateOrder;
-  Future<void> Function(
-          {required TradeSide tradeSide,
-          required TradePair tradePair,
-          required String price,
-          required String amount,
-          required String total,
-          required Future<bool> Function(DexCreateOrderParams) onConfirmSubmit,
-          required Future<WalletPrivateData> Function() onUnlockWallet,
-          required void Function(String) onSuccessTransaction})?
-      get doCreateOrder => _$this._doCreateOrder;
-  set doCreateOrder(
-          Future<void> Function(
-                  {required TradeSide tradeSide,
-                  required TradePair tradePair,
-                  required String price,
-                  required String amount,
-                  required String total,
-                  required Future<bool> Function(DexCreateOrderParams)
-                      onConfirmSubmit,
-                  required Future<WalletPrivateData> Function() onUnlockWallet,
-                  required void Function(String) onSuccessTransaction})?
-              doCreateOrder) =>
-      _$this._doCreateOrder = doCreateOrder;
-
-  Future<void> Function(
-      {required TradeOrder order,
-      required Future<bool> Function(double) onConfirmCancel,
-      required Future<WalletPrivateData> Function() onUnlockWallet,
-      required void Function(String) onSuccessTransaction})? _doCancelOrder;
-  Future<void> Function(
-          {required TradeOrder order,
-          required Future<bool> Function(double) onConfirmCancel,
-          required Future<WalletPrivateData> Function() onUnlockWallet,
-          required void Function(String) onSuccessTransaction})?
-      get doCancelOrder => _$this._doCancelOrder;
-  set doCancelOrder(
-          Future<void> Function(
-                  {required TradeOrder order,
-                  required Future<bool> Function(double) onConfirmCancel,
-                  required Future<WalletPrivateData> Function() onUnlockWallet,
-                  required void Function(String) onSuccessTransaction})?
-              doCancelOrder) =>
-      _$this._doCancelOrder = doCancelOrder;
-
-  Future<Transaction> Function(
-      {required String chain,
-      required String symbol,
-      required String fromAddress,
-      required int chainPrecision,
-      required String txId})? _getTransactionInfo;
-  Future<Transaction> Function(
-          {required String chain,
-          required String symbol,
-          required String fromAddress,
-          required int chainPrecision,
-          required String txId})?
-      get getTransactionInfo => _$this._getTransactionInfo;
-  set getTransactionInfo(
-          Future<Transaction> Function(
-                  {required String chain,
-                  required String symbol,
-                  required String fromAddress,
-                  required int chainPrecision,
-                  required String txId})?
-              getTransactionInfo) =>
-      _$this._getTransactionInfo = getTransactionInfo;
 
   Future<void> Function(
       {required WithdrawSubmitParams param,
@@ -1756,25 +1385,6 @@ class TradeHomeVMBuilder implements Builder<TradeHomeVM, TradeHomeVMBuilder> {
               transferResult) =>
       _$this._transferResult = transferResult;
 
-  bool Function(TradePair)? _needShowSlowTradePair;
-  bool Function(TradePair)? get needShowSlowTradePair =>
-      _$this._needShowSlowTradePair;
-  set needShowSlowTradePair(bool Function(TradePair)? needShowSlowTradePair) =>
-      _$this._needShowSlowTradePair = needShowSlowTradePair;
-
-  void Function(TradePair)? _doHideSlowTradePair;
-  void Function(TradePair)? get doHideSlowTradePair =>
-      _$this._doHideSlowTradePair;
-  set doHideSlowTradePair(void Function(TradePair)? doHideSlowTradePair) =>
-      _$this._doHideSlowTradePair = doHideSlowTradePair;
-
-  Future<double> Function(TradeOrder order)? _getOrderBalance;
-  Future<double> Function(TradeOrder order)? get getOrderBalance =>
-      _$this._getOrderBalance;
-  set getOrderBalance(
-          Future<double> Function(TradeOrder order)? getOrderBalance) =>
-      _$this._getOrderBalance = getOrderBalance;
-
   TradeHomeVMBuilder();
 
   TradeHomeVMBuilder get _$this {
@@ -1782,30 +1392,9 @@ class TradeHomeVMBuilder implements Builder<TradeHomeVM, TradeHomeVMBuilder> {
     if ($v != null) {
       _hasWallet = $v.hasWallet;
       _ethAddress = $v.ethAddress;
-      _tradePair = $v.tradePair.toBuilder();
-      _tradeSide = $v.tradeSide;
-      _fiatCurrency = $v.fiatCurrency;
       _activeWalletId = $v.activeWalletId;
-      _priceCoinInfo = $v.priceCoinInfo?.toBuilder();
-      _tradeCoinInfo = $v.tradeCoinInfo?.toBuilder();
-      _sideCoinInfo = $v.sideCoinInfo?.toBuilder();
-      _sideCoinConfig = $v.sideCoinConfig?.toBuilder();
-      _allTradePairs = $v.allTradePairs.toBuilder();
-      _doUpdateCoinBalance = $v.doUpdateCoinBalance;
-      _getApproveBalance = $v.getApproveBalance;
-      _doChangeTradeSide = $v.doChangeTradeSide;
-      _doChangeTradePair = $v.doChangeTradePair;
-      _doSubscribeMqtt = $v.doSubscribeMqtt;
-      _getCoinInfo = $v.getCoinInfo;
       _doUnlockWallet = $v.doUnlockWallet;
-      _doApproveOrder = $v.doApproveOrder;
-      _doCreateOrder = $v.doCreateOrder;
-      _doCancelOrder = $v.doCancelOrder;
-      _getTransactionInfo = $v.getTransactionInfo;
       _transferResult = $v.transferResult;
-      _needShowSlowTradePair = $v.needShowSlowTradePair;
-      _doHideSlowTradePair = $v.doHideSlowTradePair;
-      _getOrderBalance = $v.getOrderBalance;
       _$v = null;
     }
     return this;
@@ -1826,66 +1415,17 @@ class TradeHomeVMBuilder implements Builder<TradeHomeVM, TradeHomeVMBuilder> {
   TradeHomeVM build() => _build();
 
   _$TradeHomeVM _build() {
-    _$TradeHomeVM _$result;
-    try {
-      _$result = _$v ??
-          new _$TradeHomeVM._(
-              hasWallet: BuiltValueNullFieldError.checkNotNull(
-                  hasWallet, 'TradeHomeVM', 'hasWallet'),
-              ethAddress: BuiltValueNullFieldError.checkNotNull(
-                  ethAddress, 'TradeHomeVM', 'ethAddress'),
-              tradePair: tradePair.build(),
-              tradeSide: BuiltValueNullFieldError.checkNotNull(
-                  tradeSide, 'TradeHomeVM', 'tradeSide'),
-              fiatCurrency: BuiltValueNullFieldError.checkNotNull(
-                  fiatCurrency, 'TradeHomeVM', 'fiatCurrency'),
-              activeWalletId: activeWalletId,
-              priceCoinInfo: _priceCoinInfo?.build(),
-              tradeCoinInfo: _tradeCoinInfo?.build(),
-              sideCoinInfo: _sideCoinInfo?.build(),
-              sideCoinConfig: _sideCoinConfig?.build(),
-              allTradePairs: allTradePairs.build(),
-              doUpdateCoinBalance: BuiltValueNullFieldError.checkNotNull(
-                  doUpdateCoinBalance, 'TradeHomeVM', 'doUpdateCoinBalance'),
-              getApproveBalance: BuiltValueNullFieldError.checkNotNull(
-                  getApproveBalance, 'TradeHomeVM', 'getApproveBalance'),
-              doChangeTradeSide: doChangeTradeSide,
-              doChangeTradePair: BuiltValueNullFieldError.checkNotNull(
-                  doChangeTradePair, 'TradeHomeVM', 'doChangeTradePair'),
-              doSubscribeMqtt: BuiltValueNullFieldError.checkNotNull(
-                  doSubscribeMqtt, 'TradeHomeVM', 'doSubscribeMqtt'),
-              getCoinInfo: BuiltValueNullFieldError.checkNotNull(getCoinInfo, 'TradeHomeVM', 'getCoinInfo'),
-              doUnlockWallet: BuiltValueNullFieldError.checkNotNull(doUnlockWallet, 'TradeHomeVM', 'doUnlockWallet'),
-              doApproveOrder: BuiltValueNullFieldError.checkNotNull(doApproveOrder, 'TradeHomeVM', 'doApproveOrder'),
-              doCreateOrder: BuiltValueNullFieldError.checkNotNull(doCreateOrder, 'TradeHomeVM', 'doCreateOrder'),
-              doCancelOrder: BuiltValueNullFieldError.checkNotNull(doCancelOrder, 'TradeHomeVM', 'doCancelOrder'),
-              getTransactionInfo: BuiltValueNullFieldError.checkNotNull(getTransactionInfo, 'TradeHomeVM', 'getTransactionInfo'),
-              transferResult: BuiltValueNullFieldError.checkNotNull(transferResult, 'TradeHomeVM', 'transferResult'),
-              needShowSlowTradePair: BuiltValueNullFieldError.checkNotNull(needShowSlowTradePair, 'TradeHomeVM', 'needShowSlowTradePair'),
-              doHideSlowTradePair: BuiltValueNullFieldError.checkNotNull(doHideSlowTradePair, 'TradeHomeVM', 'doHideSlowTradePair'),
-              getOrderBalance: BuiltValueNullFieldError.checkNotNull(getOrderBalance, 'TradeHomeVM', 'getOrderBalance'));
-    } catch (_) {
-      late String _$failedField;
-      try {
-        _$failedField = 'tradePair';
-        tradePair.build();
-
-        _$failedField = 'priceCoinInfo';
-        _priceCoinInfo?.build();
-        _$failedField = 'tradeCoinInfo';
-        _tradeCoinInfo?.build();
-        _$failedField = 'sideCoinInfo';
-        _sideCoinInfo?.build();
-        _$failedField = 'sideCoinConfig';
-        _sideCoinConfig?.build();
-        _$failedField = 'allTradePairs';
-        allTradePairs.build();
-      } catch (e) {
-        throw new BuiltValueNestedFieldError(
-            'TradeHomeVM', _$failedField, e.toString());
-      }
-      rethrow;
-    }
+    final _$result = _$v ??
+        new _$TradeHomeVM._(
+            hasWallet: BuiltValueNullFieldError.checkNotNull(
+                hasWallet, 'TradeHomeVM', 'hasWallet'),
+            ethAddress: BuiltValueNullFieldError.checkNotNull(
+                ethAddress, 'TradeHomeVM', 'ethAddress'),
+            activeWalletId: activeWalletId,
+            doUnlockWallet: BuiltValueNullFieldError.checkNotNull(
+                doUnlockWallet, 'TradeHomeVM', 'doUnlockWallet'),
+            transferResult: BuiltValueNullFieldError.checkNotNull(
+                transferResult, 'TradeHomeVM', 'transferResult'));
     replace(_$result);
     return _$result;
   }

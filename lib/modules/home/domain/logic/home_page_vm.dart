@@ -21,8 +21,8 @@ abstract class HomePageVM implements Built<HomePageVM, HomePageVMBuilder> {
   //@nullable
   ConfigUpdateData? get newVersionData;
 
-  BuiltList<TradePair> get allTradePairs;
-  BuiltList<TradeMarket> get allTradeMarkets;
+  //BuiltList<TradePair> get allTradePairs;
+  //BuiltList<TradeMarket> get allTradeMarkets;
 
   bool get hasWallet;
 
@@ -46,8 +46,8 @@ abstract class HomePageVM implements Built<HomePageVM, HomePageVMBuilder> {
   @BuiltValueField(compare: false)
   Future<void> Function(String language) get doChangeLanguage;
 
-  @BuiltValueField(compare: false)
-  Future<void> Function(TradePair tradePair) get doChangeTradePair;
+  //@BuiltValueField(compare: false)
+  //Future<void> Function(TradePair tradePair) get doChangeTradePair;
 
   @BuiltValueField(compare: false)
   Future<void> Function() get doRefreshHomeData;
@@ -57,7 +57,7 @@ abstract class HomePageVM implements Built<HomePageVM, HomePageVMBuilder> {
 
 // UI Logic
   static HomePageVM fromStore(Store<AppState> store) {
-    final tradeState = store.state.tradeState;
+    //final tradeState = store.state.tradeState;
 
     return HomePageVM(
       (viewModel) => viewModel
@@ -66,12 +66,12 @@ abstract class HomePageVM implements Built<HomePageVM, HomePageVMBuilder> {
             store.state.homeState.homePrices?.toBuilder() ?? ListBuilder()
         ..homeBanners = ListBuilder(store.state.homeState.homeBanners!)
         ..homeNotices = ListBuilder(store.state.noticeState.noticeLatest!)
-        ..allTradePairs = ListBuilder(tradeState.config?.allTradePairs ?? [])
+        //..allTradePairs = ListBuilder(tradeState.config?.allTradePairs ?? [])
         ..admissionList =
             store.state.admissionState.admissionList?.toBuilder() ??
                 ListBuilder()
-        ..allTradeMarkets =
-            ListBuilder(tradeState.config?.allTradeMarkets ?? [])
+        //..allTradeMarkets =
+        //    ListBuilder(tradeState.config?.allTradeMarkets ?? [])
         ..hasNewVersion =
             store.state.commonState.newVersion?.hasNewVersion ?? false
         ..newVersionData = store.state.commonState.newVersion?.data?.toBuilder()
@@ -106,15 +106,17 @@ abstract class HomePageVM implements Built<HomePageVM, HomePageVMBuilder> {
         }
         ..doChangeLanguage = (language) async {
           await store.dispatchAsync(CommonActionChangeLanguage(language));
-          await store.dispatchAsync(CommonActionChangeFiatCurrency(
-            AppLanguages.getCurrencyByLanguage(language),
-          ));
-        }
-        ..doChangeTradePair = (tradePair) {
-          return store.dispatchAsync(
-            TradeActionOrderChangePair(tradePair),
+          await store.dispatchAsync(
+            CommonActionChangeFiatCurrency(
+              AppLanguages.getCurrencyByLanguage(language),
+            ),
           );
         },
+      //..doChangeTradePair = (tradePair) {
+      //  return store.dispatchAsync(
+      //    TradeActionOrderChangePair(tradePair),
+      //  );
+      //},
     );
   }
 }

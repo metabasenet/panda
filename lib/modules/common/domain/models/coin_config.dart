@@ -13,7 +13,9 @@ class CoinConfig {
       displayPrecisions[symbol] = value.displayPrecision;
       transferMinQuotas['${value.chain}_${value.symbol}'] =
           value.transferMinQuota ?? 0;
-      feeLevels['${value.chain}_${value.symbol}'] = value.hdWalletFeeLevel!;
+      if (value.hdWalletFeeLevel != null) {
+        feeLevels['${value.chain}_${value.symbol}'] = value.hdWalletFeeLevel!;
+      }
     });
   }
 

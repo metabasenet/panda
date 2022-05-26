@@ -42,6 +42,7 @@ class RiveToggleAnimation extends HookWidget {
     useEffect(() {
       rootBundle.load('assets/rive/$fileName.riv').then(
         (data) async {
+          /*
           final file = RiveFile.import(data);
           //if (file.import(data)) {
           riveArtboard.value = file.mainArtboard;
@@ -51,7 +52,7 @@ class RiveToggleAnimation extends HookWidget {
           );
           riveArtboard.value!.addController(
             isOn ? riveControllerOn : riveControllerOff,
-          );
+          );*/
           //}
         },
       ).catchError((error) {

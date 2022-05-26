@@ -51,81 +51,21 @@ class TradeOrderListPage extends HookWidget {
     CSListViewParams<_GetOrderListParams>? params,
     bool onlyCache = false,
   }) async {
-    final tradePair = params?.params?.tradePair;
-    late String tradeAddress;
-    late String priceAddress;
-    if (tradePair != null) {
-      tradeAddress = viewModel
-              .getCoinInfo(
-                chain: tradePair.tradeChain,
-                symbol: tradePair.tradeSymbol,
-              )
-              .address ??
-          '';
-
-      priceAddress = viewModel
-              .getCoinInfo(
-                chain: tradePair.priceChain,
-                symbol: tradePair.priceSymbol,
-              )
-              .address ??
-          '';
-    }
-    return cubit
-        .loadAll(
-      tradePairId: tradePair?.id ?? '',
-      tradeAddress: tradeAddress,
-      priceAddress: priceAddress,
-      walletId: viewModel.activeWalletId ?? '',
-      skip: params?.skip ?? 0,
-      take: params?.take ?? 0,
-      tradeSide: params?.params?.tradeSide ?? '',
-      status: params?.params?.status ?? '',
-      onlyCache: onlyCache,
-    )
-        .then((value) {
-      // Refresh TradeOrder page data with cache
-      GetIt.I<TradeOrdersPendingCubit>().loadPendingOrdersFromCache(
-        walletId: viewModel.activeWalletId ?? '',
-        tradePairId: viewModel.tradePair.id,
-      );
-      return value;
-    }).catchError((error) {
-      Toast.showError(error);
-      //throw error;
-    });
+    return 0;
   }
 
   void reloadData(
     BuildContext context,
     TradeHomeVM viewModel,
     BehaviorSubject<CSListViewParams<_GetOrderListParams>> request,
-  ) {
-    request.add(request.value.copyWith(isRefresh: true));
-    // Refresh TradeOrder page data with cache
-    GetIt.I<TradeOrdersPendingCubit>().loadPendingOrdersFromCache(
-      walletId: viewModel.activeWalletId ?? '',
-      tradePairId: viewModel.tradePair.id,
-    );
-  }
+  ) {}
 
   void updateOrderAmount(
     BuildContext context,
     TradeHomeVM viewModel,
     TradeOrder order,
     ValueNotifier<Map<String, double>> orderAmounts,
-  ) {
-    LoadingDialog.show(context);
-    viewModel.getOrderBalance(order).then((value) {
-      LoadingDialog.dismiss(context);
-      final map = orderAmounts.value;
-      map[order.templateId] = value;
-      orderAmounts.value = {...map};
-    }).catchError((error) {
-      LoadingDialog.dismiss(context);
-      Toast.showError(error);
-    });
-  }
+  ) {}
 
   @override
   Widget build(BuildContext context) {

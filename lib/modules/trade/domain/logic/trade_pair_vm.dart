@@ -17,7 +17,7 @@ abstract class TradePairVM implements Built<TradePairVM, TradePairVMBuilder> {
   void Function() get doLoadTradePair;
 
   static TradePairVM fromStore(Store<AppState> store) {
-    final tradeState = store.state.tradeState;
+    //final tradeState = store.state.tradeState;
     final fiatCurrency = store.state.commonState.fiatCurrency ?? '';
 
     //final tradePair = tradeState.tradePair ?? tradeState.getDefaultTradePair();
@@ -25,9 +25,9 @@ abstract class TradePairVM implements Built<TradePairVM, TradePairVMBuilder> {
     return TradePairVM(
       (viewModel) => viewModel
         //..tradePair = tradePair.toBuilder()
-        ..allTradePairs = ListBuilder(tradeState.config?.allTradePairs ?? [])
-        ..allTradeMarkets =
-            ListBuilder(tradeState.config?.allTradeMarkets ?? [])
+        //..allTradePairs = ListBuilder(tradeState.config?.allTradePairs ?? [])
+        //..allTradeMarkets =
+        //    ListBuilder(tradeState.config?.allTradeMarkets ?? [])
         ..fiatCurrency = fiatCurrency
         ..doLoadTradePair = () {
           GetIt.I<CoinPriceCubit>().updateAll();

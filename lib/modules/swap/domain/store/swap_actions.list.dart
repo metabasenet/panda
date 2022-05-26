@@ -9,7 +9,8 @@ class SwapActionReviseSwap extends _BaseAction {
   final bool? isAdd;
 
   @override
-  Future<AppState> reduce() async {
+  Future<AppState?> reduce() async {
+    /*
     final walletId = state.walletState.activeWalletId;
     final allSwaps = await SwapRepository().getSwapsFromCache(walletId!);
     if (isAdd ?? false) {
@@ -29,7 +30,8 @@ class SwapActionReviseSwap extends _BaseAction {
 
     return store.state.rebuild(
       (a) => a.swapState..swaps.replace(allSwaps),
-    );
+    );*/
+    return null;
   }
 }
 
@@ -39,7 +41,8 @@ class _SwapActionLoadSwaps extends _BaseAction {
   final int page;
 
   @override
-  Future<AppState> reduce() async {
+  Future<AppState?> reduce() async {
+    /*
     final walletId = state.walletState.activeWalletId;
     final swaps = await SwapRepository().getSwapsFromCache(walletId!);
 
@@ -55,7 +58,8 @@ class _SwapActionLoadSwaps extends _BaseAction {
 
     return store.state.rebuild(
       (a) => a.swapState..swaps.replace(displayData),
-    );
+    );*/
+    return null;
   }
 }
 
@@ -76,7 +80,8 @@ class SwapActionGetSwaps extends _BaseAction {
   }
 
   @override
-  Future<AppState> reduce() async {
+  Future<AppState?> reduce() async {
+    /*
     final allSwaps = await SwapRepository().getSwapsFromCache(walletId);
 
     final apiResult = await SwapRepository().getSwapsFromApi(
@@ -119,7 +124,8 @@ class SwapActionGetSwaps extends _BaseAction {
 
     return store.state.rebuild(
       (a) => a.swapState..swaps.replace(displayData),
-    );
+    );*/
+    return null;
   }
 
   @override
