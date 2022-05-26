@@ -14,8 +14,8 @@ class CommonActionCheckDefaultLanguage extends _BaseAction {
     final settings = CommonRepository().getSettings();
     final deviceLanguageCode = Platform.localeName.split('_').first;
 
-    if (settings.languageIsSet == true ||
-        settings.language == deviceLanguageCode) {
+    if (settings?.languageIsSet == true ||
+        settings?.language == deviceLanguageCode) {
       completer.complete(null);
     } else {
       final suggestedLang = AppLanguages.languages.firstWhere(
@@ -42,9 +42,9 @@ class CommonActionChangeLanguage extends _BaseAction {
   @override
   AppState reduce() {
     final settings = CommonRepository().getSettings();
-    settings.language = language;
-    settings.languageIsSet = true;
-    settings.save();
+    settings?.language = language;
+    settings?.languageIsSet = true;
+    settings?.save();
     return state.rebuild(
       (b) => b.commonState.language = language,
     );
@@ -66,8 +66,8 @@ class CommonActionChangeFiatCurrency extends _BaseAction {
   @override
   AppState reduce() {
     final settings = CommonRepository().getSettings();
-    settings.fiatCurrency = fiatCurrency;
-    settings.save();
+    settings?.fiatCurrency = fiatCurrency;
+    settings?.save();
     return state.rebuild(
       (b) => b.commonState.fiatCurrency = fiatCurrency,
     );

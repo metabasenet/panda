@@ -2249,9 +2249,9 @@ class SettingsAdapter extends TypeAdapter<Settings> {
       fiatCurrency: fields[2] as String?,
       activeWalletId: fields[3] as String?,
     )
-      ..imageSignature = (fields[5] as Map).cast<String, dynamic>()
-      ..imageSignatureLastUpdate = fields[6] as int
-      ..installId = fields[7] as String;
+      ..imageSignature = (fields[5] as Map?)?.cast<String, dynamic>()
+      ..imageSignatureLastUpdate = fields[6] as int?
+      ..installId = fields[7] as String?;
   }
 
   @override

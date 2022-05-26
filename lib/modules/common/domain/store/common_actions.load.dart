@@ -7,10 +7,9 @@ class CommonActionLoadCache extends _BaseAction {
   Future<AppState?> reduce() async {
     // Load Env
     //await DotEnv().load();
-    AppConstants.isBeta = false; //DotEnv().env['IS_BETA'] == 'true';
-    AppConstants.buildId = '1'; //DotEnv().env['BUILD_ID'] ?? '';
-    AppConstants.commitHash = '2'; // DotEnv().env['COMMIT_HASH'] ?? '';
-
+    //AppConstants.isBeta = false; //DotEnv().env['IS_BETA'] == 'true';
+    //AppConstants.buildId = '1'; //DotEnv().env['BUILD_ID'] ?? '';
+    //AppConstants.commitHash = '2'; // DotEnv().env['COMMIT_HASH'] ?? '';
     // Check if is a new installation
     if (Platform.isIOS) {
       final shared = await SharedPreferences.getInstance();
@@ -60,13 +59,13 @@ class CommonActionLoadSettings extends _BaseAction {
   Future<AppState?> reduce() async {
     final settings = CommonRepository().getSettings();
 
-    settings.installId = settings.installId;
-    AppConfig().installId = settings.installId;
+    settings?.installId = settings.installId;
+    AppConfig().installId = settings?.installId ?? '';
 
     return state.rebuild(
       (b) => b.commonState
-        ..language = settings.language
-        ..fiatCurrency = settings.fiatCurrency,
+        ..language = settings?.language
+        ..fiatCurrency = settings?.fiatCurrency,
     );
   }
 }
@@ -89,7 +88,7 @@ class CommonActionLoadImageConfig extends _BaseAction {
     final settings = CommonRepository().getSettings();
     final timeNow = DateTime.now();
     // Use cache last Signature
-    final prevJson = settings.imageSignature;
+    final prevJson = settings?.imageSignature;
     if (prevJson != null) {
       final prevSigned = prevJson['signed'] ?? {};
       AppConfig().setImageUrl(
@@ -101,11 +100,11 @@ class CommonActionLoadImageConfig extends _BaseAction {
     }
 
     if (kDebugMode ||
-        settings.imageSignatureLastUpdate == null ||
+        settings?.imageSignatureLastUpdate == null ||
         timeNow
                 .difference(
                   DateTime.fromMillisecondsSinceEpoch(
-                    settings.imageSignatureLastUpdate,
+                    settings?.imageSignatureLastUpdate ?? 0,
                   ),
                 )
                 .inDays >
@@ -118,9 +117,9 @@ class CommonActionLoadImageConfig extends _BaseAction {
         configSigned['Policy'].toString(),
         configSigned['Signature'].toString(),
       );
-      settings.imageSignature = configJson;
-      settings.imageSignatureLastUpdate = timeNow.millisecondsSinceEpoch;
-      await settings.save();
+      settings?.imageSignature = configJson;
+      settings?.imageSignatureLastUpdate = timeNow.millisecondsSinceEpoch;
+      await settings?.save();
     }
     return null;
   }

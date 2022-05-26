@@ -16,7 +16,6 @@ class CommonRepository {
 // Methods
 
   Future<void> initializeCache() async {
-    /*
     _settings = await AppHiveCache.openBox<Settings>(_settingsCacheKey);
     if (_settings.get(_settingsCacheKey) == null) {
       await _settings.put(
@@ -26,11 +25,10 @@ class CommonRepository {
           language: AppConstants.defaultLanguage,
         ),
       );
-    }*/
+    }
   }
 
-  Settings getSettings() {
-    /*
+  Settings? getSettings() {
     if (_settings.get(_settingsCacheKey) == null) {
       final settings = Settings(
         fiatCurrency: AppConstants.defaultCurrency,
@@ -40,8 +38,6 @@ class CommonRepository {
       return settings;
     }
     return _settings.get(_settingsCacheKey);
-    */
-    return Settings();
   }
 
   Future<Config> getConfig() async {

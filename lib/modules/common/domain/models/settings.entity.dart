@@ -19,10 +19,10 @@ class Settings extends HiveObject {
   String? activeWalletId;
 
   @HiveField(5)
-  late Map<String, dynamic> imageSignature;
+  Map<String, dynamic>? imageSignature;
   @HiveField(6)
-  late int imageSignatureLastUpdate;
+  int? imageSignatureLastUpdate;
 
   @HiveField(7)
-  late String installId;
+  String? installId;
 }

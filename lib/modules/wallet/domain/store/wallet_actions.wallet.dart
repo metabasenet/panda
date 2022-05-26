@@ -8,7 +8,7 @@ class WalletActionWalletLoadAll extends _BaseAction {
     final settings = CommonRepository().getSettings();
     final allWallets = await WalletRepository().getAllWallets();
 
-    final activeWalletId = settings.activeWalletId;
+    final activeWalletId = settings?.activeWalletId;
     final activeWallet = await WalletRepository().getWalletById(
       activeWalletId!,
     );
@@ -39,11 +39,11 @@ class WalletActionWalletSetActive extends _BaseAction {
   @override
   Future<AppState?> reduce() async {
     final settings = CommonRepository().getSettings();
-    if (wallet == null || settings.activeWalletId == wallet.id) {
+    if (settings?.activeWalletId == wallet.id) {
       return null;
     }
-    settings.activeWalletId = wallet.id;
-    await settings.save();
+    settings?.activeWalletId = wallet.id;
+    await settings?.save();
 
     return state.rebuild(
       (a) => a
@@ -97,7 +97,6 @@ class WalletActionWalletUnlock extends _BaseAction {
       );
     }
 
-    assert(data != null);
     completer.complete(data);
     return null;
   }
