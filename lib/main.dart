@@ -29,7 +29,7 @@ void main() {
     FlutterError.dumpErrorToConsole(details);
   };
 
-  //store = createStore();
+  store = createStore();
 
   NavigateAction.setNavigatorKey(navigatorKey);
 

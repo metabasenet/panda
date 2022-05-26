@@ -52,7 +52,7 @@ class CommonActionChangeLanguage extends _BaseAction {
 
   @override
   void after() {
-    Request().updateLanguage(store.state.commonState.languageForApi);
+    //Request().updateLanguage(store.state.commonState.languageForApi);
 
     dispatch(AppActionAfterChangeLanguage(language));
   }

@@ -875,15 +875,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.0.0"
-  network_flutter:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: HEAD
-      resolved-ref: "5ef3e184af2569ab0eb50dd5ab091d5897a96ecf"
-      url: "https://github.com/metabasenetwork/network_flutter2"
-    source: git
-    version: "0.0.1"
   octo_image:
     dependency: transitive
     description:

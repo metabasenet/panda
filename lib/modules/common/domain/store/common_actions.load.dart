@@ -76,10 +76,9 @@ class CommonActionLoadHost extends _BaseAction {
 
   @override
   Future<AppState?> reduce() async {
-    final hostBase64 = await CommonRepository().getApiDns();
-
-    final apiUrl = utf8.decode(base64Decode(hostBase64));
-    Request().updateBaseUrl(apiUrl);
+    //final hostBase64 = await CommonRepository().getApiDns();
+    //final apiUrl = utf8.decode(base64Decode(hostBase64));
+    //Request().updateBaseUrl(apiUrl);
     return null;
   }
 }

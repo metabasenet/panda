@@ -12,7 +12,7 @@ import 'package:async_redux/async_redux.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:get_it/get_it.dart';
-import 'package:network_flutter/network_flutter.dart';
+//import 'package:network_flutter/network_flutter.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 // Project imports:

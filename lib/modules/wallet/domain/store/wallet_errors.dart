@@ -25,6 +25,8 @@ class WalletFeeBalanceLowError extends Error {}
 class WalletApproveBalanceLowError extends Error {}
 
 Object? parseWalletError(dynamic error, [Completer? completer]) {
+  return 'err';
+  /*
   final responseError = Request().getResponseError(error);
   final textError = error?.toString() ?? '';
   var resultError = error;
@@ -50,4 +52,5 @@ Object? parseWalletError(dynamic error, [Completer? completer]) {
   }
   completer?.completeError(resultError as Object);
   return resultError;
+  */
 }

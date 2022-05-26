@@ -71,14 +71,14 @@ class CommunityJoinProcess {
         );
         return;
       }
-      final responseError = Request().getResponseError(error);
-      if (responseError.statusCode == 400) {
-        showJoinStatusDialog(
-          context,
-          message: responseError.message,
-        );
-        return;
-      }
+      //final responseError = Request().getResponseError(error);
+      //if (responseError.statusCode == 400) {
+      //  showJoinStatusDialog(
+      //    context,
+      //    message: responseError.message,
+      //  );
+      //  return;
+      //}
       rethrow;
     }
   }

@@ -12,7 +12,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
-import 'package:network_flutter/network_flutter.dart';
+//import 'package:network_flutter/network_flutter.dart';
 
 // Project imports:
 import 'package:mars/dialogs/dialogs.dart';

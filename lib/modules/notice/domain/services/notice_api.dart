@@ -5,9 +5,12 @@ class NoticeApi {
     required int skip,
     required int take,
   }) =>
-      Request()
-          .getListOfObjects('/v1/system_notice/lists?skip=$skip&take=$take');
+      Future.value([]);
 
-  Future<Map<String, dynamic>> getNoticeDetail(int id) =>
-      Request().getValue<Map<String, dynamic>>('v1/system_notice/$id/info');
+  //    Request()
+  //        .getListOfObjects('/v1/system_notice/lists?skip=$skip&take=$take');
+
+  Future<Map<String, dynamic>> getNoticeDetail(int id) => Future.value({});
+
+  //    Request().getValue<Map<String, dynamic>>('v1/system_notice/$id/info');
 }

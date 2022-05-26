@@ -514,6 +514,7 @@ class WalletActionSignAndSubmitRawTx extends _BaseAction {
     // If the error is about broadcasting, maybe unspent have problem,
     // so we need to clear it
     // "Tx rejected" is the error message from MNT wallet
+    /*
     final responseError = Request().getResponseError(error);
     if (responseError.message.contains('Tx rejected')) {
       WalletRepository().clearUnspentCache(
@@ -532,7 +533,7 @@ class WalletActionSignAndSubmitRawTx extends _BaseAction {
       completer.completeError(WalletTransTxRejected(responseError.message));
       return WalletTransTxRejected(responseError.message);
     }
-
+    */
     completer.completeError(error as Object);
     return error;
   }

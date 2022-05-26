@@ -56,13 +56,13 @@ class SettingsDevPage extends HookWidget {
         (value) async {
           await Future.delayed(Duration(milliseconds: 200));
           if (newSettings.hasApiBaseUrl) {
-            Request().updateBaseUrl(newSettings.apiBaseUrl);
+            //Request().updateBaseUrl(newSettings.apiBaseUrl);
           }
           if (newSettings.hasApiAppVersion) {
-            Request().updateHeader('app-version', newSettings.apiAppVersion);
+            //Request().updateHeader('app-version', newSettings.apiAppVersion);
           }
           if (newSettings.hasProxyUrl && Platform.isAndroid) {
-            Request().setupProxy(newSettings.proxyUrl);
+            //Request().setupProxy(newSettings.proxyUrl);
           }
           LoadingDialog.dismiss(context);
         },

@@ -38,17 +38,17 @@ class InvitationSubmitProcess {
           .checkDefiRelation(coinInfo.contract, toAddress)
           .then((_) => true)
           .catchError((error) {
-        LoadingDialog.dismiss(context);
-        final responseError = Request().getResponseError(error);
-        if (responseError.statusCode == 400) {
-          showAlertDialog(
-            context,
-            content: responseError.message ??
-                tr('asset:invitation_create_defi_relation'),
-          );
-        } else {
-          Toast.showError(error);
-        }
+        //LoadingDialog.dismiss(context);
+        //final responseError = Request().getResponseError(error);
+        //if (responseError.statusCode == 400) {
+        //  showAlertDialog(
+        //    context,
+        //    content: responseError.message ??
+        //        tr('asset:invitation_create_defi_relation'),
+        //  );
+        //} else {
+        //  Toast.showError(error);
+        //}
         return false;
       }),
       onUnlockWallet: () {
