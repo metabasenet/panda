@@ -27,6 +27,25 @@ class TradeHomePage extends HookWidget {
                           'https://www.shangqingdong.work/?ran=$ranNumber',
                       onWebViewCreated: (controller) {
                         webView = controller;
+
+                        webView.addJavaScriptHandler(
+                            handlerName: 'Refresh',
+                            callback: (args) {
+                              final refreshController = CSRefresherController();
+                              AssetListPage.assetListVM
+                                  .doRefreshList()
+                                  .then((_) {
+                                //refreshController.refreshCompleted();
+                                completer.complete('refresh');
+                              });
+                              // .catchError((_) {
+                              //   //refreshController.refreshFailed();
+                              //   completer.complete('refresh');
+                              // });
+
+                              return 'refresh';
+                            });
+
                         controller.addJavaScriptHandler(
                             handlerName: 'init',
                             callback: (args) {

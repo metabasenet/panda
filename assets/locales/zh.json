@@ -259,7 +259,7 @@
   "asset:lbl_balance": "余额：{balance} {symbol}",
   "asset:lbl_coin_name": "{name}({fullName})",
   "asset:list_title": "钱包",
-  "asset:list_lbl_valuation": "总资产估值",
+  "asset:list_lbl_valuation": "总资产估值({symbol})",
   "asset:list_lbl_updating": "价格更新中",
   "asset:list_lbl_hide_small": "隐藏小额资产",
   "asset:detail_title": "资产详情",

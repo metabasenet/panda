@@ -6,6 +6,7 @@ class AssetListPage extends StatelessWidget {
   final refreshController = CSRefresherController();
   final scrollController = ScrollController();
   final swiperController = SwiperController();
+  static AssetListVM assetListVM;
 
   Widget buildUpdatePrices(BuildContext context) {
     return Positioned(
@@ -222,6 +223,7 @@ class AssetListPage extends StatelessWidget {
         distinct: true,
         converter: AssetListVM.fromStore,
         onInitialBuild: (viewModel) {
+          assetListVM = viewModel;
           // _ignoreIndexChange = true;
           // swiperController
           //     .move(viewModel.wallets.indexOf(viewModel.activeWallet),
@@ -236,6 +238,11 @@ class AssetListPage extends StatelessWidget {
               scrollController: scrollController,
               onRefresh: () {
                 viewModel.doRefreshList().then((_) {
+                  //refresh data
+                  var srcRefresh =
+                      'window.dispatchEvent(new CustomEvent("Refresh",{"detail":"refresh"}));';
+                  TradeHomePage.webView.evaluateJavascript(source: srcRefresh);
+
                   refreshController.refreshCompleted();
                 }).catchError((_) {
                   refreshController.refreshFailed();
