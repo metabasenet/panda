@@ -39,34 +39,37 @@ class RiveToggleAnimation extends HookWidget {
       }
     }
 
-    useEffect(() {
-      rootBundle.load('assets/rive/$fileName.riv').then(
-        (data) async {
-          /*
-          final file = RiveFile.import(data);
-          //if (file.import(data)) {
-          riveArtboard.value = file.mainArtboard;
-          // The last controller need to be the on one
-          riveArtboard.value!.addController(
-            isOn ? riveControllerOff : riveControllerOn,
-          );
-          riveArtboard.value!.addController(
-            isOn ? riveControllerOn : riveControllerOff,
-          );*/
-          //}
-        },
-      ).catchError((error) {
-        debugPrint(error.toString());
-      });
-      return null;
-    }, []);
+    useEffect(
+      () {
+        rootBundle.load('assets/rive/$fileName.riv').then(
+          (data) async {
+            final file = RiveFile.import(data);
+            riveArtboard.value = file.mainArtboard;
+            // The last controller need to be the on one
+            riveArtboard.value?.addController(
+              isOn ? riveControllerOff : riveControllerOn,
+            );
+            riveArtboard.value?.addController(
+              isOn ? riveControllerOn : riveControllerOff,
+            );
+          },
+        ).catchError((error) {
+          debugPrint(error.toString());
+        });
+        return null;
+      },
+      [],
+    );
 
-    useEffect(() {
-      if (riveArtboard.value != null) {
-        loadAnimation();
-      }
-      return null;
-    }, [isOn]);
+    useEffect(
+      () {
+        if (riveArtboard.value != null) {
+          loadAnimation();
+        }
+        return null;
+      },
+      [isOn],
+    );
 
     return SizedBox(
       width: size,
