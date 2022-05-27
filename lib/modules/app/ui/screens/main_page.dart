@@ -184,7 +184,8 @@ class AppMainPage extends HookWidget {
                 style: context.textSmall(
                   color: color,
                   bold: true,
-                  fontWeight: FontWeight.normal,
+                  fontWeight: FontWeight.bold,
+                  lineHeight: 1,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
