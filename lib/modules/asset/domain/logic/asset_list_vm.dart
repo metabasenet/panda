@@ -69,7 +69,12 @@ abstract class AssetListVM implements Built<AssetListVM, AssetListVMBuilder> {
           ]);
         }
         ..doSwitchWallet = (wallet) {
-          return store.dispatchFuture(AppActionLoadWallet(wallet));
+          return store
+              .dispatchFuture(AppActionLoadWallet(wallet))
+              .then((value) {
+            return TradeMainTab();
+            //return TradeHomePage();
+          });
         }
         ..doSyncWallet = (wallet) {
           return store.dispatchFuture(WalletActionWalletRegister(
