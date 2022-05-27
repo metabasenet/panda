@@ -40,7 +40,6 @@ class MyApp extends StatelessWidget {
         store: store,
         child: EasyLocalization(
           path: 'assets/locales',
-          assetLoader: AppLocalizationsLoader(),
           useOnlyLangCode: true,
           startLocale: Locale(AppConstants.defaultLanguage),
           fallbackLocale: Locale(AppConstants.defaultLanguage),
@@ -60,7 +59,7 @@ class MyApp extends StatelessWidget {
                 theme: AppThemes.getLightTheme(context),
                 locale: context.locale,
                 supportedLocales: context.supportedLocales,
-                localizationsDelegates: AppLocalizations.localizationsDelegates,
+                localizationsDelegates: context.localizationDelegates,
                 navigatorKey: navigatorKey,
                 onGenerateRoute: AppNavigator.onGenerateRoute,
                 builder: (context, child) => MediaQuery(
