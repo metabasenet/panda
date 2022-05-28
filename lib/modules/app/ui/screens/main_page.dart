@@ -135,7 +135,8 @@ class AppMainPage extends HookWidget {
                   style: context.textSmall(
                     color: color,
                     bold: true,
-                    fontWeight: FontWeight.normal,
+                    fontWeight: FontWeight.bold,
+                    lineHeight: 1,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -202,24 +203,30 @@ class AppMainPage extends HookWidget {
     final currentTab = useState(0);
     final backLastTime = useState(0);
 
-    useEffect(() {
-      tabBarItems.asMap().forEach((index, value) {
-        value.index = index;
-      });
-      final subTab = _tabChanger.stream.listen((tabIndex) {
-        currentTab.value =
-            tabIndex > tabBarItems.length ? tabBarItems.length : tabIndex;
-      });
-      return () {
-        subTab.cancel();
-      };
-    }, []);
+    useEffect(
+      () {
+        tabBarItems.asMap().forEach((index, value) {
+          value.index = index;
+        });
+        final subTab = _tabChanger.stream.listen((tabIndex) {
+          currentTab.value =
+              tabIndex > tabBarItems.length ? tabBarItems.length : tabIndex;
+        });
+        return () {
+          subTab.cancel();
+        };
+      },
+      [],
+    );
 
-    useEffect(() {
-      // When change language, force refresh
-      backLastTime.value = backLastTime.value - 1;
-      return null;
-    }, [context.locale.languageCode]);
+    useEffect(
+      () {
+        // When change language, force refresh
+        backLastTime.value = backLastTime.value - 1;
+        return null;
+      },
+      [context.locale.languageCode],
+    );
 
     return WillPopScope(
       onWillPop: () async {
@@ -251,7 +258,7 @@ class AppMainPage extends HookWidget {
                 ],
               ), //tabBarItems[currentTab.value].screen,
             ),
-            /*OfflineBuilder(
+            OfflineBuilder(
               builder: (context, status) => Positioned(
                 right: 0,
                 left: 0,
@@ -280,7 +287,7 @@ class AppMainPage extends HookWidget {
                       : SizedBox(),
                 ),
               ),
-            ),*/
+            ),
           ],
         ),
         bottomNavigationBar: BottomAppBar(
@@ -303,14 +310,16 @@ class AppMainPage extends HookWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: tabBarItems
-                  .map((item) => renderAnimatedTabItem(
-                        context,
-                        item,
-                        currentTab.value,
-                        (index) {
-                          currentTab.value = index;
-                        },
-                      ))
+                  .map(
+                    (item) => renderAnimatedTabItem(
+                      context,
+                      item,
+                      currentTab.value,
+                      (index) {
+                        currentTab.value = index;
+                      },
+                    ),
+                  )
                   .toList(),
             ),
           ),
