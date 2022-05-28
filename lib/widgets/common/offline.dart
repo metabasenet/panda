@@ -1,23 +1,22 @@
 // Dart imports:
 import 'dart:async';
 
+// Package imports:
+import 'package:connectivity/connectivity.dart';
 // Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
-
-// Package imports:
-import 'package:connectivity/connectivity.dart';
 
 StreamTransformer<ConnectivityResult, ConnectivityResult> debounce(
   Duration debounceDuration,
 ) {
   var _seenFirstData = false;
-  late Timer _debounceTimer;
+  Timer? _debounceTimer;
 
   return StreamTransformer<ConnectivityResult, ConnectivityResult>.fromHandlers(
     handleData: (data, sink) {
       if (_seenFirstData) {
-        _debounceTimer.cancel();
+        _debounceTimer?.cancel();
         _debounceTimer = Timer(debounceDuration, () => sink.add(data));
       } else {
         sink.add(data);
@@ -25,7 +24,7 @@ StreamTransformer<ConnectivityResult, ConnectivityResult> debounce(
       }
     },
     handleDone: (sink) {
-      _debounceTimer.cancel();
+      _debounceTimer?.cancel();
       sink.close();
     },
   );
@@ -39,16 +38,16 @@ StreamTransformer<ConnectivityResult, ConnectivityResult> startsWith(
       input,
       cancelOnError,
     ) {
-      late StreamController<ConnectivityResult> controller;
-      late StreamSubscription<ConnectivityResult> subscription;
+      StreamController<ConnectivityResult>? controller;
+      StreamSubscription<ConnectivityResult>? subscription;
 
       controller = StreamController<ConnectivityResult>(
         sync: true,
-        onListen: () => controller.add(data),
+        onListen: () => controller?.add(data),
         onPause: ([resumeSignal]) =>
-            subscription.pause(resumeSignal as Future<dynamic>),
-        onResume: () => subscription.resume(),
-        onCancel: () => subscription.cancel(),
+            subscription?.pause(resumeSignal as Future<dynamic>),
+        onResume: () => subscription?.resume(),
+        onCancel: () => subscription?.cancel(),
       );
 
       subscription = input.listen(
@@ -57,7 +56,6 @@ StreamTransformer<ConnectivityResult, ConnectivityResult> startsWith(
         onDone: controller.close,
         cancelOnError: cancelOnError,
       );
-
       return controller.stream.listen(null);
     },
   );
@@ -91,13 +89,16 @@ class OfflineBuilder extends StatefulWidget {
     this.builder,
     this.child,
     this.errorBuilder,
-  })  : assert(debounceDuration != null, 'debounceDuration cannot be null'),
+  })  : //assert(debounceDuration != null, 'debounceDuration cannot be null'),
+        //assert(
+        //  connectivityService != null,
+        //  'connectivityService cannot be null',
+        //),
         assert(
-            connectivityService != null, 'connectivityService cannot be null'),
-        assert(
-            !(builder is WidgetBuilder && child is Widget) &&
-                !(builder == null && child == null),
-            'You should specify either a builder or a child'),
+          !(builder is WidgetBuilder && child is Widget) &&
+              !(builder == null && child == null),
+          'You should specify either a builder or a child',
+        ),
         super(key: key);
 
   /// Override connectivity service used for testing
@@ -128,23 +129,25 @@ class OfflineBuilderState extends State<OfflineBuilder> {
 
     _connectivityStream =
         Stream.fromFuture(widget.connectivityService.checkConnectivity())
-            .asyncExpand((data) => widget
-                .connectivityService.onConnectivityChanged
-                .transform(startsWith(data)))
+            .asyncExpand(
+              (data) =>
+                  widget.connectivityService.onConnectivityChanged.transform(
+                startsWith(data),
+              ),
+            )
             .transform(debounce(widget.debounceDuration));
+
+    //_connectivityStream
   }
 
   @override
   Widget build(BuildContext context) {
-    //return Text('OfflineBuilderState');
-
     return StreamBuilder<ConnectivityResult>(
       stream: _connectivityStream,
       builder: (context, snapshot) {
         if (!snapshot.hasData && !snapshot.hasError) {
           return SizedBox();
         }
-
         if (snapshot.hasError) {
           if (widget.errorBuilder != null) {
             return widget.errorBuilder!(context);
