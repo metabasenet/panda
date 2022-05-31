@@ -1,7 +1,7 @@
 part of utils;
 
 class LogBlocDelegate extends BlocObserver {
-  //@override
+  @override
   void onEvent(Bloc<dynamic, dynamic> bloc, Object? event) {
     super.onEvent(bloc, event);
     // ignore: avoid_print
