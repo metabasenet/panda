@@ -65,7 +65,9 @@ class _ListViewHeaderState extends RefreshIndicatorState<ListViewHeader>
 
   @override
   Widget buildContent(BuildContext context, RefreshStatus mode) {
-    late Widget child;
+    Widget child = Icon(
+      Icons.sync,
+    );
 
     if (mode == RefreshStatus.refreshing || mode == RefreshStatus.completed) {
       if (widget.useProgressLoading == true) {

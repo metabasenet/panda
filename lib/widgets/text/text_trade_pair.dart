@@ -89,6 +89,7 @@ class TextTradePair extends StatelessWidget {
         if (direction) Text(' '),
         Row(
           crossAxisAlignment: CrossAxisAlignment.baseline,
+          textBaseline: TextBaseline.alphabetic,
           children: [
             Text(from, style: fromStyle),
             Text('/$to', style: sameStyle ? fromStyle : toStyle),

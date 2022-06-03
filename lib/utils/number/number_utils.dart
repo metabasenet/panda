@@ -272,6 +272,15 @@ class NumberUtil {
     }
   }
 
+  static double getDoubleByTwo(double v1, double v2) {
+    try {
+      double value = (v1 / v2);
+      return value;
+    } catch (_) {
+      return 0.00;
+    }
+  }
+
   static bool isGreater<T>(dynamic v1, dynamic v2) {
     try {
       final value = Decimal.parse('$v1') > Decimal.parse('$v2');

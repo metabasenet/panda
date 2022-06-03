@@ -64,7 +64,7 @@ extension TextStyles on BuildContext {
       fontSize: 16.0,
       fontWeight: _getBold(bold, fontWeight),
       color: color ?? bodyColor,
-      height: lineHeight ?? 16,
+      height: lineHeight ?? 1,
     );
   }
 
@@ -79,7 +79,7 @@ extension TextStyles on BuildContext {
       fontSize: 15.0,
       fontWeight: _getBold(bold, fontWeight),
       color: color ?? bodyColor,
-      height: lineHeight ?? 15,
+      height: lineHeight ?? 1,
     );
   }
 
@@ -130,7 +130,7 @@ extension TextStyles on BuildContext {
       fontSize: 12,
       fontWeight: _getBold(bold, fontWeight),
       color: color ?? secondaryColor,
-      height: lineHeight ?? 12,
+      height: lineHeight ?? 1,
     );
   }
 

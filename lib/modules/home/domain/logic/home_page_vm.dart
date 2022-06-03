@@ -7,9 +7,9 @@ abstract class HomePageVM implements Built<HomePageVM, HomePageVMBuilder> {
 // Fields
 
   //@nullable
-  BuiltList<AssetPrice>? get homePrices;
+  BuiltList<AssetPrice> get homePrices;
   //@nullable
-  BuiltList<HomeBanner>? get homeBanners;
+  BuiltList<HomeBanner> get homeBanners;
   //@nullable
   BuiltList<NoticeInfo>? get homeNotices;
 
@@ -21,7 +21,7 @@ abstract class HomePageVM implements Built<HomePageVM, HomePageVMBuilder> {
   //@nullable
   ConfigUpdateData? get newVersionData;
 
-  //BuiltList<TradePair> get allTradePairs;
+  BuiltList<TradePair> get allTradePairs;
   //BuiltList<TradeMarket> get allTradeMarkets;
 
   bool get hasWallet;
@@ -46,8 +46,8 @@ abstract class HomePageVM implements Built<HomePageVM, HomePageVMBuilder> {
   @BuiltValueField(compare: false)
   Future<void> Function(String language) get doChangeLanguage;
 
-  //@BuiltValueField(compare: false)
-  //Future<void> Function(TradePair tradePair) get doChangeTradePair;
+  @BuiltValueField(compare: false)
+  Future<void> Function(TradePair tradePair) get doChangeTradePair;
 
   @BuiltValueField(compare: false)
   Future<void> Function() get doRefreshHomeData;
@@ -57,7 +57,7 @@ abstract class HomePageVM implements Built<HomePageVM, HomePageVMBuilder> {
 
 // UI Logic
   static HomePageVM fromStore(Store<AppState> store) {
-    //final tradeState = store.state.tradeState;
+    final tradeState = store.state.tradeState;
 
     return HomePageVM(
       (viewModel) => viewModel
@@ -66,7 +66,7 @@ abstract class HomePageVM implements Built<HomePageVM, HomePageVMBuilder> {
             store.state.homeState.homePrices?.toBuilder() ?? ListBuilder()
         ..homeBanners = ListBuilder(store.state.homeState.homeBanners!)
         ..homeNotices = ListBuilder(store.state.noticeState.noticeLatest!)
-        //..allTradePairs = ListBuilder(tradeState.config?.allTradePairs ?? [])
+        ..allTradePairs = ListBuilder(tradeState.config?.allTradePairs ?? [])
         ..admissionList =
             store.state.admissionState.admissionList?.toBuilder() ??
                 ListBuilder()
@@ -111,12 +111,10 @@ abstract class HomePageVM implements Built<HomePageVM, HomePageVMBuilder> {
               AppLanguages.getCurrencyByLanguage(language),
             ),
           );
+        }
+        ..doChangeTradePair = (tradePair) {
+          return store.dispatchAsync(TradeActionOrderChangePair(tradePair));
         },
-      //..doChangeTradePair = (tradePair) {
-      //  return store.dispatchAsync(
-      //    TradeActionOrderChangePair(tradePair),
-      //  );
-      //},
     );
   }
 }

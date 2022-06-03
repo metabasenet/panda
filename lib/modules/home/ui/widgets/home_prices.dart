@@ -81,20 +81,19 @@ class HomePricesCard extends StatelessWidget {
             itemCount: prices.length,
             itemBuilder: (context, index) {
               final item = prices[index];
-              final tradePair =
-                  allTradePairs.firstWhere((e) => e.id == item.tradePairId);
-
+              // final tradePair =
+              //     allTradePairs.firstWhere((e) => e.id == item.tradePairId);
               return CSContainer(
                 radius: 0,
                 padding: EdgeInsets.zero,
                 margin: EdgeInsets.zero,
-                onTap: tradePair != null
-                    ? () {
-                        doChangeTradePair(tradePair).then((_) {
-                          AppNavigator.gotoTabBarPage(AppTabBarPages.trade);
-                        });
-                      }
-                    : null,
+                // onTap: tradePair != null
+                //     ? () {
+                //         doChangeTradePair(tradePair).then((_) {
+                //           AppNavigator.gotoTabBarPage(AppTabBarPages.trade);
+                //         });
+                //       }
+                //     : null,
                 key: Key(item.tradePairId),
                 height: 50,
                 child: Row(

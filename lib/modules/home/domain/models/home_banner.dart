@@ -24,13 +24,13 @@ abstract class HomeBanner implements Built<HomeBanner, HomeBannerBuilder> {
   //@nullable
   String? get content;
 
-  //@nullable
-  String? get img;
+  String get img;
 
   //@nullable
   @BuiltValueField(wireName: 'bg_img')
   String? get bgImg;
 
   @memoized
-  String get imageUrl => AppConfig().getImageUrlFor(img ?? '');
+  String get imageUrl => img;
+  //String get imageUrl => AppConfig().getImageUrlFor(img ?? '');
 }

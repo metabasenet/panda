@@ -18,7 +18,10 @@ class _$HomeBannerSerializer implements StructuredSerializer<HomeBanner> {
   @override
   Iterable<Object?> serialize(Serializers serializers, HomeBanner object,
       {FullType specifiedType = FullType.unspecified}) {
-    final result = <Object?>[];
+    final result = <Object?>[
+      'img',
+      serializers.serialize(object.img, specifiedType: const FullType(String)),
+    ];
     Object? value;
     value = object.id;
     if (value != null) {
@@ -44,13 +47,6 @@ class _$HomeBannerSerializer implements StructuredSerializer<HomeBanner> {
     if (value != null) {
       result
         ..add('content')
-        ..add(serializers.serialize(value,
-            specifiedType: const FullType(String)));
-    }
-    value = object.img;
-    if (value != null) {
-      result
-        ..add('img')
         ..add(serializers.serialize(value,
             specifiedType: const FullType(String)));
     }
@@ -93,7 +89,7 @@ class _$HomeBannerSerializer implements StructuredSerializer<HomeBanner> {
           break;
         case 'img':
           result.img = serializers.deserialize(value,
-              specifiedType: const FullType(String)) as String?;
+              specifiedType: const FullType(String))! as String;
           break;
         case 'bg_img':
           result.bgImg = serializers.deserialize(value,
@@ -176,9 +172,9 @@ class _$HomeStateSerializer implements StructuredSerializer<HomeState> {
 
 class _$HomePageVM extends HomePageVM {
   @override
-  final BuiltList<AssetPrice>? homePrices;
+  final BuiltList<AssetPrice> homePrices;
   @override
-  final BuiltList<HomeBanner>? homeBanners;
+  final BuiltList<HomeBanner> homeBanners;
   @override
   final BuiltList<NoticeInfo>? homeNotices;
   @override
@@ -187,6 +183,8 @@ class _$HomePageVM extends HomePageVM {
   final bool? hasNewVersion;
   @override
   final ConfigUpdateData? newVersionData;
+  @override
+  final BuiltList<TradePair> allTradePairs;
   @override
   final bool hasWallet;
   @override
@@ -202,6 +200,8 @@ class _$HomePageVM extends HomePageVM {
   @override
   final Future<void> Function(String language) doChangeLanguage;
   @override
+  final Future<void> Function(TradePair tradePair) doChangeTradePair;
+  @override
   final Future<void> Function() doRefreshHomeData;
   @override
   final Future<void> Function() doRefreshCommunity;
@@ -210,12 +210,13 @@ class _$HomePageVM extends HomePageVM {
       (new HomePageVMBuilder()..update(updates))._build();
 
   _$HomePageVM._(
-      {this.homePrices,
-      this.homeBanners,
+      {required this.homePrices,
+      required this.homeBanners,
       this.homeNotices,
       this.admissionList,
       this.hasNewVersion,
       this.newVersionData,
+      required this.allTradePairs,
       required this.hasWallet,
       this.communityConfig,
       this.communityConfigState,
@@ -223,9 +224,16 @@ class _$HomePageVM extends HomePageVM {
       required this.doCheckForBetaUpdates,
       required this.doCheckLanguage,
       required this.doChangeLanguage,
+      required this.doChangeTradePair,
       required this.doRefreshHomeData,
       required this.doRefreshCommunity})
       : super._() {
+    BuiltValueNullFieldError.checkNotNull(
+        homePrices, 'HomePageVM', 'homePrices');
+    BuiltValueNullFieldError.checkNotNull(
+        homeBanners, 'HomePageVM', 'homeBanners');
+    BuiltValueNullFieldError.checkNotNull(
+        allTradePairs, 'HomePageVM', 'allTradePairs');
     BuiltValueNullFieldError.checkNotNull(hasWallet, 'HomePageVM', 'hasWallet');
     BuiltValueNullFieldError.checkNotNull(
         doLoadHomeData, 'HomePageVM', 'doLoadHomeData');
@@ -235,6 +243,8 @@ class _$HomePageVM extends HomePageVM {
         doCheckLanguage, 'HomePageVM', 'doCheckLanguage');
     BuiltValueNullFieldError.checkNotNull(
         doChangeLanguage, 'HomePageVM', 'doChangeLanguage');
+    BuiltValueNullFieldError.checkNotNull(
+        doChangeTradePair, 'HomePageVM', 'doChangeTradePair');
     BuiltValueNullFieldError.checkNotNull(
         doRefreshHomeData, 'HomePageVM', 'doRefreshHomeData');
     BuiltValueNullFieldError.checkNotNull(
@@ -258,6 +268,7 @@ class _$HomePageVM extends HomePageVM {
         admissionList == other.admissionList &&
         hasNewVersion == other.hasNewVersion &&
         newVersionData == other.newVersionData &&
+        allTradePairs == other.allTradePairs &&
         hasWallet == other.hasWallet &&
         communityConfig == other.communityConfig &&
         communityConfigState == other.communityConfigState;
@@ -272,12 +283,14 @@ class _$HomePageVM extends HomePageVM {
                     $jc(
                         $jc(
                             $jc(
-                                $jc($jc(0, homePrices.hashCode),
-                                    homeBanners.hashCode),
-                                homeNotices.hashCode),
-                            admissionList.hashCode),
-                        hasNewVersion.hashCode),
-                    newVersionData.hashCode),
+                                $jc(
+                                    $jc($jc(0, homePrices.hashCode),
+                                        homeBanners.hashCode),
+                                    homeNotices.hashCode),
+                                admissionList.hashCode),
+                            hasNewVersion.hashCode),
+                        newVersionData.hashCode),
+                    allTradePairs.hashCode),
                 hasWallet.hashCode),
             communityConfig.hashCode),
         communityConfigState.hashCode));
@@ -292,6 +305,7 @@ class _$HomePageVM extends HomePageVM {
           ..add('admissionList', admissionList)
           ..add('hasNewVersion', hasNewVersion)
           ..add('newVersionData', newVersionData)
+          ..add('allTradePairs', allTradePairs)
           ..add('hasWallet', hasWallet)
           ..add('communityConfig', communityConfig)
           ..add('communityConfigState', communityConfigState)
@@ -299,6 +313,7 @@ class _$HomePageVM extends HomePageVM {
           ..add('doCheckForBetaUpdates', doCheckForBetaUpdates)
           ..add('doCheckLanguage', doCheckLanguage)
           ..add('doChangeLanguage', doChangeLanguage)
+          ..add('doChangeTradePair', doChangeTradePair)
           ..add('doRefreshHomeData', doRefreshHomeData)
           ..add('doRefreshCommunity', doRefreshCommunity))
         .toString();
@@ -343,6 +358,12 @@ class HomePageVMBuilder implements Builder<HomePageVM, HomePageVMBuilder> {
   set newVersionData(ConfigUpdateDataBuilder? newVersionData) =>
       _$this._newVersionData = newVersionData;
 
+  ListBuilder<TradePair>? _allTradePairs;
+  ListBuilder<TradePair> get allTradePairs =>
+      _$this._allTradePairs ??= new ListBuilder<TradePair>();
+  set allTradePairs(ListBuilder<TradePair>? allTradePairs) =>
+      _$this._allTradePairs = allTradePairs;
+
   bool? _hasWallet;
   bool? get hasWallet => _$this._hasWallet;
   set hasWallet(bool? hasWallet) => _$this._hasWallet = hasWallet;
@@ -383,6 +404,13 @@ class HomePageVMBuilder implements Builder<HomePageVM, HomePageVMBuilder> {
           Future<void> Function(String language)? doChangeLanguage) =>
       _$this._doChangeLanguage = doChangeLanguage;
 
+  Future<void> Function(TradePair tradePair)? _doChangeTradePair;
+  Future<void> Function(TradePair tradePair)? get doChangeTradePair =>
+      _$this._doChangeTradePair;
+  set doChangeTradePair(
+          Future<void> Function(TradePair tradePair)? doChangeTradePair) =>
+      _$this._doChangeTradePair = doChangeTradePair;
+
   Future<void> Function()? _doRefreshHomeData;
   Future<void> Function()? get doRefreshHomeData => _$this._doRefreshHomeData;
   set doRefreshHomeData(Future<void> Function()? doRefreshHomeData) =>
@@ -398,12 +426,13 @@ class HomePageVMBuilder implements Builder<HomePageVM, HomePageVMBuilder> {
   HomePageVMBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _homePrices = $v.homePrices?.toBuilder();
-      _homeBanners = $v.homeBanners?.toBuilder();
+      _homePrices = $v.homePrices.toBuilder();
+      _homeBanners = $v.homeBanners.toBuilder();
       _homeNotices = $v.homeNotices?.toBuilder();
       _admissionList = $v.admissionList?.toBuilder();
       _hasNewVersion = $v.hasNewVersion;
       _newVersionData = $v.newVersionData?.toBuilder();
+      _allTradePairs = $v.allTradePairs.toBuilder();
       _hasWallet = $v.hasWallet;
       _communityConfig = $v.communityConfig?.toBuilder();
       _communityConfigState = $v.communityConfigState;
@@ -411,6 +440,7 @@ class HomePageVMBuilder implements Builder<HomePageVM, HomePageVMBuilder> {
       _doCheckForBetaUpdates = $v.doCheckForBetaUpdates;
       _doCheckLanguage = $v.doCheckLanguage;
       _doChangeLanguage = $v.doChangeLanguage;
+      _doChangeTradePair = $v.doChangeTradePair;
       _doRefreshHomeData = $v.doRefreshHomeData;
       _doRefreshCommunity = $v.doRefreshCommunity;
       _$v = null;
@@ -437,12 +467,13 @@ class HomePageVMBuilder implements Builder<HomePageVM, HomePageVMBuilder> {
     try {
       _$result = _$v ??
           new _$HomePageVM._(
-              homePrices: _homePrices?.build(),
-              homeBanners: _homeBanners?.build(),
+              homePrices: homePrices.build(),
+              homeBanners: homeBanners.build(),
               homeNotices: _homeNotices?.build(),
               admissionList: _admissionList?.build(),
               hasNewVersion: hasNewVersion,
               newVersionData: _newVersionData?.build(),
+              allTradePairs: allTradePairs.build(),
               hasWallet: BuiltValueNullFieldError.checkNotNull(
                   hasWallet, 'HomePageVM', 'hasWallet'),
               communityConfig: _communityConfig?.build(),
@@ -455,17 +486,19 @@ class HomePageVMBuilder implements Builder<HomePageVM, HomePageVMBuilder> {
                   doCheckLanguage, 'HomePageVM', 'doCheckLanguage'),
               doChangeLanguage: BuiltValueNullFieldError.checkNotNull(
                   doChangeLanguage, 'HomePageVM', 'doChangeLanguage'),
+              doChangeTradePair: BuiltValueNullFieldError.checkNotNull(
+                  doChangeTradePair, 'HomePageVM', 'doChangeTradePair'),
               doRefreshHomeData: BuiltValueNullFieldError.checkNotNull(
                   doRefreshHomeData, 'HomePageVM', 'doRefreshHomeData'),
-              doRefreshCommunity: BuiltValueNullFieldError.checkNotNull(
-                  doRefreshCommunity, 'HomePageVM', 'doRefreshCommunity'));
+              doRefreshCommunity:
+                  BuiltValueNullFieldError.checkNotNull(doRefreshCommunity, 'HomePageVM', 'doRefreshCommunity'));
     } catch (_) {
       late String _$failedField;
       try {
         _$failedField = 'homePrices';
-        _homePrices?.build();
+        homePrices.build();
         _$failedField = 'homeBanners';
-        _homeBanners?.build();
+        homeBanners.build();
         _$failedField = 'homeNotices';
         _homeNotices?.build();
         _$failedField = 'admissionList';
@@ -473,6 +506,8 @@ class HomePageVMBuilder implements Builder<HomePageVM, HomePageVMBuilder> {
 
         _$failedField = 'newVersionData';
         _newVersionData?.build();
+        _$failedField = 'allTradePairs';
+        allTradePairs.build();
 
         _$failedField = 'communityConfig';
         _communityConfig?.build();
@@ -497,7 +532,7 @@ class _$HomeBanner extends HomeBanner {
   @override
   final String? content;
   @override
-  final String? img;
+  final String img;
   @override
   final String? bgImg;
   String? __imageUrl;
@@ -506,8 +541,15 @@ class _$HomeBanner extends HomeBanner {
       (new HomeBannerBuilder()..update(updates))._build();
 
   _$HomeBanner._(
-      {this.id, this.type, this.title, this.content, this.img, this.bgImg})
-      : super._();
+      {this.id,
+      this.type,
+      this.title,
+      this.content,
+      required this.img,
+      this.bgImg})
+      : super._() {
+    BuiltValueNullFieldError.checkNotNull(img, 'HomeBanner', 'img');
+  }
 
   @override
   String get imageUrl => __imageUrl ??= super.imageUrl;
@@ -618,7 +660,8 @@ class HomeBannerBuilder implements Builder<HomeBanner, HomeBannerBuilder> {
             type: type,
             title: title,
             content: content,
-            img: img,
+            img:
+                BuiltValueNullFieldError.checkNotNull(img, 'HomeBanner', 'img'),
             bgImg: bgImg);
     replace(_$result);
     return _$result;

@@ -15,7 +15,7 @@ class HomeRepository {
     return _api.getBanners();
   }
 
-  Future<List<Map<String, dynamic>>> getQuotations({
+  Future<List<dynamic>> getQuotations({
     required String marketId,
     required int timestamp,
   }) async {

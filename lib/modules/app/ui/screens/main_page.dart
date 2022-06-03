@@ -52,8 +52,8 @@ class AppMainPage extends HookWidget {
 
   final tabBarItems = [
     TabBarItem(
-      //HomeMainTab(),
-      Center(),
+      HomeMainTab(),
+      //Center(),
       'global:main_tab_home',
       '',
       '',

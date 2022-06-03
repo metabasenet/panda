@@ -29,11 +29,11 @@ class HomeActionGetBanners extends _BaseAction {
 class HomeActionGetQuotations extends _BaseAction {
   @override
   Future<AppState?> reduce() async {
-    final json = await HomeRepository().getQuotations(
+    final result = await HomeRepository().getQuotations(
       marketId: 'USDT',
       timestamp: 0,
     );
-    final list = deserializeListOf<AssetPrice>(json);
+    final list = deserializeListOf<AssetPrice>(result);
     return state.rebuild(
       (a) => a..homeState.homePrices.replace(list),
     );
