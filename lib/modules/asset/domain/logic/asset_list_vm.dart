@@ -11,10 +11,10 @@ abstract class AssetListVM implements Built<AssetListVM, AssetListVMBuilder> {
   bool get isBalanceUpdating;
 
   List<Wallet> get wallets;
-  @nullable
-  bool get hasWallet;
-  @nullable
-  Wallet get activeWallet;
+  //@nullable
+  bool? get hasWallet;
+  //@nullable
+  Wallet? get activeWallet;
   String get activeWalletId;
   WalletStatus get activeWalletStatus;
 
@@ -46,33 +46,34 @@ abstract class AssetListVM implements Built<AssetListVM, AssetListVMBuilder> {
 
     return AssetListVM(
       (viewModel) => viewModel
-        ..fiatCurrency = store.state.commonState.fiatCurrency ?? ''
-        ..wallets = store.state.walletState.wallets ?? []
+        ..fiatCurrency = store.state.commonState.fiatCurrency
+        ..wallets = store.state.walletState.wallets
         ..hasWallet = store.state.walletState.hasWallet
         ..activeWallet = store.state.walletState.activeWallet
-        ..activeWalletId = store.state.walletState.activeWalletId ?? ''
-        ..activeWalletStatus =
-            store.state.walletState.activeWalletStatus ?? WalletStatus.loading
+        ..activeWalletId = store.state.walletState.activeWalletId
+        ..activeWalletStatus = store.state.walletState.activeWalletStatus
         ..coins = ListBuilder(assetState.coins)
-        ..isBalanceUpdating = store.state.assetState.isBalanceUpdating ?? false
+        ..isBalanceUpdating = store.state.assetState.isBalanceUpdating
         ..doRefreshList = () {
           return Future.wait([
+            store.dispatchAsync(AssetActionUpdatePrices(
+              store.state.commonState.fiatCurrency ?? '',
+            )),
             if (store.state.assetState.isBalanceUpdating != true)
-              store.dispatchFuture(
-                AssetActionUpdateWalletBalances(
-                  wallet: store.state.walletState.activeWallet,
+              Future.value(
+                () => store.dispatch(
+                  AssetActionUpdateWalletBalances(
+                    wallet: store.state.walletState.activeWallet!,
+                  ),
                 ),
               ),
-            store.dispatchFuture(AssetActionUpdatePrices(
-              store.state.commonState.fiatCurrency,
-            )),
           ]);
         }
         ..doSwitchWallet = (wallet) {
-          return store.dispatchFuture(AppActionLoadWallet(wallet));
+          return store.dispatchAsync(AppActionLoadWallet(wallet));
         }
         ..doSyncWallet = (wallet) {
-          return store.dispatchFuture(WalletActionWalletRegister(
+          return store.dispatchAsync(WalletActionWalletRegister(
             wallet,
             withOptions: false,
           ));

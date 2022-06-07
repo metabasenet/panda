@@ -24,7 +24,9 @@ class WalletFeeBalanceLowError extends Error {}
 /// Error when trying to create an order with amount bigger then approve balance
 class WalletApproveBalanceLowError extends Error {}
 
-Object parseWalletError(dynamic error, [Completer completer]) {
+Object? parseWalletError(dynamic error, [Completer? completer]) {
+  return 'err';
+  /*
   final responseError = Request().getResponseError(error);
   final textError = error?.toString() ?? '';
   var resultError = error;
@@ -48,6 +50,7 @@ Object parseWalletError(dynamic error, [Completer completer]) {
   } else if (textError.contains('SignMsgError')) {
     resultError = WalletSignMsgError();
   }
-  completer?.completeError(resultError);
+  completer?.completeError(resultError as Object);
   return resultError;
+  */
 }

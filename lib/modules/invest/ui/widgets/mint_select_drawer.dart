@@ -2,9 +2,9 @@ part of invest_ui_module;
 
 class MintSelectDrawer extends StatelessWidget {
   const MintSelectDrawer({
-    @required this.mints,
-    @required this.activeMintId,
-    @required this.onLoadMint,
+    required this.mints,
+    required this.activeMintId,
+    required this.onLoadMint,
   });
 
   final List<MintItem> mints;
@@ -36,14 +36,20 @@ class MintSelectDrawer extends StatelessWidget {
                     children: [
                       Text(
                         mintName,
-                        style: context.textBody(bold: true),
+                        style: context.textBody(
+                          bold: true,
+                          fontWeight: FontWeight.normal,
+                        ),
                       )
                     ],
                   ),
                   SizedBox(height: context.edgeSizeHalf),
                   Text(
                     'Make up',
-                    style: context.textSmall(),
+                    style: context.textSmall(
+                      bold: true,
+                      fontWeight: FontWeight.normal,
+                    ),
                   ),
                 ],
               ),

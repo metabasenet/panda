@@ -6,7 +6,6 @@ class AssetListPage extends StatelessWidget {
   final refreshController = CSRefresherController();
   final scrollController = ScrollController();
   final swiperController = SwiperController();
-  static AssetListVM assetListVM;
 
   Widget buildUpdatePrices(BuildContext context) {
     return Positioned(
@@ -34,6 +33,8 @@ class AssetListPage extends StatelessWidget {
                 tr('asset:list_lbl_updating'),
                 style: context.textSecondary(
                   color: context.whiteColor,
+                  bold: true,
+                  fontWeight: FontWeight.normal,
                 ),
               ),
             ],
@@ -64,7 +65,10 @@ class AssetListPage extends StatelessWidget {
               children: [
                 Text(
                   tr('asset:list_lbl_valuation'),
-                  style: context.textBody(bold: true),
+                  style: context.textBody(
+                    bold: true,
+                    fontWeight: FontWeight.normal,
+                  ),
                 ),
                 SizedBox(height: context.edgeSize),
                 PriceText(
@@ -93,7 +97,7 @@ class AssetListPage extends StatelessWidget {
       padding: EdgeInsets.zero,
       child: AssetWalletCard(
         fiatCurrency: viewModel.fiatCurrency,
-        wallet: viewModel.activeWallet,
+        wallet: viewModel.activeWallet!,
         walletStatus: viewModel.activeWalletStatus,
         onSync: (wallet) {
           LoadingDialog.show(context);
@@ -106,7 +110,7 @@ class AssetListPage extends StatelessWidget {
         onPressed: () {
           AssetWalletSelectPage.open().then((wallet) {
             if (wallet != null) {
-              viewModel.doSwitchWallet(wallet);
+              viewModel.doSwitchWallet(wallet as Wallet);
               // _ignoreIndexChange = true;
               // final index = viewModel.wallets.indexOf(wallet);
               // swiperController.move(index, animation: false).
@@ -195,7 +199,7 @@ class AssetListPage extends StatelessWidget {
                       (coin) => AssetListItem(
                         item: coin,
                         onPressed: () {
-                          if (viewModel.hasWallet) {
+                          if (viewModel.hasWallet ?? false) {
                             AssetDetailPage.open(coin);
                           } else {
                             Toast.show(tr('wallet:msg_create_wallet_tips'));
@@ -218,12 +222,14 @@ class AssetListPage extends StatelessWidget {
       hideLeading: true,
       titleCenter: false,
       title: tr('asset:list_title'),
-      titleStyle: context.textHuge(fontWeight: FontWeight.w700),
+      titleStyle: context.textHuge(
+        fontWeight: FontWeight.w700,
+        bold: true,
+      ),
       child: StoreConnector<AppState, AssetListVM>(
         distinct: true,
         converter: AssetListVM.fromStore,
-        onInitialBuild: (viewModel) {
-          assetListVM = viewModel;
+        onInitialBuild: (_, __, viewModel) {
           // _ignoreIndexChange = true;
           // swiperController
           //     .move(viewModel.wallets.indexOf(viewModel.activeWallet),
@@ -238,11 +244,6 @@ class AssetListPage extends StatelessWidget {
               scrollController: scrollController,
               onRefresh: () {
                 viewModel.doRefreshList().then((_) {
-                  //refresh data
-                  var srcRefresh =
-                      'window.dispatchEvent(new CustomEvent("Refresh",{"detail":"refresh"}));';
-                  TradeHomePage.webView.evaluateJavascript(source: srcRefresh);
-
                   refreshController.refreshCompleted();
                 }).catchError((_) {
                   refreshController.refreshFailed();

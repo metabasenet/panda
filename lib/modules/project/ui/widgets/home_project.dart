@@ -2,7 +2,7 @@ part of project_ui_module;
 
 class HomeProject extends HookWidget {
   const HomeProject({this.hasWallet});
-  final bool hasWallet;
+  final bool? hasWallet;
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +42,7 @@ class HomeProject extends HookWidget {
             name: tr('project:home_btn_create'),
             label: tr('project:home_lbl_create'),
             onPress: () {
-              if (hasWallet) {
+              if (hasWallet ?? false) {
                 ProjectApplyRulePage.open();
               } else {
                 Toast.show(tr('wallet:msg_create_wallet_need'));
@@ -58,10 +58,10 @@ class HomeProject extends HookWidget {
 
 Widget tableItem(
   BuildContext context, {
-  String image,
-  String name,
-  String label,
-  Function onPress,
+  required String image,
+  required String name,
+  required String label,
+  required Function onPress,
 }) {
   final width = (context.mediaWidth - 71) / 2;
   return InkWell(
@@ -88,7 +88,10 @@ Widget tableItem(
             children: [
               Text(
                 tr(name),
-                style: context.textBody(bold: true),
+                style: context.textBody(
+                  bold: true,
+                  fontWeight: FontWeight.normal,
+                ),
               ),
               Container(
                 padding: context.edgeTop5,
@@ -97,7 +100,10 @@ Widget tableItem(
                   tr(label),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: context.textSecondary(),
+                  style: context.textSecondary(
+                    bold: true,
+                    fontWeight: FontWeight.normal,
+                  ),
                   softWrap: false,
                 ),
               ),

@@ -3,7 +3,7 @@ part of wallet_ui_module;
 class WalletPathSelectPage extends HookWidget {
   static const routeName = '/wallet/path/select';
 
-  static Future<WalletPathConfig> open() {
+  static Future<WalletPathConfig?> open() {
     return AppNavigator.push<WalletPathConfig>(routeName);
   }
 
@@ -19,7 +19,7 @@ class WalletPathSelectPage extends HookWidget {
       margin: context.edgeAll.copyWith(top: 0),
       padding: EdgeInsets.zero,
       child: FormCell(
-        label: item.transKey != null ? tr(item.transKey) : item.name,
+        label: item.transKey != null ? tr(item.transKey ?? '') : item.name,
         cmpLeft: Padding(
           padding: context.edgeRight8,
           child: CSImage(
@@ -58,12 +58,20 @@ class WalletPathSelectPage extends HookWidget {
                 children: [
                   Text(
                     tr('wallet:select_path_tip'),
-                    style: context.textSecondary(),
+                    style: context.textSecondary(
+                      bold: false,
+                      fontWeight: FontWeight.normal,
+                    ),
                   ),
                   CSButton(
                     label: tr('wallet:select_path_btn_contact_us'),
                     flat: true,
-                    textStyle: context.textSecondary().copyWith(
+                    textStyle: context
+                        .textSecondary(
+                          bold: false,
+                          fontWeight: FontWeight.normal,
+                        )
+                        .copyWith(
                           decoration: TextDecoration.underline,
                         ),
                     onPressed: () {

@@ -26,16 +26,14 @@ class _AssetDposDetail extends State<AssetDposDetail> {
   String compoundInterestAddress = '';
   String superNodeAddress = '';
   String superNodeName = '';
-  String addressBalance = '';
-  String locked = '';
-  String investedAmount = '';
+  String? addressBalance;
   dynamic nonce;
   //dynamic gas_price;
   //dynamic gas_limit;
   dynamic status = 1;
   dynamic txData;
   final myController = TextEditingController();
-  String hex;
+  late String hex;
   Widget buildFooter(BuildContext context, AssetWithdrawVM viewModel) {
     return Container(
       color: context.bgPrimaryColor,
@@ -79,12 +77,11 @@ class _AssetDposDetail extends State<AssetDposDetail> {
       context,
       (password) => viewModel.doUnlockWallet(password),
       (walletData, _) async {
-        WalletActionMNTTxSubmit.reduceDpos(txData, walletData.mnemonic)
+        WalletActionMNTTxSubmit.reduceDpos(txData, walletData.mnemonic!)
             .then((res) {
-          //print('ddd $res');
-          AssetRepository()
-              .submitTransaction(hex: res.toString())
-              .then((hexRes) => {AppNavigator.goBack()});
+          //AssetRepository()
+          //    .submitTransaction(hex: res.toString())
+          //    .then((hexRes) => {AppNavigator.goBack()});
         });
       },
     );
@@ -97,16 +94,7 @@ class _AssetDposDetail extends State<AssetDposDetail> {
       superNodeAddress = widget.voteNodeItem['address'].toString();
       superNodeName = widget.voteNodeItem['name'].toString();
       addressBalance = widget.coinInfo.balance.toString();
-      locked = widget.coinInfo.locked == null
-          ? null
-          : widget.coinInfo.locked.toString();
     });
-    if ((addressBalance != null && addressBalance.isNotEmpty) &&
-        (locked != null && locked.isNotEmpty)) {
-      investedAmount = (Decimal.parse(addressBalance) + Decimal.parse(locked))
-          .toStringAsFixed(6);
-    }
-
     getVoteAddress();
     getCompoundInterestAddress();
     fetchNosData();
@@ -132,20 +120,18 @@ class _AssetDposDetail extends State<AssetDposDetail> {
       'gaslimit': '20000',
       'data': '01010146$hex'
     };
-    final ret = getTx(params);
+    final ret = getTx(params as Map<String, Object>);
     setState(() {
       txData = ret;
     });
   }
 
-  //获取投票地址
   void getVoteAddress() {
-    print('ddddd ${widget.coinInfo} ${widget.voteNodeItem}');
-    final ret = getVote(widget.voteNodeItem['address'].toString(),
-        widget.coinInfo.address.toString(), 1);
+    //final ret = getVote(widget.voteNodeItem['address'].toString(),
+    //    widget.coinInfo.address.toString(), 1);
     setState(() {
-      nodeAddress = ret['address'].toString();
-      hex = ret['hex'].toString();
+      //nodeAddress = ret['address'].toString();
+      //hex = ret['hex'].toString();
     });
   }
 
@@ -160,14 +146,14 @@ class _AssetDposDetail extends State<AssetDposDetail> {
 
   // 获取nonce
   void fetchNosData() async {
-    var res = await AssetRepository().getTransactionFee(
-        address: widget.coinInfo.address.toString(), symbol: '');
+    //var res = await AssetRepository().getTransactionFee(
+    //    address: widget.coinInfo.address.toString(), symbol: '');
     setState(() {
-      nonce = res['nonce'] + 1;
+      //nonce = res['nonce'] + 1;
       //gas_price = res['gas_price'];
       //gas_limit = res['gas_limit'];
     });
-    print('获取的nonce $res');
+    //print('nonce $res');
   }
 
   @override
@@ -180,7 +166,7 @@ class _AssetDposDetail extends State<AssetDposDetail> {
       child: StoreConnector<AppState, AssetWithdrawVM>(
         distinct: true,
         converter: AssetWithdrawVM.fromStore,
-        onInitialBuild: (viewModel) {},
+        onInitialBuild: (_, __, viewModel) {},
         builder: (context, viewModel) => Column(
           children: [
             Form(
@@ -215,7 +201,11 @@ class _AssetDposDetail extends State<AssetDposDetail> {
                         // label: tr('asset:withdraw_btn_address'),
                         height: 30,
                         textStyle: context
-                            .textBody(color: context.placeholderColor)
+                            .textBody(
+                              color: context.placeholderColor,
+                              bold: true,
+                              fontWeight: FontWeight.normal,
+                            )
                             .copyWith(
                               decoration: TextDecoration.underline,
                             ),
@@ -235,7 +225,7 @@ class _AssetDposDetail extends State<AssetDposDetail> {
                     //超级节点名称
                     type: FormBoxType.inputText,
 //                    title: tr('asset:withdraw_lbl_address'),
-                    title: tr('asset:super_node_name'), //超级节点地址
+                    title: tr('asset:super_node_name'),
                     // iconName: CSIcons.Scan,
                     // iconColor: context.bodyColor,
                     readOnly: true,
@@ -250,7 +240,11 @@ class _AssetDposDetail extends State<AssetDposDetail> {
                         // label: tr('asset:withdraw_btn_address'),
                         height: 30,
                         textStyle: context
-                            .textBody(color: context.placeholderColor)
+                            .textBody(
+                              color: context.placeholderColor,
+                              bold: true,
+                              fontWeight: FontWeight.normal,
+                            )
                             .copyWith(
                               decoration: TextDecoration.underline,
                             ),
@@ -266,19 +260,29 @@ class _AssetDposDetail extends State<AssetDposDetail> {
                       }
                     },
                   ),
-                  //Available amount
                   FormBox(
                     type: FormBoxType.inputText,
-                    title: tr('asset:amount_of_votes'),
+//                    title: tr('asset:withdraw_lbl_address'),
+                    title: tr('asset:amount_of_votes'), //Voting amount
+                    // iconName: CSIcons.Scan,
+                    // iconColor: context.bodyColor,
                     readOnly: true,
-                    onPressIcon: () {},
-                    hintText: tr(addressBalance),
+                    onPressIcon: () {
+//                      handleOpenAddressScan(viewModel);
+                    },
+//                    controller: address,
+                    hintText: addressBalance,
                     titleAction: Transform.translate(
                       offset: Offset(context.edgeSize, 0),
                       child: CSButton(
+                        // label: tr('asset:withdraw_btn_address'),
                         height: 30,
                         textStyle: context
-                            .textBody(color: context.placeholderColor)
+                            .textBody(
+                              color: context.placeholderColor,
+                              bold: true,
+                              fontWeight: FontWeight.normal,
+                            )
                             .copyWith(
                               decoration: TextDecoration.underline,
                             ),
@@ -292,59 +296,6 @@ class _AssetDposDetail extends State<AssetDposDetail> {
                       if (!hasFocus) {
 //                        handleChangeAddress(viewModel);
                       }
-                    },
-                  ),
-
-                  //Invested amount
-                  FormBox(
-                    type: FormBoxType.inputText,
-                    title: tr('asset:amount_of_amountvoted'),
-                    readOnly: true,
-                    onPressIcon: () {},
-                    hintText: tr(investedAmount),
-                    titleAction: Transform.translate(
-                      offset: Offset(context.edgeSize, 0),
-                      child: CSButton(
-                        height: 30,
-                        textStyle: context
-                            .textBody(color: context.placeholderColor)
-                            .copyWith(
-                              decoration: TextDecoration.underline,
-                            ),
-                        autoWidth: true,
-                        backgroundColor: Colors.transparent,
-                        onPressed: () {},
-                      ),
-                    ),
-                    maxLines: null,
-                    onFocusChanged: (hasFocus) {
-                      if (!hasFocus) {}
-                    },
-                  ),
-                  //locked amount
-                  FormBox(
-                    type: FormBoxType.inputText,
-                    title: tr('asset:amount_of_locked'),
-                    readOnly: true,
-                    onPressIcon: () {},
-                    hintText: tr(locked),
-                    titleAction: Transform.translate(
-                      offset: Offset(context.edgeSize, 0),
-                      child: CSButton(
-                        height: 30,
-                        textStyle: context
-                            .textBody(color: context.placeholderColor)
-                            .copyWith(
-                              decoration: TextDecoration.underline,
-                            ),
-                        autoWidth: true,
-                        backgroundColor: Colors.transparent,
-                        onPressed: () {},
-                      ),
-                    ),
-                    maxLines: null,
-                    onFocusChanged: (hasFocus) {
-                      if (!hasFocus) {}
                     },
                   ),
 
@@ -412,7 +363,11 @@ class _AssetDposDetail extends State<AssetDposDetail> {
               padding: context.edgeAll20,
               child: Text(
                 tr('asset:withdraw_msg_attention'),
-                style: context.textSecondary(color: context.redColor),
+                style: context.textSecondary(
+                  color: context.redColor,
+                  bold: true,
+                  fontWeight: FontWeight.normal,
+                ),
                 textAlign: TextAlign.center,
               ),
             ),

@@ -28,35 +28,36 @@ class CrashesReport {
   static final CrashesReport _instance = CrashesReport._internal();
 
   // Fields
-  SentryClient _sentry;
-  PackageInfo _appInfo;
-  DeviceInfo _deviceInfo;
+  late SentryClient _sentry;
+  late PackageInfo _appInfo;
+  late DeviceInfo _deviceInfo;
 
   static FutureOr<void> getSentryOptions(SentryFlutterOptions options) {
     options.dsn = AppConstants.sentryDns;
     options.environment = AppConstants.isBeta ? 'beta' : 'production';
     // options.debug = AppConstants.isBeta;
     options.beforeSend = (event, {hint}) {
-      if (kDebugMode ||
-          _ignoreErrors
-              .where((text) => event.exception?.value?.contains(text))
-              .isNotEmpty) {
-        dev.log(
-          'Report: Ignore error',
-          error: event.toJson(),
-          name: 'CrashesReport',
-        );
-        return null;
-      }
+      //if (kDebugMode ||
+      //    _ignoreErrors
+      //        .where((text) => event.exceptions?.contains(text))
+      //        .isNotEmpty) {
+      //  dev.log(
+      //    'Report: Ignore error',
+      //    error: event.toJson(),
+      //    name: 'CrashesReport',
+      //  );
+      //  return null;
+      //}
       return event;
     };
   }
 
   Future<Contexts> getAppContexts() async {
-    _appInfo = _appInfo ?? await PlatformUtils.getAppInfo();
-    _deviceInfo = _deviceInfo ?? await PlatformUtils.getDeviceInfo();
+    _appInfo = _appInfo; // await PlatformUtils.getAppInfo();
+    _deviceInfo = _deviceInfo;
 
     return Contexts(
+        /*
       operatingSystem: OperatingSystem(
         name: _deviceInfo.osName,
         version: _deviceInfo.osVersion,
@@ -77,8 +78,8 @@ class CrashesReport {
         manufacturer: _deviceInfo.manufacturer,
         bootTime: DateTime.now().toUtc(),
         timezone: DateTime.now().timeZoneName,
-      ),
-    );
+      ),*/
+        );
   }
 
   /// Reports [error] along with its [stackTrace] to Sentry.io.
@@ -86,7 +87,7 @@ class CrashesReport {
     String name,
     dynamic error,
     StackTrace stackTrace, [
-    Map<String, String> extra,
+    Map<String, String>? extra,
   ]) async {
     // Errors thrown in development mode are unlikely to be interesting. You can
     // check if you are running in dev mode using an assertion and omit sending
@@ -137,12 +138,12 @@ class CrashesReport {
       'fatal': true,
       'processName': AppConstants.appName,
       'device': {
-        'sdkVersion': osInfo.kernelVersion,
-        'osName': osInfo.name,
-        'osVersion': osInfo.version,
-        'model': deviceInfo.model,
-        'appVersion': appInfo.version,
-        'appBuild': appInfo.build,
+        'sdkVersion': osInfo?.kernelVersion,
+        'osName': osInfo?.name,
+        'osVersion': osInfo?.version,
+        'model': deviceInfo?.model,
+        'appVersion': appInfo?.version,
+        'appBuild': appInfo?.build,
         'appIsBeta': AppConstants.isBeta,
         'appReleaseId': AppConstants.buildId,
         'appCodeVersion': AppConstants.codeVersion,
@@ -152,8 +153,8 @@ class CrashesReport {
       'userId': _deviceInfo.deviceId,
       'exception': {
         'type': 'Exception',
-        'message': event.exception.toString(),
-        'stackTrace': event.stackTrace?.toString(),
+        'message': event.exceptions.toString(),
+        'stackTrace': event.toString(),
       }
     };
 

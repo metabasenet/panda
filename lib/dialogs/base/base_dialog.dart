@@ -2,7 +2,7 @@ part of dialogs;
 
 class CSBaseDialog extends StatelessWidget {
   const CSBaseDialog({
-    Key key,
+    Key? key,
     this.contentWidget,
     this.cancelBtnText = 'cancel',
     this.confirmBtnText = 'confirm',
@@ -19,46 +19,46 @@ class CSBaseDialog extends StatelessWidget {
   }) : super(key: key);
 
   /// 弹窗内容
-  final Widget contentWidget;
+  final Widget? contentWidget;
 
   /// 取消按钮
   final String cancelBtnText;
 
   /// 确认按钮
   final String confirmBtnText;
-  final TextStyle cancelBtnStyle;
-  final TextStyle confirmBtnStyle;
+  final TextStyle? cancelBtnStyle;
+  final TextStyle? confirmBtnStyle;
 
   /// 点击背景以及返回键 关闭弹框
   final bool dismissOnBgClick;
   final bool dismissOnConfirm;
 
   /// 弹窗关闭回调
-  final void Function() onDismiss;
+  final void Function()? onDismiss;
 
   /// 弹窗关闭回调
-  final void Function() onCancel;
+  final void Function()? onCancel;
 
   /// 弹窗关闭回调
-  final void Function() onConfirm;
+  final void Function()? onConfirm;
 
   final bool hideCancel;
   final bool hideConfirm;
 
-  final int confirmTimeout;
+  final int? confirmTimeout;
 
   void handleConfirm() {
     if (dismissOnConfirm) {
       dismiss();
     }
     if (onConfirm != null) {
-      onConfirm();
+      onConfirm!();
     }
   }
 
   void handleCancel() {
     if (onCancel != null) {
-      onCancel();
+      onCancel!();
     }
     dismiss();
   }
@@ -66,7 +66,7 @@ class CSBaseDialog extends StatelessWidget {
   void dismiss() {
     AppNavigator.goBack();
     if (onDismiss != null) {
-      onDismiss();
+      onDismiss!();
     }
   }
 
@@ -89,7 +89,7 @@ class CSBaseDialog extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                contentWidget,
+                contentWidget!,
                 Padding(
                   padding: context.edgeAll,
                   child: Row(
@@ -113,7 +113,7 @@ class CSBaseDialog extends StatelessWidget {
                                   countdown: confirmTimeout,
                                   btnText: confirmBtnText,
                                   btnColor: confirmBtnStyle != null
-                                      ? confirmBtnStyle.color
+                                      ? confirmBtnStyle!.color
                                       : context.bodyColor,
                                 )
                               : CSButton(

@@ -5,7 +5,8 @@ class AssetActionAddTransaction extends _BaseAction {
   final Transaction transaction;
 
   @override
-  Future<AppState> reduce() async {
+  Future<AppState?> reduce() async {
+    /*
     final allTransactions = await AssetRepository().getTransactionsFromCache(
       symbol: transaction.symbol,
       address: transaction.fromAddress,
@@ -20,19 +21,19 @@ class AssetActionAddTransaction extends _BaseAction {
     );
 
     GetIt.I<AssetTransactionCubit>().updateList(allTransactions);
-
+    */
     return null;
   }
 }
 
 class AssetActionGetSingleTransaction extends _BaseAction {
   AssetActionGetSingleTransaction({
-    @required this.chain,
-    @required this.symbol,
-    @required this.chainPrecision,
-    @required this.txId,
-    @required this.fromAddress,
-    @required this.completer,
+    required this.chain,
+    required this.symbol,
+    required this.chainPrecision,
+    required this.txId,
+    required this.fromAddress,
+    required this.completer,
   });
 
   final String chain;
@@ -43,9 +44,9 @@ class AssetActionGetSingleTransaction extends _BaseAction {
   final Completer<Transaction> completer;
 
   @override
-  Future<AppState> reduce() async {
+  Future<AppState?> reduce() async {
     final walletId = store.state.walletState.activeWalletId;
-
+    /*
     bool isFailed = false;
     Transaction newTransaction;
     try {
@@ -107,13 +108,13 @@ class AssetActionGetSingleTransaction extends _BaseAction {
     );
 
     GetIt.I<AssetTransactionCubit>().updateList(cachedTransactions);
-
+    */
     return null;
   }
 
   @override
-  Object wrapError(dynamic error) {
-    completer.completeError(error);
+  Object? wrapError(dynamic error) {
+    completer.completeError(error as Object);
     return error;
   }
 }

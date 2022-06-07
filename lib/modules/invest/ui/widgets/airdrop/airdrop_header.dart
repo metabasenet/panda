@@ -1,7 +1,7 @@
 part of invest_ui_module;
 
 class AirdropHeader extends StatelessWidget {
-  const AirdropHeader({Key key}) : super(key: key);
+  const AirdropHeader({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -19,6 +19,7 @@ class AirdropHeader extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: context.textBody(
                   bold: true,
+                  fontWeight: FontWeight.normal,
                   color: Color(0xFF4e4c41),
                 ),
               ),
@@ -49,6 +50,7 @@ class AirdropHeader extends StatelessWidget {
                   tr('invest:airdrop_lbl_tips'),
                   style: context.textSmall(
                     bold: true,
+                    fontWeight: FontWeight.normal,
                     color: Color(0xFFfff091),
                   ),
                 ),
@@ -78,6 +80,8 @@ class AirdropHeader extends StatelessWidget {
                   maxLines: 2,
                   softWrap: true,
                   style: context.textSmall(
+                    bold: true,
+                    fontWeight: FontWeight.normal,
                     color: Color(0xFF94820d),
                   ),
                 ),

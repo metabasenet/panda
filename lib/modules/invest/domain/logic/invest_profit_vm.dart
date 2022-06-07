@@ -11,32 +11,39 @@ abstract class InvestProfitVM
 
   bool get hasWallet;
 
-  @nullable
-  MintItem get activeMint;
+  //@nullable
+  MintItem? get activeMint;
 
   BuiltList<ProfitRecordItem> get profitRecordList;
 
   @BuiltValueField(compare: false)
-  AssetCoin Function({String chain, String symbol}) get getCoinInfo;
+  AssetCoin Function({
+    required String chain,
+    required String symbol,
+  }) get getCoinInfo;
 
   @BuiltValueField(compare: false)
-  Future<int> Function({bool isRefresh, int skip, int take})
-      get getProfitRecordList;
+  Future<int> Function({
+    required bool isRefresh,
+    required int skip,
+    required int take,
+  }) get getProfitRecordList;
 
   static InvestProfitVM fromStore(Store<AppState> store) {
     return InvestProfitVM((viewModel) => viewModel
       ..hasWallet = store.state.walletState.hasWallet
       ..activeMint = store.state.investState.activeMint?.toBuilder()
-      ..profitRecordList = store.state.investState.profitRecordList?.toBuilder()
-      ..getCoinInfo = ({chain, symbol}) {
+      ..profitRecordList = store.state.investState.profitRecordList.toBuilder()
+      ..getCoinInfo = ({required chain, required symbol}) {
         return VMWithWalletGetCoinInfoImplement.getCoinInfo(
           store,
           chain: chain,
           symbol: symbol,
         );
       }
-      ..getProfitRecordList = ({isRefresh, skip, take}) async {
-        await store.dispatchFuture(InvestActionGetProfitRecordList(
+      ..getProfitRecordList =
+          ({required isRefresh, required skip, required take}) async {
+        await store.dispatchAsync(InvestActionGetProfitRecordList(
           isRefresh: isRefresh,
           skip: skip,
           take: take,

@@ -3,12 +3,12 @@ part of project_ui_module;
 class ProjectApplyCreatePage extends HookWidget {
   ProjectApplyCreatePage(
     this.defaultCreateParams, {
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   static const routeName = '/project/apply/create';
 
-  static void open(ProjectCreateParams createParams, {bool replace}) {
+  static void open(ProjectCreateParams createParams, {required bool replace}) {
     AppNavigator.push(
       routeName,
       params: createParams,
@@ -73,7 +73,7 @@ class ProjectApplyCreatePage extends HookWidget {
     }
 
     void doNext() {
-      final isValid = formKey.currentState.validate();
+      final isValid = formKey.currentState!.validate();
 
       if (!autovalidate.value) {
         autovalidate.value = true;
@@ -83,7 +83,7 @@ class ProjectApplyCreatePage extends HookWidget {
         return;
       }
 
-      formKey.currentState.save();
+      formKey.currentState!.save();
 
       ProjectApplySubmitPage.open(getUpdatedProjectParams()).then((newParams) {
         createParamsState.value = newParams as ProjectCreateParams;
@@ -173,7 +173,10 @@ class ProjectApplyCreatePage extends HookWidget {
                   hintText: tr('project:create_input_price'),
                   iconWidget: Text(
                     'USDT',
-                    style: context.textBody(bold: true),
+                    style: context.textBody(
+                      bold: true,
+                      fontWeight: FontWeight.normal,
+                    ),
                   ),
                   inputFormatters: [
                     NumberTextInputFormatter(
@@ -192,7 +195,10 @@ class ProjectApplyCreatePage extends HookWidget {
                   hintText: tr('project:create_lbl_req_amount'),
                   iconWidget: Text(
                     tr('project:create_lbl_symbol'),
-                    style: context.textBody(bold: true),
+                    style: context.textBody(
+                      bold: true,
+                      fontWeight: FontWeight.normal,
+                    ),
                   ),
                   validator: RequiredValidator(
                     errorText: tr('project:create_lbl_req_amount'),

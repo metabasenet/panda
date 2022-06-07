@@ -1,6 +1,7 @@
 part of common_domain_module;
 
 class CommonApi {
+  /*
   Future<Map<String, Object>> getConfig() =>
       Request().getValue<Map<String, Object>>(
         '/v1/config',
@@ -48,4 +49,5 @@ class CommonApi {
       Request().getValue<List<dynamic>>(
         '/v1/config/advertising/$type',
       );
+  */
 }

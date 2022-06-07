@@ -2,29 +2,29 @@ part of community_ui_module;
 
 class CommunityQuickEntry extends StatelessWidget {
   const CommunityQuickEntry({
-    Key key,
+    Key? key,
     this.hasWallet,
     this.communityConfig,
   }) : super(key: key);
 
-  final bool hasWallet;
-  final CommunityConfig communityConfig;
+  final bool? hasWallet;
+  final CommunityConfig? communityConfig;
 
   @override
   Widget build(BuildContext context) {
     final currentLangCode = context.locale.languageCode;
     final isZh = currentLangCode == 'zh';
     final items = communityConfig != null
-        ? communityConfig.types
+        ? communityConfig?.types!
             .where((info) => info.homeQuickEntry != 'off')
             .toList()
         : <CommunityInfo>[];
     final firstLine =
-        isZh ? items : items.sublist(0, items.length > 3 ? 3 : items.length);
+        isZh ? items : items?.sublist(0, items.length > 3 ? 3 : items.length);
     final secondLine = isZh
         ? <CommunityInfo>[]
-        : items.length > 3
-            ? items.sublist(3)
+        : (items?.length ?? 0) > 3
+            ? items?.sublist(3)
             : <CommunityInfo>[];
 
     void handleJoin(CommunityTeamVM viewModel, CommunityInfo info) {
@@ -39,7 +39,7 @@ class CommunityQuickEntry extends StatelessWidget {
     }
 
     void openNewPage(CommunityTeamVM viewModel, CommunityInfo info) {
-      if (hasWallet) {
+      if (hasWallet ?? false) {
         if (info == null) {
           return;
         }
@@ -65,13 +65,13 @@ class CommunityQuickEntry extends StatelessWidget {
       converter: CommunityTeamVM.fromStore,
       builder: (context, viewModel) => Column(
         children: [
-          if (firstLine.isNotEmpty)
+          if (firstLine?.isNotEmpty ?? false)
             SizedBox(
               height: 60,
               child: ListView(
                 scrollDirection: Axis.horizontal,
                 children: [
-                  ...firstLine.map(
+                  ...firstLine!.map(
                     (info) => buildQuickEntry(
                       context,
                       name: tr(CommunityUtils.getEntryTransKey(info.teamType)),
@@ -85,13 +85,13 @@ class CommunityQuickEntry extends StatelessWidget {
                 ],
               ),
             ),
-          if (secondLine.isNotEmpty)
+          if (secondLine?.isNotEmpty ?? false)
             SizedBox(
               height: 60,
               child: ListView(
                 scrollDirection: Axis.horizontal,
                 children: [
-                  ...secondLine.map(
+                  ...secondLine!.map(
                     (info) => buildQuickEntry(
                       context,
                       name: tr(CommunityUtils.getEntryTransKey(info.teamType)),
@@ -113,14 +113,13 @@ class CommunityQuickEntry extends StatelessWidget {
 
 Widget buildQuickEntry(
   BuildContext context, {
-  String name,
-  void Function() onPress,
-  IconData icon,
+  String? name,
+  void Function()? onPress,
+  IconData? icon,
 }) {
   return CSContainer(
     onTap: onPress,
     height: 48,
-    width: null,
     margin: context.edgeAll.copyWith(
       right: 0,
       top: 0,
@@ -136,8 +135,12 @@ Widget buildQuickEntry(
         Padding(
           padding: EdgeInsets.only(left: 6),
           child: Text(
-            name,
-            style: context.textSecondary(color: context.bodyColor),
+            name ?? '',
+            style: context.textSecondary(
+              color: context.bodyColor,
+              fontWeight: FontWeight.normal,
+              bold: true,
+            ),
           ),
         ),
       ],

@@ -2,9 +2,9 @@ part of wallet_domain_module;
 
 class WalletFeeUtils {
   static List<MapEntry<String, String>> getFeeOptions({
-    @required String chain,
-    @required ConfigCoinFee configCoinFee,
-    @required WalletWithdrawFeeData defaultFee,
+    required String chain,
+    required ConfigCoinFee configCoinFee,
+    required WalletWithdrawFeeData defaultFee,
   }) {
     final List<MapEntry<String, String>> feeOptions = [];
     switch (chain) {
@@ -15,7 +15,7 @@ class WalletFeeUtils {
               defaultFee.feeRate,
               ratio == 0 ? 1 : ratio,
             );
-            feeOptions.add(MapEntry(level, getBTCFeeRate(satoshi)));
+            feeOptions.add(MapEntry(level, getBTCFeeRate(satoshi ?? 0)));
           },
         );
         break;
@@ -26,7 +26,7 @@ class WalletFeeUtils {
               defaultFee.gasPrice,
               ratio == 0 ? 1 : ratio,
             );
-            feeOptions.add(MapEntry(level, getETHFeeRate(gasPrice)));
+            feeOptions.add(MapEntry(level, getETHFeeRate(gasPrice ?? 0)));
           },
         );
         break;
@@ -36,7 +36,7 @@ class WalletFeeUtils {
             defaultFee.feeRate,
             ratio == 0 ? 1 : ratio,
           );
-          feeOptions.add(MapEntry(level, getTRXFeeRate(sun)));
+          feeOptions.add(MapEntry(level, getTRXFeeRate(sun ?? 0)));
         });
         break;
       case AppConstants.mnt_chain:
@@ -46,7 +46,7 @@ class WalletFeeUtils {
               defaultFee.feeRate,
               ratio == 0 ? 1 : ratio,
             );
-            feeOptions.add(MapEntry(level, getMNTFeeRate(mnt)));
+            feeOptions.add(MapEntry(level, getMNTFeeRate(mnt ?? 0)));
           },
         );
         break;
@@ -68,9 +68,9 @@ class WalletFeeUtils {
 
   /// Return fee in ETH
   static double getETHFeeValue({
-    @required int gasPrice,
-    @required int gasLimit,
-    @required int chainPrecision,
+    required int gasPrice,
+    required int gasLimit,
+    required int chainPrecision,
   }) {
     final fee = NumberUtil.getIntAmountAsDouble(
       gasPrice * gasLimit,
@@ -85,8 +85,8 @@ class WalletFeeUtils {
 
   /// Return fee in TRX
   static double getTRXFeeValue({
-    @required int sun,
-    @required int chainPrecision,
+    required int sun,
+    required int chainPrecision,
   }) {
     return NumberUtil.truncateDecimal<double>(
       NumberUtil.getIntAmountAsDouble(sun, 6),
@@ -102,8 +102,8 @@ class WalletFeeUtils {
   }
 
   static double getMNTFeeValue({
-    @required double mnt,
-    @required int chainPrecision,
+    required double mnt,
+    required int chainPrecision,
   }) {
     return NumberUtil.truncateDecimal<double>(
       mnt,
@@ -118,8 +118,8 @@ class WalletFeeUtils {
 
   /// Return fee in BTC (Bitcoin)
   static Future<double> getBTCFeeValue({
-    @required int satoshi,
-    @required String fromAddress,
+    required int satoshi,
+    required String fromAddress,
   }) async {
     try {
       final unspent = await WalletRepository().getUnspentFromCache(
@@ -127,13 +127,13 @@ class WalletFeeUtils {
         address: fromAddress,
       );
       if (unspent == null || unspent.isEmpty) {
-        return null;
+        return 0;
       }
       final utxos = unspent
           .map((item) => {
                 'txId': item['tx_hash'],
                 'vOut': NumberUtil.getInt(item['tx_output_n']),
-                'vAmount': Decimal.parse('${item['value']}').toInt(),
+                'vAmount': Decimal.parse('${item['value']}').toBigInt().toInt(),
               })
           .toList();
       final feeInBtc = await WalletRepository().createBTCTransaction(
@@ -154,24 +154,24 @@ class WalletFeeUtils {
     }
   }
 
-  static Future<WalletWithdrawFeeData> getFeeData({
-    @required WalletWithdrawFeeData defaultFee,
-    @required AssetCoin coinInfo,
-    @required String level,
-    @required String fromAddress,
+  static Future<WalletWithdrawFeeData?> getFeeData({
+    required WalletWithdrawFeeData defaultFee,
+    required AssetCoin coinInfo,
+    required String level,
+    required String fromAddress,
   }) async {
     final configCoinFee = GetIt.I<CoinConfig>().getFeeLevel(
       chain: coinInfo.chain,
       symbol: coinInfo.symbol,
     );
     final ratio =
-        configCoinFee.level[level] == 0 ? 1.0 : configCoinFee.level[level];
+        configCoinFee!.level[level] == 0 ? 1.0 : configCoinFee.level[level];
 
     switch (coinInfo.chain) {
       case 'BTC':
         final satoshi = NumberUtil.multiply<int>(defaultFee.feeRate, ratio);
         final feeValue = await getBTCFeeValue(
-          satoshi: satoshi,
+          satoshi: satoshi!,
           fromAddress: fromAddress,
         );
         final feeRate = getBTCFeeRate(satoshi);
@@ -183,9 +183,9 @@ class WalletFeeUtils {
       case 'ETH':
         final gasPrice = NumberUtil.multiply<int>(defaultFee.gasPrice, ratio);
         final feeValue = getETHFeeValue(
-          gasPrice: gasPrice,
-          gasLimit: defaultFee.gasLimit,
-          chainPrecision: coinInfo.chainPrecision,
+          gasPrice: gasPrice!,
+          gasLimit: defaultFee.gasLimit!,
+          chainPrecision: coinInfo.chainPrecision ?? 0,
         );
         final feeRate = getETHFeeRate(gasPrice);
         return defaultFee.copyWith(
@@ -197,8 +197,8 @@ class WalletFeeUtils {
       case 'TRX':
         final sun = NumberUtil.multiply<int>(defaultFee.feeRate, ratio);
         final feeValue = getTRXFeeValue(
-          sun: sun,
-          chainPrecision: coinInfo.chainPrecision,
+          sun: sun!,
+          chainPrecision: coinInfo.chainPrecision ?? 0,
         );
         final feeRate = getTRXFeeRate(sun);
         return defaultFee.copyWith(
@@ -206,11 +206,12 @@ class WalletFeeUtils {
           feeValue: feeValue,
           feeRate: feeRate,
         );
+
       case AppConstants.mnt_chain:
         final mnt = NumberUtil.multiply<double>(defaultFee.feeRate, ratio);
         final feeValue = getMNTFeeValue(
-          mnt: mnt,
-          chainPrecision: coinInfo.chainPrecision,
+          mnt: mnt!,
+          chainPrecision: coinInfo.chainPrecision ?? 0,
         );
         final feeRate = getMNTFeeRate(mnt);
         return defaultFee.copyWith(

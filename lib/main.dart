@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 // Package imports:
 import 'package:async_redux/async_redux.dart';
 import 'package:flutter_flipperkit/flutter_flipperkit.dart';
+import 'package:flutter_dabank/flutter_dabank.dart';
+import 'package:flutter_dabank/dabank_window_manager.dart';
 
 // Project imports:
 import 'app.dart';
@@ -14,11 +16,10 @@ import 'routers/navigator.dart';
 import 'themes/themes.dart';
 import 'utils/utils.dart';
 
-Store<AppState> store;
+late Store<AppState> store;
 
 void main() {
   ensureFlutterBindingsInitialized();
-
   ThemeDisplay.setPortraitMode();
   ThemeStatusBar.setStatusBarStyle();
 

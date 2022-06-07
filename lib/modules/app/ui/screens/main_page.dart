@@ -11,7 +11,7 @@ class TabBarItem {
     this.isVisible = true,
   });
 
-  int index;
+  int? index;
   final Widget screen;
   final String label;
   final String iconDefault;
@@ -33,7 +33,7 @@ class AppMainPage extends HookWidget {
   }
 
   static void openDrawer() {
-    _scaffoldKey.currentState.openDrawer();
+    _scaffoldKey.currentState?.openDrawer();
   }
 
   static void open() {
@@ -53,6 +53,7 @@ class AppMainPage extends HookWidget {
   final tabBarItems = [
     TabBarItem(
       HomeMainTab(),
+      //Center(),
       'global:main_tab_home',
       '',
       '',
@@ -61,6 +62,7 @@ class AppMainPage extends HookWidget {
     ),
     TabBarItem(
       TradeMainTab(),
+      //Center(),
       'global:main_tab_trade',
       '',
       '',
@@ -68,7 +70,8 @@ class AppMainPage extends HookWidget {
       'Trading',
     ),
     TabBarItem(
-      AssetMainTab(),
+      //AssetMainTab(),
+      Center(),
       'global:main_tab_wallet',
       '',
       '',
@@ -77,7 +80,8 @@ class AppMainPage extends HookWidget {
     ),
     if (AppConstants.isBeta)
       TabBarItem(
-        InvestMainTab(),
+        //InvestMainTab(),
+        Center(),
         'global:main_tab_invest',
         '',
         '',
@@ -108,7 +112,7 @@ class AppMainPage extends HookWidget {
       child: InkWell(
         onTap: isVisible
             ? () {
-                onSelected(item.index);
+                onSelected(item.index ?? 0);
               }
             : null,
         child: AnimatedContainer(
@@ -128,7 +132,12 @@ class AppMainPage extends HookWidget {
                 padding: context.edgeHorizontal5.copyWith(top: 2),
                 child: Text(
                   tr(item.label),
-                  style: context.textSmall(color: color, bold: true),
+                  style: context.textSmall(
+                    color: color,
+                    bold: true,
+                    fontWeight: FontWeight.bold,
+                    lineHeight: 1,
+                  ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -154,7 +163,7 @@ class AppMainPage extends HookWidget {
       key: ValueKey(item.iconRive),
       onTap: () {
         Toast.hide();
-        onSelected(item.index);
+        onSelected(item.index ?? 0);
       },
       child: SizedBox(
         width: menuTabItemWidth,
@@ -173,7 +182,12 @@ class AppMainPage extends HookWidget {
               padding: context.edgeHorizontal5,
               child: Text(
                 tr(item.label),
-                style: context.textSmall(color: color, bold: true),
+                style: context.textSmall(
+                  color: color,
+                  bold: true,
+                  fontWeight: FontWeight.bold,
+                  lineHeight: 1,
+                ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -189,24 +203,30 @@ class AppMainPage extends HookWidget {
     final currentTab = useState(0);
     final backLastTime = useState(0);
 
-    useEffect(() {
-      tabBarItems.asMap().forEach((index, value) {
-        value.index = index;
-      });
-      final subTab = _tabChanger.stream.listen((tabIndex) {
-        currentTab.value =
-            tabIndex > tabBarItems.length ? tabBarItems.length : tabIndex;
-      });
-      return () {
-        subTab.cancel();
-      };
-    }, []);
+    useEffect(
+      () {
+        tabBarItems.asMap().forEach((index, value) {
+          value.index = index;
+        });
+        final subTab = _tabChanger.stream.listen((tabIndex) {
+          currentTab.value =
+              tabIndex > tabBarItems.length ? tabBarItems.length : tabIndex;
+        });
+        return () {
+          subTab.cancel();
+        };
+      },
+      [],
+    );
 
-    useEffect(() {
-      // When change language, force refresh
-      backLastTime.value = backLastTime.value - 1;
-      return null;
-    }, [context.locale.languageCode]);
+    useEffect(
+      () {
+        // When change language, force refresh
+        backLastTime.value = backLastTime.value - 1;
+        return null;
+      },
+      [context.locale.languageCode],
+    );
 
     return WillPopScope(
       onWillPop: () async {
@@ -228,12 +248,15 @@ class AppMainPage extends HookWidget {
             PageStorage(
               // key: pageKey,
               bucket: pageBucket,
-              child: IndexedStack(index: currentTab.value, children: [
-                tabBarItems[0].screen,
-                tabBarItems[1].screen,
-                tabBarItems[2].screen,
-                tabBarItems[3].screen
-              ]), //tabBarItems[currentTab.value].screen,
+              child: IndexedStack(
+                index: currentTab.value,
+                children: [
+                  tabBarItems[0].screen,
+                  tabBarItems[1].screen,
+                  tabBarItems[2].screen,
+                  tabBarItems[3].screen
+                ],
+              ), //tabBarItems[currentTab.value].screen,
             ),
             OfflineBuilder(
               builder: (context, status) => Positioned(
@@ -242,7 +265,7 @@ class AppMainPage extends HookWidget {
                 bottom: 40,
                 child: AnimatedSwitcher(
                   duration: Duration(milliseconds: 350),
-                  child: status.data // true if is offline
+                  child: status.data ?? false // true if is offline
                       ? Container(
                           height: 40,
                           width: 220,
@@ -256,6 +279,8 @@ class AppMainPage extends HookWidget {
                             tr('global:msg_app_offline'),
                             style: context.textSecondary(
                               color: context.whiteColor,
+                              bold: true,
+                              fontWeight: FontWeight.normal,
                             ),
                           ),
                         )
@@ -285,14 +310,16 @@ class AppMainPage extends HookWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: tabBarItems
-                  .map((item) => renderAnimatedTabItem(
-                        context,
-                        item,
-                        currentTab.value,
-                        (index) {
-                          currentTab.value = index;
-                        },
-                      ))
+                  .map(
+                    (item) => renderAnimatedTabItem(
+                      context,
+                      item,
+                      currentTab.value,
+                      (index) {
+                        currentTab.value = index;
+                      },
+                    ),
+                  )
                   .toList(),
             ),
           ),

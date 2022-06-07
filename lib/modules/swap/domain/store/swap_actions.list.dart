@@ -5,18 +5,19 @@ class SwapActionReviseSwap extends _BaseAction {
     this.swap,
     this.isAdd,
   });
-  final Swap swap;
-  final bool isAdd;
+  final Swap? swap;
+  final bool? isAdd;
 
   @override
-  Future<AppState> reduce() async {
+  Future<AppState?> reduce() async {
+    /*
     final walletId = state.walletState.activeWalletId;
-    final allSwaps = await SwapRepository().getSwapsFromCache(walletId);
-    if (isAdd) {
-      allSwaps.add(swap);
+    final allSwaps = await SwapRepository().getSwapsFromCache(walletId!);
+    if (isAdd ?? false) {
+      allSwaps.add(swap!);
     } else {
       for (final item in allSwaps) {
-        if (item.txId == swap.txId) {
+        if (item.txId == swap?.txId) {
           item.status = SwapStatus.pending;
         }
       }
@@ -29,7 +30,8 @@ class SwapActionReviseSwap extends _BaseAction {
 
     return store.state.rebuild(
       (a) => a.swapState..swaps.replace(allSwaps),
-    );
+    );*/
+    return null;
   }
 }
 
@@ -39,13 +41,16 @@ class _SwapActionLoadSwaps extends _BaseAction {
   final int page;
 
   @override
-  Future<AppState> reduce() async {
+  Future<AppState?> reduce() async {
+    /*
     final walletId = state.walletState.activeWalletId;
-    final swaps = await SwapRepository().getSwapsFromCache(walletId);
+    final swaps = await SwapRepository().getSwapsFromCache(walletId!);
 
-    swaps.sort((a, b) => b.createdAt == a.createdAt
-        ? b.txId.compareTo(b.txId)
-        : (b.createdAt ?? 0).compareTo(a.createdAt ?? 0));
+    swaps.sort(
+      (a, b) => b.createdAt == a.createdAt
+          ? b.txId.compareTo(b.txId)
+          : (b.createdAt).compareTo(a.createdAt),
+    );
 
     final skip = (page + 1) * 10;
     final allLength = swaps.length;
@@ -53,15 +58,16 @@ class _SwapActionLoadSwaps extends _BaseAction {
 
     return store.state.rebuild(
       (a) => a.swapState..swaps.replace(displayData),
-    );
+    );*/
+    return null;
   }
 }
 
 class SwapActionGetSwaps extends _BaseAction {
   SwapActionGetSwaps({
-    @required this.page,
-    @required this.skip,
-    @required this.completer,
+    required this.page,
+    required this.skip,
+    required this.completer,
   });
 
   final int page;
@@ -70,11 +76,12 @@ class SwapActionGetSwaps extends _BaseAction {
 
   @override
   Future<void> before() {
-    return dispatchFuture(_SwapActionLoadSwaps(page));
+    return dispatchAsync(_SwapActionLoadSwaps(page));
   }
 
   @override
-  Future<AppState> reduce() async {
+  Future<AppState?> reduce() async {
+    /*
     final allSwaps = await SwapRepository().getSwapsFromCache(walletId);
 
     final apiResult = await SwapRepository().getSwapsFromApi(
@@ -88,7 +95,6 @@ class SwapActionGetSwaps extends _BaseAction {
     final newSwaps = rawData.map((item) => Swap.fromApi(
           cached: allSwaps.firstWhere(
             (element) => element.txId == item['user_out_txid'],
-            orElse: () => null,
           ),
           json: item,
         ));
@@ -96,14 +102,14 @@ class SwapActionGetSwaps extends _BaseAction {
     final ids = newSwaps.map((e) => e.txId).toSet();
 
     // cache
-    allSwaps.retainWhere((x) => !ids.contains(x.txId ?? ''));
+    allSwaps.retainWhere((x) => !ids.contains(x.txId));
 
     allSwaps.addAll(newSwaps);
 
     allSwaps.sort(
       (a, b) => b.createdAt == a.createdAt
           ? b.txId.compareTo(b.txId)
-          : (b.createdAt ?? 0).compareTo(a.createdAt ?? 0),
+          : (b.createdAt).compareTo(a.createdAt),
     );
 
     await SwapRepository().saveSwapsToCache(
@@ -118,12 +124,13 @@ class SwapActionGetSwaps extends _BaseAction {
 
     return store.state.rebuild(
       (a) => a.swapState..swaps.replace(displayData),
-    );
+    );*/
+    return null;
   }
 
   @override
-  Object wrapError(dynamic error) {
-    completer.completeError(error);
+  Object? wrapError(dynamic error) {
+    completer.completeError(error as Object);
     return error;
   }
 }

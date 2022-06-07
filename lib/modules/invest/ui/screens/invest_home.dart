@@ -49,7 +49,10 @@ class InvestHomePage extends HookWidget {
       backgroundColor: Colors.transparent,
       extendBodyBehindAppBar: true,
       title: tr('invest:title'),
-      titleStyle: context.textHuge(fontWeight: FontWeight.w700),
+      titleStyle: context.textHuge(
+        fontWeight: FontWeight.w700,
+        bold: true,
+      ),
       drawer: CSDrawer(
         width: 264,
         elevation: 100,
@@ -64,7 +67,7 @@ class InvestHomePage extends HookWidget {
           converter: InvestHomeVM.fromStore,
           builder: (context, viewModel) => MintSelectDrawer(
             mints: viewModel.mints.toList(),
-            activeMintId: viewModel.activeMint?.id,
+            activeMintId: viewModel.activeMint?.id ?? 0,
             onLoadMint: (mint) {
               loadMint(viewModel, mint, selectedTab);
             },
@@ -74,12 +77,12 @@ class InvestHomePage extends HookWidget {
       child: StoreConnector<AppState, InvestHomeVM>(
         distinct: true,
         converter: InvestHomeVM.fromStore,
-        onInitialBuild: (viewModel) {
+        onInitialBuild: (_, __, viewModel) {
           // Load first mint
           if (viewModel.mints.isNotEmpty) {
             loadMint(
               viewModel,
-              viewModel.activeMint ?? viewModel.mints.first,
+              viewModel.activeMint!,
               selectedTab,
             );
           }
@@ -94,7 +97,7 @@ class InvestHomePage extends HookWidget {
               if (viewModel.getDefaultMint() != null) {
                 loadMint(
                   viewModel,
-                  viewModel.getDefaultMint(),
+                  viewModel.getDefaultMint()!,
                   selectedTab,
                 );
               }
@@ -185,8 +188,6 @@ class InvestHomePage extends HookWidget {
       );
     }
 
-    final symbol = viewModel.activeMint?.symbol ?? '';
-
     if (select == InvestTabs.loading) {
       return Expanded(
         child: CSContainer(
@@ -205,7 +206,7 @@ class InvestHomePage extends HookWidget {
             showButton: true,
             btnText: tr('global:btn_refresh'),
             onPressed: () {
-              loadMint(viewModel, viewModel.activeMint, selectedTab);
+              loadMint(viewModel, viewModel.activeMint!, selectedTab);
             },
           ),
         ),
@@ -213,8 +214,8 @@ class InvestHomePage extends HookWidget {
     }
 
     final coinInfo = viewModel.getCoinInfo(
-      chain: viewModel.activeMint.chain,
-      symbol: viewModel.activeMint.symbol,
+      chain: viewModel.activeMint?.chain ?? '',
+      symbol: viewModel.activeMint?.symbol ?? '',
     );
 
     if (select == InvestTabs.airdrop) {

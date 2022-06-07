@@ -2,17 +2,17 @@ part of swap_ui_module;
 
 class SwapApproveBalance extends StatelessWidget {
   const SwapApproveBalance({
-    @required this.approveBalance,
-    @required this.isRefreshing,
-    @required this.onGetApproveBalance,
-    @required this.onResetApproveBalance,
-    Key key,
+    required this.approveBalance,
+    required this.isRefreshing,
+    required this.onGetApproveBalance,
+    required this.onResetApproveBalance,
+    Key? key,
     this.padding,
   }) : super(key: key);
 
   final bool isRefreshing;
   final double approveBalance;
-  final EdgeInsetsGeometry padding;
+  final EdgeInsetsGeometry? padding;
   final void Function() onGetApproveBalance;
   final void Function() onResetApproveBalance;
 
@@ -29,6 +29,7 @@ class SwapApproveBalance extends StatelessWidget {
                 tr('swap:create_lbl_approve_balance'),
                 style: context.textBody(
                   bold: true,
+                  fontWeight: FontWeight.normal,
                   color: context.labelColor,
                 ),
               ),
@@ -38,7 +39,12 @@ class SwapApproveBalance extends StatelessWidget {
                 label: tr('swap:create_btn_approve_balance'),
                 flat: true,
                 padding: context.edgeAll.copyWith(bottom: 0),
-                textStyle: context.textSecondary().copyWith(
+                textStyle: context
+                    .textSecondary(
+                      fontWeight: FontWeight.normal,
+                      bold: true,
+                    )
+                    .copyWith(
                       color: context.secondaryColor,
                       decoration: TextDecoration.underline,
                     ),
@@ -56,8 +62,11 @@ class SwapApproveBalance extends StatelessWidget {
             children: [
               if (isRefreshing == false)
                 Text(
-                  approveBalance?.toString() ?? '-',
-                  style: context.textBody(),
+                  approveBalance.toString(),
+                  style: context.textBody(
+                    bold: true,
+                    fontWeight: FontWeight.normal,
+                  ),
                 ),
               if (isRefreshing == true)
                 CSProgressIndicator(

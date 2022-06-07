@@ -30,6 +30,8 @@ class WalletCreateDialog extends StatelessWidget {
             tr('wallet:msg_create_wallet_title'),
             style: context.textBody(
               color: context.secondaryColor,
+              bold: false,
+              fontWeight: FontWeight.normal,
             ),
           ),
           WalletCreateButtons(
@@ -42,6 +44,8 @@ class WalletCreateDialog extends StatelessWidget {
               tr('wallet:lbl_imtoken'),
               style: context.textSmall(
                 color: context.placeholderColor,
+                bold: false,
+                fontWeight: FontWeight.normal,
               ),
             ),
           ),

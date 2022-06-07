@@ -9,7 +9,7 @@ class WalletActionChangePassword extends _BaseAction {
   final String pwdNew;
 
   @override
-  Future<AppState> reduce() async {
+  Future<AppState?> reduce() async {
     final activeWallet = state.walletState.activeWallet;
 
     if (activeWallet == null) {
@@ -24,10 +24,10 @@ class WalletActionChangePassword extends _BaseAction {
 
     // 保存助记词
     await saveWalletPrivateData(
-      walletId: data.walletId,
+      walletId: data.walletId!,
       password: pwdNew,
-      mnemonic: data.mnemonic,
-      privateKey: data.privateKey,
+      mnemonic: data.mnemonic!,
+      privateKey: data.privateKey!,
     );
     return null;
   }
@@ -54,7 +54,7 @@ class WalletActionChangeName extends _BaseAction {
   final String name;
 
   @override
-  Future<AppState> reduce() async {
+  Future<AppState?> reduce() async {
     final activeWallet = state.walletState.activeWallet;
 
     if (activeWallet == null) {
@@ -71,7 +71,7 @@ class WalletActionChangeName extends _BaseAction {
     return state.rebuild(
       (b) => b.walletState
         ..activeWallet = activeWallet
-        ..wallets = allWallets ?? [],
+        ..wallets = allWallets,
     );
   }
 }
@@ -81,7 +81,7 @@ class WalletActionDeleteWallet extends _BaseAction {
   WalletActionDeleteWallet();
 
   @override
-  Future<AppState> reduce() async {
+  Future<AppState?> reduce() async {
     final activeWallet = state.walletState.activeWallet;
 
     if (activeWallet == null) {
@@ -94,13 +94,13 @@ class WalletActionDeleteWallet extends _BaseAction {
 
     final nextWallet = allWallets.isEmpty ? null : allWallets[0];
 
-    dispatch(AppActionLoadWallet(nextWallet));
+    dispatch(AppActionLoadWallet(nextWallet!));
 
     return state.rebuild(
       (b) => b.walletState
-        ..activeWalletId = nextWallet?.id
+        ..activeWalletId = nextWallet.id
         ..activeWallet = nextWallet
-        ..wallets = allWallets ?? [],
+        ..wallets = allWallets,
     );
   }
 }

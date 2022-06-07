@@ -2,8 +2,8 @@ part of project_ui_module;
 
 class ProjectPoolPlanItem extends HookWidget {
   const ProjectPoolPlanItem({
-    @required this.item,
-    Key key,
+    required this.item,
+    Key? key,
     this.editable = true,
     this.onPress,
     this.monthCallback,
@@ -14,9 +14,9 @@ class ProjectPoolPlanItem extends HookWidget {
 
   final ProjectCreateMint item;
   final bool editable;
-  final Function(int index) onPress;
-  final Function(String text, int index) monthCallback;
-  final Function(String text, int index) ratioCallback;
+  final Function(int index)? onPress;
+  final Function(String text, int index)? monthCallback;
+  final Function(String text, int index)? ratioCallback;
   final String cacheRatio;
   final String cacheMonth;
 
@@ -47,7 +47,7 @@ class ProjectPoolPlanItem extends HookWidget {
                 editable: editable,
                 controller: monthController,
                 callback: (text) {
-                  monthCallback(text.toString(), item.index);
+                  monthCallback?.call(text.toString(), item.index);
                 },
               ),
               SizedBox(height: 10),
@@ -58,7 +58,7 @@ class ProjectPoolPlanItem extends HookWidget {
                 editable: editable,
                 controller: ratioController,
                 callback: (text) {
-                  ratioCallback(text.toString(), item.index);
+                  ratioCallback?.call(text.toString(), item.index);
                 },
                 isRatio: true,
               ),
@@ -69,7 +69,7 @@ class ProjectPoolPlanItem extends HookWidget {
           else
             InkWell(
               onTap: () {
-                onPress(item.index);
+                onPress?.call(item.index);
               },
               child: Padding(
                 padding: context.edgeLeft10,
@@ -89,15 +89,15 @@ class ProjectPoolPlanItem extends HookWidget {
 
 Widget poolSetInput(
   BuildContext context, {
-  String hintText,
-  String rightLabel,
-  bool editable,
-  TextEditingController controller,
-  Function callback,
+  String? hintText,
+  String? rightLabel,
+  bool? editable,
+  TextEditingController? controller,
+  Function? callback,
   bool isRatio = false,
 }) {
   return Container(
-    key: Key(rightLabel),
+    key: Key(rightLabel ?? ''),
     height: 44,
     width: context.mediaWidth - 90,
     padding: context.edgeHorizontal10,
@@ -115,13 +115,16 @@ Widget poolSetInput(
             autocorrect: false, //是否自动更正
             enabled: editable,
             onChanged: (text) {
-              callback(text);
+              callback?.call(text);
             },
             decoration: InputDecoration(
               hintText: hintText,
               border: InputBorder.none,
               isDense: true,
-              hintStyle: context.textPlaceholder(),
+              hintStyle: context.textPlaceholder(
+                bold: true,
+                fontWeight: FontWeight.normal,
+              ),
               counterText: '',
             ),
             inputFormatters: isRatio
@@ -137,12 +140,18 @@ Widget poolSetInput(
                       maxInteger: 8,
                     ),
                   ],
-            style: context.textBody(),
+            style: context.textBody(
+              bold: true,
+              fontWeight: FontWeight.normal,
+            ),
           ),
         ),
         Text(
-          rightLabel,
-          style: context.textBody(bold: true),
+          rightLabel ?? '',
+          style: context.textBody(
+            bold: true,
+            fontWeight: FontWeight.normal,
+          ),
         ),
       ],
     ),

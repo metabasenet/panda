@@ -31,6 +31,7 @@ class HDKeyMnemonicListPage extends StatelessWidget {
       confirmBtnStyle: context.textBody(
         bold: true,
         color: context.redColor,
+        fontWeight: FontWeight.normal,
       ),
       onConfirm: () {
         Toast.show('todo delete mnemonic');

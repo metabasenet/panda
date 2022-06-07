@@ -2,9 +2,9 @@ part of app_module;
 
 class AppDrawerMenuTap extends StatelessWidget {
   const AppDrawerMenuTap({
-    @required this.label,
-    @required this.onPress,
-    Key key,
+    required this.label,
+    required this.onPress,
+    Key? key,
   }) : super(key: key);
 
   final String label;
@@ -26,7 +26,10 @@ class AppDrawerMenuTap extends StatelessWidget {
             child: Text(
               label,
               maxLines: 1,
-              style: context.textBody(bold: true),
+              style: context.textBody(
+                bold: true,
+                fontWeight: FontWeight.normal,
+              ),
             ),
           ),
           Icon(

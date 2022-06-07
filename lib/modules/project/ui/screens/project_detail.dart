@@ -8,7 +8,7 @@ class ProjectDetailStatus {
 class ProjectDetailPage extends HookWidget {
   const ProjectDetailPage(
     this.params, {
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   static const routeName = '/project/detail';
@@ -23,7 +23,7 @@ class ProjectDetailPage extends HookWidget {
   static Route<dynamic> route(RouteSettings settings) {
     return DefaultTransition(
       settings,
-      ProjectDetailPage(settings.arguments as ProjectDetailParams),
+      ProjectDetailPage(settings.arguments! as ProjectDetailParams),
     );
   }
 
@@ -37,37 +37,36 @@ class ProjectDetailPage extends HookWidget {
     final detailList = [
       {
         'name': tr('project:detail_lbl_id'),
-        'label': projectInfo.value?.fork ?? '',
+        'label': projectInfo.value.fork ?? '',
       },
       {
         'name': tr('project:detail_lbl_coin_name'),
-        'label': projectInfo.value?.symbol ?? '',
+        'label': projectInfo.value.symbol ?? '',
       },
       {
         'name': tr('project:detail_lbl_price', namedArgs: {'symbol': 'USDT'}),
-        'label': projectInfo.value?.displayPrice ?? '',
+        'label': projectInfo.value.displayPrice ?? '',
       },
       {
         'name': tr('project:detail_lbl_total_amount'),
         'label':
-            '''${projectInfo.value?.displayTotalAmount ?? ''} ${projectInfo.value?.symbol ?? ''}''',
+            '''${projectInfo.value.displayTotalAmount ?? ''} ${projectInfo.value.symbol ?? ''}''',
       },
       {
         'name': tr('project:detail_lbl_init_amount'),
         'label':
-            '''${projectInfo.value?.displayInitAmount ?? ''} ${projectInfo.value?.symbol ?? ''}''',
+            '''${projectInfo.value.displayInitAmount ?? ''} ${projectInfo.value.symbol ?? ''}''',
       },
       {
         'name': tr('project:detail_lbl_owner_name'),
-        'label': projectInfo.value != null &&
-                projectInfo.value.ownerName != null &&
-                projectInfo.value.ownerName.isNotEmpty
-            ? projectInfo.value?.ownerName['default'].toString()
+        'label': projectInfo.value.ownerName != null &&
+                (projectInfo.value.ownerName?.isNotEmpty ?? false)
+            ? projectInfo.value.ownerName!['default']
             : '',
       },
       {
         'name': tr('project:detail_detail_web'),
-        'label': projectInfo.value?.ownerWebsite ?? '',
+        'label': projectInfo.value.ownerWebsite ?? '',
         'isWebAddress': true,
       },
     ];
@@ -78,9 +77,9 @@ class ProjectDetailPage extends HookWidget {
       child: StoreConnector<AppState, ProjectDetailVM>(
         distinct: true,
         converter: ProjectDetailVM.fromStore,
-        onInitialBuild: (viewModel) {
+        onInitialBuild: (_, __, viewModel) {
           LoadingDialog.show(context);
-          viewModel.getProjectDetail(params.id).then((value) {
+          viewModel.getProjectDetail(params.id ?? 0).then((value) {
             projectInfo.value = value;
           }).catchError((e) {
             Toast.showError(e);
@@ -106,8 +105,11 @@ class ProjectDetailPage extends HookWidget {
                         width: context.mediaWidth * 0.8,
                         padding: context.edgeLeft10,
                         child: Text(
-                          projectInfo.value?.projectName ?? '',
-                          style: context.textBody(bold: true),
+                          projectInfo.value.projectName ?? '',
+                          style: context.textBody(
+                            bold: true,
+                            fontWeight: FontWeight.normal,
+                          ),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
@@ -146,9 +148,12 @@ class ProjectDetailPage extends HookWidget {
                                 Expanded(
                                   flex: 2,
                                   child: Text(
-                                    item['name'].toString() ?? '',
+                                    item['name'].toString(),
                                     style: context.textBody(
-                                        color: context.secondaryColor),
+                                      bold: true,
+                                      fontWeight: FontWeight.normal,
+                                      color: context.secondaryColor,
+                                    ),
                                   ),
                                 ),
                                 Expanded(
@@ -164,7 +169,7 @@ class ProjectDetailPage extends HookWidget {
                                             }
                                           : null,
                                       child: Text(
-                                        item['label'].toString() ?? '',
+                                        item['label'].toString(),
                                         textAlign: TextAlign.end,
                                         style: context
                                             .textBody(
@@ -172,6 +177,8 @@ class ProjectDetailPage extends HookWidget {
                                                   item['isWebAddress'] == true
                                                       ? context.orangeColor
                                                       : context.bodyColor,
+                                              bold: true,
+                                              fontWeight: FontWeight.normal,
                                             )
                                             .copyWith(height: 1.71),
                                         maxLines: 3,
@@ -198,16 +205,19 @@ class ProjectDetailPage extends HookWidget {
                             bottom: 30,
                           ),
                           child: Text(
-                            projectInfo.value != null &&
-                                    projectInfo.value.projectDescription !=
-                                        null &&
+                            projectInfo.value.projectDescription != null &&
                                     projectInfo
-                                        .value.projectDescription.isNotEmpty
+                                        .value.projectDescription!.isNotEmpty
                                 ? projectInfo
-                                    .value.projectDescription['default']
+                                    .value.projectDescription!['default']
                                     .toString()
                                 : '',
-                            style: context.textBody().copyWith(height: 2),
+                            style: context
+                                .textBody(
+                                  bold: true,
+                                  fontWeight: FontWeight.normal,
+                                )
+                                .copyWith(height: 2),
                           ),
                         ),
                       ],
@@ -215,7 +225,7 @@ class ProjectDetailPage extends HookWidget {
                   ),
               ],
             ),
-            if (projectInfo.value.displayPoolBtn)
+            if (projectInfo.value.displayPoolBtn ?? false)
               Positioned(
                 right: 0,
                 left: 0,
@@ -228,12 +238,12 @@ class ProjectDetailPage extends HookWidget {
                     borderRadius: 0,
                     onPressed: () {
                       LoadingDialog.show(context);
-                      viewModel.setActivePool(projectInfo.value.id).then(
+                      viewModel.setActivePool(projectInfo.value.id ?? 0).then(
                         (value) {
                           LoadingDialog.dismiss(context);
                           AppNavigator.gotoTabBar();
                           //todo go pool
-                          // AppNavigator.gotoTabBarPage(1);
+                          //AppNavigator.gotoTabBarPage(1);
                         },
                       ).catchError(
                         (e) {

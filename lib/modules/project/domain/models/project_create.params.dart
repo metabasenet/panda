@@ -37,14 +37,14 @@ abstract class ProjectCreateParams
   static Serializer<ProjectCreateParams> get serializer =>
       _$projectCreateParamsSerializer;
 
-  static ProjectCreateParams fromJson(dynamic json) {
+  static ProjectCreateParams? fromJson(dynamic json) {
     if (json != null) {
       return deserialize<ProjectCreateParams>(json);
     }
     return null;
   }
 
-  Object toJson() {
+  Object? toJson() {
     return serialize<ProjectCreateParams>(this);
   }
 
@@ -72,21 +72,21 @@ abstract class ProjectCreateParams
 
 // TODO： Withdraw Info
 
-  @nullable
-  String get chain;
-  @nullable
-  String get symbol;
-  @nullable
-  String get txId;
-  @nullable
-  String get address;
-  @nullable
+  //@nullable
+  String? get chain;
+  //@nullable
+  String? get symbol;
+  //@nullable
+  String? get txId;
+  //@nullable
+  String? get address;
+  //@nullable
   @BuiltValueSerializer(custom: true)
-  WalletWithdrawData get withdrawData;
-  @nullable
-  double get withdrawAmount;
-  @nullable
-  int get submittedAt;
+  WalletWithdrawData? get withdrawData;
+  //@nullable
+  double? get withdrawAmount;
+  //@nullable
+  int? get submittedAt;
 
   Map<String, dynamic> toApiParams() {
     return {
@@ -97,7 +97,7 @@ abstract class ProjectCreateParams
       'owner_email': email,
       'project_name': projectName,
       'project_description': projectDescription,
-      'currency': coinName?.toUpperCase(),
+      'currency': coinName.toUpperCase(),
       'currency_price': price,
       'currency_issuing_amount': amount,
       'currency_issuing_initial_amount': poolInitAmount,
@@ -119,14 +119,14 @@ abstract class ProjectCreateParams
   }
 
   ProjectCreateParams setPool({
-    @required String poolInitAmount,
-    @required String poolCycle,
-    @required String poolMinCurrency,
-    @required bool poolEnable,
-    @required String minBalance,
-    @required String remainAmount,
-    @required String remainMonths,
-    @required List<ProjectCreateMint> mintList,
+    required String poolInitAmount,
+    required String poolCycle,
+    required String poolMinCurrency,
+    required bool poolEnable,
+    required String minBalance,
+    required String remainAmount,
+    required String remainMonths,
+    required List<ProjectCreateMint> mintList,
   }) {
     return rebuild(
       (a) => a
@@ -168,8 +168,8 @@ abstract class ProjectCreateParams
   List<ProjectCreateMint> updateMintConfig(
     List<ProjectCreateMint> mintList,
     int index, {
-    String month,
-    String ratio,
+    String? month,
+    String? ratio,
   }) {
     return mintList.asMap().entries.map((item) {
       if (item.key == index) {
@@ -188,15 +188,17 @@ abstract class ProjectCreateParams
     List<ProjectCreateMint> list,
     String poolCycle,
   ) {
-    final totalMonths = list.map((e) => e.month).toList().reduce(
+    /*
+    final totalMonths = 
+     list.map((e) => e.month).toList().reduce(
           (cur, next) => NumberUtil.plus(
-            NumberUtil.getDouble(cur) ?? 0,
+            NumberUtil.getDouble(cur),
             NumberUtil.getDouble(next) ?? 0,
           ),
-        );
+        );*/
     return NumberUtil.minus<int>(
           poolCycle,
-          totalMonths ?? 0,
+          '0',
         ) ??
         0;
   }
@@ -205,8 +207,8 @@ abstract class ProjectCreateParams
     List<ProjectCreateMint> list,
     String poolInitAmount,
   ) {
-    double mintTotalAmount;
-
+    final double mintTotalAmount = 0;
+    /*
     for (final item in list) {
       if (item.ratio != '' && item.month != '') {
         final ratio = math.pow(
@@ -215,12 +217,12 @@ abstract class ProjectCreateParams
         );
         mintTotalAmount = NumberUtil.multiply(ratio, mintTotalAmount ?? 1);
       }
-    }
+    }*/
     return NumberUtil.truncateDecimal(
             NumberUtil.minus(
                 amount,
                 NumberUtil.multiply(
-                  poolInitAmount ?? 0,
+                  poolInitAmount,
                   mintTotalAmount,
                 )),
             2) ??

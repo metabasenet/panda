@@ -22,7 +22,7 @@ lefthook install
 
 ```
 
-### Commands
+### Commands 
 
 ```sh
 # Code generation (.g.dart)

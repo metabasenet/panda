@@ -17,14 +17,10 @@ abstract class ExplorerHomeVM
     final List<ExplorerItem> list = [];
 
     for (final item in ExplorerUtils.explorerChains) {
-      final explorerConfig = ExplorerUtils.explorerConfigs.firstWhere(
-        (config) => config.chain == item,
-        orElse: () => null,
-      );
-      final coinInfo = store.state.assetState.coins.firstWhere(
-        (coin) => coin.chain == item,
-        orElse: () => null,
-      );
+      final explorerConfig = ExplorerUtils.explorerConfigs
+          .firstWhere((config) => config.chain == item);
+      final coinInfo =
+          store.state.assetState.coins.firstWhere((coin) => coin.chain == item);
       if (explorerConfig != null) {
         list.add(ExplorerItem(
           coinInfo: coinInfo,

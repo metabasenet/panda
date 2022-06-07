@@ -2,15 +2,15 @@ part of invitation_domain_module;
 
 class InvitationActionCreateSubmit extends _BaseAction {
   InvitationActionCreateSubmit({
-    @required this.coinInfo,
-    @required this.toAddress,
-    @required this.signCode,
-    @required this.sharePrvKey,
-    @required this.amount,
-    @required this.onUnlockWallet,
-    @required this.onSuccessTransaction,
-    @required this.onConfirmParams,
-    @required this.onConfirmSubmit,
+    required this.coinInfo,
+    required this.toAddress,
+    required this.signCode,
+    required this.sharePrvKey,
+    required this.amount,
+    required this.onUnlockWallet,
+    required this.onSuccessTransaction,
+    required this.onConfirmParams,
+    required this.onConfirmSubmit,
   });
 
   final AssetCoin coinInfo;
@@ -24,19 +24,16 @@ class InvitationActionCreateSubmit extends _BaseAction {
   final Future<bool> Function() onConfirmSubmit;
 
   @override
-  Future<AppState> reduce() async {
+  Future<AppState?> reduce() async {
     final canContinue = await onConfirmSubmit();
     if (canContinue == false) {
       return null;
     }
 
     final walletData = await onUnlockWallet();
-    if (walletData == null) {
-      return null;
-    }
 
     final parentPubKey =
-        await WalletMNT.addressMNTToPublicKey(address: coinInfo.address);
+        await WalletMNT.addressMNTToPublicKey(address: coinInfo.address ?? '');
 
     final sharedKeyInfo =
         await WalletMNT.createMNTFromPrivateKey(privateKey: sharePrvKey);
@@ -44,7 +41,7 @@ class InvitationActionCreateSubmit extends _BaseAction {
     final parentCode = await InvitationRepository().createInvitationCodeData(
       signPrivateKey: sharePrvKey,
       codePrivateKey: sharePrvKey,
-      codePublicKey: parentPubKey,
+      codePublicKey: parentPubKey!,
       codeForkId: '', // No need
     );
 
@@ -58,11 +55,11 @@ class InvitationActionCreateSubmit extends _BaseAction {
     final withdrawDataRequest = Completer<WalletWithdrawData>();
     dispatch(WalletActionWithdrawBefore(
       params: WithdrawBeforeParams(
-        chain: coinInfo.chain,
-        symbol: coinInfo.symbol,
-        fromAddress: coinInfo.address,
+        chain: coinInfo.chain ?? '',
+        symbol: coinInfo.symbol ?? '',
+        fromAddress: coinInfo.address ?? '',
         amount: NumberUtil.getDouble(amount),
-        chainPrecision: coinInfo.chainPrecision,
+        chainPrecision: coinInfo.chainPrecision ?? 0,
         contractOrForkId: coinInfo.contract,
         toAddress: toAddress,
         txData: '010000a0${ByteUtils.bytesToHex(vchData)}',
@@ -81,7 +78,7 @@ class InvitationActionCreateSubmit extends _BaseAction {
       params: WithdrawSubmitParams(
         withdrawData: withdrawData,
         amount: NumberUtil.getDouble(amount),
-        chainPrecision: coinInfo.chainPrecision,
+        chainPrecision: coinInfo.chainPrecision ?? 0,
         toAddress: toAddress,
         type: 2, // Invitation Type
         txData: ByteUtils.bytesToHex(vchData),
@@ -98,7 +95,7 @@ class InvitationActionCreateSubmit extends _BaseAction {
   }
 
   @override
-  Object wrapError(dynamic error) {
+  Object? wrapError(dynamic error) {
     return parseWalletError(error);
   }
 }

@@ -6,9 +6,9 @@ part of widgets;
 
 class LoadMore extends StatefulWidget {
   const LoadMore({
-    @required this.child,
-    @required this.onLoadMore,
-    Key key,
+    required this.child,
+    required this.onLoadMore,
+    Key? key,
     this.textBuilder,
     this.isFinish = false,
     this.delegate,
@@ -33,10 +33,10 @@ class LoadMore extends StatefulWidget {
   final bool isFinish;
 
   /// see [LoadMoreDelegate]
-  final LoadMoreDelegate delegate;
+  final LoadMoreDelegate? delegate;
 
   /// see [LoadMoreTextBuilder]
-  final LoadMoreTextBuilder textBuilder;
+  final LoadMoreTextBuilder? textBuilder;
 
   /// when [whenEmptyLoad] is true,
   /// and when listView children length is 0,
@@ -72,7 +72,7 @@ class _LoadMoreState extends State<LoadMore> {
       return _buildListView(child as ListView);
     }
     if (child is SliverList) {
-      return _buildSliverList(child as SliverList);
+      return _buildSliverList(child as SliverList)!;
     }
     return child;
   }
@@ -87,12 +87,12 @@ class _LoadMoreState extends State<LoadMore> {
       if (!widget.whenEmptyLoad && delegate.estimatedChildCount == 0) {
         break outer;
       }
-      final viewCount = delegate.estimatedChildCount + 1;
+      final viewCount = delegate.estimatedChildCount! + 1;
       Widget builder(BuildContext context, int index) {
         if (index == viewCount - 1) {
           return _buildLoadMoreView();
         }
-        return delegate.builder(context, index);
+        return delegate.builder(context, index)!;
       }
 
       return ListView.builder(
@@ -144,16 +144,16 @@ class _LoadMoreState extends State<LoadMore> {
     return listView;
   }
 
-  Widget _buildSliverList(SliverList list) {
+  Widget? _buildSliverList(SliverList list) {
     final delegate = list.delegate;
     if (delegate == null) {
       return list;
     }
 
     if (delegate is SliverChildListDelegate) {
-      return SliverList(
+      return null; /*SliverList(
         delegate: null,
-      );
+      );*/
     }
 
     outer:
@@ -161,8 +161,8 @@ class _LoadMoreState extends State<LoadMore> {
       if (!widget.whenEmptyLoad && delegate.estimatedChildCount == 0) {
         break outer;
       }
-      final viewCount = delegate.estimatedChildCount + 1;
-      Widget builder(BuildContext context, int index) {
+      final viewCount = delegate.estimatedChildCount! + 1;
+      Widget? builder(BuildContext context, int index) {
         if (index == viewCount - 1) {
           return _buildLoadMoreView();
         }
@@ -293,10 +293,10 @@ enum LoadMoreStatus {
 
 class DefaultLoadMoreView extends StatefulWidget {
   const DefaultLoadMoreView({
-    @required this.delegate,
-    @required this.textBuilder,
+    required this.delegate,
+    required this.textBuilder,
     this.status = LoadMoreStatus.idle,
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   final LoadMoreStatus status;

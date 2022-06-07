@@ -2,9 +2,9 @@ part of invest_ui_module;
 
 class MiningHeader extends StatelessWidget {
   const MiningHeader({
-    @required this.mintInfo,
-    @required this.symbol,
-    Key key,
+    required this.mintInfo,
+    required this.symbol,
+    Key? key,
   }) : super(key: key);
 
   final MintInfo mintInfo;
@@ -21,11 +21,15 @@ class MiningHeader extends StatelessWidget {
         children: [
           Text(
             tr('invest:mining_lbl_header'),
-            style: context.textSmall(color: context.bodyColor),
+            style: context.textSmall(
+              color: context.bodyColor,
+              bold: true,
+              fontWeight: FontWeight.normal,
+            ),
           ),
           SizedBox(height: 6),
           PriceText(
-            mintInfo?.totalProfit?.toString() ?? '-',
+            mintInfo.totalProfit.toString(),
             symbol,
             TextSize.big,
             color: context.redColor,

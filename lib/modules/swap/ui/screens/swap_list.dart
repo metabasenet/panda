@@ -37,7 +37,7 @@ class SwapListPage extends StatelessWidget {
       child: StoreConnector<AppState, SwapListVM>(
         distinct: true,
         converter: SwapListVM.fromStore,
-        onInitialBuild: (viewModel) {},
+        onInitialBuild: (_, __, viewModel) {},
         builder: (context, viewModel) => Container(
           decoration: ThemeBorders.borderTop,
           child: CSListViewStream(
@@ -50,7 +50,7 @@ class SwapListPage extends StatelessWidget {
                 10,
               );
             },
-            itemCount: viewModel.swapList.length ?? 0,
+            itemCount: viewModel.swapList.length,
             itemBuilder: (context, index) {
               return SwapItem(
                 item: viewModel.swapList[index],

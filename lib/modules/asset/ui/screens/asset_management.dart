@@ -34,7 +34,7 @@ class AssetManagementPage extends StatelessWidget {
         child: StoreConnector<AppState, AssetManagementVM>(
           distinct: true,
           converter: AssetManagementVM.fromStore,
-          onInitialBuild: (viewModel) {
+          onInitialBuild: (_, __, viewModel) {
             viewModel.doSearchCoin('');
           },
           builder: (context, viewModel) => CustomScrollView(
@@ -112,22 +112,23 @@ Widget buildAssetHeader(BuildContext context, String title) => Container(
         title,
         style: context.textBody(
           bold: true,
+          fontWeight: FontWeight.normal,
           color: context.labelColor,
         ),
       ),
     );
 void updateCoinAddress({
-  BuildContext context,
-  AssetManagementVM viewModel,
-  AssetCoin coin,
-  bool isEnabled,
+  required BuildContext context,
+  required AssetManagementVM viewModel,
+  required AssetCoin coin,
+  required bool isEnabled,
 }) {
   showPasswordDialog(
     context,
     (password) => viewModel.doUnlockWallet(password),
     (data, _) {
       LoadingDialog.show(context);
-      viewModel.updateCoinAddress(data, coin.chain).then((value) {
+      viewModel.updateCoinAddress(data, coin.chain ?? '').then((value) {
         viewModel.doToggleCoin(coin, isEnabled);
       }).catchError((e) {
         Toast.showError(e);
@@ -161,13 +162,13 @@ Widget buildAssetItem(
         radius: 27,
         backgroundColor: context.whiteColor,
       ),
-      trailing: !item.isFixed
+      trailing: !(item.isFixed ?? false)
           ? CSSwitch(
-              value: item.isEnabled,
+              value: item.isEnabled ?? false,
               onChangedBack: (isEnabled) {
                 // 关闭币种，可以不管他是不是有地址
-                if ((item.address == null || item.address.isEmpty) &&
-                    isEnabled) {
+                if (item.address == null ||
+                    (item.address?.isEmpty ?? true) && isEnabled) {
                   updateCoinAddress(
                     context: context,
                     viewModel: viewModel,
@@ -185,15 +186,21 @@ Widget buildAssetItem(
       title: Transform.translate(
         offset: Offset(-10, 0),
         child: Text(
-          item.symbol,
-          style: context.textBody(),
+          item.symbol ?? '',
+          style: context.textBody(
+            bold: true,
+            fontWeight: FontWeight.normal,
+          ),
         ),
       ),
       subtitle: Transform.translate(
         offset: Offset(-10, 0),
         child: Text(
-          item.name,
-          style: context.textSecondary(),
+          item.name ?? '',
+          style: context.textSecondary(
+            bold: true,
+            fontWeight: FontWeight.normal,
+          ),
         ),
       ),
     ),

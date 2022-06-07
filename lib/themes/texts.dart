@@ -22,7 +22,8 @@ extension TextStyles on BuildContext {
   }
 
   /// 28px #333333
-  TextStyle textHuge({bool bold, FontWeight fontWeight, Color color}) {
+  TextStyle textHuge(
+      {required bool bold, required FontWeight fontWeight, Color? color}) {
     return textFont.copyWith(
       fontSize: 28.0,
       fontWeight: _getBold(bold, fontWeight),
@@ -33,7 +34,8 @@ extension TextStyles on BuildContext {
 
   /// 18px #333333
   /// [Only for Page Header Title AppBar]
-  TextStyle textTitle({bool bold, FontWeight fontWeight, Color color}) {
+  TextStyle textTitle(
+      {required bool bold, required FontWeight fontWeight, Color? color}) {
     return textFont.copyWith(
       fontSize: 18.0,
       fontWeight: _getBold(bold, fontWeight),
@@ -42,7 +44,8 @@ extension TextStyles on BuildContext {
   }
 
   /// 18px #333333
-  TextStyle textBig({bool bold, FontWeight fontWeight, Color color}) {
+  TextStyle textBig(
+      {required bool bold, required FontWeight fontWeight, Color? color}) {
     return textFont.copyWith(
       fontSize: 18.0,
       fontWeight: _getBold(bold, fontWeight),
@@ -52,36 +55,37 @@ extension TextStyles on BuildContext {
 
   /// 16px #333333
   TextStyle textMedium({
-    bool bold,
-    FontWeight fontWeight,
-    Color color,
-    double lineHeight,
+    required bool bold,
+    required FontWeight fontWeight,
+    Color? color,
+    double? lineHeight,
   }) {
     return textFont.copyWith(
       fontSize: 16.0,
       fontWeight: _getBold(bold, fontWeight),
       color: color ?? bodyColor,
-      height: lineHeight,
+      height: lineHeight ?? 1,
     );
   }
 
   /// 15px #333333
   TextStyle textBody({
-    bool bold,
-    FontWeight fontWeight,
-    Color color,
-    double lineHeight,
+    required bool bold,
+    required FontWeight fontWeight,
+    Color? color,
+    double? lineHeight,
   }) {
     return textFont.copyWith(
       fontSize: 15.0,
       fontWeight: _getBold(bold, fontWeight),
       color: color ?? bodyColor,
-      height: lineHeight,
+      height: lineHeight ?? 1,
     );
   }
 
   /// 15px #999999
-  TextStyle textPlaceholder({bool bold, FontWeight fontWeight, Color color}) {
+  TextStyle textPlaceholder(
+      {required bool bold, required FontWeight fontWeight, Color? color}) {
     return textFont.copyWith(
       fontSize: 15.0,
       fontWeight: _getBold(bold, fontWeight),
@@ -91,7 +95,8 @@ extension TextStyles on BuildContext {
 
   /// 15px #333333
   /// [Only for CSButton widgets]
-  TextStyle textButton({bool bold, FontWeight fontWeight, Color color}) {
+  TextStyle textButton(
+      {required bool bold, required FontWeight fontWeight, Color? color}) {
     return textFont.copyWith(
       fontSize: 15.0,
       fontWeight: _getBold(bold, fontWeight),
@@ -101,36 +106,37 @@ extension TextStyles on BuildContext {
 
   /// 14px #999999
   TextStyle textSecondary({
-    bool bold,
-    FontWeight fontWeight,
-    Color color,
-    double lineHeight,
+    required bool bold,
+    required FontWeight fontWeight,
+    Color? color,
+    double? lineHeight,
   }) {
     return textFont.copyWith(
       fontSize: 14.0,
       fontWeight: _getBold(bold, fontWeight),
       color: color ?? secondaryColor,
-      height: lineHeight,
+      height: lineHeight ?? 14,
     );
   }
 
   /// 12px #999999
   TextStyle textSmall({
-    bool bold,
-    FontWeight fontWeight,
-    Color color,
-    double lineHeight,
+    required bool bold,
+    required FontWeight fontWeight,
+    Color? color,
+    double? lineHeight,
   }) {
     return textFont.copyWith(
       fontSize: 12,
       fontWeight: _getBold(bold, fontWeight),
       color: color ?? secondaryColor,
-      height: lineHeight,
+      height: lineHeight ?? 1,
     );
   }
 
   /// 10px #999999
-  TextStyle textTiny({bool bold, FontWeight fontWeight, Color color}) {
+  TextStyle textTiny(
+      {required bool bold, required FontWeight fontWeight, Color? color}) {
     return textFont.copyWith(
       fontSize: 10,
       fontWeight: _getBold(bold, fontWeight),
@@ -143,8 +149,8 @@ extension TextStyles on BuildContext {
   /// 28px #333333
   TextStyle textHugePrice({
     bool bold = true,
-    FontWeight fontWeight,
-    Color color,
+    required FontWeight fontWeight,
+    Color? color,
   }) {
     return textPriceFont.copyWith(
       fontSize: 28.0,
@@ -156,8 +162,8 @@ extension TextStyles on BuildContext {
   /// 24px #333333
   TextStyle textBigPrice({
     bool bold = true,
-    FontWeight fontWeight,
-    Color color,
+    required FontWeight fontWeight,
+    Color? color,
   }) {
     return textPriceFont.copyWith(
       fontSize: 24.0,
@@ -168,9 +174,9 @@ extension TextStyles on BuildContext {
 
   /// 20px #333333
   TextStyle textMediumPrice({
-    bool bold,
-    FontWeight fontWeight,
-    Color color,
+    required bool bold,
+    required FontWeight fontWeight,
+    Color? color,
   }) {
     return textPriceFont.copyWith(
       fontSize: 20.0,
@@ -181,9 +187,9 @@ extension TextStyles on BuildContext {
 
   /// 15px #333333
   TextStyle textBodyPrice({
-    bool bold,
-    FontWeight fontWeight,
-    Color color,
+    required bool bold,
+    required FontWeight fontWeight,
+    Color? color,
   }) {
     return textPriceFont.copyWith(
       fontSize: 15.0,
@@ -194,9 +200,9 @@ extension TextStyles on BuildContext {
 
   /// 14px #333333
   TextStyle textSecondaryPrice({
-    bool bold,
-    FontWeight fontWeight,
-    Color color,
+    required bool bold,
+    required FontWeight fontWeight,
+    Color? color,
   }) {
     return textPriceFont.copyWith(
       fontSize: 14.0,
@@ -208,8 +214,8 @@ extension TextStyles on BuildContext {
   /// 13px #333333
   TextStyle textSmallPrice({
     bool bold = false,
-    FontWeight fontWeight,
-    Color color,
+    required FontWeight fontWeight,
+    Color? color,
   }) {
     return textPriceFont.copyWith(
       fontSize: 13.0,
@@ -220,9 +226,9 @@ extension TextStyles on BuildContext {
 
   /// 10.5px #333333
   TextStyle textTinyPrice({
-    bool bold,
-    FontWeight fontWeight,
-    Color color,
+    required bool bold,
+    required FontWeight fontWeight,
+    Color? color,
   }) {
     return textPriceFont.copyWith(
       fontSize: 10.5,

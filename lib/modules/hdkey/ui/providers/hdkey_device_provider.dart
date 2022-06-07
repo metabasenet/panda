@@ -2,9 +2,9 @@ part of hdkey_ui_module;
 
 class HDKeyDeviceProvider extends HookWidget {
   const HDKeyDeviceProvider({
-    @required this.device,
-    @required this.child,
-    Key key,
+    required this.device,
+    required this.child,
+    Key? key,
   }) : super(key: key);
 
   final Widget child;

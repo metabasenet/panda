@@ -4,13 +4,13 @@ const bool inProduction = bool.fromEnvironment('dart.vm.product');
 
 class DeviceInfo {
   DeviceInfo({
-    this.brand,
-    this.model,
-    this.product,
-    this.manufacturer,
-    this.deviceId,
-    this.osName,
-    this.osVersion,
+    required this.brand,
+    required this.model,
+    required this.product,
+    required this.manufacturer,
+    required this.deviceId,
+    required this.osName,
+    required this.osVersion,
     this.osBuild,
   });
 
@@ -21,7 +21,7 @@ class DeviceInfo {
   final String deviceId;
   final String osName;
   final String osVersion;
-  final String osBuild;
+  final String? osBuild;
 
   Map<String, String> toJson() {
     final data = <String, String>{};
@@ -62,7 +62,7 @@ class PlatformUtils {
     return deviceId;
   }
 
-  static Future<DeviceInfo> getDeviceInfo() async {
+  static Future<DeviceInfo?> getDeviceInfo() async {
     final deviceInfo = DeviceInfoPlugin();
 
     if (Platform.isAndroid) {

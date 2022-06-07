@@ -2,14 +2,17 @@ part of invest_domain_module;
 
 class InvestApi {
   /// Invest config
-  Future<List<Map<String, dynamic>>> getConfig() =>
-      Request().getListOfObjects('/v1/hd/defi/mint/config');
+  Future<List<Map<String, dynamic>>> getConfig() => Future.value([]);
+
+  //    Request().getListOfObjects('/v1/hd/defi/mint/config');
 
   /// 矿池详情
   Future<Map<String, dynamic>> getMintInfo({
-    @required String fork,
-    @required String walletId,
+    required String fork,
+    required String walletId,
   }) =>
+      Future.value({});
+  /*
       addAuthSignature(
         walletId,
         {},
@@ -19,12 +22,14 @@ class InvestApi {
           authorization: auth,
         ),
       );
-
+*/
   /// 矿池收益曲线图
   Future<List<Map<String, dynamic>>> getChartList({
-    @required String fork,
-    @required String walletId,
+    required String fork,
+    required String walletId,
   }) =>
+      Future.value([]);
+  /*
       addAuthSignature(
         walletId,
         {},
@@ -34,14 +39,16 @@ class InvestApi {
           authorization: auth,
         ),
       );
-
+*/
   /// 收益列表
   Future<List<Map<String, dynamic>>> getProfitRecordList({
-    @required String fork,
-    @required String walletId,
-    @required int skip,
-    @required int take,
+    required String fork,
+    required String walletId,
+    required int skip,
+    required int take,
   }) =>
+      Future.value([]);
+  /*
       addAuthSignature(
         walletId,
         {},
@@ -51,14 +58,16 @@ class InvestApi {
           authorization: auth,
         ),
       );
-
+*/
   /// 推荐 列表
   Future<List<Map<String, dynamic>>> getProfitInvitationList({
-    @required String fork,
-    @required String walletId,
-    @required int skip,
-    @required int take,
+    required String fork,
+    required String walletId,
+    required int skip,
+    required int take,
   }) =>
+      Future.value([]);
+  /*
       addAuthSignature(
         walletId,
         {},
@@ -68,4 +77,5 @@ class InvestApi {
           authorization: auth,
         ),
       );
+      */
 }

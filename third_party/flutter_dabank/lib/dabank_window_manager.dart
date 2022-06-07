@@ -57,7 +57,7 @@ class DabankWindowManager {
       'addFlags',
       {'flags': flags},
     );
-    return result;
+    return result!;
   }
 
   static Future<bool> clearFlags(int flags) async {
@@ -65,6 +65,6 @@ class DabankWindowManager {
       'clearFlags',
       {'flags': flags},
     );
-    return result;
+    return result!;
   }
 }

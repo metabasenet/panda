@@ -34,19 +34,19 @@ class WalletConfigNetwork {
     }
   }
 
-  static void setTestNetByChain(String chain, {bool value}) {
+  static void setTestNetByChain(String chain, {bool? value}) {
     switch (chain) {
       case AppConstants.mnt_chain:
-        WalletConfigNetwork.mnt = value;
+        WalletConfigNetwork.mnt = value ?? false;
         break;
       case 'BTC':
-        WalletConfigNetwork.btc = value;
+        WalletConfigNetwork.btc = value ?? false;
         break;
       case 'ETH':
-        WalletConfigNetwork.eth = value;
+        WalletConfigNetwork.eth = value ?? false;
         break;
       case 'TRX':
-        WalletConfigNetwork.trx = value;
+        WalletConfigNetwork.trx = value ?? false;
         break;
       default:
     }

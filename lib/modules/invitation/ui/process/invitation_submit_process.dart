@@ -2,15 +2,19 @@ part of invitation_ui_module;
 
 class InvitationSubmitProcess {
   static void doSubmit({
-    @required BuildContext context,
-    @required InvitationCreateVM viewModel,
-    @required AssetCoin coinInfo,
-    @required String toAddress,
-    @required String signCode,
-    @required String sharePrvKey,
-    @required String amount,
-    @required AssetCoin Function({String chain, String symbol}) getCoinInfo,
-    @required Function(String) onSuccessTransaction,
+    required BuildContext context,
+    required InvitationCreateVM viewModel,
+    required AssetCoin coinInfo,
+    required String toAddress,
+    required String signCode,
+    required String sharePrvKey,
+    required String amount,
+    required AssetCoin Function({
+      required String chain,
+      required String symbol,
+    })
+        getCoinInfo,
+    required Function(String) onSuccessTransaction,
   }) {
     LoadingDialog.show(context);
     viewModel
@@ -31,20 +35,20 @@ class InvitationSubmitProcess {
         );
       },
       onConfirmSubmit: () => viewModel
-          .checkDefiRelation(coinInfo.contract, toAddress)
+          .checkDefiRelation(coinInfo.contract ?? '', toAddress)
           .then((_) => true)
           .catchError((error) {
-        LoadingDialog.dismiss(context);
-        final responseError = Request().getResponseError(error);
-        if (responseError.statusCode == 400) {
-          showAlertDialog(
-            context,
-            content: responseError.message ??
-                tr('asset:invitation_create_defi_relation'),
-          );
-        } else {
-          Toast.showError(error);
-        }
+        //LoadingDialog.dismiss(context);
+        //final responseError = Request().getResponseError(error);
+        //if (responseError.statusCode == 400) {
+        //  showAlertDialog(
+        //    context,
+        //    content: responseError.message ??
+        //        tr('asset:invitation_create_defi_relation'),
+        //  );
+        //} else {
+        //  Toast.showError(error);
+        //}
         return false;
       }),
       onUnlockWallet: () {

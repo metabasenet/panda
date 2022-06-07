@@ -29,8 +29,8 @@ abstract class AssetTransactionVM
               store,
               chain: chain,
               symbol: symbol,
-            )?.name ??
-            symbol;
+            ).name ??
+            '';
       }
       ..getSingleTransaction = (transaction) {
         final completer = Completer<Transaction>();
@@ -41,13 +41,13 @@ abstract class AssetTransactionVM
           symbol: transaction.symbol,
         );
 
-        store.dispatchFuture(
+        store.dispatchAsync(
           AssetActionGetSingleTransaction(
             txId: transaction.txId,
             chain: transaction.chain,
             symbol: transaction.symbol,
             fromAddress: transaction.fromAddress,
-            chainPrecision: coinInfo.chainPrecision,
+            chainPrecision: coinInfo.chainPrecision ?? 0,
             completer: completer,
           ),
         );

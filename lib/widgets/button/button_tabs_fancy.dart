@@ -127,13 +127,13 @@ class _TabFancySelectedPainter extends CustomPainter {
 
 class CSButtonTabsFancy extends StatelessWidget {
   const CSButtonTabsFancy({
-    @required this.selected,
-    @required this.onSelected,
-    @required this.holdLbl,
-    @required this.holdValue,
-    @required this.invitationLbl,
-    @required this.invitationValue,
-    Key key,
+    required this.selected,
+    required this.onSelected,
+    required this.holdLbl,
+    required this.holdValue,
+    required this.invitationLbl,
+    required this.invitationValue,
+    Key? key,
   }) : super(key: key);
 
   final int selected;
@@ -178,12 +178,14 @@ class CSButtonTabsFancy extends StatelessWidget {
                         Text(
                           holdLbl,
                           style: context.textSmall(
-                            color: context.labelColor,
-                          ),
+                              color: context.labelColor,
+                              fontWeight: FontWeight.normal,
+                              bold: true),
                         ),
                         Text(
                           holdValue,
-                          style: context.textBodyPrice(),
+                          style: context.textBodyPrice(
+                              fontWeight: FontWeight.normal, bold: true),
                         ),
                       ],
                     ),
@@ -207,12 +209,14 @@ class CSButtonTabsFancy extends StatelessWidget {
                       Text(
                         invitationLbl,
                         style: context.textSmall(
-                          color: context.labelColor,
-                        ),
+                            color: context.labelColor,
+                            fontWeight: FontWeight.normal,
+                            bold: true),
                       ),
                       Text(
                         invitationValue,
-                        style: context.textBodyPrice(),
+                        style: context.textBodyPrice(
+                            fontWeight: FontWeight.normal, bold: true),
                       ),
                     ],
                   ),

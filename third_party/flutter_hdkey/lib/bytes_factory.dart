@@ -7,10 +7,10 @@ class BytesFactory {
     _data = ByteData.view(_bytes.buffer);
   }
 
-  int _position = 0; // 参数set position
-  Endian _endian;
-  Uint8List _bytes;
-  ByteData _data;
+  late int _position = 0; // 参数set position
+  late Endian _endian;
+  late Uint8List _bytes;
+  late ByteData _data;
 
   BytesFactory setInt(int value) {
     _data.setInt32(_position, value, _endian);

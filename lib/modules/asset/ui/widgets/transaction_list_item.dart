@@ -2,8 +2,8 @@ part of asset_ui_module;
 
 class TransactionListItem extends StatelessWidget {
   const TransactionListItem({
-    Key key,
-    this.item,
+    required this.item,
+    Key? key,
   }) : super(key: key);
 
   final Transaction item;
@@ -55,12 +55,18 @@ class TransactionListItem extends StatelessWidget {
 //                  标题
                   Text(
                     tr(item.typeTransKey),
-                    style: context.textMedium(bold: true),
+                    style: context.textMedium(
+                      bold: true,
+                      fontWeight: FontWeight.normal,
+                    ),
                   ),
                   SizedBox(height: 10),
                   Text(
                     item.displayTime,
-                    style: context.textSmall(),
+                    style: context.textSmall(
+                      bold: true,
+                      fontWeight: FontWeight.normal,
+                    ),
                   ),
                 ],
               ),
@@ -95,7 +101,11 @@ class TransactionListItem extends StatelessWidget {
                     copyTextToClipboard(item.txId);
                     Toast.show(tr('global:msg_copy_success'));
                   },
-                  textStyle: context.textSmall(color: context.bodyColor),
+                  textStyle: context.textSmall(
+                    color: context.bodyColor,
+                    bold: true,
+                    fontWeight: FontWeight.normal,
+                  ),
                   cmpRight: CSButtonIcon(
                     borderRadius: 4,
                     icon: CSIcons.Copy,
@@ -119,7 +129,11 @@ class TransactionListItem extends StatelessWidget {
                       ),
                     Text(
                       tr(item.confirmingTransKey),
-                      style: context.textSmall(color: statusColor()),
+                      style: context.textSmall(
+                        color: statusColor(),
+                        bold: true,
+                        fontWeight: FontWeight.normal,
+                      ),
                       maxLines: 1,
                     ),
                   ],

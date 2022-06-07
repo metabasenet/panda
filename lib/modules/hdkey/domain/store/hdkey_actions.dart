@@ -11,7 +11,7 @@ class HDKeyActionDeviceInit extends _BaseAction {
   HDKeyActionDeviceInit();
 
   @override
-  Future<AppState> reduce() async {
+  Future<AppState?> reduce() async {
     final hdDevice = GetIt.I<HDKeyDevice>();
 
     hdDevice.deviceAttached.listen((isConnected) {
@@ -24,7 +24,7 @@ class HDKeyActionDeviceInit extends _BaseAction {
 
     hdDevice.walletCreated.listen((wallet) async {
       if (wallet != null) {
-        await dispatchFuture(AppActionLoadWallet(wallet));
+        await dispatchAsync(AppActionLoadWallet(wallet));
       }
     });
 
@@ -43,7 +43,7 @@ class HDKeyActionDeviceConnected extends _BaseAction {
   HDKeyActionDeviceConnected();
 
   @override
-  AppState reduce() {
+  AppState? reduce() {
     return state.rebuild(
       (b) => b.hdkeyState..isConnected = true,
     );

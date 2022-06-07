@@ -1,7 +1,7 @@
 part of project_ui_module;
 
 class ProjectApplySubmitPage extends HookWidget {
-  ProjectApplySubmitPage(this.createParams, {Key key}) : super(key: key);
+  ProjectApplySubmitPage(this.createParams, {Key? key}) : super(key: key);
 
   static const routeName = '/project/apply/submit';
 
@@ -15,7 +15,7 @@ class ProjectApplySubmitPage extends HookWidget {
   static Route<dynamic> route(RouteSettings settings) {
     return DefaultTransition(
       settings,
-      ProjectApplySubmitPage(settings.arguments as ProjectCreateParams),
+      ProjectApplySubmitPage(settings.arguments! as ProjectCreateParams),
     );
   }
 
@@ -79,7 +79,7 @@ class ProjectApplySubmitPage extends HookWidget {
 
     void doSubmit(ProjectApplyVM viewModel) {
       if (isOpenPool.value) {
-        final isValid = formKey.currentState.validate();
+        final isValid = formKey.currentState!.validate();
 
         if (!autovalidate.value) {
           autovalidate.value = true;
@@ -105,7 +105,7 @@ class ProjectApplySubmitPage extends HookWidget {
           return;
         }
 
-        formKey.currentState.save();
+        formKey.currentState!.save();
       }
 
       final newParams = getUpdatedProjectParams();
@@ -175,6 +175,7 @@ class ProjectApplySubmitPage extends HookWidget {
                           tr('project:create_lbl_enable_pool'),
                           style: context.textBody(
                             bold: true,
+                            fontWeight: FontWeight.normal,
                             color: context.labelColor,
                           ),
                         ),
@@ -203,10 +204,14 @@ class ProjectApplySubmitPage extends HookWidget {
                         },
                         iconWidget: Text(
                           tr('project:create_lbl_symbol'),
-                          style: context.textBody(bold: true),
+                          style: context.textBody(
+                            bold: true,
+                            fontWeight: FontWeight.normal,
+                          ),
                         ),
                         validator: RequiredValidator(
-                            errorText: tr('project:create_input_init_amount')),
+                          errorText: tr('project:create_input_init_amount'),
+                        ),
                         inputFormatters: [
                           NumberTextInputFormatter(
                             maxInteger: 20,
@@ -222,7 +227,10 @@ class ProjectApplySubmitPage extends HookWidget {
                         editable: isOpenPool.value,
                         iconWidget: Text(
                           tr('project:create_lbl_symbol'),
-                          style: context.textBody(bold: true),
+                          style: context.textBody(
+                            bold: true,
+                            fontWeight: FontWeight.normal,
+                          ),
                         ),
                         inputFormatters: [
                           NumberTextInputFormatter(
@@ -231,7 +239,8 @@ class ProjectApplySubmitPage extends HookWidget {
                           ),
                         ],
                         validator: RequiredValidator(
-                            errorText: tr('project:create_input_min_amount')),
+                          errorText: tr('project:create_input_min_amount'),
+                        ),
                       ),
                       FormBox(
                         type: FormBoxType.inputNumber,
@@ -241,7 +250,10 @@ class ProjectApplySubmitPage extends HookWidget {
                         editable: isOpenPool.value,
                         iconWidget: Text(
                           tr('global:lbl_month'),
-                          style: context.textBody(bold: true),
+                          style: context.textBody(
+                            bold: true,
+                            fontWeight: FontWeight.normal,
+                          ),
                         ),
                         onChanged: (value) {
                           remainMonth.value = getMintRemainMonths();
@@ -253,7 +265,8 @@ class ProjectApplySubmitPage extends HookWidget {
                           ),
                         ],
                         validator: RequiredValidator(
-                            errorText: tr('project:create_input_pool_cycle')),
+                          errorText: tr('project:create_input_pool_cycle'),
+                        ),
                       ),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -264,6 +277,7 @@ class ProjectApplySubmitPage extends HookWidget {
                               tr('project:create_lbl_pool'),
                               style: context.textBody(
                                 bold: true,
+                                fontWeight: FontWeight.normal,
                                 color: context.labelColor,
                               ),
                             ),
@@ -310,7 +324,7 @@ class ProjectApplySubmitPage extends HookWidget {
                       labelItem(
                         context,
                         name: tr('project:create_lbl_pool_amount'),
-                        label: remainAmount.value ?? '0.00',
+                        label: remainAmount.value,
                       ),
                       labelItem(
                         context,
@@ -363,7 +377,11 @@ class ProjectApplySubmitPage extends HookWidget {
   }
 }
 
-Widget labelItem(BuildContext context, {String name, String label}) {
+Widget labelItem(
+  BuildContext context, {
+  required String name,
+  required String label,
+}) {
   return Padding(
     padding: EdgeInsets.only(
       top: 20,
@@ -375,12 +393,16 @@ Widget labelItem(BuildContext context, {String name, String label}) {
       children: [
         Text(
           name,
-          style: context.textSecondary(),
+          style: context.textSecondary(
+            bold: true,
+            fontWeight: FontWeight.normal,
+          ),
         ),
         Text(
           label,
           style: context.textSecondary(
             bold: true,
+            fontWeight: FontWeight.normal,
             color: context.bodyColor,
           ),
         ),

@@ -2,8 +2,12 @@ part of swap_ui_module;
 
 Future<bool> showSwapConfirmDialog(
   BuildContext context, {
-  @required SwapCreateParams params,
-  @required AssetCoin Function({String chain, String symbol}) getCoinInfo,
+  required SwapCreateParams params,
+  required AssetCoin Function({
+    required String chain,
+    required String symbol,
+  })
+      getCoinInfo,
 }) {
   final response = Completer<bool>();
 
@@ -15,20 +19,29 @@ Future<bool> showSwapConfirmDialog(
   final isFeeSameChain = feeCoin.symbol == params.outCoinInfo.symbol;
   final payAmount = NumberUtil.getDouble(params.amount);
 
-  final outCoinName = tr('asset:lbl_coin_name', namedArgs: {
-    'name': params.outCoinInfo.symbol,
-    'fullName': params.outCoinInfo.fullName,
-  });
+  final outCoinName = tr(
+    'asset:lbl_coin_name',
+    namedArgs: {
+      'name': params.outCoinInfo.symbol ?? '',
+      'fullName': params.outCoinInfo.fullName ?? '',
+    },
+  );
 
-  final inCoinName = tr('asset:lbl_coin_name', namedArgs: {
-    'name': params.inCoinInfo.symbol,
-    'fullName': params.inCoinInfo.fullName,
-  });
+  final inCoinName = tr(
+    'asset:lbl_coin_name',
+    namedArgs: {
+      'name': params.inCoinInfo.symbol ?? '',
+      'fullName': params.inCoinInfo.fullName ?? '',
+    },
+  );
 
-  final feeCoinName = tr('asset:lbl_coin_name', namedArgs: {
-    'name': feeCoin.symbol,
-    'fullName': feeCoin.fullName,
-  });
+  final feeCoinName = tr(
+    'asset:lbl_coin_name',
+    namedArgs: {
+      'name': feeCoin.symbol ?? '',
+      'fullName': feeCoin.fullName ?? '',
+    },
+  );
 
   var payBalanceNotEnough = false;
   var feeBalanceNotEnough = false;
@@ -59,14 +72,14 @@ Future<bool> showSwapConfirmDialog(
       notice: inCoinName,
       value: '$payAmount',
     ),
-    CSConfirmItem(
-      label: tr('swap:confirm_dialog_lbl_real_amount'),
-      notice: inCoinName,
-      value: NumberUtil.minus<String>(
-        payAmount,
-        params.inCoinConfig.transferFee,
-      ),
-    ),
+    //CSConfirmItem(
+    //label: tr('swap:confirm_dialog_lbl_real_amount'),
+    //notice: inCoinName,
+    //value: NumberUtil.minus<String>(
+    //  payAmount,
+    //  params.inCoinConfig.transferFee,
+    //),
+    //),
     CSConfirmItem(
       label: tr('swap:confirm_dialog_lbl_fee'),
       notice: feeCoinName,

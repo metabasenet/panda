@@ -9,8 +9,8 @@ abstract class InvitationCreateVM
   InvitationCreateVM._();
 
 // Fields
-  @nullable
-  String get walletId;
+  //@nullable
+  String? get walletId;
 
 // Withdraw Methods
   @override
@@ -23,36 +23,36 @@ abstract class InvitationCreateVM
   @override
   @BuiltValueField(compare: false)
   Future<String> Function(
-    WithdrawSubmitParams params,
-    WalletPrivateData walletData, [
-    Future<bool> Function() onConfirmSubmit,
+    WithdrawSubmitParams? params,
+    WalletPrivateData? walletData, [
+    Future<bool> Function()? onConfirmSubmit,
   ]) get submit;
 
   @BuiltValueField(compare: false)
   Future<void> Function({
-    AssetCoin coinInfo,
-    String toAddress,
-    String signCode,
-    String sharePrvKey,
-    String amount,
-    Future<WalletPrivateData> Function() onUnlockWallet,
-    void Function(String txId) onSuccessTransaction,
-    Future<bool> Function(WalletWithdrawData withdrawData) onConfirmParams,
-    Future<bool> Function() onConfirmSubmit,
+    AssetCoin? coinInfo,
+    String? toAddress,
+    String? signCode,
+    String? sharePrvKey,
+    String? amount,
+    Future<WalletPrivateData> Function()? onUnlockWallet,
+    void Function(String txId)? onSuccessTransaction,
+    Future<bool> Function(WalletWithdrawData withdrawData)? onConfirmParams,
+    Future<bool> Function()? onConfirmSubmit,
   }) get doSubmitInvitation;
 
   @override
   @BuiltValueField(compare: false)
   double Function({
-    @required String chain,
-    @required String symbol,
+    required String chain,
+    required String symbol,
   }) get getCoinBalance;
 
   @override
   @BuiltValueField(compare: false)
   AssetCoin Function({
-    @required String chain,
-    @required String symbol,
+    required String chain,
+    required String symbol,
   }) get getCoinInfo;
 
   @override
@@ -81,7 +81,7 @@ abstract class InvitationCreateVM
         ));
         return completer.future;
       }
-      ..submit = (_, __, [___]) {
+      ..submit = (_, __, [Future<bool> Function()? F]) {
         return Future.value('');
       }
       ..doUnlockWallet = (password) {
@@ -100,26 +100,26 @@ abstract class InvitationCreateVM
         onConfirmParams,
         onConfirmSubmit,
       }) {
-        return store.dispatchFuture(InvitationActionCreateSubmit(
-          coinInfo: coinInfo,
-          toAddress: toAddress,
-          signCode: signCode,
-          sharePrvKey: sharePrvKey,
-          amount: amount,
-          onUnlockWallet: onUnlockWallet,
-          onSuccessTransaction: onSuccessTransaction,
-          onConfirmParams: onConfirmParams,
-          onConfirmSubmit: onConfirmSubmit,
+        return store.dispatchAsync(InvitationActionCreateSubmit(
+          coinInfo: coinInfo!,
+          toAddress: toAddress!,
+          signCode: signCode!,
+          sharePrvKey: sharePrvKey!,
+          amount: amount!,
+          onUnlockWallet: onUnlockWallet!,
+          onSuccessTransaction: onSuccessTransaction!,
+          onConfirmParams: onConfirmParams!,
+          onConfirmSubmit: onConfirmSubmit!,
         ));
       }
-      ..getCoinInfo = ({chain, symbol}) {
+      ..getCoinInfo = ({required chain, required symbol}) {
         return VMWithWalletGetCoinInfoImplement.getCoinInfo(
           store,
           chain: chain,
           symbol: symbol,
         );
       }
-      ..getCoinBalance = ({chain, symbol}) {
+      ..getCoinBalance = ({required chain, required symbol}) {
         return VMWithAssetGetCoinBalanceImplement.getCoinBalance(
           store,
           chain: chain,

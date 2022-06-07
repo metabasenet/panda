@@ -28,7 +28,10 @@ class MnemonicBackupImgTip extends StatelessWidget {
             SizedBox(height: 10),
             Text(
               item.tip,
-              style: context.textSecondary(),
+              style: context.textSecondary(
+                bold: false,
+                fontWeight: FontWeight.normal,
+              ),
             )
           ],
         ),

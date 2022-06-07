@@ -4,7 +4,6 @@ library asset_ui_module;
 import 'dart:async';
 
 // Flutter imports:
-import 'package:decimal/decimal.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -30,7 +29,6 @@ import 'package:mars/routers/navigator.dart';
 import 'package:mars/themes/themes.dart';
 import 'package:mars/utils/utils.dart';
 import 'package:mars/widgets/widgets.dart';
-import 'package:mars/modules/trade/ui/trade.dart';
 
 part 'listeners/asset_balance_listener.dart';
 part 'listeners/asset_price_listener.dart';
@@ -56,7 +54,7 @@ part 'widgets/asset_wallet_card.dart';
 part 'widgets/asset_wallet_status.dart';
 part 'process/asset_withdraw_process.dart';
 
-Route<dynamic> moduleAssetInitRoutes(RouteSettings settings) {
+Route? moduleAssetInitRoutes(RouteSettings settings) {
   switch (settings.name) {
     case AssetWalletSelectPage.routeName:
       return AssetWalletSelectPage.route(settings);

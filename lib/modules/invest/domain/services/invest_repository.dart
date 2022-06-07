@@ -1,7 +1,7 @@
 part of invest_domain_module;
 
 class InvestRepository {
-  factory InvestRepository([InvestApi _api]) {
+  factory InvestRepository([InvestApi? _api]) {
     _instance._api = _api ?? InvestApi();
     return _instance;
   }
@@ -9,7 +9,7 @@ class InvestRepository {
 
   static final _instance = InvestRepository._internal();
 
-  InvestApi _api;
+  late InvestApi _api;
 
   Future<InvestConfig> getConfig() async {
     final json = [
@@ -23,7 +23,7 @@ class InvestRepository {
       }
     ];
     final c = InvestConfig.fromJson(json);
-    return c;
+    return c!;
   }
 
   /*
@@ -49,26 +49,32 @@ class InvestRepository {
   }
   */
 
-  //get Profit record
-  Future<List<dynamic>> getProfitRecordList({
-    @required String fork,
-    @required String address,
-    @required int skip,
-    @required int take,
+  //
+  Future<List<Map<String, dynamic>>> getProfitRecordList({
+    required String fork,
+    required String address,
+    required int skip,
+    required int take,
   }) async {
+    /*
     final dio = Dio();
-    final response = await dio.get(
-        '${AppConstants.randomApiUrl}/profit?address=$address&pagenum=${(skip + 1)}&pagesize=$take');
-    final data = response.data as Map<String, dynamic>;
-    return data['data'] as List<dynamic>;
+    final response =
+        await dio.get('${AppConstants.randomApiUrl}/profit?address=$address');
+    final data = response.data;
+    return List<Map<String, dynamic>>.from(
+      data.map(
+        (e) => Map<String, dynamic>.from(e as Map<String, dynamic>),
+      ),
+    );*/
+    return [];
   }
 
-  //get Invitation record
+  //
   Future<List<dynamic>> getProfitInvitationList({
-    @required String fork,
-    @required String addr,
-    @required int skip,
-    @required int take,
+    required String fork,
+    required String addr,
+    required int skip,
+    required int take,
   }) async {
     final dio = Dio();
     final response =

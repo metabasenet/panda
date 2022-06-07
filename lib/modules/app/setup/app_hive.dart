@@ -3,7 +3,7 @@ part of app_module;
 // Global cache
 class AppHiveCache {
   static const encryptionKeyLocation = 'Mars@PublicKey';
-  static Directory storageLocation;
+  static late Directory storageLocation;
 
   static Future<void> initHive() async {
     storageLocation = await getApplicationDocumentsDirectory();

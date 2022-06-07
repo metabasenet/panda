@@ -7,12 +7,11 @@ abstract class _BaseAction extends ReduxAction<AppState> {
 class HomeActionInit extends _BaseAction {
   @override
   Future<AppState> reduce() async {
-    debugPrint("==============> 我看看请求");
-    await store.dispatchFuture(HomeActionGetBanners());
-    await store.dispatchFuture(AdmissionActionGetLatest());
-    await store.dispatchFuture(HomeActionGetQuotations());
+    await store.dispatchAsync(HomeActionGetBanners());
+    await store.dispatchAsync(AdmissionActionGetLatest());
+    await store.dispatchAsync(HomeActionGetQuotations());
     if (store.state.communityState.configState != ConfigState.loading.index) {
-      await store.dispatchFuture(CommunityActionLoadConfig());
+      await store.dispatchAsync(CommunityActionLoadConfig());
     }
     return state.rebuild((a) => a..homeState.isInitialized = true);
   }
@@ -29,18 +28,19 @@ class HomeActionGetBanners extends _BaseAction {
 
 class HomeActionGetQuotations extends _BaseAction {
   @override
-  Future<AppState> reduce() async {
-    final json = await HomeRepository().getQuotations(
+  Future<AppState?> reduce() async {
+    final result = await HomeRepository().getQuotations(
       marketId: 'USDT',
+      timestamp: 0,
     );
-    final list = deserializeListOf<AssetPrice>(json);
+    final list = deserializeListOf<AssetPrice>(result);
     return state.rebuild(
       (a) => a..homeState.homePrices.replace(list),
     );
   }
 
   @override
-  Object wrapError(dynamic error) {
+  Object? wrapError(dynamic error) {
     return error;
   }
 }

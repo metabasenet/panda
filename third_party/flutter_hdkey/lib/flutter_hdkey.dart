@@ -50,7 +50,7 @@ class HDKeyCore {
     return _id++;
   }
 
-  static Future<String> _request(
+  static Future<String?> _request(
     int id,
     Uint8List bytes, [
     _ResultEnum type = _ResultEnum.string,
@@ -93,14 +93,14 @@ class HDKeyCore {
 
   ///* active check hdkey is connect
   ///* result bool
-  static Future<bool> hasHDKey() async {
+  static Future<bool?> hasHDKey() async {
     final result = await _methodChannel.invokeMethod<bool>('hasHDKey');
     return result;
   }
 
   ///* connect HDKey
   ///* result bool
-  static Future<bool> connectHDKey() async {
+  static Future<bool?> connectHDKey() async {
     final result = await _methodChannel.invokeMethod<bool>('connectHDKey');
     return result;
   }
@@ -177,7 +177,7 @@ class HDKeyCore {
 
   ///* validate pin code
   ///* result bool
-  static Future<bool> validatePin(String pinCode) async {
+  static Future<bool?> validatePin(String pinCode) async {
     final result = await _methodChannel.invokeMethod<bool>(
       'validatePin',
       {'pin': pinCode},
@@ -188,7 +188,7 @@ class HDKeyCore {
   ///* on init set pin code
   ///* result bool  PIN_CODE_USED
   ///* error -1 PIN_CODE_USED
-  static Future<bool> setPin(String pinCode) async {
+  static Future<bool?> setPin(String pinCode) async {
     final result = await _methodChannel.invokeMethod<bool>(
       'setPin',
       {'pin': pinCode},
@@ -215,8 +215,8 @@ class HDKeyCore {
   ///* result bool
   ///* error -1 OLD_PIN_FAIL ,-2 NEW_PIN_LENGTH_FAIL
   static Future<bool> changePin({
-    @required String oldPin,
-    @required String newPin,
+    required String oldPin,
+    required String newPin,
   }) async {
     // final result = await _methodChannel.invokeMethod<bool>(
     //   'changePin',
@@ -245,7 +245,7 @@ class HDKeyCore {
 
   ///* get mnemonic list,, Don't use it yet
   ///* result bool
-  static Future<List<String>> getMnemonicList(
+  static Future<List<String>?> getMnemonicList(
     String pinCode,
   ) async {
     final result = await _methodChannel.invokeMethod<List<String>>(
@@ -259,9 +259,9 @@ class HDKeyCore {
 
   ///写入私钥 参数1：写入的solt，值为0~6 参数2：32字节私钥 参数3：32字节公钥
   static Future<bool> writeKeyPair({
-    @required int solt,
-    @required String privateKey,
-    @required String publicKey,
+    required int solt,
+    required String privateKey,
+    required String publicKey,
   }) async {
     // final result = await _methodChannel.invokeMethod<bool>(
     //   'write_keypair',
@@ -287,8 +287,8 @@ class HDKeyCore {
 
   ///擦除私钥 参数1：写入的solt，值为0~6   参数2：pin code
   static Future<bool> eraseKeyPair({
-    @required int solt,
-    @required String pinCode,
+    required int solt,
+    required String pinCode,
   }) async {
     // final result = await _methodChannel.invokeMethod<bool>(
     //   'erase_keypair',
@@ -312,9 +312,9 @@ class HDKeyCore {
   }
 
   /// 写入秘密数据 参数1：写入的section，值为0~6 参数2: pin code
-  static Future<bool> writeSecret({
-    @required int secret,
-    @required String data,
+  static Future<bool?> writeSecret({
+    required int secret,
+    required String data,
   }) async {
     final result = await _methodChannel.invokeMethod<bool>(
       'write_secret',
@@ -327,9 +327,9 @@ class HDKeyCore {
   }
 
   /// 擦除秘密数据
-  static Future<bool> eraseSecret({
-    @required int secret,
-    @required String pinCode,
+  static Future<bool?> eraseSecret({
+    required int secret,
+    required String pinCode,
   }) async {
     final result = await _methodChannel.invokeMethod<bool>(
       'erase_secret',
@@ -342,7 +342,7 @@ class HDKeyCore {
   }
 
   /// 写入秘密数据 参数1：需要读取的section，值为0~6
-  static Future<String> readSecret(
+  static Future<String?> readSecret(
     int secret,
   ) async {
     final result = await _methodChannel.invokeMethod<String>(
@@ -355,7 +355,7 @@ class HDKeyCore {
   }
 
   ///重置设备（需要验证pincode）  参数1：pin code
-  static Future<bool> resetDevice(
+  static Future<bool?> resetDevice(
     String pinCode,
   ) async {
     final result = await _methodChannel.invokeMethod<bool>(

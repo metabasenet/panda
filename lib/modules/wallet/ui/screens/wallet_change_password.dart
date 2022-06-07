@@ -22,7 +22,7 @@ class WalletChangePasswordPage extends HookWidget {
     ValueNotifier<bool> autovalidate,
     TextEditingController newPassword1,
   ) {
-    final isValid = formKey.currentState.validate();
+    final isValid = formKey.currentState!.validate();
 
     if (!autovalidate.value) {
       autovalidate.value = true;
@@ -32,7 +32,7 @@ class WalletChangePasswordPage extends HookWidget {
       return;
     }
 
-    formKey.currentState.save();
+    formKey.currentState?.save();
     viewModel.changePassword(oldPassword, newPassword1.text).then((_) {
       AppNavigator.goBack();
       Toast.show(tr('wallet:change_pwd_msg_success'));

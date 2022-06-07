@@ -6,7 +6,7 @@ class InvitationCreatePage extends HookWidget {
 
   static const routeName = '/invitation/create';
 
-  static void open([AssetCoin coinInfo]) {
+  static void open([AssetCoin? coinInfo]) {
     AppNavigator.push(routeName, params: coinInfo);
   }
 
@@ -14,7 +14,7 @@ class InvitationCreatePage extends HookWidget {
     final arg = settings.arguments;
     return DefaultTransition(
       settings,
-      InvitationCreatePage(arg != null ? arg as AssetCoin : null),
+      InvitationCreatePage(arg! as AssetCoin),
     );
   }
 
@@ -22,14 +22,14 @@ class InvitationCreatePage extends HookWidget {
 
   Future<void> doSubmit(
     BuildContext context, {
-    @required AssetCoin coinInfo,
-    @required InvitationCreateVM viewModel,
-    @required String address,
-    @required String signCode,
-    @required String sharePrvKey,
-    @required String amount,
+    required AssetCoin coinInfo,
+    required InvitationCreateVM viewModel,
+    required String address,
+    required String signCode,
+    required String sharePrvKey,
+    required String amount,
   }) async {
-    final isValid = formKey.currentState.validate();
+    final isValid = formKey.currentState!.validate();
 
     if (!isValid) {
       return;
@@ -40,7 +40,7 @@ class InvitationCreatePage extends HookWidget {
       return;
     }
 
-    formKey.currentState.save();
+    formKey.currentState?.save();
     InvitationSubmitProcess.doSubmit(
       context: context,
       viewModel: viewModel,
@@ -79,19 +79,19 @@ class InvitationCreatePage extends HookWidget {
   }
 
   void showCoinSelect({
-    @required BuildContext context,
-    @required InvitationCreateVM viewModel,
-    @required ValueNotifier<AssetCoin> coinInfo,
-    @required TextEditingController address,
-    @required TextEditingController signCode,
-    @required TextEditingController sharePrvKey,
-    @required TextEditingController amount,
-    @required ValueNotifier<double> miniAmount,
+    required BuildContext context,
+    required InvitationCreateVM viewModel,
+    required ValueNotifier<AssetCoin> coinInfo,
+    required TextEditingController address,
+    required TextEditingController signCode,
+    required TextEditingController sharePrvKey,
+    required TextEditingController amount,
+    required ValueNotifier<double> miniAmount,
   }) {
     InvitationCoinSelectPage.open().then((coin) {
-      if (coinInfo.value.chain != coin.chain ||
-          coinInfo.value.symbol != coin.symbol) {
-        coinInfo.value = coin;
+      if (coinInfo.value.chain != coin?.chain ||
+          coinInfo.value.symbol != coin?.symbol) {
+        coinInfo.value = coin!;
         address.text = '';
         signCode.text = '';
         sharePrvKey.text = '';
@@ -127,14 +127,14 @@ class InvitationCreatePage extends HookWidget {
     final autovalidate = useState(false);
     final feeIsRefreshing = useState(false);
     final miniAmount = useState<double>(0);
-    final coinName = coinInfo.value?.name ?? '';
+    final coinName = coinInfo.value.name ?? '';
 
     void openQrScan() {
       QRScannerPage.open().then((qrStr) {
         if (qrStr != null && qrStr.isNotEmpty) {
           InvitationCodeUtils.decodeQRCodeData(
-            chain: coinInfo.value.chain,
-            symbol: coinInfo.value.symbol,
+            chain: coinInfo.value.chain ?? '',
+            symbol: coinInfo.value.symbol ?? '',
             data: qrStr,
           ).then((value) {
             address.text = value[0];
@@ -180,8 +180,8 @@ class InvitationCreatePage extends HookWidget {
 
     void loadDefaultCoin(InvitationCreateVM viewModel) {
       final coins = viewModel.getInvitationCoins();
-      if (coins?.isNotEmpty == true) {
-        final defaultCoin = coinInfo.value ?? coins.first;
+      if (coins.isNotEmpty == true) {
+        final defaultCoin = coinInfo.value;
         final mini = GetIt.I<CoinConfig>().getTransferMinQuota(
           chain: defaultCoin.chain,
           symbol: defaultCoin.symbol,
@@ -196,7 +196,7 @@ class InvitationCreatePage extends HookWidget {
       child: StoreConnector<AppState, InvitationCreateVM>(
         distinct: true,
         converter: InvitationCreateVM.fromStore,
-        onInitialBuild: (viewModel) {
+        onInitialBuild: (_, __, viewModel) {
           loadDefaultCoin(viewModel);
         },
         builder: (context, viewModel) => ModelPermissionView(
@@ -281,10 +281,13 @@ class InvitationCreatePage extends HookWidget {
                         hintText: tr('invitation:defi_create_hint_prvkey'),
                         maxLines: null,
                       ),
-                      //金额
+
                       FormBox(
                         type: FormBoxType.inputNumber,
-                        inputTextStyle: context.textBody(bold: true),
+                        inputTextStyle: context.textBody(
+                          bold: true,
+                          fontWeight: FontWeight.normal,
+                        ),
                         title: tr('invitation:defi_create_lbl_amount'),
                         controller: amount,
                         maxLength: 25,
@@ -293,7 +296,7 @@ class InvitationCreatePage extends HookWidget {
                         ),
                         inputFormatters: [
                           DecimalTextInputFormatter(
-                            decimalRange: coinInfo.value?.chainPrecision ?? 8,
+                            decimalRange: coinInfo.value.chainPrecision,
                           ),
                         ],
                         onPressIcon: () {
@@ -319,11 +322,14 @@ class InvitationCreatePage extends HookWidget {
                               tr(
                                 'asset:lbl_balance',
                                 namedArgs: {
-                                  'balance': balance,
+                                  'balance': balance!,
                                   'symbol': coinName,
                                 },
                               ),
-                              style: context.textSecondary(),
+                              style: context.textSecondary(
+                                bold: true,
+                                fontWeight: FontWeight.normal,
+                              ),
                             ),
                           ),
                         ),
@@ -334,7 +340,11 @@ class InvitationCreatePage extends HookWidget {
                   padding: context.edgeAll,
                   child: Text(
                     tr('invitation:defi_create_tip'),
-                    style: context.textSecondary(color: context.redColor),
+                    style: context.textSecondary(
+                      color: context.redColor,
+                      bold: true,
+                      fontWeight: FontWeight.normal,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                 ),

@@ -8,11 +8,6 @@ import 'dart:io';
 import 'dart:math' as math;
 import 'dart:ui';
 
-// Flutter imports:
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart' hide Builder;
-import 'package:flutter/services.dart';
-
 // Package imports:
 import 'package:amplitude_flutter/amplitude.dart';
 import 'package:async_redux/async_redux.dart';
@@ -22,17 +17,15 @@ import 'package:built_value/built_value.dart';
 import 'package:convert/convert.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:easy_localization/src/translations.dart';
+// Flutter imports:
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart' hide Builder;
+import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart' hide Store;
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive/hive.dart';
-import 'package:network_flutter/network_flutter.dart';
-import 'package:package_info/package_info.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:sentry_flutter/sentry_flutter.dart' hide Request;
-import 'package:video_player/video_player.dart';
-
 // Project imports:
 import 'package:mars/dialogs/dialogs.dart';
 import 'package:mars/modules/admission/domain/admission.dart';
@@ -49,8 +42,6 @@ import 'package:mars/modules/invest/ui/invest.dart';
 import 'package:mars/modules/invitation/domain/invitation.dart';
 import 'package:mars/modules/notice/domain/notice.dart';
 import 'package:mars/modules/project/domain/project.dart';
-import 'package:mars/modules/settings/domain/settings.dart';
-import 'package:mars/modules/settings/ui/settings.dart';
 import 'package:mars/modules/swap/domain/swap.dart';
 import 'package:mars/modules/trade/domain/trade.dart';
 import 'package:mars/modules/trade/ui/trade.dart';
@@ -60,6 +51,10 @@ import 'package:mars/themes/themes.dart';
 import 'package:mars/utils/utils.dart';
 import 'package:mars/widgets/common/offline.dart';
 import 'package:mars/widgets/widgets.dart';
+import 'package:package_info/package_info.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:sentry_flutter/sentry_flutter.dart'; //hide Request;
+import 'package:video_player/video_player.dart';
 
 export 'package:sentry_flutter/sentry_flutter.dart' show SentryFlutter;
 
@@ -72,8 +67,8 @@ part 'config/app_constants.dart';
 part 'config/app_languages.dart';
 part 'config/app_links.dart';
 part 'permission/module_permission.dart';
-part 'permission/module_permission_vm.dart';
 part 'permission/module_permission_view.dart';
+part 'permission/module_permission_vm.dart';
 part 'setup/app_actions.dart';
 part 'setup/app_errors.dart';
 part 'setup/app_getit.dart';

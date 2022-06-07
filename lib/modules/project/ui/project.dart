@@ -34,7 +34,7 @@ part 'widgets/project_pool_plan.dart';
 
 part 'dialogs/project_submit_dialog.dart';
 
-Route<dynamic> moduleProjectInitRoutes(RouteSettings settings) {
+Route<dynamic>? moduleProjectInitRoutes(RouteSettings settings) {
   switch (settings.name) {
     case ProjectListPage.routeName:
       return ProjectListPage.route(settings);

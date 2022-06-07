@@ -9,6 +9,7 @@ import 'package:async_redux/async_redux.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_page_indicator/flutter_page_indicator.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
+import 'package:built_collection/src/list.dart';
 
 // Project imports:
 import 'package:mars/dialogs/dialogs.dart';

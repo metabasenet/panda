@@ -31,34 +31,36 @@ Future<void> downloadTranslations(SheetsApi api) async {
   load('.env.locales');
 
   final spreadsheetId = env['TRANSLATION_DOC_ID'];
-  final localeSheets = env['TRANSLATION_SHEETS'].split('|');
-  final localeLanguages = env['TRANSLATION_LANGUAGES'].split('|');
+  final localeSheets = env['TRANSLATION_SHEETS']?.split('|');
+  final localeLanguages = env['TRANSLATION_LANGUAGES']?.split('|');
 
   log.d('Open Doc: $spreadsheetId');
 
-  final doc = await api.spreadsheets.get(spreadsheetId);
+  final doc = await api.spreadsheets.get(spreadsheetId!);
 
   // Initialize Languages
   final translations = localeLanguages
-      .map((lang) => {
-            lang: {},
-          })
+      ?.map(
+    (lang) => {
+      lang: {},
+    },
+  )
       .fold({}, (previousValue, element) => {...previousValue, ...element});
 
-  if (doc.sheets.isEmpty) {
+  if (doc.sheets?.isEmpty ?? false) {
     throw Exception('No namespaces sheets');
   }
 
-  for (final sheet in doc.sheets) {
-    final sheetName = sheet.properties.title;
+  for (final sheet in doc.sheets!) {
+    final sheetName = sheet.properties?.title;
     log.i('Process Sheet: $sheetName');
 
-    if (localeSheets.contains(sheetName)) {
+    if (localeSheets!.contains(sheetName)) {
       final docValues = await api.spreadsheets.values
           .get(spreadsheetId, '$sheetName!A1:F1000');
 
-      for (final row in docValues.values) {
-        for (final lang in localeLanguages.asMap().entries) {
+      for (final row in docValues.values!) {
+        for (final lang in localeLanguages!.asMap().entries) {
           try {
             if (row.isNotEmpty && row[0] != 'Key') {
               final transKey = '$sheetName:${row[0]}';
@@ -75,7 +77,7 @@ Future<void> downloadTranslations(SheetsApi api) async {
     }
   }
 
-  for (final lang in localeLanguages) {
+  for (final lang in localeLanguages!) {
     final file = File('assets/locales/$lang.json');
     await file.create(recursive: true);
     final encoder = JsonEncoder.withIndent('  ');
@@ -89,7 +91,7 @@ Future<void> main() async {
   final client = await clientViaServiceAccount(
     accountCredentials,
     [
-      SheetsApi.SpreadsheetsScope,
+      SheetsApi.spreadsheetsScope,
     ],
   );
 

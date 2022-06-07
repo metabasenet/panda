@@ -1,12 +1,12 @@
 name: flutter_dabank
 description: dabank
 version: 0.0.2
-author:
+author: dabank
 homepage:
 
 environment:
-  sdk: ">=2.2.2 <3.0.0"
-
+  ##sdk: ">=2.2.2 <3.0.0"
+  sdk: ">=2.15.1 <3.0.0"
 dependencies:
   flutter:
     sdk: flutter

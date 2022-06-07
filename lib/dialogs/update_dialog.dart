@@ -2,15 +2,15 @@ part of dialogs;
 
 void showUpdateAppDialog(
   BuildContext context, {
-  @required String downloadUrl,
-  @required String description,
-  @required String version,
+  required String downloadUrl,
+  required String description,
+  required String version,
 }) {
   Future.delayed(Duration.zero, () {
     showCSDialog(
       context,
       (_) => _UpdateAppDialog(
-        content: description ?? tr('global:update_dialog_default_content'),
+        content: description,
         onConfirm: () {
           if (Platform.isIOS) {
             doOpenUrl(downloadUrl);
@@ -39,11 +39,11 @@ class _UpdateAppDialog extends StatelessWidget {
   });
 
   /// 弹窗内容
-  final String content;
+  final String? content;
   final bool hideCancel;
 
   /// 弹窗关闭回调
-  final void Function() onConfirm;
+  final void Function()? onConfirm;
 
   @override
   Widget build(BuildContext context) {
@@ -56,6 +56,8 @@ class _UpdateAppDialog extends StatelessWidget {
       cancelBtnText: tr('global:btn_next_time'),
       onConfirm: onConfirm,
       cancelBtnStyle: context.textBody(
+        bold: true,
+        fontWeight: FontWeight.normal,
         color: context.secondaryColor,
       ),
       dismissOnBgClick: false,
@@ -68,7 +70,10 @@ class _UpdateAppDialog extends StatelessWidget {
             child: Center(
               child: Text(
                 tr('global:update_dialog_title'),
-                style: context.textBig(bold: true),
+                style: context.textBig(
+                  bold: true,
+                  fontWeight: FontWeight.normal,
+                ),
               ),
             ),
           ),
@@ -82,7 +87,10 @@ class _UpdateAppDialog extends StatelessWidget {
               child: SingleChildScrollView(
                 child: Text(
                   content ?? '',
-                  style: context.textBody(),
+                  style: context.textBody(
+                    bold: true,
+                    fontWeight: FontWeight.normal,
+                  ),
                 ),
               ),
             ),
@@ -95,8 +103,8 @@ class _UpdateAppDialog extends StatelessWidget {
 
 class _UpdateAppDownloadDialog extends HookWidget {
   const _UpdateAppDownloadDialog({
-    @required this.url,
-    @required this.version,
+    required this.url,
+    required this.version,
   });
 
   final String url;
@@ -132,7 +140,7 @@ class _UpdateAppDownloadDialog extends HookWidget {
       FlutterDabank.updateAppAndroid(url: url, forceUpdate: false);
       return () {
         if (subscription['progress'] != null) {
-          subscription['progress'].cancel();
+          subscription['progress']?.cancel();
         }
       };
     }, []);
@@ -188,8 +196,11 @@ class _UpdateAppDownloadDialog extends HookWidget {
                       Container(
                         alignment: Alignment.center,
                         height: topImgHeight,
-                        child: Text(version ?? '',
-                            style: context.textTitle(bold: true)),
+                        child: Text(version,
+                            style: context.textTitle(
+                              bold: true,
+                              fontWeight: FontWeight.normal,
+                            )),
                       ),
                       Container(
                           padding: context.edgeAll,
@@ -202,7 +213,10 @@ class _UpdateAppDownloadDialog extends HookWidget {
                                 complete.value
                                     ? tr('global:update_download_complete_lbl')
                                     : tr('global:update_dialog_native_title'),
-                                style: context.textBody(bold: true),
+                                style: context.textBody(
+                                  bold: true,
+                                  fontWeight: FontWeight.normal,
+                                ),
                               ),
                               if (!complete.value)
                                 SizedBox(height: context.edgeSize),
@@ -228,7 +242,7 @@ class _UpdateAppDownloadDialog extends HookWidget {
                                           child: LinearProgressIndicator(
                                             minHeight: 6,
                                             backgroundColor: context.whiteColor,
-                                            value: (snapshot?.data ?? 0) * 0.01,
+                                            value: (snapshot.data ?? 0) * 0.01,
                                             valueColor:
                                                 AlwaysStoppedAnimation<Color>(
                                               context.primaryColor,

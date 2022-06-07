@@ -17,7 +17,7 @@ abstract class FieldValidator<T> {
   /// call is a special function that makes a class callable
   /// returns null if the input is valid otherwise it
   /// returns the provided error errorText
-  String call(T value) {
+  String? call(T value) {
     return isValid(value) ? null : errorText;
   }
 }
@@ -30,7 +30,7 @@ abstract class TextFieldValidator extends FieldValidator<String> {
   bool get ignoreEmptyValues => true;
 
   @override
-  String call(String value) {
+  String? call(String value) {
     return (ignoreEmptyValues && value.isEmpty) ? null : super.call(value);
   }
 
@@ -41,7 +41,7 @@ abstract class TextFieldValidator extends FieldValidator<String> {
 
 class RequiredValidator extends TextFieldValidator {
   RequiredValidator({
-    @required String errorText,
+    required String errorText,
   }) : super(errorText);
 
   @override
@@ -53,22 +53,22 @@ class RequiredValidator extends TextFieldValidator {
   }
 
   @override
-  String call(String value) {
+  String? call(String value) {
     return isValid(value) ? null : errorText;
   }
 }
 
 class RequiredCreateAd extends TextFieldValidator {
   RequiredCreateAd({
-    @required String errorText,
+    required String errorText,
     this.inputController,
     this.text,
     this.errorZeroText,
   }) : super(errorText);
 
-  final TextEditingController inputController;
-  final String text;
-  final String errorZeroText;
+  final TextEditingController? inputController;
+  final String? text;
+  final String? errorZeroText;
 
   @override
   bool get ignoreEmptyValues => false;
@@ -79,7 +79,7 @@ class RequiredCreateAd extends TextFieldValidator {
   }
 
   @override
-  String call(String value) {
+  String? call(String value) {
     final amount = inputController?.text;
     if (isValid(value) == false) {
       return errorText;
@@ -98,7 +98,7 @@ class RequiredCreateAd extends TextFieldValidator {
 }
 
 class MaxLengthValidator extends TextFieldValidator {
-  MaxLengthValidator(this.max, {@required String errorText}) : super(errorText);
+  MaxLengthValidator(this.max, {required String errorText}) : super(errorText);
   final int max;
 
   @override
@@ -108,7 +108,7 @@ class MaxLengthValidator extends TextFieldValidator {
 }
 
 class MinLengthValidator extends TextFieldValidator {
-  MinLengthValidator(this.min, {@required String errorText}) : super(errorText);
+  MinLengthValidator(this.min, {required String errorText}) : super(errorText);
   final int min;
 
   @override
@@ -122,9 +122,9 @@ class MinLengthValidator extends TextFieldValidator {
 
 class LengthRangeValidator extends TextFieldValidator {
   LengthRangeValidator({
-    @required this.min,
-    @required this.max,
-    @required String errorText,
+    required this.min,
+    required this.max,
+    required String errorText,
   }) : super(errorText);
 
   final int min;
@@ -141,9 +141,9 @@ class LengthRangeValidator extends TextFieldValidator {
 
 class RangeValidator extends TextFieldValidator {
   RangeValidator({
-    @required this.min,
-    @required this.max,
-    @required String errorText,
+    required this.min,
+    required this.max,
+    required String errorText,
     this.graterThen = false,
     this.isRequired = false,
   }) : super(errorText);
@@ -157,7 +157,7 @@ class RangeValidator extends TextFieldValidator {
 
   @override
   bool isValid(String value) {
-    if (isRequired && value?.isEmpty == true) {
+    if (isRequired && value.isEmpty == true) {
       return false;
     }
 
@@ -173,7 +173,7 @@ class RangeValidator extends TextFieldValidator {
 }
 
 class EmailValidator extends TextFieldValidator {
-  EmailValidator({@required String errorText}) : super(errorText);
+  EmailValidator({required String errorText}) : super(errorText);
 
   /// regex pattern to validate email inputs.
   final String emailRegex =
@@ -184,7 +184,7 @@ class EmailValidator extends TextFieldValidator {
 }
 
 class PatternValidator extends TextFieldValidator {
-  PatternValidator(this.pattern, {@required String errorText})
+  PatternValidator(this.pattern, {required String errorText})
       : super(errorText);
 
   final String pattern;
@@ -196,7 +196,7 @@ class PatternValidator extends TextFieldValidator {
 class DateValidator extends TextFieldValidator {
   DateValidator(
     this.format, {
-    @required String errorText,
+    required String errorText,
   }) : super(errorText);
   final String format;
 
@@ -228,7 +228,7 @@ class MultiValidator extends FieldValidator {
   }
 
   @override
-  String call(dynamic value) {
+  String? call(dynamic value) {
     return isValid(value) ? null : _errorText;
   }
 }
@@ -236,22 +236,22 @@ class MultiValidator extends FieldValidator {
 /// a special match validator to check
 /// if the input equals another provided value;
 class MatchValidator {
-  MatchValidator({@required this.errorText});
+  MatchValidator({required this.errorText});
   final String errorText;
 
-  String validateMatch(String value, String value2) {
+  String? validateMatch(String value, String value2) {
     return value == value2 ? null : errorText;
   }
 }
 
 class AccountPasswordValidator extends TextFieldValidator {
-  AccountPasswordValidator({@required String errorText}) : super(errorText);
+  AccountPasswordValidator({required String errorText}) : super(errorText);
   @override
   bool isValid(String value) => hasMatch(accountPasswordRegex, value);
 }
 
 class WalletPasswordValidator extends TextFieldValidator {
-  WalletPasswordValidator({@required String errorText}) : super(errorText);
+  WalletPasswordValidator({required String errorText}) : super(errorText);
   static const walletPasswordMaxLength = 10000;
   static const walletPasswordRegex =
       r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[^]{8,10000}$';
@@ -263,7 +263,7 @@ class WalletPasswordValidator extends TextFieldValidator {
 // 单纯判断两个密码是否一致 密码规则，为空用 别的方法判断
 class AccountPasswordAgainValidator extends RequiredValidator {
   AccountPasswordAgainValidator(
-      {@required String errorText, @required this.fieldPwd})
+      {required String errorText, required this.fieldPwd})
       : super(errorText: errorText);
   final TextEditingController fieldPwd;
 
@@ -277,7 +277,7 @@ class AccountPasswordAgainValidator extends RequiredValidator {
 }
 
 class ProjectNameValidator extends RequiredValidator {
-  ProjectNameValidator({@required String errorText})
+  ProjectNameValidator({required String errorText})
       : super(errorText: errorText);
   final String enRegex = r'^[A-Za-z\s]+$';
 
@@ -286,7 +286,7 @@ class ProjectNameValidator extends RequiredValidator {
 }
 
 class SymbolValidator extends RequiredValidator {
-  SymbolValidator({@required String errorText}) : super(errorText: errorText);
+  SymbolValidator({required String errorText}) : super(errorText: errorText);
   final String enRegex = r'^[A-Za-z]+$';
 
   @override
@@ -294,7 +294,7 @@ class SymbolValidator extends RequiredValidator {
 }
 
 class WebUrlValidator extends RequiredValidator {
-  WebUrlValidator({@required String errorText}) : super(errorText: errorText);
+  WebUrlValidator({required String errorText}) : super(errorText: errorText);
 
   final String webUrlRegex =
       r'(?=^.{3,255}$)[\s\S]{0,62}(\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+$';

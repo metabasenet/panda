@@ -34,13 +34,13 @@ class _LineChartHoldState extends State<MiningRewardChart> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.chartList == null || widget.chartList.isEmpty) {
+    if (widget.chartList.isEmpty) {
       return Container();
     }
 
     selectSort(widget.chartList);
 
-    final data = (widget.chartList ?? [])
+    final data = (widget.chartList)
         .map(
           (e) => FlSpot(
             NumberUtil.getDouble(e.balance),
@@ -48,7 +48,8 @@ class _LineChartHoldState extends State<MiningRewardChart> {
           ),
         )
         .toList();
-    final showIndex = (widget.chartList ?? []).indexWhere((e) => e.isBalance);
+    final showIndex =
+        (widget.chartList).indexWhere((e) => e.isBalance ?? false);
     return Stack(
       children: <Widget>[
         Padding(
@@ -64,7 +65,10 @@ class _LineChartHoldState extends State<MiningRewardChart> {
           children: [
             Text(
               tr('invest:reward_lbl_chart_tip'),
-              style: context.textSmall(),
+              style: context.textSmall(
+                bold: true,
+                fontWeight: FontWeight.normal,
+              ),
             ),
             /*
             Spacer(),
@@ -100,7 +104,7 @@ class _LineChartHoldState extends State<MiningRewardChart> {
     return value;
   }
 
-  String formatLbl(double value, {bool isZh}) {
+  String formatLbl(double value, {required bool isZh}) {
     if (isZh) {
       final date = DateTime.fromMillisecondsSinceEpoch((value * 1000).toInt());
       return '${date.month}-${date.day}';
@@ -133,8 +137,9 @@ class _LineChartHoldState extends State<MiningRewardChart> {
       }
       return false;
     }
-    return defaultCheckToShowTitle(
-        minValue, maxValue, sideTitles, appliedInterval, value);
+    //defaultCheckToShowTitle(
+    //    minValue, maxValue, sideTitles, appliedInterval, value);
+    return true;
   }
 
   LineChartData mainData(
@@ -194,6 +199,7 @@ class _LineChartHoldState extends State<MiningRewardChart> {
       // clipData: FlClipData.horizontal(),
       titlesData: FlTitlesData(
         show: true,
+        /*
         bottomTitles: SideTitles(
           showTitles: true,
           reservedSize: 22,
@@ -220,21 +226,22 @@ class _LineChartHoldState extends State<MiningRewardChart> {
           checkToShowTitle: checkToShowTitle,
           reservedSize: 28,
           margin: 5,
-        ),
+        ),*/
       ),
       borderData: FlBorderData(
-          show: true,
-          border: Border.all(
-            color: context.bgSecondaryColor,
-            width: 0.5,
-          )),
+        show: true,
+        border: Border.all(
+          color: context.bgSecondaryColor,
+          width: 0.5,
+        ),
+      ),
       lineBarsData: [
         LineChartBarData(
           showingIndicators: showIndex >= 0 ? [showIndex] : [],
           spots: data,
           // isCurved: true,
           // curveSmoothness: 0.05,
-          colors: gradientColors,
+          //colors: gradientColors,
           barWidth: 2.5,
           isStrokeCapRound: true,
           dotData: FlDotData(
@@ -242,8 +249,8 @@ class _LineChartHoldState extends State<MiningRewardChart> {
           ),
           belowBarData: BarAreaData(
             show: true,
-            colors:
-                gradientColors.map((color) => color.withOpacity(0.05)).toList(),
+            //colors:
+            //    gradientColors.map((color) => color.withOpacity(0.05)).toList(),
           ),
         ),
       ],

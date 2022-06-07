@@ -22,7 +22,7 @@ class NoticeListPage extends HookWidget {
       child: StoreConnector<AppState, NoticeListVM>(
         distinct: true,
         converter: NoticeListVM.fromStore,
-        onInitialBuild: (viewModel) {
+        onInitialBuild: (_, __, viewModel) {
           request.add(CSListViewParams());
         },
         builder: (context, viewModel) {
@@ -38,7 +38,7 @@ class NoticeListPage extends HookWidget {
               },
               itemCount: viewModel.listCount,
               itemBuilder: (context, index) {
-                return NoticeListItem(item: viewModel.noticeList[index]);
+                return NoticeListItem(item: viewModel.noticeList![index]);
               });
         },
       ),

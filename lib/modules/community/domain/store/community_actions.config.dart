@@ -2,7 +2,7 @@ part of community_domain_module;
 
 class CommunityActionLoadConfig extends _BaseAction {
   @override
-  Future<AppState> reduce() async {
+  Future<AppState?> reduce() async {
     final config = await CommunityRepository().getConfig();
     return state.rebuild(
       (a) => a.communityState.config.replace(config),
@@ -16,17 +16,16 @@ class CommunityActionLoadConfig extends _BaseAction {
   }
 
   @override
-  Object wrapError(dynamic error) {
+  Object? wrapError(dynamic error) {
     return error;
   }
 }
 
 class CommunityActionLoadConfigAfter extends _BaseAction {
   @override
-  AppState reduce() {
-    final isError = communityConfig == null ||
-        communityConfig.ecological == null ||
-        communityConfig.ecological.isEmpty;
+  AppState? reduce() {
+    final isError = communityConfig.ecological == null ||
+        (communityConfig.ecological?.isEmpty ?? false);
 
     return store.state.rebuild(
       (a) => a.communityState.configState =

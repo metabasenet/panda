@@ -8,63 +8,63 @@ abstract class CommunityTeam
 
   static Serializer<CommunityTeam> get serializer => _$communityTeamSerializer;
 
-  static CommunityTeam fromJson(Map<String, dynamic> json) {
+  static CommunityTeam? fromJson(Map<String, dynamic> json) {
     return deserialize<CommunityTeam>(json);
   }
 
 // Fields
-  @nullable
-  String get id;
+  //@nullable
+  String? get id;
 
   /// 10 缺省， 20 审核通过 , 30 拉黑， 40 拒绝通过
-  @nullable
-  int get status;
+  //@nullable
+  int? get status;
 
-  @nullable
-  String get fork;
+  //@nullable
+  String? get fork;
 
-  @nullable
-  int get type;
+  //@nullable
+  int? get type;
 
-  CommunityTypes get teamType => CommunityUtils.mapCommunityType(type);
+  CommunityTypes get teamType => CommunityUtils.mapCommunityType(type ?? 0);
 
-  @nullable
-  String get owner;
+  //@nullable
+  String? get owner;
 
-  @nullable
-  int get order;
+  //@nullable
+  int? get order;
 
-  @nullable
-  bool get black;
+  //@nullable
+  bool? get black;
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'is_mine')
-  bool get isMine;
+  bool? get isMine;
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'owner_wallet_hash')
-  String get ownerWalletHash;
+  String? get ownerWalletHash;
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'telegram_account')
-  String get telegramAccount;
+  String? get telegramAccount;
 
-  @nullable
-  String get name;
+  //@nullable
+  String? get name;
 
-  @nullable
-  CommunityTeamOptions get options;
+  //@nullable
+  CommunityTeamOptions? get options;
 
-  @nullable
-  String get describe;
+  //@nullable
+  String? get describe;
 
-  @nullable
-  String get chain;
+  //@nullable
+  String? get chain;
 
-  @nullable
-  String get symbol;
+  //@nullable
+  String? get symbol;
 
-  bool get canJoin => options.joinApplyType == 'on';
+  bool get canJoin => options?.joinApplyType == 'on';
 
   /// 10 缺省，
   bool get statusPending => status == 10;
@@ -81,33 +81,35 @@ abstract class CommunityTeam
   /// 没有提交过
   bool get statusDefault => status == null;
 
-  @nullable
+  //@nullable
   @BuiltValueField(wireName: 'create_at')
-  int get createAt;
+  int? get createAt;
 
   String get displayCreatedAt =>
-      formatDate(DateTime.fromMillisecondsSinceEpoch(createAt * 1000));
+      formatDate(DateTime.fromMillisecondsSinceEpoch((createAt ?? 0) * 1000));
 
-  String get displayIcon => options.displayIcon;
+  String get displayIcon => options?.displayIcon ?? '';
 
   /// 平均持币
   String get displayAverageBalance {
-    if (options != null && options.addressAverageBalance != null) {
-      var balance = '';
-      if (options.addressAverageBalance.containsKey('MNT')) {
-        balance = options.addressAverageBalance['MNT'];
-      } else if (options.addressAverageBalance.containsKey('MNT')) {
-        balance = options.addressAverageBalance['MNT'];
+    if (options != null && options?.addressAverageBalance != null) {
+      String? balance = '';
+      if (options?.addressAverageBalance?.containsKey('MNT') ?? false) {
+        balance = options?.addressAverageBalance?['MNT'];
+      } else if (options?.addressAverageBalance?.containsKey('MNT') ?? false) {
+        balance = options?.addressAverageBalance?['MNT'];
       }
       return NumberUtil.truncateDecimal<String>(
-          balance != null && balance.isNotEmpty ? balance : 0, 6);
+        balance != null && balance.isNotEmpty ? balance : 0,
+        6,
+      );
     }
     return '0';
   }
 
   String get displayAverageSymbol {
-    if (options != null && options.addressAverageBalance != null) {
-      return options.addressAverageBalance.containsKey('MNT')
+    if (options != null && options?.addressAverageBalance != null) {
+      return (options?.addressAverageBalance?.containsKey('MNT') ?? false)
           ? 'MNT'
           : AppConstants.mnt_chain;
     }
@@ -117,9 +119,9 @@ abstract class CommunityTeam
   /// 拒绝理由
   String get rejectedMessage {
     if (options != null &&
-        options.admin != null &&
-        options.admin['rejected_message'] != null) {
-      return options.admin['rejected_message'].toString();
+        options?.admin != null &&
+        options?.admin?['rejected_message'] != null) {
+      return options?.admin?['rejected_message'].toString() ?? '';
     }
     return '';
   }
@@ -127,9 +129,9 @@ abstract class CommunityTeam
   /// 禁用理由
   String get blackMessage {
     if (options != null &&
-        options.admin != null &&
-        options.admin['black_message'] != null) {
-      return options.admin['black_message'].toString();
+        options?.admin != null &&
+        options?.admin?['black_message'] != null) {
+      return options?.admin?['black_message'].toString() ?? '';
     }
     return '';
   }

@@ -2,10 +2,10 @@ part of project_domain_module;
 
 class ProjectActionCreateSubmit extends _BaseAction {
   ProjectActionCreateSubmit({
-    @required this.params,
-    @required this.onUnlockWallet,
-    @required this.onConfirmData,
-    @required this.onSuccessTransaction,
+    required this.params,
+    required this.onUnlockWallet,
+    required this.onConfirmData,
+    required this.onSuccessTransaction,
     this.onConfirmSubmit,
   });
 
@@ -13,10 +13,10 @@ class ProjectActionCreateSubmit extends _BaseAction {
   final Future<WalletPrivateData> Function() onUnlockWallet;
   final Future<bool> Function(ProjectCreateParams) onConfirmData;
   final void Function(String txId) onSuccessTransaction;
-  final Future<bool> Function() onConfirmSubmit;
+  final Future<bool> Function()? onConfirmSubmit;
 
   @override
-  Future<AppState> reduce() async {
+  Future<AppState?> reduce() async {
     // final projectConfig = store.state.commonState.config.project;
 
     final payCoin = store.state.assetState.getCoinInfo(
@@ -24,8 +24,8 @@ class ProjectActionCreateSubmit extends _BaseAction {
       symbol: AppConstants.mnt_chain,
     );
 
-    await store.dispatchFuture(
-      WalletActionWalletRegister(store.state.walletState.activeWallet),
+    await store.dispatchAsync(
+      WalletActionWalletRegister(store.state.walletState.activeWallet!),
       notify: false,
     );
 
@@ -33,10 +33,10 @@ class ProjectActionCreateSubmit extends _BaseAction {
     final withdrawDataRequest = Completer<WalletWithdrawData>();
     dispatch(WalletActionWithdrawBefore(
       params: WithdrawBeforeParams(
-        chain: payCoin.chain,
-        symbol: payCoin.symbol,
-        fromAddress: payCoin.address,
-        chainPrecision: payCoin.chainPrecision,
+        chain: payCoin.chain ?? '',
+        symbol: payCoin.symbol ?? '',
+        fromAddress: payCoin.address ?? '',
+        chainPrecision: payCoin.chainPrecision ?? 0,
         contractOrForkId: payCoin.contract,
         toAddress: 'projectConfig.toAddress',
       ),
@@ -63,14 +63,14 @@ class ProjectActionCreateSubmit extends _BaseAction {
     final submitTransaction = Completer<String>();
     dispatch(WalletActionWithdrawSubmit(
       params: WithdrawSubmitParams(
-        withdrawData: params.withdrawData,
-        amount: params.withdrawAmount,
-        chainPrecision: payCoin.chainPrecision,
-        toAddress: params.withdrawData.toAddress,
+        withdrawData: params.withdrawData!,
+        amount: params.withdrawAmount!,
+        chainPrecision: payCoin.chainPrecision ?? 0,
+        toAddress: params.withdrawData!.toAddress!,
       ),
       walletData: walletData,
       completer: submitTransaction,
-      onConfirmSubmit: onConfirmSubmit,
+      onConfirmSubmit: onConfirmSubmit!,
     ));
 
     final txId = await submitTransaction.future;
@@ -81,9 +81,9 @@ class ProjectActionCreateSubmit extends _BaseAction {
     // );
 
     // Reset project info cache
-    await dispatchFuture(ProjectActionCreateSaveToCache(null));
+    await dispatchAsync(ProjectActionCreateSaveToCache(ProjectCreateParams()));
 
-    await dispatchFuture(ProjectActionCreateSuccess(params));
+    await dispatchAsync(ProjectActionCreateSuccess(params));
 
     onSuccessTransaction(txId);
 
@@ -91,7 +91,7 @@ class ProjectActionCreateSubmit extends _BaseAction {
   }
 
   @override
-  Object wrapError(dynamic error) {
+  Object? wrapError(dynamic error) {
     return error;
   }
 }
@@ -101,12 +101,12 @@ class ProjectActionCreateSuccess extends _BaseAction {
   final ProjectCreateParams params;
 
   @override
-  Future<AppState> reduce() async {
+  Future<AppState?> reduce() async {
     final walletId = state.walletState.activeWalletId;
 
     // Call api
     await ProjectRepository().submitProject(
-      walletId: walletId,
+      walletId: walletId!,
       params: params.toApiParams(),
     );
 
@@ -122,7 +122,7 @@ class ProjectActionCreateSuccess extends _BaseAction {
 
 class ProjectActionReSubmitProjects extends _BaseAction {
   @override
-  Future<AppState> reduce() async {
+  Future<AppState?> reduce() async {
     final broadcastRequest = Completer<List<BroadcastTxInfo>>();
     dispatch(WalletActionGetBroadcastsFailed(
       type: BroadcastTxType.project,
@@ -133,7 +133,7 @@ class ProjectActionReSubmitProjects extends _BaseAction {
     for (final broadcastInfo in prevBroadcasts) {
       dispatch(
         ProjectActionCreateSuccess(
-          ProjectCreateParams.fromJson(broadcastInfo.apiParams),
+          ProjectCreateParams.fromJson(broadcastInfo.apiParams)!,
         ),
       );
     }

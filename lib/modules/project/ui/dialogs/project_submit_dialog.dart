@@ -2,25 +2,26 @@ part of project_ui_module;
 
 Future<bool> showProjectConfirmDialog(
   BuildContext context, {
-  @required ProjectCreateParams params,
-  @required AssetCoin Function({String chain, String symbol}) getCoinInfo,
+  required ProjectCreateParams params,
+  required AssetCoin Function({required String chain, required String symbol})
+      getCoinInfo,
 }) {
   final response = Completer<bool>();
 
   final feeCoin = getCoinInfo(
-    chain: params.withdrawData.chain,
-    symbol: params.withdrawData.fee.feeSymbol,
+    chain: params.withdrawData?.chain ?? '',
+    symbol: params.withdrawData?.fee.feeSymbol ?? '',
   );
 
   final payCoin = getCoinInfo(
-    chain: params.chain,
-    symbol: params.symbol,
+    chain: params.chain ?? '',
+    symbol: params.symbol ?? '',
   );
 
   final isFeeSameChain = feeCoin.symbol == params.symbol;
   final payAmount = NumberUtil.getDouble(params.amount);
 
-  final feeSymbol = params.withdrawData.fee.feeSymbol;
+  final feeSymbol = params.withdrawData?.fee.feeSymbol;
 
   final outCoinName = params.symbol;
 
@@ -29,14 +30,14 @@ Future<bool> showProjectConfirmDialog(
 
   // Check if I have enough balance to pay the total and the network fee
   final totalToPayFromBalance = isFeeSameChain
-      ? NumberUtil.plus<double>(params.withdrawData.fee, payAmount)
+      ? NumberUtil.plus<double>(params.withdrawData?.fee, payAmount)
       : payAmount;
 
-  if (payCoin.balance < totalToPayFromBalance) {
+  if ((payCoin.balance ?? 0) < (totalToPayFromBalance ?? 0)) {
     canSubmit = false;
   }
 
-  if (feeCoin.balance < params.withdrawData.fee.feeValue) {
+  if ((feeCoin.balance ?? 0) < (params.withdrawData?.fee.feeValue ?? 0)) {
     canSubmit = false;
     isFeeNeedDeposit = true;
   }
@@ -45,19 +46,25 @@ Future<bool> showProjectConfirmDialog(
 
   final confirmList = [
     {
-      'label': tr('swap:confirm_dialog_lbl_pay_amount',
-          namedArgs: {'symbol': outCoinName}),
+      'label': tr(
+        'swap:confirm_dialog_lbl_pay_amount',
+        namedArgs: {'symbol': outCoinName ?? ''},
+      ),
       'value': payAmount,
     },
     {
-      'label':
-          tr('swap:confirm_dialog_lbl_fee', namedArgs: {'symbol': feeSymbol}),
-      'value': params.withdrawData.displayFee,
+      'label': tr(
+        'swap:confirm_dialog_lbl_fee',
+        namedArgs: {'symbol': feeSymbol ?? ''},
+      ),
+      'value': params.withdrawData?.displayFee ?? '',
     },
     {
-      'label': tr('swap:confirm_dialog_lbl_real_amount',
-          namedArgs: {'symbol': 'payCoin'}),
-      'value': realAmount > 0 ? realAmount : '-',
+      'label': tr(
+        'swap:confirm_dialog_lbl_real_amount',
+        namedArgs: {'symbol': 'payCoin'},
+      ),
+      'value': (realAmount ?? 0) > 0 ? realAmount : '-',
     },
   ];
 
@@ -68,11 +75,17 @@ Future<bool> showProjectConfirmDialog(
       confirmBtnText: canSubmit
           ? tr('global:btn_continue')
           : tr('trade:order_confirm_dialog_btn_deposit'),
-      confirmBtnStyle: context.textBody(bold: true),
+      confirmBtnStyle: context.textBody(
+        bold: true,
+        fontWeight: FontWeight.normal,
+      ),
       hideCancel: false,
       dismissOnBgClick: false,
       cancelBtnText: tr('global:btn_return'),
-      cancelBtnStyle: context.textBody(),
+      cancelBtnStyle: context.textBody(
+        bold: true,
+        fontWeight: FontWeight.normal,
+      ),
       contentPadding: EdgeInsets.zero,
       onCancel: () {
         response.complete(false);
@@ -104,7 +117,10 @@ Future<bool> showProjectConfirmDialog(
                           children: [
                             Text(
                               item['label'].toString(),
-                              style: context.textSmall(),
+                              style: context.textSmall(
+                                bold: true,
+                                fontWeight: FontWeight.normal,
+                              ),
                             ),
                             SizedBox(height: 10),
                             Text(
@@ -112,6 +128,7 @@ Future<bool> showProjectConfirmDialog(
                               style: context.textSecondary(
                                 bold: true,
                                 color: context.bodyColor,
+                                fontWeight: FontWeight.normal,
                               ),
                             ),
                           ],
@@ -129,10 +146,16 @@ Future<bool> showProjectConfirmDialog(
                 tr(
                   'swap:lbl_insufficient_balance',
                   namedArgs: {
-                    'symbol': isFeeNeedDeposit ? feeSymbol : outCoinName
+                    'symbol': isFeeNeedDeposit
+                        ? (feeSymbol ?? '')
+                        : (outCoinName ?? '')
                   },
                 ),
-                style: context.textSmall(color: context.redColor),
+                style: context.textSmall(
+                  color: context.redColor,
+                  bold: true,
+                  fontWeight: FontWeight.normal,
+                ),
               ),
             ),
           SizedBox(height: context.edgeSize),

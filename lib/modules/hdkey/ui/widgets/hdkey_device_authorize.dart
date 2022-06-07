@@ -7,7 +7,7 @@ enum _AuthorizeSteps {
 
 class HDKeyDeviceAuthorize extends HookWidget {
   HDKeyDeviceAuthorize({
-    @required this.onAuthorize,
+    required this.onAuthorize,
   });
 
   final pageController = PageController();
@@ -53,6 +53,7 @@ class HDKeyDeviceAuthorize extends HookWidget {
                 style: context.textBody(
                   color: context.titleColor,
                   bold: true,
+                  fontWeight: FontWeight.normal,
                 ),
               ),
             ),

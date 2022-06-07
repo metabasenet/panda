@@ -6,8 +6,8 @@ abstract class CommunityJoinVM
       _$CommunityJoinVM;
   CommunityJoinVM._();
 
-  @nullable
-  String get walletId;
+  //@nullable
+  String? get walletId;
 
   @BuiltValueField(compare: false)
   Future<CommunityMember> Function(String id) get getMyJoin;
@@ -30,7 +30,7 @@ abstract class CommunityJoinVM
           return completer.future;
         }
         ..joinTeam = (params) {
-          return store.dispatchFuture(CommunityActionJoin(params));
+          return store.dispatchAsync(CommunityActionJoin(params));
         },
     );
   }

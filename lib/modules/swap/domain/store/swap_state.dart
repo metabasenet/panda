@@ -7,6 +7,7 @@ abstract class SwapState implements Built<SwapState, SwapStateBuilder> {
     return _$SwapState._(
       swaps: BuiltList<Swap>(),
       configState: ConfigState.loading.index,
+      config: SwapConfig(),
     );
   }
   SwapState._();
@@ -15,21 +16,22 @@ abstract class SwapState implements Built<SwapState, SwapStateBuilder> {
 
 // Fields
 
-  @nullable
-  SwapConfig get config;
+  //@nullable
+  SwapConfig? get config;
 
-  @nullable
-  int get configState;
+  //@nullable
+  int? get configState;
 
-  @nullable
-  BuiltList<Swap> get swaps;
+  //@nullable
+  BuiltList<Swap>? get swaps;
 
-  SwapConfigCoin getCoinSwapConfig({
-    @required String chain,
-    @required String symbol,
+  SwapConfigCoin? getCoinSwapConfig({
+    required String chain,
+    required String symbol,
   }) {
-    if (config.tradePairs != null && config.tradePairs.isNotEmpty) {
-      for (final pair in config.tradePairs) {
+    if (config?.tradePairs != null &&
+        (config!.tradePairs?.isNotEmpty ?? false)) {
+      for (final pair in config!.tradePairs!) {
         for (final coin in pair) {
           if (coin.chain == chain && coin.symbol == symbol) {
             return coin;

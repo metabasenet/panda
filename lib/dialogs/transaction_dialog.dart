@@ -2,28 +2,28 @@ part of dialogs;
 
 class CSConfirmItem {
   CSConfirmItem({
-    @required this.label,
-    @required this.value,
+    required this.label,
+    required this.value,
     this.notice,
   });
 
   final String label;
-  final String notice;
+  final String? notice;
   final String value;
 }
 
 void showCSTransactionDialog(
   BuildContext context, {
-  @required List<CSConfirmItem> confirmList,
-  String title,
-  String cancelBtnText,
-  String confirmBtnText,
-  String errorText,
-  String approveText,
-  void Function() onCancel,
-  void Function() onConfirm,
+  required List<CSConfirmItem> confirmList,
+  String? title,
+  String? cancelBtnText,
+  String? confirmBtnText,
+  String? errorText,
+  String? approveText,
+  void Function()? onCancel,
+  void Function()? onConfirm,
   bool isDismissible = true,
-  Widget subtitleWidget,
+  Widget? subtitleWidget,
 }) {
   showCSBottomSheet(
     context,
@@ -36,8 +36,9 @@ void showCSTransactionDialog(
           Padding(
             padding: context.edgeBottom16,
             child: Text(
-              title,
-              style: context.textBody(bold: true),
+              title!,
+              style:
+                  context.textBody(bold: true, fontWeight: FontWeight.normal),
             ),
           ),
           if (subtitleWidget != null)
@@ -59,8 +60,9 @@ void showCSTransactionDialog(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            item.label ?? '-',
-                            style: context.textSmall(),
+                            item.label,
+                            style: context.textSmall(
+                                bold: true, fontWeight: FontWeight.normal),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -71,8 +73,10 @@ void showCSTransactionDialog(
                             children: [
                               Expanded(
                                 child: Text(
-                                  item.value ?? '-',
+                                  item.value,
                                   style: context.textSmall(
+                                    bold: true,
+                                    fontWeight: FontWeight.normal,
                                     color: context.bodyColor,
                                   ),
                                   maxLines: 1,
@@ -83,6 +87,8 @@ void showCSTransactionDialog(
                               Text(
                                 item.notice ?? '',
                                 style: context.textSmall(
+                                  bold: true,
+                                  fontWeight: FontWeight.normal,
                                   color: context.bodyColor,
                                 ),
                                 maxLines: 1,
@@ -96,8 +102,10 @@ void showCSTransactionDialog(
                   ),
                   if (approveText != null && approveText.isNotEmpty)
                     Text(
-                      approveText ?? '',
+                      approveText,
                       style: context.textSmall(
+                        bold: true,
+                        fontWeight: FontWeight.normal,
                         color: context.redColor,
                       ),
                     ),
@@ -105,8 +113,11 @@ void showCSTransactionDialog(
                     Padding(
                       padding: context.edgeTop5,
                       child: Text(
-                        errorText ?? '-',
-                        style: context.textSmall(color: context.redColor),
+                        errorText,
+                        style: context.textSmall(
+                            bold: true,
+                            fontWeight: FontWeight.normal,
+                            color: context.redColor),
                       ),
                     ),
                 ],

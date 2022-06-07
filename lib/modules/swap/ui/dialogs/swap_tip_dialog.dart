@@ -14,6 +14,7 @@ void showSwapTipDialog(BuildContext context) {
             tr('global:dialog_alert_title'),
             style: context.textBody(
               bold: true,
+              fontWeight: FontWeight.normal,
             ),
           ),
           SizedBox(height: context.edgeSize),
@@ -24,6 +25,8 @@ void showSwapTipDialog(BuildContext context) {
                 style: context.textSecondary(
                   color: context.bodyColor,
                   lineHeight: 1.61,
+                  bold: true,
+                  fontWeight: FontWeight.normal,
                 ),
               ),
             ),

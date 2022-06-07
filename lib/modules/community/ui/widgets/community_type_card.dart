@@ -2,11 +2,11 @@ part of community_ui_module;
 
 class CommunityTypeCard extends HookWidget {
   const CommunityTypeCard({
-    @required this.config,
-    @required this.configState,
-    @required this.onPressed,
-    @required this.onRefresh,
-    Key key,
+    required this.config,
+    required this.configState,
+    required this.onPressed,
+    required this.onRefresh,
+    Key? key,
   }) : super(key: key);
 
   final CommunityConfig config;
@@ -15,9 +15,9 @@ class CommunityTypeCard extends HookWidget {
   final Function() onRefresh;
 
   Widget buildTableCard({
-    BuildContext context,
-    List<CommunityInfo> typeList,
-    Function(CommunityInfo item) onPress,
+    required BuildContext context,
+    List<CommunityInfo>? typeList,
+    Function(CommunityInfo item)? onPress,
   }) {
     String imageUrl(CommunityTypes type) {
       switch (type) {
@@ -50,14 +50,14 @@ class CommunityTypeCard extends HookWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ...typeList.map(
+        ...typeList!.map(
           (item) => InkWell(
             onTap: () {
               AnalyticsReport().reportLog('Community_Card', {
                 'type': item.type,
                 'name': item.name,
               });
-              onPress(item);
+              onPress?.call(item);
             },
             child: SizedBox(
               width: width,
@@ -73,13 +73,15 @@ class CommunityTypeCard extends HookWidget {
                   Padding(
                     padding: context.edgeTop8,
                     child: Text(
-                      item.name,
+                      item.name ?? '',
                       textAlign: TextAlign.center,
                       softWrap: true,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: context.textSecondary(
                         color: context.bodyColor,
+                        bold: true,
+                        fontWeight: FontWeight.normal,
                       ),
                     ),
                   ),
@@ -122,8 +124,8 @@ class CommunityTypeCard extends HookWidget {
       );
     }
 
-    final list = config?.types?.toList() ?? [];
-    list.retainWhere((x) => config.homeList.contains(x.type));
+    final list = config.types?.toList() ?? [];
+    list.retainWhere((x) => config.homeList!.contains(x.type));
     final swiperNumber = (list.length / 4).ceil();
 
     return Swiper(

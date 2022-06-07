@@ -1,5 +1,5 @@
 part of app_module;
-
+/*
 class AppLocalizationsLoader extends AssetLoader {
   AppLocalizationsLoader({
     this.isFromNetwork = false,
@@ -23,7 +23,7 @@ class AppLocalizationsLoader extends AssetLoader {
   @override
   Future<Map<String, dynamic>> load(String path, Locale locale) async {
     dev.log('Load $isFromNetwork asset from $path', name: 'AppLocalizations');
-
+    /*
     if (isFromNetwork) {
       try {
         // Load from network
@@ -38,41 +38,22 @@ class AppLocalizationsLoader extends AssetLoader {
       } catch (error) {
         dev.log('Error update from network $error', name: 'AppLocalizations');
       }
-    }
+    }*/
 
     final localePath = await getLocalePath(path, locale);
     return json.decode(await rootBundle.loadString(localePath))
         as Map<String, dynamic>;
   }
 }
+*/
 
 class AppLocalizations {
   static Future<Translations> getTranslationsByLocale(Locale locale) async {
-    final translations = json.decode(await rootBundle.loadString(
-            'assets/locales/${localeToString(locale, separator: "-")}.json'))
-        as Map<String, dynamic>;
-
+    final translations = json.decode(
+      await rootBundle.loadString(
+        'assets/locales/${locale.toStringWithSeparator(separator: "-")}.json',
+      ),
+    ) as Map<String, dynamic>;
     return Translations(translations);
   }
-
-  static void updateFromNetwork(BuildContext context) {
-    final localization = EasyLocalization.of(context);
-    localization.bloc.onChange(
-      Resource(
-        path: localization.parent.path,
-        locale: context.locale,
-        assetLoader: AppLocalizationsLoader(isFromNetwork: true),
-        useOnlyLangCode: true,
-      ),
-    );
-  }
-
-  static const List<LocalizationsDelegate> localizationsDelegates = [
-    // Built-in localization of basic text for Material widgets
-    GlobalMaterialLocalizations.delegate,
-    // Built-in localization of basic text for Cupertino widgets
-    GlobalCupertinoLocalizations.delegate,
-    // Built-in localization for text direction LTR/RTL
-    GlobalWidgetsLocalizations.delegate,
-  ];
 }

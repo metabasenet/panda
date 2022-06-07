@@ -2,9 +2,9 @@ part of asset_ui_module;
 
 class AssetListItem extends HookWidget {
   const AssetListItem({
-    @required this.item,
-    @required this.onPressed,
-  }) : assert(item != null);
+    required this.item,
+    required this.onPressed,
+  }); //: assert(item != null);
 
   final AssetCoin item;
   final void Function() onPressed;
@@ -20,7 +20,7 @@ class AssetListItem extends HookWidget {
       child: Row(
         children: [
           CSImage(
-            item.iconLocal,
+            item.iconLocal ?? '',
             fallbackUrl: item.iconLocal,
             height: 36,
             width: 36,
@@ -33,12 +33,18 @@ class AssetListItem extends HookWidget {
             children: [
               Text(
                 item.displayName,
-                style: context.textBody(bold: true),
+                style: context.textBody(
+                  bold: true,
+                  fontWeight: FontWeight.normal,
+                ),
               ),
               SizedBox(height: 4),
               Text(
                 item.displayFullName,
-                style: context.textSecondary(),
+                style: context.textSecondary(
+                  bold: true,
+                  fontWeight: FontWeight.normal,
+                ),
               ),
             ],
           ),
@@ -60,7 +66,7 @@ class AssetListItem extends HookWidget {
                     item: item,
                     builder: (context, {balance, unconfirmed, data}) =>
                         PriceText(
-                      balance,
+                      balance!,
                       '',
                       TextSize.body,
                     ),

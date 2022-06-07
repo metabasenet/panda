@@ -20,15 +20,17 @@ void showCSDialog(BuildContext context, WidgetBuilder builder) {
       );
     },
     transitionDuration: Duration(milliseconds: 200),
-    pageBuilder: (_, __, ___) => null,
+    pageBuilder: (context, animation, secondaryAnimation) {
+      return Center();
+    },
   );
 }
 
 void showAlertDialog(
   BuildContext context, {
-  @required String content,
-  String title,
-  void Function() onDismiss,
+  required String content,
+  String? title,
+  void Function()? onDismiss,
 }) {
   showCSDialog(
     context,
@@ -42,16 +44,16 @@ void showAlertDialog(
 
 void showConfirmDialog(
   BuildContext context, {
-  @required String content,
-  @required void Function() onConfirm,
-  void Function() onCancel,
-  String title,
-  TextStyle titleStyle,
-  String cancelBtnText,
-  TextStyle cancelBtnStyle,
-  String confirmBtnText,
-  TextStyle confirmBtnStyle,
-  int confirmTimeout,
+  required String content,
+  required void Function() onConfirm,
+  void Function()? onCancel,
+  String? title,
+  TextStyle? titleStyle,
+  String? cancelBtnText,
+  TextStyle? cancelBtnStyle,
+  String? confirmBtnText,
+  TextStyle? confirmBtnStyle,
+  int? confirmTimeout,
 }) {
   showCSDialog(
     context,
@@ -64,7 +66,8 @@ void showConfirmDialog(
       confirmTimeout: confirmTimeout,
       hideCancel: false,
       cancelBtnText: cancelBtnText,
-      cancelBtnStyle: cancelBtnStyle ?? context.textBody(),
+      cancelBtnStyle: cancelBtnStyle ??
+          context.textBody(bold: true, fontWeight: FontWeight.normal),
       onCancel: onCancel,
       onConfirm: onConfirm,
     ),

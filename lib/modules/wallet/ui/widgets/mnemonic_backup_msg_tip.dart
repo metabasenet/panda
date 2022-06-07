@@ -35,7 +35,12 @@ class MnemonicBackupMsgTip extends StatelessWidget {
                     Expanded(
                       child: Text(
                         tipText,
-                        style: context.textSecondary().copyWith(
+                        style: context
+                            .textSecondary(
+                              bold: false,
+                              fontWeight: FontWeight.normal,
+                            )
+                            .copyWith(
                               height: 2,
                               color: context.bodyColor,
                             ),

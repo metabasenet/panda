@@ -2,44 +2,41 @@ part of asset_ui_module;
 
 class AssetWithdrawFee extends StatelessWidget {
   const AssetWithdrawFee({
-    @required this.withdrawInfo,
-    @required this.isRefreshing,
+    required this.withdrawInfo,
+    required this.isRefreshing,
     this.onPress,
-    Key key,
+    Key? key,
     this.padding,
     this.onGetFee,
   }) : super(key: key);
 
   final WalletWithdrawData withdrawInfo;
   final bool isRefreshing;
-  final EdgeInsetsGeometry padding;
-  final Function(String type) onPress;
-  final Function() onGetFee;
+  final EdgeInsetsGeometry? padding;
+  final Function(String type)? onPress;
+  final Function()? onGetFee;
 
   void handleShowFeeDialog(
     BuildContext context, {
-    ConfigCoinFee configCoinFee,
-    Function(String level) onSelected,
+    ConfigCoinFee? configCoinFee,
+    Function(String level)? onSelected,
   }) {
     DeviceUtils.hideKeyboard(context);
     final list = WalletFeeUtils.getFeeOptions(
-      chain: withdrawInfo?.chain,
-      defaultFee: withdrawInfo?.feeDefault,
-      configCoinFee: configCoinFee,
+      chain: withdrawInfo.chain,
+      defaultFee: withdrawInfo.feeDefault,
+      configCoinFee: configCoinFee!,
     );
-    final feeChain = withdrawInfo?.chain?.toLowerCase() ?? '';
+    final feeChain = withdrawInfo.chain.toLowerCase();
     final List<CSOptionsItem> options = list
         .map(
           (item) => CSOptionsItem(
             label: tr(
               'asset:withdraw_lbl_fee_${feeChain}_${item.key}',
-              namedArgs: {
-                'fuel': item.value.toString(),
-                'unit': withdrawInfo?.fee?.feeUnit ?? ''
-              },
+              namedArgs: {'fuel': item.value, 'unit': withdrawInfo.fee.feeUnit},
             ),
             value: item.key,
-            color: withdrawInfo?.fee?.feeLevel == item.key
+            color: withdrawInfo.fee.feeLevel == item.key
                 ? context.primaryColor
                 : null,
           ),
@@ -50,7 +47,7 @@ class AssetWithdrawFee extends StatelessWidget {
       context,
       options: options,
       onSelected: (level) {
-        onSelected(level.toString());
+        onSelected!(level.toString());
       },
     );
   }
@@ -58,18 +55,18 @@ class AssetWithdrawFee extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final configCoinFee = GetIt.I<CoinConfig>().getFeeLevel(
-      chain: withdrawInfo?.chain,
-      symbol: withdrawInfo?.symbol,
+      chain: withdrawInfo.chain,
+      symbol: withdrawInfo.symbol,
     );
     final showGasBtn = configCoinFee != null &&
         configCoinFee.enable != null &&
         configCoinFee.enable == true;
 
-    final feeChain = withdrawInfo?.chain?.toLowerCase();
-    final feeLevel = withdrawInfo?.fee?.feeLevel ?? '';
-    final feeUnit = withdrawInfo?.fee?.feeUnit ?? '';
-    final feeSymbol = withdrawInfo?.fee?.feeSymbol ?? '';
-    final feeRate = withdrawInfo?.fee?.feeRate ?? '';
+    final feeChain = withdrawInfo.chain.toLowerCase();
+    final feeLevel = withdrawInfo.fee.feeLevel;
+    final feeUnit = withdrawInfo.fee.feeUnit;
+    final feeSymbol = withdrawInfo.fee.feeSymbol;
+    final feeRate = withdrawInfo.fee.feeRate;
 
     final gasLevel = tr(
       'asset:withdraw_lbl_fee_${feeChain}_$feeLevel',
@@ -91,6 +88,7 @@ class AssetWithdrawFee extends StatelessWidget {
                 style: context.textBody(
                   bold: true,
                   color: context.labelColor,
+                  fontWeight: FontWeight.normal,
                 ),
               ),
             ),
@@ -99,12 +97,17 @@ class AssetWithdrawFee extends StatelessWidget {
                 label: tr('asset:withdraw_btn_get_fee'),
                 flat: true,
                 margin: context.edgeHorizontal,
-                textStyle: context.textSecondary().copyWith(
+                textStyle: context
+                    .textSecondary(
+                      bold: true,
+                      fontWeight: FontWeight.normal,
+                    )
+                    .copyWith(
                       color: context.secondaryColor,
                       decoration: TextDecoration.underline,
                     ),
                 onPressed: () {
-                  onGetFee();
+                  onGetFee!();
                 },
               ),
           ],
@@ -118,7 +121,7 @@ class AssetWithdrawFee extends StatelessWidget {
                     context,
                     configCoinFee: configCoinFee,
                     onSelected: (level) {
-                      onPress(level);
+                      onPress!(level);
                     },
                   );
                 }
@@ -132,8 +135,11 @@ class AssetWithdrawFee extends StatelessWidget {
                     Text(
                       withdrawInfo == null
                           ? '-'
-                          : '${withdrawInfo?.displayFee ?? ''} $feeSymbol',
-                      style: context.textBody(),
+                          : '${withdrawInfo.displayFee} $feeSymbol',
+                      style: context.textBody(
+                        bold: true,
+                        fontWeight: FontWeight.normal,
+                      ),
                     ),
                   if (isRefreshing == true)
                     CSProgressIndicator(
@@ -149,7 +155,10 @@ class AssetWithdrawFee extends StatelessWidget {
                   if (showGasBtn)
                     Text(
                       gasLevel,
-                      style: context.textSecondary(),
+                      style: context.textSecondary(
+                        bold: true,
+                        fontWeight: FontWeight.normal,
+                      ),
                     ),
                   if (feeRate != '-' &&
                       feeUnit != '' &&
@@ -161,7 +170,10 @@ class AssetWithdrawFee extends StatelessWidget {
                       //   'symbol': feeUnit,
                       // }),
                       '',
-                      style: context.textSecondary(),
+                      style: context.textSecondary(
+                        bold: true,
+                        fontWeight: FontWeight.normal,
+                      ),
                     ),
                   if (showGasBtn)
                     Padding(

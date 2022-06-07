@@ -1,5 +1,7 @@
 part of asset_domain_module;
 
+class AssetApi {}
+/*
 class AssetApi {
   /// **** Prices ****
 
@@ -369,3 +371,4 @@ class AssetApi {
         ),
       );
 }
+*/

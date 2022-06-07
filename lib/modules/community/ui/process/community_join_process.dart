@@ -2,13 +2,14 @@ part of community_ui_module;
 
 class CommunityJoinProcess {
   static Future<void> checkCanJoin({
-    @required BuildContext context,
-    @required CommunityInfo info,
-    @required Future<CommunityTeam> Function(String teamId) onGetTeamInfo,
-    @required
-        Future<bool> Function({String fork, String fromAddress}) onCheckOnChain,
-    CommunityTeam team,
-    Function(bool) onJoinResult,
+    required BuildContext context,
+    required CommunityInfo info,
+    required Future<CommunityTeam> Function(String teamId) onGetTeamInfo,
+    required Future<bool> Function(
+            {required String fork, required String fromAddress})
+        onCheckOnChain,
+    CommunityTeam? team,
+    Function(bool)? onJoinResult,
   }) async {
     if (team != null ? !team.canJoin : !info.canJoin) {
       showJoinStatusDialog(
@@ -20,7 +21,7 @@ class CommunityJoinProcess {
 
     try {
       LoadingDialog.show(context);
-      final newTeam = team ?? await onGetTeamInfo(info.id);
+      final newTeam = team ?? await onGetTeamInfo(info.id ?? '');
 
       if (info.joinIsOnChain) {
         // Check again
@@ -34,8 +35,8 @@ class CommunityJoinProcess {
         }
 
         final success = await onCheckOnChain(
-          fork: newTeam.fork,
-          fromAddress: newTeam.owner,
+          fork: newTeam.fork ?? '',
+          fromAddress: newTeam.owner ?? '',
         );
 
         LoadingDialog.dismiss(context);
@@ -52,7 +53,7 @@ class CommunityJoinProcess {
       if (info.joinIsOnChain) {
         showJoinOnChainDialog(
           context,
-          newTeam?.options?.telegramAccount ?? '-',
+          newTeam.options?.telegramAccount ?? '-',
         );
       } else {
         CommunityJoinPage.open(info, newTeam).then((value) {
@@ -70,14 +71,14 @@ class CommunityJoinProcess {
         );
         return;
       }
-      final responseError = Request().getResponseError(error);
-      if (responseError.statusCode == 400) {
-        showJoinStatusDialog(
-          context,
-          message: responseError.message,
-        );
-        return;
-      }
+      //final responseError = Request().getResponseError(error);
+      //if (responseError.statusCode == 400) {
+      //  showJoinStatusDialog(
+      //    context,
+      //    message: responseError.message,
+      //  );
+      //  return;
+      //}
       rethrow;
     }
   }

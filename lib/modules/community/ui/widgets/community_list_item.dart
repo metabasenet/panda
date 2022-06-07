@@ -2,10 +2,10 @@ part of community_ui_module;
 
 class CommunityListItem extends StatelessWidget {
   const CommunityListItem({
-    @required this.name,
-    @required this.onPress,
-    @required this.displayIcon,
-    Key key,
+    required this.name,
+    required this.onPress,
+    required this.displayIcon,
+    Key? key,
     this.isMine,
     this.hasWallet,
     this.isBlacklist = false,
@@ -15,14 +15,14 @@ class CommunityListItem extends StatelessWidget {
   }) : super(key: key);
 
   final Function() onPress;
-  final int order;
-  final bool isMine;
-  final bool hasWallet;
+  final int? order;
+  final bool? isMine;
+  final bool? hasWallet;
   final bool isBlacklist;
   final bool isSuccess;
   final String displayIcon;
   final String name;
-  final int index;
+  final int? index;
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +53,7 @@ class CommunityListItem extends StatelessWidget {
                   : context.bgPrimaryColor,
             ),
             onTap: () {
-              if (hasWallet) {
+              if (hasWallet ?? false) {
                 onPress();
               } else {
                 Toast.show(tr('wallet:msg_create_wallet_need'));
@@ -84,13 +84,15 @@ class CommunityListItem extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                             style: context.textSecondary(
                               color: context.bodyColor,
+                              fontWeight: FontWeight.normal,
+                              bold: true,
                             ),
                           ),
                         ),
                         SizedBox(width: 4),
                         if (order != null &&
-                            order < 4 &&
-                            order > 0 &&
+                            (order ?? 0) < 4 &&
+                            (order ?? 0) > 0 &&
                             isBlacklist == false &&
                             isSuccess)
                           CSImage(
@@ -106,7 +108,8 @@ class CommunityListItem extends StatelessWidget {
                               'No.$order',
                               style: context.textSmall(
                                 bold: true,
-                                color: iconColor(order),
+                                fontWeight: FontWeight.normal,
+                                color: iconColor(order ?? 0),
                               ),
                             ),
                           ),
@@ -127,6 +130,7 @@ class CommunityListItem extends StatelessWidget {
                         textAlign: TextAlign.center,
                         style: context.textSmall(
                           bold: true,
+                          fontWeight: FontWeight.normal,
                           color: context.blackColor,
                         ),
                       ),

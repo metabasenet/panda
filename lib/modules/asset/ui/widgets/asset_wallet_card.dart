@@ -2,11 +2,11 @@ part of asset_ui_module;
 
 class AssetWalletCard extends HookWidget {
   const AssetWalletCard({
-    @required this.wallet,
-    @required this.walletStatus,
-    @required this.fiatCurrency,
-    @required this.onSync,
-    @required this.onPressed,
+    required this.wallet,
+    required this.walletStatus,
+    required this.fiatCurrency,
+    required this.onSync,
+    required this.onPressed,
   }) : assert(wallet != null);
 
   final Wallet wallet;
@@ -32,7 +32,7 @@ class AssetWalletCard extends HookWidget {
                 child: CSContainer(
                   margin: context.edgeAll8,
                   padding: context.edgeAll8,
-                  width: null,
+                  //width: null,
                   onTap: onPressed,
                   child: Column(
                     key: Key(wallet.id),
@@ -42,7 +42,10 @@ class AssetWalletCard extends HookWidget {
                         children: [
                           Text(
                             wallet.name,
-                            style: context.textBody(bold: true),
+                            style: context.textBody(
+                              bold: true,
+                              fontWeight: FontWeight.normal,
+                            ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -67,7 +70,10 @@ class AssetWalletCard extends HookWidget {
                         }),
                         maxLines: 1,
                         overflow: TextOverflow.fade,
-                        style: context.textSmall(),
+                        style: context.textSmall(
+                          bold: true,
+                          fontWeight: FontWeight.normal,
+                        ),
                       ),
                     ],
                   ),
@@ -92,13 +98,11 @@ class AssetWalletCard extends HookWidget {
               Padding(
                 padding: context.edgeHorizontal16,
                 child: Text(
-                  tr(
-                    'asset:list_lbl_valuation',
-                    namedArgs: {'symbol': AppConstants.currencySymbol},
-                  ),
+                  tr('asset:list_lbl_valuation'),
                   style: context.textBody(
                     bold: true,
                     color: context.bodyColor,
+                    fontWeight: FontWeight.normal,
                   ),
                 ),
               ),
@@ -116,7 +120,7 @@ class AssetWalletCard extends HookWidget {
               symbol: 'MNT/USDT',
               builder: (context, price, fiatCurrency, _) => PriceText(
                 wallet.getTotalValuation(fiatCurrency),
-                '',
+                AppConstants.currencySymbol,
                 TextSize.huge,
               ),
             ),

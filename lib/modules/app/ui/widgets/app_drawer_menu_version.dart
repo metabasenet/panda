@@ -2,11 +2,11 @@ part of app_module;
 
 class AppDrawerMenuVersion extends StatelessWidget {
   const AppDrawerMenuVersion({
-    @required this.label,
-    @required this.version,
-    @required this.hasNew,
-    @required this.onPressed,
-    Key key,
+    required this.label,
+    required this.version,
+    required this.hasNew,
+    required this.onPressed,
+    Key? key,
   }) : super(key: key);
 
   final String label;
@@ -28,14 +28,20 @@ class AppDrawerMenuVersion extends StatelessWidget {
           Expanded(
             child: Text(
               label,
-              style: context.textBody(bold: true),
+              style: context.textBody(
+                bold: true,
+                fontWeight: FontWeight.normal,
+              ),
             ),
           ),
           Padding(
             padding: context.edgeRight8,
             child: Text(
               version,
-              style: context.textSecondary(),
+              style: context.textBody(
+                bold: true,
+                fontWeight: FontWeight.normal,
+              ),
             ),
           ),
           if (hasNew) CSBadge(size: 6),

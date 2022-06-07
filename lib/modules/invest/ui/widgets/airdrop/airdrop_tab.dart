@@ -9,7 +9,7 @@ enum AirdropStatus {
 }
 
 class AirdropTab extends StatelessWidget {
-  const AirdropTab({Key key}) : super(key: key);
+  const AirdropTab({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -51,6 +51,7 @@ class AirdropTab extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: context.textSecondary(
                     bold: true,
+                    fontWeight: FontWeight.normal,
                     color: context.bodyColor,
                   ),
                 ),
@@ -117,6 +118,8 @@ Widget airdropDes(BuildContext context) {
             style: context.textSecondary(
               color: Color(0xFF94820d),
               lineHeight: 1.77,
+              bold: true,
+              fontWeight: FontWeight.normal,
             ),
           ),
         ),

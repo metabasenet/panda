@@ -2,11 +2,11 @@ part of swap_domain_module;
 
 class SwapCreateParams {
   SwapCreateParams({
-    @required this.amount,
-    @required this.outCoinInfo,
-    @required this.inCoinInfo,
-    @required this.outCoinConfig,
-    @required this.inCoinConfig,
+    required this.amount,
+    required this.outCoinInfo,
+    required this.inCoinInfo,
+    required this.outCoinConfig,
+    required this.inCoinConfig,
   });
 
   final double amount;
@@ -14,7 +14,7 @@ class SwapCreateParams {
   final AssetCoin inCoinInfo;
   final SwapConfigCoin outCoinConfig;
   final SwapConfigCoin inCoinConfig;
-  WalletTemplateData templateData;
+  late WalletTemplateData templateData;
 
   /// If true, this chain used API to create Order transaction RawTx
   bool get isChainUseApiRawTx => ['ETH', 'TRX'].contains(outCoinInfo.chain);
@@ -22,15 +22,15 @@ class SwapCreateParams {
 
 class SwapActionSwapSubmit extends _BaseAction {
   SwapActionSwapSubmit({
-    @required this.outCoinInfo,
-    @required this.inCoinInfo,
-    @required this.outCoinConfig,
-    @required this.inCoinConfig,
-    @required this.amount,
-    @required this.onNoticeDoubleTransaction,
-    @required this.onConfirmSubmit,
-    @required this.onUnlockWallet,
-    @required this.onSuccessTransaction,
+    required this.outCoinInfo,
+    required this.inCoinInfo,
+    required this.outCoinConfig,
+    required this.inCoinConfig,
+    required this.amount,
+    required this.onNoticeDoubleTransaction,
+    required this.onConfirmSubmit,
+    required this.onUnlockWallet,
+    required this.onSuccessTransaction,
   });
 
   final AssetCoin outCoinInfo;
@@ -44,7 +44,7 @@ class SwapActionSwapSubmit extends _BaseAction {
   final void Function(String txId) onSuccessTransaction;
 
   @override
-  Future<AppState> reduce() async {
+  Future<AppState?> reduce() async {
     final params = SwapCreateParams(
       amount: NumberUtil.getDouble(amount),
       outCoinInfo: outCoinInfo,
@@ -57,10 +57,10 @@ class SwapActionSwapSubmit extends _BaseAction {
 
     final completer = Completer<double>();
     store.dispatch(AssetActionGetCoinBalance(
-      wallet: store.state.walletState.activeWallet,
-      chain: params.inCoinConfig.chain,
-      symbol: params.inCoinConfig.symbol,
-      address: params.inCoinConfig.address,
+      wallet: store.state.walletState.activeWallet!,
+      chain: params.inCoinConfig.chain ?? '',
+      symbol: params.inCoinConfig.symbol ?? '',
+      address: params.inCoinConfig.address ?? '',
       ignoreUnspent: true,
       ignoreBalanceLock: true,
       completer: completer,
@@ -73,11 +73,11 @@ class SwapActionSwapSubmit extends _BaseAction {
     if (params.isChainUseApiRawTx) {
       // Check again balance
       final approveBalance = await SwapRepository().getApproveBalance(
-        chain: outCoinInfo.chain,
-        symbol: outCoinInfo.symbol,
-        address: outCoinInfo.address,
-        contract: outCoinInfo.contract,
-        chainPrecision: outCoinInfo.chainPrecision,
+        chain: outCoinInfo.chain ?? '',
+        symbol: outCoinInfo.symbol ?? '',
+        address: outCoinInfo.address ?? '',
+        contract: outCoinInfo.contract ?? '',
+        chainPrecision: outCoinInfo.chainPrecision ?? 0,
       );
       if (NumberUtil.isGreater(amount, approveBalance)) {
         throw SwapApproveBalanceLowError();
@@ -85,21 +85,21 @@ class SwapActionSwapSubmit extends _BaseAction {
 
       final payAmount = NumberUtil.getAmountAsInt(
         params.amount,
-        outCoinInfo.chainPrecision,
+        outCoinInfo.chainPrecision ?? 0,
       );
 
       final json = await SwapRepository().postCreateTransaction(
-        chain: params.outCoinInfo.chain,
-        symbol: params.outCoinInfo.symbol,
-        fromAddress: params.outCoinInfo.address,
-        fromContract: params.outCoinInfo.contract,
-        toAddress: params.inCoinInfo.address,
-        toContract: params.inCoinInfo.contract,
+        chain: params.outCoinInfo.chain ?? '',
+        symbol: params.outCoinInfo.symbol ?? '',
+        fromAddress: params.outCoinInfo.address ?? '',
+        fromContract: params.outCoinInfo.contract ?? '',
+        toAddress: params.inCoinInfo.address ?? '',
+        toContract: params.inCoinInfo.contract ?? '',
         amount: payAmount,
       );
       params.templateData = WalletTemplateData(
-        chain: params.outCoinInfo.chain,
-        symbol: params.outCoinInfo.symbol,
+        chain: params.outCoinInfo.chain ?? '',
+        symbol: params.outCoinInfo.symbol ?? '',
         templateData: json,
         templateAddress: '',
         templateHex: '',
@@ -111,21 +111,20 @@ class SwapActionSwapSubmit extends _BaseAction {
       }
 
       final walletData = await onUnlockWallet();
-      if (walletData == null) {
-        return null;
-      }
 
       final requestSubmit = Completer<String>();
-      dispatch(WalletActionSignAndSubmitRawTx(
-        chain: params.outCoinInfo.chain,
-        symbol: params.outCoinInfo.symbol,
-        rawTx: params.templateData.rawTx,
-        walletData: walletData,
-        fromAddress: params.outCoinInfo.address,
-        broadcastType: '',
-        completer: requestSubmit,
-        amount: NumberUtil.getDouble(params.amount),
-      ));
+      dispatch(
+        WalletActionSignAndSubmitRawTx(
+          chain: params.outCoinInfo.chain ?? '',
+          symbol: params.outCoinInfo.symbol ?? '',
+          rawTx: params.templateData.rawTx,
+          walletData: walletData,
+          fromAddress: params.outCoinInfo.address ?? '',
+          broadcastType: '',
+          completer: requestSubmit,
+          amount: NumberUtil.getDouble(params.amount),
+        ),
+      );
       txId = await requestSubmit.future;
     } else {
       final txData = {
@@ -137,11 +136,11 @@ class SwapActionSwapSubmit extends _BaseAction {
       final withdrawDataRequest = Completer<WalletWithdrawData>();
       dispatch(WalletActionWithdrawBefore(
         params: WithdrawBeforeParams(
-          chain: params.outCoinInfo.chain,
-          symbol: params.outCoinInfo.symbol,
-          fromAddress: params.outCoinInfo.address,
+          chain: params.outCoinInfo.chain ?? '',
+          symbol: params.outCoinInfo.symbol ?? '',
+          fromAddress: params.outCoinInfo.address ?? '',
           amount: NumberUtil.getDouble(amount),
-          chainPrecision: params.outCoinInfo.chainPrecision,
+          chainPrecision: params.outCoinInfo.chainPrecision ?? 0,
           contractOrForkId: params.outCoinInfo.contract,
           toAddress: params.outCoinConfig.address,
           txData: '${AppConstants.swapUUID}0000000000${jsonEncode(txData)}',
@@ -152,8 +151,8 @@ class SwapActionSwapSubmit extends _BaseAction {
       final withdrawData = await withdrawDataRequest.future;
 
       params.templateData = WalletTemplateData(
-        chain: params.outCoinInfo.chain,
-        symbol: params.outCoinInfo.symbol,
+        chain: params.outCoinInfo.chain ?? '',
+        symbol: params.outCoinInfo.symbol ?? '',
         templateData: {
           'fee': withdrawData.fee.feeValue,
         },
@@ -167,46 +166,47 @@ class SwapActionSwapSubmit extends _BaseAction {
       }
 
       final walletData = await onUnlockWallet();
-      if (walletData == null) {
-        return null;
-      }
 
       final submitTransaction = Completer<String>();
-      dispatch(WalletActionWithdrawSubmit(
-        params: WithdrawSubmitParams(
-          withdrawData: withdrawData,
-          amount: NumberUtil.getDouble(amount),
-          chainPrecision: params.outCoinInfo.chainPrecision,
-          toAddress: params.outCoinConfig.address,
-          txData: jsonEncode(txData),
-          txDataUUID: AppConstants.swapUUID,
-          dataType: MntDataType.withData,
+      dispatch(
+        WalletActionWithdrawSubmit(
+          params: WithdrawSubmitParams(
+            withdrawData: withdrawData,
+            amount: NumberUtil.getDouble(amount),
+            chainPrecision: params.outCoinInfo.chainPrecision ?? 0,
+            toAddress: params.outCoinConfig.address ?? '',
+            txData: jsonEncode(txData),
+            txDataUUID: AppConstants.swapUUID,
+            dataType: MntDataType.withData,
+          ),
+          walletData: walletData,
+          completer: submitTransaction,
         ),
-        walletData: walletData,
-        completer: submitTransaction,
-      ));
+      );
       txId = await submitTransaction.future;
     }
 
-    dispatch(AssetActionAddTransaction(Transaction.fromRaw(
-      txId: txId,
-      chain: params.outCoinInfo.chain,
-      symbol: params.outCoinInfo.symbol,
-      feeValue: params.templateData.feeValue,
-      feeSymbol: params.outCoinInfo.chain,
-      amount: params.amount,
-      toAddress: params.templateData.contract,
-      fromAddress: params.outCoinInfo.address,
-      type: TransactionType.approveCall,
-    )));
-
+    dispatch(
+      AssetActionAddTransaction(
+        Transaction.fromRaw(
+          txId: txId,
+          chain: params.outCoinInfo.chain ?? '',
+          symbol: params.outCoinInfo.symbol ?? '',
+          feeValue: params.templateData.feeValue,
+          feeSymbol: params.outCoinInfo.chain ?? '',
+          amount: params.amount,
+          toAddress: params.templateData.contract,
+          fromAddress: params.outCoinInfo.address ?? '',
+          type: TransactionType.approveCall,
+        ),
+      ),
+    );
     onSuccessTransaction(txId);
-
     return null;
   }
 
   @override
-  Object wrapError(dynamic error) {
+  Object? wrapError(dynamic error) {
     return error;
   }
 }

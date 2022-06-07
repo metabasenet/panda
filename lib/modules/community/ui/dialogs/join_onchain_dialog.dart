@@ -12,7 +12,10 @@ void showJoinOnChainDialog(BuildContext context, String userName) {
         children: [
           Text(
             tr('community:detail_msg_leader'),
-            style: context.textBody(bold: true),
+            style: context.textBody(
+              bold: true,
+              fontWeight: FontWeight.normal,
+            ),
           ),
           CSContainer(
             margin: context.edgeVertical.copyWith(top: context.edgeSizeDouble),
@@ -26,6 +29,7 @@ void showJoinOnChainDialog(BuildContext context, String userName) {
               style: context.textSecondary(
                 bold: true,
                 color: context.bodyColor,
+                fontWeight: FontWeight.normal,
               ),
             ),
           ),
@@ -34,6 +38,8 @@ void showJoinOnChainDialog(BuildContext context, String userName) {
             style: context.textSmall(
               color: context.redColor,
               lineHeight: 1.61,
+              bold: true,
+              fontWeight: FontWeight.normal,
             ),
           ),
           Text(
@@ -41,6 +47,8 @@ void showJoinOnChainDialog(BuildContext context, String userName) {
             style: context.textSmall(
               color: context.redColor,
               lineHeight: 1.61,
+              bold: true,
+              fontWeight: FontWeight.normal,
             ),
           ),
           SizedBox(height: 60),

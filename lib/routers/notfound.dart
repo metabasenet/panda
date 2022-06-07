@@ -16,7 +16,7 @@ class NotFoundPage extends StatelessWidget {
           padding: EdgeInsets.all(40),
           child: Text(
             'Page not found',
-            style: context.textBody(),
+            style: context.textBody(fontWeight: FontWeight.normal, bold: true),
           ),
         ),
       ),

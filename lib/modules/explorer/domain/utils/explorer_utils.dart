@@ -30,10 +30,7 @@ class ExplorerUtils {
   ];
 
   static String getChainExplorerTxUrl(String chain, String txid) {
-    final list = explorerConfigs.firstWhere(
-      (item) => item.chain == chain,
-      orElse: () => null,
-    );
+    final list = explorerConfigs.firstWhere((item) => item.chain == chain);
 
     if (onlySearchAddress.contains(chain)) {
       return list != null ? (list.txUrl + txid) : browserUrl;
@@ -43,10 +40,7 @@ class ExplorerUtils {
   }
 
   static String getChainExplorerSearchUrl(String chain, String term) {
-    final list = explorerConfigs.firstWhere(
-      (item) => item.chain == chain,
-      orElse: () => null,
-    );
+    final list = explorerConfigs.firstWhere((item) => item.chain == chain);
 
     if (onlySearchAddress.contains(chain)) {
       return list != null ? (list.addressUrl + term) : browserUrl;

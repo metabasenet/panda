@@ -9,13 +9,13 @@ class AssetActionSyncWalletCoins extends _BaseAction {
   final Wallet wallet;
 
   @override
-  Future<AppState> reduce() async {
-    if (wallet == null) {
-      return state.rebuild((a) => a..assetState.coins = ListBuilder([]));
-    }
+  Future<AppState?> reduce() async {
+    //if (wallet == null) {
+    //  return state.rebuild((a) => a..assetState.coins = ListBuilder([]));
+    //}
 
-    final walletCoins = wallet.coins ?? [];
-    final configCoins = store.state.commonState.config?.coins?.values ?? [];
+    final walletCoins = wallet.coins;
+    final configCoins = store.state.commonState.config?.coins.values ?? [];
 
     // If needed remove faulty coins
     walletCoins.removeWhere((e) => [].contains(e.symbol));
@@ -23,46 +23,45 @@ class AssetActionSyncWalletCoins extends _BaseAction {
     // We take the config coins as the good ones
     configCoins.toList().forEach((remote) {
       // Update local coin with config infos (icon, name, etc)
-      final existing = walletCoins?.firstWhere(
+      final existing = walletCoins.firstWhere(
         (local) => local.symbol == remote.symbol && local.chain == remote.chain,
-        orElse: () => null,
       );
-      if (existing != null) {
-        existing.name = remote.name;
-        existing.fullName = remote.fullName;
-        existing.iconOnline = remote.icon;
-        existing.contract = remote.contract ?? '';
-        existing.chainPrecision = remote.chainPrecision;
-        existing.displayPrecision = remote.displayPrecision;
-        existing.isFixed = kDefaultCoinFixed.contains(remote.symbol);
-        existing.isEnabled = true; // kDefaultCoinFixed.contains(remote.symbol);
-        if (kDebugMode) {
-          // Only in Debug mode update chain with API config
-          existing.chain = remote.chain;
-        }
-      } else {
-        walletCoins.add(
-          CoinInfo(
-            chain: remote.chain,
-            symbol: remote.symbol,
-            contract: remote.contract,
-            name: remote.name,
-            fullName: remote.fullName,
-            iconLocal: '',
-            iconOnline: remote.icon,
-            chainPrecision: remote.chainPrecision,
-            displayPrecision: remote.displayPrecision,
-            isFixed: kDefaultCoinFixed.contains(remote.symbol),
-            isEnabled: true, // kDefaultCoinFixed.contains(remote.symbol),
-          ),
-        );
+      //if (existing != null) {
+      existing.name = remote.name;
+      existing.fullName = remote.fullName;
+      existing.iconOnline = remote.icon;
+      existing.contract = remote.contract ?? '';
+      existing.chainPrecision = remote.chainPrecision ?? 0;
+      existing.displayPrecision = remote.displayPrecision;
+      existing.isFixed = kDefaultCoinFixed.contains(remote.symbol);
+      existing.isEnabled = true; // kDefaultCoinFixed.contains(remote.symbol);
+      if (kDebugMode) {
+        // Only in Debug mode update chain with API config
+        existing.chain = remote.chain;
       }
+      //} else {
+      //  walletCoins.add(
+      //    CoinInfo(
+      //      chain: remote.chain,
+      //      symbol: remote.symbol,
+      //      contract: remote.contract,
+      //      name: remote.name,
+      //      fullName: remote.fullName,
+      //      iconLocal: '',
+      //      iconOnline: remote.icon,
+      //      chainPrecision: remote.chainPrecision,
+      //      displayPrecision: remote.displayPrecision,
+      //      isFixed: kDefaultCoinFixed.contains(remote.symbol),
+      //      isEnabled: true, // kDefaultCoinFixed.contains(remote.symbol),
+      //    ),
+      //  );
+      //}
     });
 
     // Disable coins without address
     for (final e in walletCoins) {
       final address = wallet.getCoinAddressByChain(e.chain);
-      if (address == null || address.isEmpty) {
+      if (address.isEmpty) {
         e.isEnabled = false;
       }
     }
@@ -83,8 +82,8 @@ class AssetActionSyncWalletCoins extends _BaseAction {
           ..fullName = e.fullName
           ..iconLocal = e.iconLocal
           ..iconOnline = e.iconOnline
-          ..chainPrecision = e.chainPrecision ?? 18
-          ..displayPrecision = e.displayPrecision ?? 8
+          ..chainPrecision = e.chainPrecision
+          ..displayPrecision = e.displayPrecision
           ..address = wallet.getCoinAddressByChain(e.chain)
           ..balance = wallet.getCoinBalance(
             chain: e.chain,
@@ -103,10 +102,10 @@ class AssetActionSyncWalletCoins extends _BaseAction {
     // Set Initial balance in cubit
     for (final coin in assetCoins) {
       GetIt.I<AssetBalanceCubit>().updateBalance(
-        symbol: coin.symbol,
-        address: coin.address,
-        balance: coin.balance,
-        unconfirmed: coin.balanceUnconfirmed,
+        symbol: coin.symbol ?? '',
+        address: coin.address ?? '',
+        balance: coin.balance ?? 0,
+        unconfirmed: coin.balanceUnconfirmed ?? 0,
       );
     }
 
@@ -114,7 +113,7 @@ class AssetActionSyncWalletCoins extends _BaseAction {
   }
 
   @override
-  Object wrapError(dynamic error) {
+  Object? wrapError(dynamic error) {
     CrashesReport().reportEvent(
       'AssetLog_01_SyncWalletCoins',
       error,
@@ -126,7 +125,7 @@ class AssetActionSyncWalletCoins extends _BaseAction {
 
 class AssetActionToggleHideSmallAssets extends _BaseAction {
   AssetActionToggleHideSmallAssets({this.hide});
-  final bool hide;
+  final bool? hide;
 
   @override
   Future<AppState> reduce() async {

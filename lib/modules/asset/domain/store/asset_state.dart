@@ -13,6 +13,7 @@ abstract class AssetState implements Built<AssetState, AssetStateBuilder> {
       hideDepositShowcase: false,
       hideWithdrawShowcase: false,
       isBalanceUpdating: false,
+      addressRequestId: '',
     );
   }
   AssetState._();
@@ -30,6 +31,8 @@ abstract class AssetState implements Built<AssetState, AssetStateBuilder> {
         hideDepositShowcase: data[2] == true,
         hideWithdrawShowcase: data[3] == true,
         isBalanceUpdating: false,
+        addressRequestId: '',
+        addressList: BuiltList<AssetAddress>(),
       );
     } catch (error) {
       return AssetState();
@@ -66,33 +69,26 @@ abstract class AssetState implements Built<AssetState, AssetStateBuilder> {
   // asset address
   BuiltList<AssetAddress> get addressList;
 
-  @nullable
-  String get addressRequestId;
+  //@nullable
+  String? get addressRequestId;
 
 // Methods
   AssetCoin getCoinInfo({
-    @required String chain,
-    @required String symbol,
+    required String chain,
+    required String symbol,
   }) {
     if (chain == null || chain.isEmpty) {
       return coins.firstWhere(
         (e) => e.symbol == symbol,
-        orElse: () => null,
       );
     }
 
-    return coins.firstWhere(
-      (e) => e.symbol == symbol && e.chain == chain,
-      orElse: () => null,
-    );
+    return coins.firstWhere((e) => e.symbol == symbol && e.chain == chain);
   }
 
   AssetCoin getCoinInfoByContract({
-    @required String contract,
+    required String contract,
   }) {
-    return coins.firstWhere(
-      (e) => e.contract == contract,
-      orElse: () => null,
-    );
+    return coins.firstWhere((e) => e.contract == contract);
   }
 }

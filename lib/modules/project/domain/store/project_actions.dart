@@ -10,26 +10,29 @@ class ProjectActionGetList extends _BaseAction {
     this.isRefresh,
   });
 
-  final int skip;
-  final bool isRefresh;
+  final int? skip;
+  final bool? isRefresh;
 
   @override
   Future<AppState> reduce() async {
     final projects = await ProjectRepository().getProjectList(
-      skip: skip,
+      skip: skip ?? 0,
       take: 10,
     );
 
     final projectsWithCoin = projects.map(
       (project) => project.rebuild(
         (a) => a.iconUrl = state.assetState
-            .getCoinInfo(chain: AppConstants.mnt_chain, symbol: project.symbol)
-            ?.iconUrl,
+            .getCoinInfo(
+              chain: AppConstants.mnt_chain,
+              symbol: project.symbol ?? '',
+            )
+            .iconUrl,
       ),
     );
 
     return state.rebuild((a) {
-      isRefresh
+      (isRefresh ?? false)
           ? a.projectState.projectList.replace(projectsWithCoin)
           : a.projectState.projectList.addAll(projectsWithCoin);
       return a;
@@ -43,19 +46,19 @@ class ProjectActionGetInfo extends _BaseAction {
     this.completer,
   });
 
-  final int id;
-  final Completer<ProjectInfo> completer;
+  final int? id;
+  final Completer<ProjectInfo>? completer;
 
   @override
-  Future<AppState> reduce() async {
-    final data = await ProjectRepository().getProjectInfo(id: id);
-    completer.complete(data);
+  Future<AppState?> reduce() async {
+    final data = await ProjectRepository().getProjectInfo(id: id!);
+    completer?.complete(data);
     return null;
   }
 
   @override
-  Object wrapError(dynamic error) {
-    completer.completeError(error);
+  Object? wrapError(dynamic error) {
+    completer?.completeError(error as Object);
     return error;
   }
 }
@@ -65,10 +68,10 @@ class ProjectActionSetActivePool extends _BaseAction {
     this.id,
   });
 
-  final int id;
+  final int? id;
 
   @override
-  Future<AppState> reduce() async {
+  Future<AppState?> reduce() async {
     // final poolItem = state.poolState.pools.firstWhere(
     //   (item) => item.id == id,
     //   orElse: () => null,
@@ -86,6 +89,6 @@ class ProjectActionGetConfig extends _BaseAction {
     final data = await ProjectRepository().getProjectConfig();
 
     return state
-        .rebuild((a) => a.projectState.projectConfig = data?.toBuilder());
+        .rebuild((a) => a.projectState.projectConfig = data.toBuilder());
   }
 }
