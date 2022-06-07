@@ -61,8 +61,8 @@ class AppMainPage extends HookWidget {
       'Home',
     ),
     TabBarItem(
-      //TradeMainTab(),
-      Center(),
+      TradeMainTab(),
+      //Center(),
       'global:main_tab_trade',
       '',
       '',

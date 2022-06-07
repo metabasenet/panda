@@ -155,7 +155,7 @@ class _CSExpansionTileState extends State<CSExpansionTile>
   late Animation<double> _heightFactor;
   // Animation<Color> _backgroundColor;
 
-  bool _isExpanded = false;
+  bool? _isExpanded = false;
 
   @override
   void initState() {
@@ -170,7 +170,7 @@ class _CSExpansionTileState extends State<CSExpansionTile>
     //     _controller.drive(_backgroundColorTween.chain(_easeOutTween));
 
     _isExpanded = PageStorage.of(context)?.readState(context) as bool;
-    if (_isExpanded) {
+    if (_isExpanded ?? false) {
       _controller.value = 1.0;
     }
   }
@@ -183,8 +183,8 @@ class _CSExpansionTileState extends State<CSExpansionTile>
 
   void _handleTap() {
     setState(() {
-      _isExpanded = !_isExpanded;
-      if (_isExpanded) {
+      _isExpanded = !(_isExpanded ?? false);
+      if (_isExpanded ?? false) {
         _controller.forward();
       } else {
         _controller.reverse().then<void>((value) {
@@ -199,7 +199,7 @@ class _CSExpansionTileState extends State<CSExpansionTile>
       PageStorage.of(context)?.writeState(context, _isExpanded);
     });
     if (widget.onExpansionChanged != null) {
-      widget.onExpansionChanged!(_isExpanded);
+      widget.onExpansionChanged?.call(_isExpanded ?? false);
     }
   }
 
@@ -207,7 +207,7 @@ class _CSExpansionTileState extends State<CSExpansionTile>
     return CSContainer(
       margin: widget.tileMargin,
       padding: EdgeInsets.zero,
-      radius: widget.tileRadius!,
+      radius: widget.tileRadius ?? 12,
       onTap: _handleTap,
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -257,7 +257,7 @@ class _CSExpansionTileState extends State<CSExpansionTile>
 
   @override
   Widget build(BuildContext context) {
-    final bool closed = !_isExpanded && _controller.isDismissed;
+    final bool closed = !(_isExpanded ?? false) && _controller.isDismissed;
     final bool shouldRemoveChildren = closed && !widget.maintainState;
 
     final result = Offstage(

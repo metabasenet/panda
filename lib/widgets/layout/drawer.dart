@@ -50,8 +50,7 @@ class _CSDrawerState extends State<CSDrawer> {
   @override
   Widget build(BuildContext context) {
     assert(debugCheckHasMaterialLocalizations(context));
-
-    String label = widget.semanticLabel.toString();
+    String label = widget.semanticLabel ?? '';
     switch (Theme.of(context).platform) {
       case TargetPlatform.iOS:
       case TargetPlatform.macOS:

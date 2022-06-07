@@ -28,51 +28,55 @@ class TradeHomePage extends HookWidget {
           builder: (context, viewModel) {
             if (viewModel.hasWallet && viewModel.ethAddress != '') {
               return InAppWebView(
-                  initialFile: 'https://www.shangqingdong.work/?ran=$ranNumber',
-                  onWebViewCreated: (controller) {
-                    webView = controller;
-                    controller.addJavaScriptHandler(
-                        handlerName: 'init',
-                        callback: (args) {
-                          return {
-                            'PrivateKey': '',
-                            'Address': viewModel.ethAddress
-                          };
-                        });
-                    controller.addJavaScriptHandler(
-                      handlerName: 'verify',
-                      callback: (args) async {
-                        final ret = Completer<String>();
-                        showPasswordDialog(
-                          context,
-                          (password) => viewModel.doUnlockWallet(password),
-                          (walletData, _) async {
-                            final pri =
-                                await WalletRepository().exportPrivateKey(
-                              mnemonic: walletData.mnemonic!,
-                              chain: 'ETH',
-                              forkId: '',
-                            );
-                            ret.complete(pri);
-                          },
-                        );
-                        return ret.future;
-                      },
-                    );
-                    controller.addJavaScriptHandler(
-                      handlerName: 'TransferResult',
-                      callback: (args) async {
-                        final ret = args[0] as Map<String, dynamic>;
-                        if (completer.isCompleted == false) {
-                          final txid = ret['txid'] as String;
-                          viewModel.transferResult(
-                              param: TradeHomePage.params, txId: txid);
-                          completer.complete(txid);
-                        }
-                        return ret;
-                      },
-                    );
-                  });
+                initialUrlRequest: URLRequest(
+                  url: Uri.parse(
+                      'https://www.shangqingdong.work/?ran=$ranNumber'),
+                ),
+                onWebViewCreated: (controller) {
+                  webView = controller;
+                  controller.addJavaScriptHandler(
+                    handlerName: 'init',
+                    callback: (args) {
+                      return {
+                        'PrivateKey': '',
+                        'Address': viewModel.ethAddress
+                      };
+                    },
+                  );
+                  controller.addJavaScriptHandler(
+                    handlerName: 'verify',
+                    callback: (args) async {
+                      final ret = Completer<String>();
+                      showPasswordDialog(
+                        context,
+                        (password) => viewModel.doUnlockWallet(password),
+                        (walletData, _) async {
+                          final pri = await WalletRepository().exportPrivateKey(
+                            mnemonic: walletData.mnemonic!,
+                            chain: 'ETH',
+                            forkId: '',
+                          );
+                          ret.complete(pri);
+                        },
+                      );
+                      return ret.future;
+                    },
+                  );
+                  controller.addJavaScriptHandler(
+                    handlerName: 'TransferResult',
+                    callback: (args) async {
+                      final ret = args[0] as Map<String, dynamic>;
+                      if (completer.isCompleted == false) {
+                        final txid = ret['txid'] as String;
+                        viewModel.transferResult(
+                            param: TradeHomePage.params, txId: txid);
+                        completer.complete(txid);
+                      }
+                      return ret;
+                    },
+                  );
+                },
+              );
             } else {
               return Column(
                 mainAxisAlignment: MainAxisAlignment.center,
