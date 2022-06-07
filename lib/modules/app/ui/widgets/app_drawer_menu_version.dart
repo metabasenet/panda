@@ -38,7 +38,7 @@ class AppDrawerMenuVersion extends StatelessWidget {
             padding: context.edgeRight8,
             child: Text(
               version,
-              style: context.textSecondary(
+              style: context.textBody(
                 bold: true,
                 fontWeight: FontWeight.normal,
               ),
