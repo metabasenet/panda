@@ -15,8 +15,8 @@ abstract class AssetListVM implements Built<AssetListVM, AssetListVMBuilder> {
   bool? get hasWallet;
   //@nullable
   Wallet? get activeWallet;
-  String get activeWalletId;
-  WalletStatus get activeWalletStatus;
+  String? get activeWalletId;
+  WalletStatus? get activeWalletStatus;
 
 // Methods
 

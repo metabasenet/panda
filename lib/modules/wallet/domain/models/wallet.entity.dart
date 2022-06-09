@@ -72,9 +72,9 @@ class Wallet extends HiveObject {
   @HiveField(7)
   List<CoinInfo> coins;
   @HiveField(8)
-  late List<CoinBalance> balances;
+  List<CoinBalance> balances = [];
   @HiveField(9)
-  late List<CoinAddress> addresses;
+  List<CoinAddress> addresses = [];
 
   // Flags
 
@@ -162,14 +162,29 @@ class Wallet extends HiveObject {
   }
 
   /// Get coin balance from this wallet cache
+  // double getCoinBalance({
+  //   required String chain,
+  //   required String symbol,
+  // }) {
+  //   assert(chain != null, symbol != null);
+  //   try {
+  //     if (balances.length > 0) {
+  //       final data =
+  //           balances.firstWhere((e) => e.symbol == symbol && e.chain == chain);
+  //       return data.balance;
+  //     } else {
+  //       return 0.00;
+  //     }
+  //   } catch (e) {
+  //     return 0.00;
+  //   }
+  // }
+
   double getCoinBalance({
     required String chain,
     required String symbol,
   }) {
-    assert(chain != null, symbol != null);
-    final data =
-        balances.firstWhere((e) => e.symbol == symbol && e.chain == chain);
-    return data.balance;
+    return 0.00;
   }
 
   /// Get Unconfirmed coin balance
@@ -179,9 +194,13 @@ class Wallet extends HiveObject {
     required String symbol,
   }) {
     assert(chain != null, symbol != null);
-    final data =
-        balances.firstWhere((e) => e.symbol == symbol && e.chain == chain);
-    return data == null ? 0 : data.unconfirmed;
+    if (balances.length > 0) {
+      final data =
+          balances.firstWhere((e) => e.symbol == symbol && e.chain == chain);
+      return data == null ? 0 : data.unconfirmed;
+    } else {
+      return 0.00;
+    }
   }
 
   CoinBalance? getCoinBalanceInfo({
@@ -193,9 +212,13 @@ class Wallet extends HiveObject {
     if (!isThisWalletAddress(address)) {
       return null;
     }
-    final data =
-        balances.firstWhere((e) => e.symbol == symbol && e.chain == chain);
-    return data;
+    if (balances.length > 0) {
+      final data =
+          balances.firstWhere((e) => e.symbol == symbol && e.chain == chain);
+      return data;
+    } else {
+      return CoinBalance(chain: '', symbol: '', balance: 0, unconfirmed: 0);
+    }
   }
 
   /// Update coin enable to use state

@@ -40,10 +40,10 @@ class CoinAddress extends HiveObject {
   String? addressType;
 
   @HiveField(4)
-  late String publicKey;
+  String? publicKey;
 
   @HiveField(6)
-  late DateTime createdAt;
+  DateTime? createdAt;
   @HiveField(7)
-  late DateTime updatedAt;
+  DateTime? updatedAt;
 }

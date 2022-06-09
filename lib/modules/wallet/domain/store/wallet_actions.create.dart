@@ -209,7 +209,7 @@ class WalletActionUpdateAddress extends _BaseAction {
     wallet.updateCoinAddress(
       chain: chain,
       address: item.address,
-      publicKey: item.publicKey,
+      publicKey: item.publicKey ?? '',
     );
 
     final allWallets = await WalletRepository().saveWallet(

@@ -33,7 +33,7 @@ class AssetActionGetCoinBalance extends _BaseAction {
     final cachedBalance = balanceInfo!.balance;
     var newBalance = balanceInfo.balance;
     var newUnconfirmed = balanceInfo.unconfirmed;
-    /*
+
     if (address == null || address.isEmpty) {
       completer?.complete(newBalance);
       return null;
@@ -56,7 +56,7 @@ class AssetActionGetCoinBalance extends _BaseAction {
           chain: chain,
           symbol: symbol,
           address: address,
-          contract: coinInfo.contract,
+          contract: coinInfo.contract ?? '',
         );
 
         // For ETH token, since we use etherscan the balance
@@ -90,13 +90,14 @@ class AssetActionGetCoinBalance extends _BaseAction {
     // We need to subtractFromBalance
     if (subtractFromBalance != null &&
         (newBalance == -1 || cachedBalance == newBalance)) {
-      newBalance = NumberUtil.minus(cachedBalance, subtractFromBalance);
+      newBalance =
+          NumberUtil.minus(cachedBalance, subtractFromBalance) as double;
     }
 
     // If api return a negative balance,
     // use the provided balance or the cached one
     if (newBalance < 0) {
-      newBalance = cachedBalance ?? 0.0;
+      newBalance = cachedBalance;
     }
 
     // If balance still negative, use zero
@@ -120,7 +121,7 @@ class AssetActionGetCoinBalance extends _BaseAction {
         unspent = await utxosRequest.future;
       } catch (_) {
         isFailed = true;
-        unspent = null;
+        unspent = [];
       }
 
       // If we have unspent and is a empty list, means we don't have any balance
@@ -153,7 +154,7 @@ class AssetActionGetCoinBalance extends _BaseAction {
       unconfirmed: newUnconfirmed,
     );
 
-    await dispatchFuture(_AssetActionUpdateAssetCoinBalance(
+    await dispatchAsync(_AssetActionUpdateAssetCoinBalance(
       chain: chain,
       symbol: symbol,
       address: address,
@@ -162,8 +163,6 @@ class AssetActionGetCoinBalance extends _BaseAction {
     ));
 
     completer?.complete(newBalance);
-    */
-    return null;
   }
 
   @override
@@ -292,28 +291,31 @@ class AssetActionUpdateWalletBalances extends _BaseAction {
     if (wallet == null) {
       return null;
     }
-    /*
+
     for (final coin in state.assetState.coins) {
       final balanceInfo = wallet.getCoinBalanceInfo(
-        chain: coin.chain,
-        symbol: coin.symbol,
-        address: coin.address,
+        chain: coin.chain ?? '',
+        symbol: coin.symbol ?? '',
+        address: coin.address ?? '',
       );
-      if (skipFrequentUpdate == true &&
-          balanceInfo?.updatedAt != null &&
-          DateTime.now().difference(balanceInfo.updatedAt).inMinutes < 5) {
-        await Future.delayed(Duration(milliseconds: 200));
-      } else {
-        await dispatchFuture(
-          AssetActionGetCoinBalance(
-            wallet: wallet,
-            chain: coin.chain,
-            symbol: coin.symbol,
-            address: coin.address,
-          ),
-        );
-      }
-    }*/
+
+      DateTime dtUpdatedAt = balanceInfo?.updatedAt ?? DateTime.now();
+
+      // if (skipFrequentUpdate == true &&
+      //     balanceInfo?.updatedAt != null &&
+      //     DateTime.now().difference(dtUpdatedAt).inMinutes < 5) {
+      //   await Future.delayed(Duration(milliseconds: 200));
+      // } else {
+      await dispatchAsync(
+        AssetActionGetCoinBalance(
+          wallet: wallet,
+          chain: coin.chain ?? '',
+          symbol: coin.symbol ?? '',
+          address: coin.address ?? '',
+        ),
+      );
+      // }
+    }
     return null;
   }
 

@@ -862,9 +862,9 @@ class _$AssetListVM extends AssetListVM {
   @override
   final Wallet? activeWallet;
   @override
-  final String activeWalletId;
+  final String? activeWalletId;
   @override
-  final WalletStatus activeWalletStatus;
+  final WalletStatus? activeWalletStatus;
   @override
   final Future<void> Function() doRefreshList;
   @override
@@ -884,8 +884,8 @@ class _$AssetListVM extends AssetListVM {
       required this.wallets,
       this.hasWallet,
       this.activeWallet,
-      required this.activeWalletId,
-      required this.activeWalletStatus,
+      this.activeWalletId,
+      this.activeWalletStatus,
       required this.doRefreshList,
       required this.doSwitchWallet,
       required this.doSyncWallet,
@@ -897,10 +897,6 @@ class _$AssetListVM extends AssetListVM {
     BuiltValueNullFieldError.checkNotNull(
         isBalanceUpdating, 'AssetListVM', 'isBalanceUpdating');
     BuiltValueNullFieldError.checkNotNull(wallets, 'AssetListVM', 'wallets');
-    BuiltValueNullFieldError.checkNotNull(
-        activeWalletId, 'AssetListVM', 'activeWalletId');
-    BuiltValueNullFieldError.checkNotNull(
-        activeWalletStatus, 'AssetListVM', 'activeWalletStatus');
     BuiltValueNullFieldError.checkNotNull(
         doRefreshList, 'AssetListVM', 'doRefreshList');
     BuiltValueNullFieldError.checkNotNull(
@@ -1078,17 +1074,16 @@ class AssetListVMBuilder implements Builder<AssetListVM, AssetListVMBuilder> {
                   wallets, 'AssetListVM', 'wallets'),
               hasWallet: hasWallet,
               activeWallet: activeWallet,
-              activeWalletId: BuiltValueNullFieldError.checkNotNull(
-                  activeWalletId, 'AssetListVM', 'activeWalletId'),
-              activeWalletStatus: BuiltValueNullFieldError.checkNotNull(
-                  activeWalletStatus, 'AssetListVM', 'activeWalletStatus'),
+              activeWalletId: activeWalletId,
+              activeWalletStatus: activeWalletStatus,
               doRefreshList: BuiltValueNullFieldError.checkNotNull(
                   doRefreshList, 'AssetListVM', 'doRefreshList'),
               doSwitchWallet: BuiltValueNullFieldError.checkNotNull(
                   doSwitchWallet, 'AssetListVM', 'doSwitchWallet'),
               doSyncWallet: BuiltValueNullFieldError.checkNotNull(
                   doSyncWallet, 'AssetListVM', 'doSyncWallet'),
-              doHideSmallAssets: BuiltValueNullFieldError.checkNotNull(doHideSmallAssets, 'AssetListVM', 'doHideSmallAssets'));
+              doHideSmallAssets: BuiltValueNullFieldError.checkNotNull(
+                  doHideSmallAssets, 'AssetListVM', 'doHideSmallAssets'));
     } catch (_) {
       late String _$failedField;
       try {

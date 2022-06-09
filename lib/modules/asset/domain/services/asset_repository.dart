@@ -68,7 +68,6 @@ class AssetRepository {
   /// - This api will return a map of Coin symbol with USD price
   /// - Es: BTC => 12000 (USD)
   Future<Map<String, double>> getCoinPrices() async {
-    /*
     final json = await _api.getPrices();
     final data = <String, double>{};
     json.forEach((key, value) {
@@ -77,7 +76,7 @@ class AssetRepository {
     await savePricesToCache(coinPrices: data);
     return data;
     //return {'BTC': 12000, 'ETH': 1200, 'MNT': 120, 'SUG': 12, 'TRX': 1.2};
-    */
+
     /*
     final prices = _prices?.get(_pricesKey);
     if (prices.coinPrices.isNotEmpty &&
@@ -93,7 +92,6 @@ class AssetRepository {
     await savePricesToCache(coinPrices: data);
     return data;
     */
-    return {};
   }
 
   /// Exchange rates from USD to other Fiat currency
@@ -173,13 +171,12 @@ class AssetRepository {
     return null;
   }
 
-  Future<Map<String, String>?> getCoinBalance({
+  Future<Map<String, String>> getCoinBalance({
     required String chain,
     required String symbol,
     required String address,
     required String contract,
   }) async {
-    /*
     if (chain == AppConstants.mnt_chain) {
       final res = await _api.getCoinBalanceWithUnconfirmed(
         chain: chain,
@@ -187,8 +184,8 @@ class AssetRepository {
         address: address,
       );
       return {
-        'balance': res['balance']?.toString(),
-        'unconfirmed': res['unconfirmed']?.toString()
+        'balance': res['balance'].toString(),
+        'unconfirmed': res['unconfirmed'].toString()
       };
     } else if (chain == 'ETH' && symbol == 'BNB') {
       final res = await _api.getCoinBalanceBNB(
@@ -197,8 +194,8 @@ class AssetRepository {
         address: address,
       );
       return {
-        'balance': res['balance']?.toString(),
-        'unconfirmed': res['unconfirmed']?.toString()
+        'balance': res['balance'].toString(),
+        'unconfirmed': res['unconfirmed'].toString()
       };
     } else if (chain == 'ETH' && (symbol == 'MNT' || symbol == 'USDT')) {
       final res = await _api.getCoinBalanceBMU(
@@ -207,16 +204,15 @@ class AssetRepository {
         address: address,
       );
       return {
-        'balance': res['balance']?.toString(),
-        'unconfirmed': res['unconfirmed']?.toString()
+        'balance': res['balance'].toString(),
+        'unconfirmed': res['unconfirmed'].toString()
       };
     } else {
       return {
         'balance': '0',
         'unconfirmed': '0',
       };
-    }*/
-    return null;
+    }
   }
 
   /// ***  Search Coins *** ///

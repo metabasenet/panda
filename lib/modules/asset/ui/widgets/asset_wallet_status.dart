@@ -4,9 +4,9 @@ class AssetWalletStatus extends HookWidget {
   const AssetWalletStatus({
     required this.status,
     required this.onPressed,
-  }) : assert(status != null);
+  });
 
-  final WalletStatus status;
+  final WalletStatus? status;
   final void Function() onPressed;
 
   String get statusTransKey {
@@ -41,15 +41,14 @@ class AssetWalletStatus extends HookWidget {
             ? CSIcons.Delete
             : CSIcons.Refresh;
 
-    return CSContainer(
+    return Container(
       padding: context.edgeAll8,
       margin: EdgeInsets.zero,
-      //width: null,
       decoration: context.boxDecorationOnlyLeft(
         color: context.blackColor.withOpacity(0.02),
         radius: 14,
       ),
-      onTap: needSync ? onPressed : null,
+      //onTap: needSync ? onPressed : null,
       child: Row(
         children: [
           Container(

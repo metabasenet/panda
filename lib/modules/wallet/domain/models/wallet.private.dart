@@ -21,12 +21,10 @@ class WalletPrivateData {
 Future<String> generateWalletId(String mnemonicOrPrivateKey) async {
   // final str = md5.convert(utf8.encode(mnemonicOrPrivateKey)).toString();
   // return str.substring(0, 20);
-  //final words = mnemonicOrPrivateKey.split(' ').reversed.join('-');
-  //final signature = await sha256.hash(utf8.encode(words));
-  //final signatureString = hex.encode(signature.bytes);
-  //return signatureString.substring(0, 50);
-  throw 'err';
-  return '';
+  final words = mnemonicOrPrivateKey.split(' ').reversed.join('-');
+  final signature = await Sha256().hash(utf8.encode(words));
+  final signatureString = hex.encode(signature.bytes);
+  return signatureString.substring(0, 50);
 }
 
 Future<WalletPrivateData> getWalletDevicePrivateData({
