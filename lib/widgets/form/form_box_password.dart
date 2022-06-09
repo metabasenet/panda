@@ -7,7 +7,7 @@ class FormBoxPassword extends HookWidget {
     this.maxLength = WalletPasswordValidator.walletPasswordMaxLength,
     this.hintText,
     this.autoFocus = false,
-    this.bordered,
+    this.bordered = false,
     this.validator,
     this.title,
     this.titleStyle,
@@ -23,7 +23,7 @@ class FormBoxPassword extends HookWidget {
   final String? title;
   final TextStyle? titleStyle;
   final bool autoFocus;
-  final bool? bordered;
+  final bool bordered;
   final FieldValidator? validator;
   final EdgeInsetsGeometry? margin;
   final ValueChanged<String>? onChanged;
@@ -41,7 +41,7 @@ class FormBoxPassword extends HookWidget {
       titleStyle: titleStyle,
       titleAction: titleAction,
       autoFocus: autoFocus,
-      bordered: bordered!,
+      bordered: bordered,
       validator: validator,
       controller: controller,
       hintText: hintText,

@@ -593,13 +593,13 @@ class CoinAddressAdapter extends TypeAdapter<CoinAddress> {
       chain: fields[0] as String,
       symbol: fields[8] as String,
       address: fields[1] as String,
-      publicKey: fields[4] as String,
+      publicKey: fields[4] as String?,
       addressType: fields[2] as String?,
       addressMemoOrTag: fields[3] as String?,
       description: fields[5] as String?,
     )
-      ..createdAt = fields[6] as DateTime
-      ..updatedAt = fields[7] as DateTime;
+      ..createdAt = fields[6] as DateTime?
+      ..updatedAt = fields[7] as DateTime?;
   }
 
   @override
@@ -654,7 +654,7 @@ class CoinBalanceAdapter extends TypeAdapter<CoinBalance> {
       unconfirmed: fields[3] as double,
     )
       ..createdAt = fields[4] as DateTime
-      ..updatedAt = fields[5] as DateTime
+      ..updatedAt = fields[5] as DateTime?
       ..lockUntil = fields[6] as DateTime;
   }
 

@@ -62,7 +62,7 @@ class PlatformUtils {
     return deviceId;
   }
 
-  static Future<DeviceInfo?> getDeviceInfo() async {
+  static Future<DeviceInfo> getDeviceInfo() async {
     final deviceInfo = DeviceInfoPlugin();
 
     if (Platform.isAndroid) {
@@ -89,7 +89,15 @@ class PlatformUtils {
         osVersion: info.systemVersion,
       );
     } else {
-      return null;
+      return DeviceInfo(
+        brand: '',
+        model: '',
+        product: '',
+        manufacturer: '',
+        deviceId: '',
+        osName: '',
+        osVersion: '',
+      );
     }
   }
 }

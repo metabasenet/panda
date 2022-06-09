@@ -10,9 +10,9 @@ class AssetActionSyncWalletCoins extends _BaseAction {
 
   @override
   Future<AppState?> reduce() async {
-    //if (wallet == null) {
-    //  return state.rebuild((a) => a..assetState.coins = ListBuilder([]));
-    //}
+    if (wallet == null) {
+      return state.rebuild((a) => a..assetState.coins = ListBuilder([]));
+    }
 
     final walletCoins = wallet.coins;
     final configCoins = store.state.commonState.config?.coins.values ?? [];
@@ -26,36 +26,36 @@ class AssetActionSyncWalletCoins extends _BaseAction {
       final existing = walletCoins.firstWhere(
         (local) => local.symbol == remote.symbol && local.chain == remote.chain,
       );
-      //if (existing != null) {
-      existing.name = remote.name;
-      existing.fullName = remote.fullName;
-      existing.iconOnline = remote.icon;
-      existing.contract = remote.contract ?? '';
-      existing.chainPrecision = remote.chainPrecision ?? 0;
-      existing.displayPrecision = remote.displayPrecision;
-      existing.isFixed = kDefaultCoinFixed.contains(remote.symbol);
-      existing.isEnabled = true; // kDefaultCoinFixed.contains(remote.symbol);
-      if (kDebugMode) {
-        // Only in Debug mode update chain with API config
-        existing.chain = remote.chain;
+      if (existing != null) {
+        existing.name = remote.name;
+        existing.fullName = remote.fullName;
+        existing.iconOnline = remote.icon;
+        existing.contract = remote.contract ?? '';
+        existing.chainPrecision = remote.chainPrecision ?? 0;
+        existing.displayPrecision = remote.displayPrecision;
+        existing.isFixed = kDefaultCoinFixed.contains(remote.symbol);
+        existing.isEnabled = true; // kDefaultCoinFixed.contains(remote.symbol);
+        if (kDebugMode) {
+          // Only in Debug mode update chain with API config
+          existing.chain = remote.chain;
+        }
+      } else {
+        walletCoins.add(
+          CoinInfo(
+            chain: remote.chain,
+            symbol: remote.symbol,
+            contract: remote.contract ?? '',
+            name: remote.name,
+            fullName: remote.fullName,
+            iconLocal: '',
+            iconOnline: remote.icon,
+            chainPrecision: remote.chainPrecision ?? 0,
+            displayPrecision: remote.displayPrecision,
+            isFixed: kDefaultCoinFixed.contains(remote.symbol),
+            isEnabled: true, // kDefaultCoinFixed.contains(remote.symbol),
+          ),
+        );
       }
-      //} else {
-      //  walletCoins.add(
-      //    CoinInfo(
-      //      chain: remote.chain,
-      //      symbol: remote.symbol,
-      //      contract: remote.contract,
-      //      name: remote.name,
-      //      fullName: remote.fullName,
-      //      iconLocal: '',
-      //      iconOnline: remote.icon,
-      //      chainPrecision: remote.chainPrecision,
-      //      displayPrecision: remote.displayPrecision,
-      //      isFixed: kDefaultCoinFixed.contains(remote.symbol),
-      //      isEnabled: true, // kDefaultCoinFixed.contains(remote.symbol),
-      //    ),
-      //  );
-      //}
     });
 
     // Disable coins without address
@@ -89,10 +89,11 @@ class AssetActionSyncWalletCoins extends _BaseAction {
             chain: e.chain,
             symbol: e.symbol,
           )
-          ..balanceUnconfirmed = wallet.getCoinBalanceUnconfirmed(
-            chain: e.chain,
-            symbol: e.symbol,
-          )
+          ..balanceUnconfirmed = 0
+          // ..balanceUnconfirmed = wallet.getCoinBalanceUnconfirmed(
+          //   chain: e.chain,
+          //   symbol: e.symbol,
+          // )
           ..isEnabled = e.isEnabled
           ..isFixed = e.isFixed
           ..contract = e.contract,
@@ -110,6 +111,37 @@ class AssetActionSyncWalletCoins extends _BaseAction {
     }
 
     return state.rebuild((a) => a..assetState.coins.replace(assetCoins));
+  }
+
+  Future<Iterable<AssetCoin>> getAssetCoin() async {
+    final assetCoinSign = wallet.coins.map(
+      (e) => AssetCoin(
+        (a) => a
+          ..chain = e.chain
+          ..symbol = e.symbol
+          ..name = e.name
+          ..fullName = e.fullName
+          ..iconLocal = e.iconLocal
+          ..iconOnline = e.iconOnline
+          ..chainPrecision = e.chainPrecision
+          ..displayPrecision = e.displayPrecision
+          ..address = wallet.getCoinAddressByChain(e.chain)
+          ..balance = wallet.getCoinBalance(
+            chain: e.chain,
+            symbol: e.symbol,
+          )
+          ..balanceUnconfirmed = 0
+          // ..balanceUnconfirmed = wallet.getCoinBalanceUnconfirmed(
+          //   chain: e.chain,
+          //   symbol: e.symbol,
+          // )
+          ..isEnabled = e.isEnabled
+          ..isFixed = e.isFixed
+          ..contract = e.contract,
+      ),
+    );
+
+    return assetCoinSign;
   }
 
   @override

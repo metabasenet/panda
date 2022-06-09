@@ -30,8 +30,7 @@ class TradeHomePage extends HookWidget {
               return InAppWebView(
                 initialUrlRequest: URLRequest(
                   url: Uri.parse(
-                    'https://www.shangqingdong.work/?ran=$ranNumber',
-                  ),
+                      'https://www.shangqingdong.work/?ran=$ranNumber'),
                 ),
                 onWebViewCreated: (controller) {
                   webView = controller;

@@ -10,7 +10,7 @@ class AssetWalletCard extends HookWidget {
   }) : assert(wallet != null);
 
   final Wallet wallet;
-  final WalletStatus walletStatus;
+  final WalletStatus? walletStatus;
   final String fiatCurrency;
   final void Function(Wallet) onSync;
   final void Function() onPressed;

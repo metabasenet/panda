@@ -53,17 +53,16 @@ class CrashesReport {
   }
 
   Future<Contexts> getAppContexts() async {
-    _appInfo = _appInfo; // await PlatformUtils.getAppInfo();
-    _deviceInfo = _deviceInfo;
+    _appInfo = await PlatformUtils.getAppInfo();
+    _deviceInfo = await PlatformUtils.getDeviceInfo();
 
     return Contexts(
-        /*
-      operatingSystem: OperatingSystem(
+      operatingSystem: SentryOperatingSystem(
         name: _deviceInfo.osName,
         version: _deviceInfo.osVersion,
         build: _deviceInfo.osBuild ?? '',
       ),
-      app: App(
+      app: SentryApp(
         name: _appInfo.appName,
         version: _appInfo.version,
         identifier: _appInfo.packageName,
@@ -71,15 +70,15 @@ class CrashesReport {
         deviceAppHash: _deviceInfo.deviceId,
         startTime: DateTime.now().toUtc(),
       ),
-      device: Device(
+      device: SentryDevice(
         model: _deviceInfo.model,
         modelId: _deviceInfo.product,
         brand: _deviceInfo.brand,
         manufacturer: _deviceInfo.manufacturer,
         bootTime: DateTime.now().toUtc(),
         timezone: DateTime.now().timeZoneName,
-      ),*/
-        );
+      ),
+    );
   }
 
   /// Reports [error] along with its [stackTrace] to Sentry.io.

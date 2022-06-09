@@ -20,9 +20,9 @@ class CoinBalance extends HiveObject {
   @HiveField(3)
   double unconfirmed;
   @HiveField(4)
-  late DateTime createdAt;
+  DateTime createdAt = DateTime.now();
   @HiveField(5)
-  late DateTime updatedAt;
+  DateTime? updatedAt = DateTime.now();
   @HiveField(6)
-  late DateTime lockUntil;
+  DateTime lockUntil = DateTime.now();
 }

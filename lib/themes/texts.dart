@@ -115,7 +115,7 @@ extension TextStyles on BuildContext {
       fontSize: 14.0,
       fontWeight: _getBold(bold, fontWeight),
       color: color ?? secondaryColor,
-      height: lineHeight ?? 14,
+      height: lineHeight ?? 1,
     );
   }
 

@@ -70,8 +70,8 @@ class AppMainPage extends HookWidget {
       'Trading',
     ),
     TabBarItem(
-      //AssetMainTab(),
-      Center(),
+      AssetMainTab(),
+      //Center(),
       'global:main_tab_wallet',
       '',
       '',
