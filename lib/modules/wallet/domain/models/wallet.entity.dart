@@ -48,7 +48,7 @@ class Wallet extends HiveObject {
     required this.hasBackup,
     required this.coins,
   }) {
-    balances = [];
+    //balances = [];
     createdAt = DateTime.now();
     status = WalletStatus.notSynced;
   }

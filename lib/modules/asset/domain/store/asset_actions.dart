@@ -73,17 +73,44 @@ class AssetActionSyncWalletCoins extends _BaseAction {
       await WalletRepository().saveWallet(wallet.id, wallet);
     }
 
-    Iterable<AssetCoin> assetCoins;
+    final assetCoins = wallet.coins.map(
+      (e) => AssetCoin(
+        (a) => a
+          ..chain = e.chain
+          ..symbol = e.symbol
+          ..name = e.name
+          ..fullName = e.fullName
+          ..iconLocal = e.iconLocal
+          ..iconOnline = e.iconOnline
+          ..chainPrecision = e.chainPrecision
+          ..displayPrecision = e.displayPrecision
+          ..address = wallet.getCoinAddressByChain(e.chain)
+          ..balance = wallet.getCoinBalance(
+            chain: e.chain,
+            symbol: e.symbol,
+          )
+          ..balanceUnconfirmed = 0
+          // ..balanceUnconfirmed = wallet.getCoinBalanceUnconfirmed(
+          //   chain: e.chain,
+          //   symbol: e.symbol,
+          // )
+          ..isEnabled = e.isEnabled
+          ..isFixed = e.isFixed
+          ..contract = e.contract,
+      ),
+    );
 
-    //final assetCoins;
-    await getAssetCoin().then((value) {
-      assetCoins = value;
-      for (AssetCoin coin in value) {
-        String bbb = coin.displayFullName;
-      }
+    // Set Initial balance in cubit
+    for (final coin in assetCoins) {
+      GetIt.I<AssetBalanceCubit>().updateBalance(
+        symbol: coin.symbol ?? '',
+        address: coin.address ?? '',
+        balance: coin.balance ?? 0,
+        unconfirmed: coin.balanceUnconfirmed ?? 0,
+      );
+    }
 
-      return state.rebuild((a) => a..assetState.coins.replace(assetCoins));
-    });
+    return state.rebuild((a) => a..assetState.coins.replace(assetCoins));
   }
 
   Future<Iterable<AssetCoin>> getAssetCoin() async {
