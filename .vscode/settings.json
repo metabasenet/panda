@@ -94,7 +94,9 @@
   "dart.debugExternalLibraries": true,
   "dart.debugSdkLibraries": true,
   "dart.lineLength": 80,
-  "cSpell.enableFiletypes": ["dart"],
+  "cSpell.enableFiletypes": [
+    "dart"
+  ],
   "peacock.color": "#c0b04a",
   "workbench.colorCustomizations": {
     "activityBar.activeBackground": "#cdc170",
