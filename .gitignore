@@ -42,3 +42,4 @@ app.*.map.json
 
 # android build apk
 */app/release
+third_party/wallet_sdk_flutter
