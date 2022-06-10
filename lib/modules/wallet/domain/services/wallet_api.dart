@@ -89,7 +89,7 @@ class WalletApi {
     return [];
   }
 
-  /// 广播交易
+  //Broadcast transaction submit
   Future<String> submitTransaction({
     required String chain,
     required String symbol,

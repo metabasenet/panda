@@ -70,7 +70,7 @@ class WalletActionWithdrawSubmit extends _BaseAction {
           params,
           walletData,
           completer,
-          onConfirmSubmit!,
+          onConfirmSubmit as Future<bool> Function(),
         );
         break;
       case 'TRX':
@@ -311,7 +311,8 @@ class WalletActionMNTTxSubmit extends _BaseAction {
       'time': timestamp,
       'nonce': (data.fee.nonce ?? 0) + 1,
       'amount': amount.toString(),
-      'gasprice': params.withdrawData.fee.gasPrice.toString(),
+      'gasprice':
+          '1000000000000.0', //params.withdrawData.fee.gasPrice.toString(),
       'gaslimit': params.withdrawData.fee.gasLimit.toString(),
       'data': txData,
       'type': txData.length > 160 ? 1 : 0,
@@ -331,7 +332,7 @@ class WalletActionMNTTxSubmit extends _BaseAction {
     final signature = sign(Uint8List.fromList(message.toList()), rpk, public);
     final signedTx = '${rawTx['tx_hex']}40${HEX.encode(signature)}';
     final txId = await WalletRepository().submitTransaction(
-      type: params.broadcastType!,
+      type: params.broadcastType ?? '',
       chain: 'MNT',
       symbol: 'MNT',
       signedTx: signedTx,

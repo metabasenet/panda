@@ -77,7 +77,7 @@ class CSAlertDialog extends StatelessWidget {
       cancelBtnStyle: cancelBtnStyle!,
       onConfirm: onConfirm!,
       onDismiss: onDismiss ?? onConfirm,
-      onCancel: onCancel!,
+      onCancel: onCancel,
       dismissOnBgClick: dismissOnBgClick,
       dismissOnConfirm: dismissOnConfirm,
       confirmTimeout: confirmTimeout ?? 0,

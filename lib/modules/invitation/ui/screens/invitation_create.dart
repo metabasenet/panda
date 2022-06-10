@@ -14,7 +14,7 @@ class InvitationCreatePage extends HookWidget {
     final arg = settings.arguments;
     return DefaultTransition(
       settings,
-      InvitationCreatePage(arg! as AssetCoin),
+      InvitationCreatePage(arg as AssetCoin),
     );
   }
 
@@ -127,7 +127,7 @@ class InvitationCreatePage extends HookWidget {
     final autovalidate = useState(false);
     final feeIsRefreshing = useState(false);
     final miniAmount = useState<double>(0);
-    final coinName = coinInfo.value.name ?? '';
+    final coinName = coinInfo.value != null ? coinInfo.value.name : '';
 
     void openQrScan() {
       QRScannerPage.open().then((qrStr) {
@@ -155,7 +155,7 @@ class InvitationCreatePage extends HookWidget {
       if (NumberUtil.isLess(amount.text, miniAmount.value)) {
         return Toast.show(tr(
           'asset:withdraw_req_minimum',
-          namedArgs: {'value': '${miniAmount.value}', 'symbol': coinName},
+          namedArgs: {'value': '${miniAmount.value}', 'symbol': coinName ?? ''},
         ));
       }
 
@@ -183,8 +183,8 @@ class InvitationCreatePage extends HookWidget {
       if (coins.isNotEmpty == true) {
         final defaultCoin = coinInfo.value;
         final mini = GetIt.I<CoinConfig>().getTransferMinQuota(
-          chain: defaultCoin.chain,
-          symbol: defaultCoin.symbol,
+          chain: defaultCoin.chain ?? '',
+          symbol: defaultCoin.symbol ?? '',
         );
         miniAmount.value = mini;
         coinInfo.value = defaultCoin;
@@ -296,7 +296,9 @@ class InvitationCreatePage extends HookWidget {
                         ),
                         inputFormatters: [
                           DecimalTextInputFormatter(
-                            decimalRange: coinInfo.value.chainPrecision,
+                            decimalRange: coinInfo.value != null
+                                ? coinInfo.value.chainPrecision
+                                : 0,
                           ),
                         ],
                         onPressIcon: () {
@@ -307,7 +309,7 @@ class InvitationCreatePage extends HookWidget {
                         hintText: tr(
                           'invitation:defi_hint_minimum',
                           namedArgs: {
-                            'symbol': coinName,
+                            'symbol': coinName ?? '',
                             'value': miniAmount.value.toString(),
                           },
                         ),
@@ -322,8 +324,8 @@ class InvitationCreatePage extends HookWidget {
                               tr(
                                 'asset:lbl_balance',
                                 namedArgs: {
-                                  'balance': balance!,
-                                  'symbol': coinName,
+                                  'balance': balance ?? '',
+                                  'symbol': coinName ?? '',
                                 },
                               ),
                               style: context.textSecondary(

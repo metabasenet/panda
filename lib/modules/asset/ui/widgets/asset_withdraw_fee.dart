@@ -10,7 +10,7 @@ class AssetWithdrawFee extends StatelessWidget {
     this.onGetFee,
   }) : super(key: key);
 
-  final WalletWithdrawData withdrawInfo;
+  final WalletWithdrawData? withdrawInfo;
   final bool isRefreshing;
   final EdgeInsetsGeometry? padding;
   final Function(String type)? onPress;
@@ -23,20 +23,23 @@ class AssetWithdrawFee extends StatelessWidget {
   }) {
     DeviceUtils.hideKeyboard(context);
     final list = WalletFeeUtils.getFeeOptions(
-      chain: withdrawInfo.chain,
-      defaultFee: withdrawInfo.feeDefault,
+      chain: withdrawInfo!.chain,
+      defaultFee: withdrawInfo!.feeDefault,
       configCoinFee: configCoinFee!,
     );
-    final feeChain = withdrawInfo.chain.toLowerCase();
+    final feeChain = withdrawInfo!.chain.toLowerCase();
     final List<CSOptionsItem> options = list
         .map(
           (item) => CSOptionsItem(
             label: tr(
               'asset:withdraw_lbl_fee_${feeChain}_${item.key}',
-              namedArgs: {'fuel': item.value, 'unit': withdrawInfo.fee.feeUnit},
+              namedArgs: {
+                'fuel': item.value,
+                'unit': withdrawInfo!.fee.feeUnit
+              },
             ),
             value: item.key,
-            color: withdrawInfo.fee.feeLevel == item.key
+            color: withdrawInfo!.fee.feeLevel == item.key
                 ? context.primaryColor
                 : null,
           ),
@@ -55,18 +58,18 @@ class AssetWithdrawFee extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final configCoinFee = GetIt.I<CoinConfig>().getFeeLevel(
-      chain: withdrawInfo.chain,
-      symbol: withdrawInfo.symbol,
+      chain: withdrawInfo!.chain,
+      symbol: withdrawInfo!.symbol,
     );
     final showGasBtn = configCoinFee != null &&
         configCoinFee.enable != null &&
         configCoinFee.enable == true;
 
-    final feeChain = withdrawInfo.chain.toLowerCase();
-    final feeLevel = withdrawInfo.fee.feeLevel;
-    final feeUnit = withdrawInfo.fee.feeUnit;
-    final feeSymbol = withdrawInfo.fee.feeSymbol;
-    final feeRate = withdrawInfo.fee.feeRate;
+    final feeChain = withdrawInfo!.chain.toLowerCase();
+    final feeLevel = withdrawInfo!.fee.feeLevel;
+    final feeUnit = withdrawInfo!.fee.feeUnit;
+    final feeSymbol = withdrawInfo!.fee.feeSymbol;
+    final feeRate = withdrawInfo!.fee.feeRate;
 
     final gasLevel = tr(
       'asset:withdraw_lbl_fee_${feeChain}_$feeLevel',
@@ -135,7 +138,7 @@ class AssetWithdrawFee extends StatelessWidget {
                     Text(
                       withdrawInfo == null
                           ? '-'
-                          : '${withdrawInfo.displayFee} $feeSymbol',
+                          : '${withdrawInfo!.displayFee} $feeSymbol',
                       style: context.textBody(
                         bold: true,
                         fontWeight: FontWeight.normal,

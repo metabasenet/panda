@@ -2,7 +2,8 @@ part of app_module;
 
 class AppConstants {
   static const mnt_fork =
-      '000000005f7ef624ac7ef5f929dbca7e1146d888a29d7455ff7246312cdf62a3';
+      '000000007b3d3956a54c231f74ed02f621c71f62aa9f7def149050d55085f93f';
+
   static const mnt_chain = '\u{0042}\u{0042}\u{0043}';
 
   static const codeVersion = 0;

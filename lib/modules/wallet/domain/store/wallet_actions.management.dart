@@ -94,11 +94,11 @@ class WalletActionDeleteWallet extends _BaseAction {
 
     final nextWallet = allWallets.isEmpty ? null : allWallets[0];
 
-    dispatch(AppActionLoadWallet(nextWallet!));
+    dispatch(AppActionLoadWallet(nextWallet));
 
     return state.rebuild(
       (b) => b.walletState
-        ..activeWalletId = nextWallet.id
+        ..activeWalletId = nextWallet?.id
         ..activeWallet = nextWallet
         ..wallets = allWallets,
     );
