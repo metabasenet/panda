@@ -16,7 +16,7 @@ abstract class InvestHomeVM
   String get fiatCurrency;
 
   //@nullable
-  MintItem? get activeMint;
+  MintItem get activeMint;
 
   BuiltList<MintItem> get mints;
 

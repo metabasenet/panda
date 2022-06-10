@@ -293,13 +293,13 @@ class AssetActionUpdateWalletBalances extends _BaseAction {
     }
 
     for (final coin in state.assetState.coins) {
-      final balanceInfo = wallet.getCoinBalanceInfo(
-        chain: coin.chain ?? '',
-        symbol: coin.symbol ?? '',
-        address: coin.address ?? '',
-      );
+      // final balanceInfo = wallet.getCoinBalanceInfo(
+      //   chain: coin.chain ?? '',
+      //   symbol: coin.symbol ?? '',
+      //   address: coin.address ?? '',
+      // );
 
-      DateTime dtUpdatedAt = balanceInfo?.updatedAt ?? DateTime.now();
+      // DateTime dtUpdatedAt = balanceInfo?.updatedAt ?? DateTime.now();
 
       // if (skipFrequentUpdate == true &&
       //     balanceInfo?.updatedAt != null &&

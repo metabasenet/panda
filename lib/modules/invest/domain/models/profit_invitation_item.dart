@@ -11,7 +11,7 @@ abstract class ProfitInvitationItem
       _$profitInvitationItemSerializer;
 
 // Fields
-  @BuiltValueField(wireName: '_id')
+  @BuiltValueField(wireName: 'address')
   String get address;
 
   @BuiltValueField(wireName: 'amount')

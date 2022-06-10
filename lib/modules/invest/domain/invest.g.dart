@@ -257,24 +257,36 @@ class _$MintItemSerializer implements StructuredSerializer<MintItem> {
   Iterable<Object?> serialize(Serializers serializers, MintItem object,
       {FullType specifiedType = FullType.unspecified}) {
     final result = <Object?>[
-      'id',
-      serializers.serialize(object.id, specifiedType: const FullType(int)),
       'name',
       serializers.serialize(object.name,
           specifiedType: const FullType(BuiltMap,
               const [const FullType(String), const FullType(String)])),
-      'symbol',
-      serializers.serialize(object.symbol,
-          specifiedType: const FullType(String)),
-      'chain',
-      serializers.serialize(object.chain,
-          specifiedType: const FullType(String)),
     ];
     Object? value;
+    value = object.id;
+    if (value != null) {
+      result
+        ..add('id')
+        ..add(serializers.serialize(value, specifiedType: const FullType(int)));
+    }
     value = object.forkId;
     if (value != null) {
       result
         ..add('fork')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.symbol;
+    if (value != null) {
+      result
+        ..add('symbol')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.chain;
+    if (value != null) {
+      result
+        ..add('chain')
         ..add(serializers.serialize(value,
             specifiedType: const FullType(String)));
     }
@@ -307,7 +319,7 @@ class _$MintItemSerializer implements StructuredSerializer<MintItem> {
       switch (key) {
         case 'id':
           result.id = serializers.deserialize(value,
-              specifiedType: const FullType(int))! as int;
+              specifiedType: const FullType(int)) as int?;
           break;
         case 'fork':
           result.forkId = serializers.deserialize(value,
@@ -320,11 +332,11 @@ class _$MintItemSerializer implements StructuredSerializer<MintItem> {
           break;
         case 'symbol':
           result.symbol = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'chain':
           result.chain = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'mint_enable':
           result.mintEnable = serializers.deserialize(value,
@@ -356,7 +368,7 @@ class _$ProfitInvitationItemSerializer
       Serializers serializers, ProfitInvitationItem object,
       {FullType specifiedType = FullType.unspecified}) {
     final result = <Object?>[
-      '_id',
+      'address',
       serializers.serialize(object.address,
           specifiedType: const FullType(String)),
       'amount',
@@ -393,7 +405,7 @@ class _$ProfitInvitationItemSerializer
       iterator.moveNext();
       final Object? value = iterator.current;
       switch (key) {
-        case '_id':
+        case 'address':
           result.address = serializers.deserialize(value,
               specifiedType: const FullType(String))! as String;
           break;
@@ -427,19 +439,30 @@ class _$ProfitRecordItemSerializer
   Iterable<Object?> serialize(Serializers serializers, ProfitRecordItem object,
       {FullType specifiedType = FullType.unspecified}) {
     final result = <Object?>[
-      'height',
-      serializers.serialize(object.height, specifiedType: const FullType(int)),
+      'vote',
+      serializers.serialize(object.vote, specifiedType: const FullType(String)),
+      'extend',
+      serializers.serialize(object.extend,
+          specifiedType: const FullType(String)),
       'balance',
       serializers.serialize(object.balance,
           specifiedType: const FullType(String)),
-      'stake_reward',
-      serializers.serialize(object.stakeReward,
+      'height',
+      serializers.serialize(object.height,
           specifiedType: const FullType(String)),
-      'promotion_reward',
-      serializers.serialize(object.promotionReward,
-          specifiedType: const FullType(String)),
+      'txid',
+      serializers.serialize(object.txid, specifiedType: const FullType(String)),
+      'time',
+      serializers.serialize(object.time, specifiedType: const FullType(String)),
     ];
-
+    Object? value;
+    value = object.totalReward;
+    if (value != null) {
+      result
+        ..add('totalReward')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
     return result;
   }
 
@@ -455,21 +478,33 @@ class _$ProfitRecordItemSerializer
       iterator.moveNext();
       final Object? value = iterator.current;
       switch (key) {
-        case 'height':
-          result.height = serializers.deserialize(value,
-              specifiedType: const FullType(int))! as int;
+        case 'vote':
+          result.vote = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'extend':
+          result.extend = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
           break;
         case 'balance':
           result.balance = serializers.deserialize(value,
               specifiedType: const FullType(String))! as String;
           break;
-        case 'stake_reward':
-          result.stakeReward = serializers.deserialize(value,
+        case 'height':
+          result.height = serializers.deserialize(value,
               specifiedType: const FullType(String))! as String;
           break;
-        case 'promotion_reward':
-          result.promotionReward = serializers.deserialize(value,
+        case 'txid':
+          result.txid = serializers.deserialize(value,
               specifiedType: const FullType(String))! as String;
+          break;
+        case 'time':
+          result.time = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'totalReward':
+          result.totalReward = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String?;
           break;
       }
     }
@@ -484,7 +519,7 @@ class _$InvestHomeVM extends InvestHomeVM {
   @override
   final String fiatCurrency;
   @override
-  final MintItem? activeMint;
+  final MintItem activeMint;
   @override
   final BuiltList<MintItem> mints;
   @override
@@ -521,7 +556,7 @@ class _$InvestHomeVM extends InvestHomeVM {
   _$InvestHomeVM._(
       {required this.hasWallet,
       required this.fiatCurrency,
-      this.activeMint,
+      required this.activeMint,
       required this.mints,
       this.mintInfo,
       required this.chartList,
@@ -538,6 +573,8 @@ class _$InvestHomeVM extends InvestHomeVM {
         hasWallet, 'InvestHomeVM', 'hasWallet');
     BuiltValueNullFieldError.checkNotNull(
         fiatCurrency, 'InvestHomeVM', 'fiatCurrency');
+    BuiltValueNullFieldError.checkNotNull(
+        activeMint, 'InvestHomeVM', 'activeMint');
     BuiltValueNullFieldError.checkNotNull(mints, 'InvestHomeVM', 'mints');
     BuiltValueNullFieldError.checkNotNull(
         chartList, 'InvestHomeVM', 'chartList');
@@ -727,7 +764,7 @@ class InvestHomeVMBuilder
     if ($v != null) {
       _hasWallet = $v.hasWallet;
       _fiatCurrency = $v.fiatCurrency;
-      _activeMint = $v.activeMint?.toBuilder();
+      _activeMint = $v.activeMint.toBuilder();
       _mints = $v.mints.toBuilder();
       _mintInfo = $v.mintInfo?.toBuilder();
       _chartList = $v.chartList.toBuilder();
@@ -767,7 +804,7 @@ class InvestHomeVMBuilder
                   hasWallet, 'InvestHomeVM', 'hasWallet'),
               fiatCurrency: BuiltValueNullFieldError.checkNotNull(
                   fiatCurrency, 'InvestHomeVM', 'fiatCurrency'),
-              activeMint: _activeMint?.build(),
+              activeMint: activeMint.build(),
               mints: mints.build(),
               mintInfo: _mintInfo?.build(),
               chartList: chartList.build(),
@@ -789,7 +826,7 @@ class InvestHomeVMBuilder
       late String _$failedField;
       try {
         _$failedField = 'activeMint';
-        _activeMint?.build();
+        activeMint.build();
         _$failedField = 'mints';
         mints.build();
         _$failedField = 'mintInfo';
@@ -1375,15 +1412,15 @@ class MintInfoBuilder implements Builder<MintInfo, MintInfoBuilder> {
 
 class _$MintItem extends MintItem {
   @override
-  final int id;
+  final int? id;
   @override
   final String? forkId;
   @override
   final BuiltMap<String, String> name;
   @override
-  final String symbol;
+  final String? symbol;
   @override
-  final String chain;
+  final String? chain;
   @override
   final int? mintEnable;
   @override
@@ -1393,18 +1430,15 @@ class _$MintItem extends MintItem {
       (new MintItemBuilder()..update(updates))._build();
 
   _$MintItem._(
-      {required this.id,
+      {this.id,
       this.forkId,
       required this.name,
-      required this.symbol,
-      required this.chain,
+      this.symbol,
+      this.chain,
       this.mintEnable,
       this.minBalance})
       : super._() {
-    BuiltValueNullFieldError.checkNotNull(id, 'MintItem', 'id');
     BuiltValueNullFieldError.checkNotNull(name, 'MintItem', 'name');
-    BuiltValueNullFieldError.checkNotNull(symbol, 'MintItem', 'symbol');
-    BuiltValueNullFieldError.checkNotNull(chain, 'MintItem', 'chain');
   }
 
   @override
@@ -1523,13 +1557,11 @@ class MintItemBuilder implements Builder<MintItem, MintItemBuilder> {
     try {
       _$result = _$v ??
           new _$MintItem._(
-              id: BuiltValueNullFieldError.checkNotNull(id, 'MintItem', 'id'),
+              id: id,
               forkId: forkId,
               name: name.build(),
-              symbol: BuiltValueNullFieldError.checkNotNull(
-                  symbol, 'MintItem', 'symbol'),
-              chain: BuiltValueNullFieldError.checkNotNull(
-                  chain, 'MintItem', 'chain'),
+              symbol: symbol,
+              chain: chain,
               mintEnable: mintEnable,
               minBalance: minBalance);
     } catch (_) {
@@ -1672,31 +1704,40 @@ class ProfitInvitationItemBuilder
 
 class _$ProfitRecordItem extends ProfitRecordItem {
   @override
-  final int height;
+  final String vote;
+  @override
+  final String extend;
   @override
   final String balance;
   @override
-  final String stakeReward;
+  final String height;
   @override
-  final String promotionReward;
+  final String txid;
+  @override
+  final String time;
+  @override
+  final String? totalReward;
 
   factory _$ProfitRecordItem(
           [void Function(ProfitRecordItemBuilder)? updates]) =>
       (new ProfitRecordItemBuilder()..update(updates))._build();
 
   _$ProfitRecordItem._(
-      {required this.height,
+      {required this.vote,
+      required this.extend,
       required this.balance,
-      required this.stakeReward,
-      required this.promotionReward})
+      required this.height,
+      required this.txid,
+      required this.time,
+      this.totalReward})
       : super._() {
-    BuiltValueNullFieldError.checkNotNull(height, 'ProfitRecordItem', 'height');
+    BuiltValueNullFieldError.checkNotNull(vote, 'ProfitRecordItem', 'vote');
+    BuiltValueNullFieldError.checkNotNull(extend, 'ProfitRecordItem', 'extend');
     BuiltValueNullFieldError.checkNotNull(
         balance, 'ProfitRecordItem', 'balance');
-    BuiltValueNullFieldError.checkNotNull(
-        stakeReward, 'ProfitRecordItem', 'stakeReward');
-    BuiltValueNullFieldError.checkNotNull(
-        promotionReward, 'ProfitRecordItem', 'promotionReward');
+    BuiltValueNullFieldError.checkNotNull(height, 'ProfitRecordItem', 'height');
+    BuiltValueNullFieldError.checkNotNull(txid, 'ProfitRecordItem', 'txid');
+    BuiltValueNullFieldError.checkNotNull(time, 'ProfitRecordItem', 'time');
   }
 
   @override
@@ -1711,27 +1752,39 @@ class _$ProfitRecordItem extends ProfitRecordItem {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is ProfitRecordItem &&
-        height == other.height &&
+        vote == other.vote &&
+        extend == other.extend &&
         balance == other.balance &&
-        stakeReward == other.stakeReward &&
-        promotionReward == other.promotionReward;
+        height == other.height &&
+        txid == other.txid &&
+        time == other.time &&
+        totalReward == other.totalReward;
   }
 
   @override
   int get hashCode {
     return $jf($jc(
-        $jc($jc($jc(0, height.hashCode), balance.hashCode),
-            stakeReward.hashCode),
-        promotionReward.hashCode));
+        $jc(
+            $jc(
+                $jc(
+                    $jc($jc($jc(0, vote.hashCode), extend.hashCode),
+                        balance.hashCode),
+                    height.hashCode),
+                txid.hashCode),
+            time.hashCode),
+        totalReward.hashCode));
   }
 
   @override
   String toString() {
     return (newBuiltValueToStringHelper('ProfitRecordItem')
-          ..add('height', height)
+          ..add('vote', vote)
+          ..add('extend', extend)
           ..add('balance', balance)
-          ..add('stakeReward', stakeReward)
-          ..add('promotionReward', promotionReward))
+          ..add('height', height)
+          ..add('txid', txid)
+          ..add('time', time)
+          ..add('totalReward', totalReward))
         .toString();
   }
 }
@@ -1740,32 +1793,46 @@ class ProfitRecordItemBuilder
     implements Builder<ProfitRecordItem, ProfitRecordItemBuilder> {
   _$ProfitRecordItem? _$v;
 
-  int? _height;
-  int? get height => _$this._height;
-  set height(int? height) => _$this._height = height;
+  String? _vote;
+  String? get vote => _$this._vote;
+  set vote(String? vote) => _$this._vote = vote;
+
+  String? _extend;
+  String? get extend => _$this._extend;
+  set extend(String? extend) => _$this._extend = extend;
 
   String? _balance;
   String? get balance => _$this._balance;
   set balance(String? balance) => _$this._balance = balance;
 
-  String? _stakeReward;
-  String? get stakeReward => _$this._stakeReward;
-  set stakeReward(String? stakeReward) => _$this._stakeReward = stakeReward;
+  String? _height;
+  String? get height => _$this._height;
+  set height(String? height) => _$this._height = height;
 
-  String? _promotionReward;
-  String? get promotionReward => _$this._promotionReward;
-  set promotionReward(String? promotionReward) =>
-      _$this._promotionReward = promotionReward;
+  String? _txid;
+  String? get txid => _$this._txid;
+  set txid(String? txid) => _$this._txid = txid;
+
+  String? _time;
+  String? get time => _$this._time;
+  set time(String? time) => _$this._time = time;
+
+  String? _totalReward;
+  String? get totalReward => _$this._totalReward;
+  set totalReward(String? totalReward) => _$this._totalReward = totalReward;
 
   ProfitRecordItemBuilder();
 
   ProfitRecordItemBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _height = $v.height;
+      _vote = $v.vote;
+      _extend = $v.extend;
       _balance = $v.balance;
-      _stakeReward = $v.stakeReward;
-      _promotionReward = $v.promotionReward;
+      _height = $v.height;
+      _txid = $v.txid;
+      _time = $v.time;
+      _totalReward = $v.totalReward;
       _$v = null;
     }
     return this;
@@ -1788,14 +1855,19 @@ class ProfitRecordItemBuilder
   _$ProfitRecordItem _build() {
     final _$result = _$v ??
         new _$ProfitRecordItem._(
-            height: BuiltValueNullFieldError.checkNotNull(
-                height, 'ProfitRecordItem', 'height'),
+            vote: BuiltValueNullFieldError.checkNotNull(
+                vote, 'ProfitRecordItem', 'vote'),
+            extend: BuiltValueNullFieldError.checkNotNull(
+                extend, 'ProfitRecordItem', 'extend'),
             balance: BuiltValueNullFieldError.checkNotNull(
                 balance, 'ProfitRecordItem', 'balance'),
-            stakeReward: BuiltValueNullFieldError.checkNotNull(
-                stakeReward, 'ProfitRecordItem', 'stakeReward'),
-            promotionReward: BuiltValueNullFieldError.checkNotNull(
-                promotionReward, 'ProfitRecordItem', 'promotionReward'));
+            height: BuiltValueNullFieldError.checkNotNull(
+                height, 'ProfitRecordItem', 'height'),
+            txid: BuiltValueNullFieldError.checkNotNull(
+                txid, 'ProfitRecordItem', 'txid'),
+            time: BuiltValueNullFieldError.checkNotNull(
+                time, 'ProfitRecordItem', 'time'),
+            totalReward: totalReward);
     replace(_$result);
     return _$result;
   }

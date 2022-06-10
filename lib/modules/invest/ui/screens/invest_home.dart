@@ -67,7 +67,7 @@ class InvestHomePage extends HookWidget {
           converter: InvestHomeVM.fromStore,
           builder: (context, viewModel) => MintSelectDrawer(
             mints: viewModel.mints.toList(),
-            activeMintId: viewModel.activeMint?.id ?? 0,
+            activeMintId: viewModel.activeMint.id ?? 0,
             onLoadMint: (mint) {
               loadMint(viewModel, mint, selectedTab);
             },
@@ -80,9 +80,13 @@ class InvestHomePage extends HookWidget {
         onInitialBuild: (_, __, viewModel) {
           // Load first mint
           if (viewModel.mints.isNotEmpty) {
+            MintItem mintActiveItem = viewModel.activeMint.chain == null
+                ? viewModel.mints.first
+                : viewModel.activeMint;
+
             loadMint(
               viewModel,
-              viewModel.activeMint!,
+              mintActiveItem,
               selectedTab,
             );
           }
@@ -128,13 +132,13 @@ class InvestHomePage extends HookWidget {
                     ],
                   ),
                 ),
-                if (viewModel.activeMint?.isMining == true &&
+                if (viewModel.activeMint.isMining == true &&
                     isLoaded &&
                     viewModel.hasWallet)
                   CSButtonTabsFancy(
                     selected:
-                        //selectedTab.value == InvestTabs.invitation ? 1 : 0,
                         selectedTab.value == InvestTabs.invitation ? 1 : 0,
+
                     onSelected: (value) {
                       selectedTab.value = value == 0
                           ? InvestTabs.reward
@@ -206,17 +210,17 @@ class InvestHomePage extends HookWidget {
             showButton: true,
             btnText: tr('global:btn_refresh'),
             onPressed: () {
-              loadMint(viewModel, viewModel.activeMint!, selectedTab);
+              loadMint(viewModel, viewModel.activeMint, selectedTab);
             },
           ),
         ),
       );
     }
 
-    final coinInfo = viewModel.getCoinInfo(
-      chain: viewModel.activeMint?.chain ?? '',
-      symbol: viewModel.activeMint?.symbol ?? '',
-    );
+    // final coinInfo = viewModel.getCoinInfo(
+    //   chain: viewModel.activeMint.chain ?? '',
+    //   symbol: viewModel.activeMint.symbol ?? '',
+    // );
 
     if (select == InvestTabs.airdrop) {
       return AirdropTab();
@@ -224,7 +228,7 @@ class InvestHomePage extends HookWidget {
 
     if (select == InvestTabs.reward) {
       return MiningProfitTab(
-        coinInfo: coinInfo,
+        coinInfo: AssetCoin(),
         listData: viewModel.profitRecordList.toList(),
         doLoadData: viewModel.getProfitRecordList,
       );
@@ -241,7 +245,7 @@ class InvestHomePage extends HookWidget {
 
     if (select == InvestTabs.invitation) {
       return MiningInvitationTab(
-        coinInfo: coinInfo,
+        coinInfo: AssetCoin(),
         listData: viewModel.profitInvitationList.toList(),
         doLoadData: viewModel.getProfitInvitationList,
       );

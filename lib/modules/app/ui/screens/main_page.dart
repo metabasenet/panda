@@ -80,8 +80,8 @@ class AppMainPage extends HookWidget {
     ),
     if (AppConstants.isBeta)
       TabBarItem(
-        //InvestMainTab(),
-        Center(),
+        InvestMainTab(),
+        //Center(),
         'global:main_tab_invest',
         '',
         '',
