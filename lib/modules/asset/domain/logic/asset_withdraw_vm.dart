@@ -79,7 +79,7 @@ abstract class AssetWithdrawVM
               params: params,
               walletData: walletData,
               completer: completer,
-              onConfirmSubmit: onConfirmSubmit!,
+              onConfirmSubmit: onConfirmSubmit,
             ));
             return completer.future;
           } else {
