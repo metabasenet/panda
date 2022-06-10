@@ -150,13 +150,13 @@ class CSButtonTabsFancy extends StatelessWidget {
       margin: context.edgeTop.copyWith(bottom: 2),
       padding: context.edgeHorizontal,
       height: 56,
-      decoration: BorderDecorator(
-        hasBottom: true,
-        color: context.primaryColor,
-        width: 2,
-        leftInset: 8,
-        rightInset: 8,
-      ),
+      // decoration: BorderDecorator(
+      //   hasBottom: true,
+      //   color: context.primaryColor,
+      //   width: 2,
+      //   leftInset: 8,
+      //   rightInset: 8,
+      // ),
       child: Container(
         margin: EdgeInsets.only(bottom: 2),
         child: Row(

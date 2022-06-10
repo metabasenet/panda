@@ -9,7 +9,7 @@ abstract class MintItem implements Built<MintItem, MintItemBuilder> {
 
 // Fields
 
-  int get id;
+  int? get id;
 
   //@nullable
   @BuiltValueField(wireName: 'fork')
@@ -17,9 +17,9 @@ abstract class MintItem implements Built<MintItem, MintItemBuilder> {
 
   BuiltMap<String, String> get name;
 
-  String get symbol;
+  String? get symbol;
 
-  String get chain;
+  String? get chain;
 
   /// 10-关闭，11-开启
   //@nullable

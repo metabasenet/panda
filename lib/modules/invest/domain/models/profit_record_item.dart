@@ -10,21 +10,29 @@ abstract class ProfitRecordItem
   static Serializer<ProfitRecordItem> get serializer =>
       _$profitRecordItemSerializer;
 
+  @BuiltValueField(wireName: 'vote')
+  String get vote;
+
   // Fields
-  @BuiltValueField(wireName: 'height')
-  int get height;
+  @BuiltValueField(wireName: 'extend')
+  String get extend;
 
   @BuiltValueField(wireName: 'balance')
   String get balance;
 
   ///
-  @BuiltValueField(wireName: 'stake_reward')
-  String get stakeReward;
+  @BuiltValueField(wireName: 'height')
+  String get height;
 
   ///
-  @BuiltValueField(wireName: 'promotion_reward')
-  String get promotionReward;
+  @BuiltValueField(wireName: 'txid')
+  String get txid;
 
-  String get totalReward =>
-      NumberUtil.plus<String>(stakeReward, promotionReward) ?? '';
+  @BuiltValueField(wireName: 'time')
+  String get time;
+
+  String? get totalReward;
+
+  // String get totalReward =>
+  //     NumberUtil.plus<String>(stakeReward, promotionReward) ?? '';
 }

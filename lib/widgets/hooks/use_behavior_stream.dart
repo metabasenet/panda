@@ -11,10 +11,10 @@ BehaviorSubject<T> useBehaviorStreamController<T>(
     VoidCallback? onCancel,
     List<Object>? keys}) {
   return use(_BehaviorStreamControllerHook(
-    onCancel: onCancel!,
-    onListen: onListen!,
+    onCancel: onCancel,
+    onListen: onListen,
     sync: sync,
-    keys: keys!,
+    keys: keys,
   ));
 }
 

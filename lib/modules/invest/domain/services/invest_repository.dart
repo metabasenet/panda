@@ -50,23 +50,37 @@ class InvestRepository {
   */
 
   //
-  Future<List<Map<String, dynamic>>> getProfitRecordList({
+  Future<List<dynamic>> getProfitRecordList({
     required String fork,
     required String address,
     required int skip,
     required int take,
   }) async {
-    /*
     final dio = Dio();
     final response =
         await dio.get('${AppConstants.randomApiUrl}/profit?address=$address');
-    final data = response.data;
-    return List<Map<String, dynamic>>.from(
-      data.map(
-        (e) => Map<String, dynamic>.from(e as Map<String, dynamic>),
-      ),
-    );*/
-    return [];
+    //final data = response.data;
+
+    List<dynamic> d = [];
+    Map<String, dynamic> e = {
+      'vote': '1',
+      'extend': '1',
+      'balance': '1',
+      'height': '1200',
+      'txid': '1',
+      'time': '2022-6-10 10:00:00'
+    };
+
+    d.add(e);
+    return d;
+
+    //return response.data as List<dynamic>;
+
+    // return List<Map<String, dynamic>>.from(
+    //   data.map(
+    //     (e) => Map<String, dynamic>.from(e as Map<String, dynamic>),
+    //   ),
+    // );
   }
 
   //
@@ -79,6 +93,19 @@ class InvestRepository {
     final dio = Dio();
     final response =
         await dio.get('${AppConstants.randomApiUrl}/general_reward?addr=$addr');
-    return response.data as List<dynamic>;
+
+    List<dynamic> d = [];
+    Map<String, dynamic> e = {
+      'address': 'x09883fjjjfff',
+      'amount': '120',
+      'height': '1200',
+      'time': '2022-6-10 10:00:00'
+    };
+
+    d.add(e);
+
+    return d;
+
+    //return response.data as List<dynamic>;
   }
 }

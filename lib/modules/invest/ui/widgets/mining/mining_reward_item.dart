@@ -48,7 +48,7 @@ class MiningRewardItem extends StatelessWidget {
               ),
               Spacer(),
               Text(
-                item.totalReward,
+                item.totalReward ?? '',
                 style: context.textMedium(
                   color: context.greenColor,
                   bold: true,
