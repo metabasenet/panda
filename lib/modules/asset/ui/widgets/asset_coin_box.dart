@@ -29,7 +29,7 @@ class AssetCoinBox extends StatelessWidget {
           children: [
             CSImage(
               coinInfo.iconLocal ?? '',
-              fallbackUrl: coinInfo.iconLocal,
+              fallbackUrl: coinInfo.iconLocal ?? '',
               width: 30,
               height: 30,
               radius: 30,
@@ -45,7 +45,7 @@ class AssetCoinBox extends StatelessWidget {
               ),
             ),
             SizedBox(width: 10),
-            if (coinInfo.fullName != null)
+            if (coinInfo != null)
               Text(
                 coinInfo.fullName ?? '',
                 style: context.textSecondary(

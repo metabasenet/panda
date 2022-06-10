@@ -87,7 +87,7 @@ class AssetWithdrawProcess {
             type: type ?? 0,
           ),
           walletData,
-          onConfirmSubmit!,
+          onConfirmSubmit as Future<bool> Function(),
         )
             .then(
           (txId) {

@@ -255,7 +255,7 @@ class FormBox extends HookWidget {
                 keyboardType: type == FormBoxType.inputNumber
                     ? TextInputType.numberWithOptions(decimal: true)
                     : TextInputType.text,
-                validator: validator!,
+                validator: validator?.call,
                 controller: controller,
                 inputFormatters: [
                   ...inputFormatters ?? [],

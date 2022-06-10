@@ -30,9 +30,13 @@ class AssetWithdrawPage extends HookWidget {
   }) {
     final isValid = formKey.currentState?.validate();
 
-    if (isValid ?? false) {
+    if (!isValid!) {
       return;
     }
+
+    // if (isValid ?? false) {
+    //   return;
+    // }
 
     AnalyticsReport().reportLog('Asset_Withdraw_Submit', {
       'chain': coinInfo?.chain,
@@ -209,7 +213,7 @@ class AssetWithdrawPage extends HookWidget {
             AssetWithdrawProcess.getWithdrawFee(
               viewModel: viewModel,
               coinInfo: coinInfo!,
-              previousWithdrawData: withdrawInfo.value!,
+              previousWithdrawData: withdrawInfo.value as WalletWithdrawData,
               toAddress: '',
               amount: '0',
             ).then((value) {
@@ -325,7 +329,7 @@ class AssetWithdrawPage extends HookWidget {
                     ),
                   ),
                   AssetWithdrawFee(
-                    withdrawInfo: withdrawInfo.value!,
+                    withdrawInfo: withdrawInfo.value as WalletWithdrawData,
                     isRefreshing: feeIsRefreshing.value,
                     onPress: (type) {
                       handleChangeGas(type);

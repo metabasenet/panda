@@ -13,17 +13,76 @@
 
 // Project imports:
 //import 'package:mars/app.dart';
-import 'dart:typed_data';
-import 'package:mars/utils/utils.dart';
+//import 'dart:typed_data';
+//import 'package:flutter_test/flutter_test.dart';
+//import 'package:mars/crypto/mnt.dart';
+//import 'package:ed25519_dart_base/ed25519_dart.dart';
+//import 'package:hex/hex.dart';
 
+import 'package:cryptography/cryptography.dart';
+
+/*
+String formatBytesAsHexString(Uint8List bytes) {
+  final result = StringBuffer();
+  for (var i = 0; i < bytes.lengthInBytes; i++) {
+    final part = bytes[i];
+    result.write('${part < 16 ? '0' : ''}${part.toRadixString(16)}');
+  }
+  return result.toString();
+}
+*/
 void main() async {
-  final v = await CryptographyUtils.encrypt('1234', '1234qweR');
-  final ret1 = Uint8List.fromList(v.codeUnits);
-  print(ret1);
-  final ret2 = String.fromCharCodes(ret1);
-  final ret3 = await CryptographyUtils.decrypt(ret2, '1234qweR');
-  print(ret3);
+  final cipher = Chacha20.poly1305Aead();
+  final secretKey = SecretKey(List.filled(32, 0));
+  final nonce = List.filled(12, 0);
+  final ret = await cipher.encrypt(
+    List.filled(32, 0),
+    secretKey: secretKey,
+    nonce: nonce,
+  );
+  final ret_ = List.filled(0, 0, growable: true);
+  ret_.addAll(ret.mac.bytes);
+  ret_.addAll(ret.cipherText);
+  //print(ret_);
+  //print(ret_.length);
 
+  //final ret_ = ret.mac.bytes.addAll(ret.cipherText);
+  //final ret_ = List.from([ret.mac.bytes, ret.cipherText]);
+  //print(ret_.length);
+  final sb = SecretBox(
+    ret_.sublist(16), // ret.cipherText,
+    nonce: nonce,
+    mac: Mac(ret_.sublist(0, 16)), // Mac(expectedMac),
+  );
+  final ret2 = await cipher.decrypt(sb, secretKey: secretKey);
+  print(ret2);
+  print(ret2.length);
+  //print(ret);
+  //print(ret.cipherText);
+  //print(ret.cipherText.length);
+  /*
+  final cipher = Chacha20.poly1305Aead();
+    final listIntPwd = utf8.encode('$password$uniqueChars'.substring(0, 32));
+    final secretKey = SecretKey(listIntPwd);
+    //final nonce = Nonce(utf8.encode(uniqueChars.substring(0, 12)));
+    final nonce = List.filled(12, 0);
+    if (isEncrypt) {
+      final ret = await cipher.encrypt(
+        utf8.encode(value),
+        secretKey: secretKey,
+        nonce: nonce,
+      );
+      //ret.cipherText
+      //return String.fromCharCodes(ret.);
+    } else {
+      SecretBox(
+        Uint8List.fromList(value.codeUnits),
+        nonce: nonce,
+        mac: mac,
+      );
+      //cipher.decrypt(null, secretKey: secretKey);
+    }
+*/
   /*
   testWidgets('Counter increments smoke test', (tester) async {
     const vote = {
