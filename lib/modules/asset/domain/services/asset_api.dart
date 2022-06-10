@@ -84,14 +84,14 @@ class AssetApi {
     return resData as Map<String, dynamic>;
   }
 
-  // 发送交易
+  // Send transaction
   Future<dynamic> submitTransaction({
     required String hex,
   }) async {
     final dio = Dio();
     final response =
         await dio.get('${AppConstants.randomApiUrl}/sendtransaction?hex=$hex');
-    dynamic resData = response.data;
+    final resData = response.data;
     return resData;
   }
 
