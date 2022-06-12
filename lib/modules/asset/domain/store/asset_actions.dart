@@ -113,37 +113,6 @@ class AssetActionSyncWalletCoins extends _BaseAction {
     return state.rebuild((a) => a..assetState.coins.replace(assetCoins));
   }
 
-  Future<Iterable<AssetCoin>> getAssetCoin() async {
-    final assetCoinSign = wallet.coins.map(
-      (e) => AssetCoin(
-        (a) => a
-          ..chain = e.chain
-          ..symbol = e.symbol
-          ..name = e.name
-          ..fullName = e.fullName
-          ..iconLocal = e.iconLocal
-          ..iconOnline = e.iconOnline
-          ..chainPrecision = e.chainPrecision
-          ..displayPrecision = e.displayPrecision
-          ..address = wallet.getCoinAddressByChain(e.chain)
-          ..balance = wallet.getCoinBalance(
-            chain: e.chain,
-            symbol: e.symbol,
-          )
-          ..balanceUnconfirmed = 0
-          // ..balanceUnconfirmed = wallet.getCoinBalanceUnconfirmed(
-          //   chain: e.chain,
-          //   symbol: e.symbol,
-          // )
-          ..isEnabled = e.isEnabled
-          ..isFixed = e.isFixed
-          ..contract = e.contract,
-      ),
-    );
-
-    return assetCoinSign;
-  }
-
   @override
   Object? wrapError(dynamic error) {
     CrashesReport().reportEvent(

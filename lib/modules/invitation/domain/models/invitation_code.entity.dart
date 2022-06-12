@@ -24,19 +24,19 @@ class InvitationCode extends HiveObject {
         ..createdAt = SystemDate.getTime();
 
   @HiveField(0)
-  late String chain;
+  String chain = '';
   @HiveField(1)
-  late String symbol;
+  String symbol = '';
   @HiveField(2)
-  late String fork;
+  String fork = '';
   @HiveField(4)
-  late String address;
+  String address = '';
 
   @HiveField(5)
-  late String subSign;
+  String subSign = '';
   @HiveField(6)
-  late String sharePrvKey;
+  String sharePrvKey = '';
 
   @HiveField(7)
-  late int createdAt;
+  int createdAt = SystemDate.getTime();
 }

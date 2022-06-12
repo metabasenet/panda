@@ -104,7 +104,7 @@ class InvitationCodePage extends HookWidget {
                         children: [
                           Center(
                             child: CSContainer(
-                              //width: null,
+                              width: 180,
                               child: QrCodeView(
                                 qrCodeStr,
                                 size: context.mediaWidth * 0.437,

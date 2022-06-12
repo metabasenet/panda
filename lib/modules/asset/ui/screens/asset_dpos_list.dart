@@ -28,7 +28,7 @@ class AssetDposList extends StatefulWidget {
 }
 
 class _AssetDposList extends State<AssetDposList> {
-  var voteNodeList = []; // 节点列表
+  var voteNodeList = []; // nodelist
   void checkIfWalletHasBackup(BuildContext context, AssetDetailVM viewModel) {
     if (!(viewModel.activeWallet?.hasBackup ?? false) && !kDebugMode) {
       showConfirmDialog(
@@ -190,8 +190,17 @@ class _AssetDposList extends State<AssetDposList> {
     );
   }
 
+  @override
+  void initState() {
+    AssetRepository().getVoteNode().then((res) => {
+          setState(() {
+            voteNodeList = res as List<dynamic>;
+          }),
+        });
+  }
+
   void onChanged() {
-    //initState();
+    initState();
   }
 
   @override

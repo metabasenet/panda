@@ -125,25 +125,16 @@ class AssetRepository {
     required String symbol,
     required String address,
   }) async {
-    /*
     final res = await _api.getTransactionFeeInformation(
       symbol: symbol,
       address: address,
     );
     return res;
-    */
-    return null;
   }
 
-  Future<List<Map<String, dynamic>>?> getVoteNode() async {
-    /*
+  Future<List<dynamic>?> getVoteNode() async {
     final res = await _api.getVoteNodeList();
-    var nodelist = (res as List<dynamic>)
-        .map((e) => ((e as Map<String, dynamic>)))
-        .toList();
-    return nodelist;
-    */
-    return null;
+    return res;
   }
 
   Future<Map<String, dynamic>> getVoteNodeDetail({
@@ -151,24 +142,20 @@ class AssetRepository {
     required String owner,
     required int rewardmode,
   }) async {
-    /*
     final res = await _api.getVoteNodeDetail(
-      delegate: delegate,
-      owner: owner,
-      rewardmode: rewardmode
-    );
-    print(res);
+        delegate: delegate, owner: owner, rewardmode: rewardmode);
+    //print(res);
     return res;
-    */
-    return getVote(delegate, owner, rewardmode);
+
+    //return getVote(delegate, owner, rewardmode);
   }
 
+  //Send voting transaction
   Future<dynamic> submitTransaction({
     required String hex,
   }) async {
-    //final res = await _api.submitTransaction(hex: hex);
-    //return res;
-    return null;
+    final res = await _api.submitTransaction(hex: hex);
+    return res;
   }
 
   Future<Map<String, String>> getCoinBalance({

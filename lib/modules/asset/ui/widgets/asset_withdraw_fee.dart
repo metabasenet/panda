@@ -58,18 +58,19 @@ class AssetWithdrawFee extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final configCoinFee = GetIt.I<CoinConfig>().getFeeLevel(
-      chain: withdrawInfo!.chain,
-      symbol: withdrawInfo!.symbol,
+      chain: withdrawInfo == null ? '' : withdrawInfo!.chain,
+      symbol: withdrawInfo == null ? '' : withdrawInfo!.symbol,
     );
     final showGasBtn = configCoinFee != null &&
         configCoinFee.enable != null &&
         configCoinFee.enable == true;
 
-    final feeChain = withdrawInfo!.chain.toLowerCase();
-    final feeLevel = withdrawInfo!.fee.feeLevel;
-    final feeUnit = withdrawInfo!.fee.feeUnit;
-    final feeSymbol = withdrawInfo!.fee.feeSymbol;
-    final feeRate = withdrawInfo!.fee.feeRate;
+    final feeChain =
+        withdrawInfo == null ? '' : withdrawInfo!.chain.toLowerCase();
+    final feeLevel = withdrawInfo == null ? '' : withdrawInfo!.fee.feeLevel;
+    final feeUnit = withdrawInfo == null ? '' : withdrawInfo!.fee.feeUnit;
+    final feeSymbol = withdrawInfo == null ? '' : withdrawInfo!.fee.feeSymbol;
+    final feeRate = withdrawInfo == null ? '' : withdrawInfo!.fee.feeRate;
 
     final gasLevel = tr(
       'asset:withdraw_lbl_fee_${feeChain}_$feeLevel',
