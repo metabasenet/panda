@@ -100,7 +100,7 @@ class AssetWithdrawPage extends HookWidget {
         AssetWithdrawProcess.getWithdrawFee(
           coinInfo: coinInfo!,
           viewModel: viewModel,
-          previousWithdrawData: withdrawInfo.value as WalletWithdrawData,
+          previousWithdrawData: withdrawInfo.value,
           toAddress: address.text,
           amount: amount.text,
         ).then((value) {

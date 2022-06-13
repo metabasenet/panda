@@ -16,7 +16,7 @@ abstract class AdmissionCreateVM
   @BuiltValueField(compare: false)
   Future<WalletWithdrawData> Function(
     WithdrawBeforeParams params,
-    WalletWithdrawData previousData,
+    WalletWithdrawData? previousData,
   ) get onWithdrawBefore;
 
   @override
