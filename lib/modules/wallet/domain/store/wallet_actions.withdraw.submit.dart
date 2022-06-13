@@ -312,7 +312,7 @@ class WalletActionMNTTxSubmit extends _BaseAction {
       'nonce': (data.fee.nonce ?? 0) + 1,
       'amount': amount.toString(),
       'gasprice':
-          '1000000000000.0', //params.withdrawData.fee.gasPrice.toString(),
+          '1000000000000', //params.withdrawData.fee.gasPrice.toString(),
       'gaslimit': params.withdrawData.fee.gasLimit.toString(),
       'data': txData,
       'type': txData.length > 160 ? 1 : 0,

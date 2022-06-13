@@ -24,16 +24,16 @@ class AssetApi {
 
   /// **** Balance ****
 
-  // Future<Map<String, dynamic>> getTransactionFeeInformation({
-  //   @required String symbol,
-  //   @required String address,
-  // }) async {
-  //   final dio = Dio();
-  //   final response = await dio.get(
-  //       '${AppConstants.randomApiUrl}/fee?address=$address&symbol=$symbol');
-  //   final data = response.data;
-  //   return data as Map<String, dynamic>;
-  // }
+  Future<Map<String, dynamic>> getTransactionFeeInformation({
+    required String symbol,
+    required String address,
+  }) async {
+    final dio = Dio();
+    final response = await dio.get(
+        '${AppConstants.randomApiUrl}/fee?address=$address&symbol=$symbol');
+    final data = response.data;
+    return data as Map<String, dynamic>;
+  }
 
   Future<List<dynamic>> getVoteNodeList() async {
     final dio = Dio();
@@ -84,7 +84,7 @@ class AssetApi {
     return resData as Map<String, dynamic>;
   }
 
-  // Send transaction
+  //Send voting transaction
   Future<dynamic> submitTransaction({
     required String hex,
   }) async {

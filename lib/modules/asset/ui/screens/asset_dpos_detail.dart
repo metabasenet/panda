@@ -79,9 +79,9 @@ class _AssetDposDetail extends State<AssetDposDetail> {
       (walletData, _) async {
         WalletActionMNTTxSubmit.reduceDpos(txData, walletData.mnemonic!)
             .then((res) {
-          //AssetRepository()
-          //    .submitTransaction(hex: res.toString())
-          //    .then((hexRes) => {AppNavigator.goBack()});
+          AssetRepository()
+              .submitTransaction(hex: res.toString())
+              .then((hexRes) => {AppNavigator.goBack()});
         });
       },
     );
@@ -116,8 +116,8 @@ class _AssetDposDetail extends State<AssetDposDetail> {
       'from': isTou ? widget.coinInfo.address : address,
       'to': isTou ? address : widget.coinInfo.address,
       'amount': myController.text,
-      'gasprice': '10000',
-      'gaslimit': '20000',
+      'gasprice': '1000000000000',
+      'gaslimit': '40000',
       'data': '01010146$hex'
     };
     final ret = getTx(params as Map<String, Object>);
@@ -126,12 +126,13 @@ class _AssetDposDetail extends State<AssetDposDetail> {
     });
   }
 
+  //get vote address
   void getVoteAddress() {
-    //final ret = getVote(widget.voteNodeItem['address'].toString(),
-    //    widget.coinInfo.address.toString(), 1);
+    final ret = getVote(widget.voteNodeItem['address'].toString(),
+        widget.coinInfo.address.toString(), 1);
     setState(() {
-      //nodeAddress = ret['address'].toString();
-      //hex = ret['hex'].toString();
+      nodeAddress = ret['address'].toString();
+      hex = ret['hex'].toString();
     });
   }
 
@@ -146,14 +147,13 @@ class _AssetDposDetail extends State<AssetDposDetail> {
 
   // 获取nonce
   void fetchNosData() async {
-    //var res = await AssetRepository().getTransactionFee(
-    //    address: widget.coinInfo.address.toString(), symbol: '');
+    var res = await AssetRepository().getTransactionFee(
+        address: widget.coinInfo.address.toString(), symbol: '');
     setState(() {
-      //nonce = res['nonce'] + 1;
+      nonce = res?['nonce'] + 1;
       //gas_price = res['gas_price'];
       //gas_limit = res['gas_limit'];
     });
-    //print('nonce $res');
   }
 
   @override

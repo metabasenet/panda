@@ -45,8 +45,8 @@ class InvitationCoinSelectPage extends HookWidget {
             itemBuilder: (context, index) {
               final item = invitationCoins.value[index];
               final codeItem = viewModel.invitationCodes.firstWhere(
-                (e) => e.chain == item.chain && e.symbol == item.symbol,
-              );
+                  (e) => e.chain == item.chain && e.symbol == item.symbol,
+                  orElse: () => InvitationCode());
               return _buildItem(
                 context: context,
                 viewModel: viewModel,
@@ -67,7 +67,7 @@ class InvitationCoinSelectPage extends HookWidget {
     InvitationCode codeItem,
   ) {
     if (showInvitationCode ?? false) {
-      if (codeItem != null) {
+      if (codeItem.chain.isNotEmpty) {
         InvitationCodePage.open(codeItem);
         return;
       }

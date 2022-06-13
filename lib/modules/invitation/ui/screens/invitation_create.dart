@@ -133,8 +133,8 @@ class InvitationCreatePage extends HookWidget {
       QRScannerPage.open().then((qrStr) {
         if (qrStr != null && qrStr.isNotEmpty) {
           InvitationCodeUtils.decodeQRCodeData(
-            chain: coinInfo.value.chain ?? '',
-            symbol: coinInfo.value.symbol ?? '',
+            chain: coinInfo.value == null ? '' : coinInfo.value.chain ?? '',
+            symbol: coinInfo.value == null ? '' : coinInfo.value.symbol ?? '',
             data: qrStr,
           ).then((value) {
             address.text = value[0];
@@ -181,10 +181,11 @@ class InvitationCreatePage extends HookWidget {
     void loadDefaultCoin(InvitationCreateVM viewModel) {
       final coins = viewModel.getInvitationCoins();
       if (coins.isNotEmpty == true) {
-        final defaultCoin = coinInfo.value;
+        final defaultCoin =
+            coinInfo.value == null ? coins.first : coinInfo.value;
         final mini = GetIt.I<CoinConfig>().getTransferMinQuota(
-          chain: defaultCoin.chain ?? '',
-          symbol: defaultCoin.symbol ?? '',
+          chain: defaultCoin == null ? '' : defaultCoin.chain ?? '',
+          symbol: defaultCoin == null ? '' : defaultCoin.symbol ?? '',
         );
         miniAmount.value = mini;
         coinInfo.value = defaultCoin;

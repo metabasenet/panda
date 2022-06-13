@@ -169,19 +169,20 @@ class InvitationActionCreateCode extends _BaseAction {
       codeForkId: coinInfo.contract ?? '',
     );
 
-    //获取全部缓存
+    //Get all caches
     final allCode = await InvitationRepository().getInvitationCodeFromCache(
       walletId!,
     );
 
-    // 应该不会有重复的，但是以防万一
+    //There should be no repetition, but just in case
     final existingCode = allCode.firstWhere(
       (e) => e.chain == coinInfo.chain && e.symbol == coinInfo.symbol,
+      orElse: () => InvitationCode(),
     );
 
     var newCode = existingCode;
 
-    if (existingCode == null) {
+    if (existingCode.chain.isEmpty) {
       newCode = InvitationCode.create(
         chain: coinInfo.chain ?? '',
         symbol: coinInfo.symbol ?? '',
