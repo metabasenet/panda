@@ -4,7 +4,7 @@ abstract class VMWithWalletWithdraw {
   @BuiltValueField(compare: false)
   Future<WalletWithdrawData> Function(
     WithdrawBeforeParams params,
-    WalletWithdrawData previousData,
+    WalletWithdrawData? previousData,
   ) get onWithdrawBefore;
 
   @BuiltValueField(compare: false)

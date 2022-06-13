@@ -1382,7 +1382,7 @@ class _$AssetWithdrawVM extends AssetWithdrawVM {
   final bool hideWithdrawShowcase;
   @override
   final Future<WalletWithdrawData> Function(
-          WithdrawBeforeParams params, WalletWithdrawData previousData)
+          WithdrawBeforeParams params, WalletWithdrawData? previousData)
       onWithdrawBefore;
   @override
   final Future<String> Function(
@@ -1475,14 +1475,14 @@ class AssetWithdrawVMBuilder
       _$this._hideWithdrawShowcase = hideWithdrawShowcase;
 
   Future<WalletWithdrawData> Function(
-          WithdrawBeforeParams params, WalletWithdrawData previousData)?
+          WithdrawBeforeParams params, WalletWithdrawData? previousData)?
       _onWithdrawBefore;
   Future<WalletWithdrawData> Function(
-          WithdrawBeforeParams params, WalletWithdrawData previousData)?
+          WithdrawBeforeParams params, WalletWithdrawData? previousData)?
       get onWithdrawBefore => _$this._onWithdrawBefore;
   set onWithdrawBefore(
-          Future<WalletWithdrawData> Function(
-                  WithdrawBeforeParams params, WalletWithdrawData previousData)?
+          Future<WalletWithdrawData> Function(WithdrawBeforeParams params,
+                  WalletWithdrawData? previousData)?
               onWithdrawBefore) =>
       _$this._onWithdrawBefore = onWithdrawBefore;
 

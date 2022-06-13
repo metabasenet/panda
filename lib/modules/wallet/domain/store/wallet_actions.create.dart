@@ -67,7 +67,7 @@ class WalletActionCreateFromMnemonic extends _BaseAction {
     final walletModel = existingWallet ??
         Wallet(
           id: walletId,
-          type: type!,
+          type: type as WalletType,
           name: name,
           coins: AppCoins.defaultCoins,
           addresses: addresses,

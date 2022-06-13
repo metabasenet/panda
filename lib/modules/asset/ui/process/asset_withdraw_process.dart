@@ -10,7 +10,7 @@ class AssetWithdrawProcess {
     required AssetCoin coinInfo,
     required String toAddress,
     required String amount,
-    required WalletWithdrawData previousWithdrawData,
+    WalletWithdrawData? previousWithdrawData,
   }) {
     return viewModel
         .onWithdrawBefore(
