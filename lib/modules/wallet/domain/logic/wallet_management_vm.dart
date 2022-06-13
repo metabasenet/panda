@@ -46,8 +46,8 @@ abstract class WalletManagementVM
             WalletActionCreateFromMnemonic(
               name,
               password,
-              importMnemonic!,
-              type!,
+              importMnemonic,
+              type as WalletType,
               completer,
             ),
           );
