@@ -6,7 +6,6 @@ class AssetActionAddTransaction extends _BaseAction {
 
   @override
   Future<AppState?> reduce() async {
-    /*
     final allTransactions = await AssetRepository().getTransactionsFromCache(
       symbol: transaction.symbol,
       address: transaction.fromAddress,
@@ -21,8 +20,6 @@ class AssetActionAddTransaction extends _BaseAction {
     );
 
     GetIt.I<AssetTransactionCubit>().updateList(allTransactions);
-    */
-    return null;
   }
 }
 

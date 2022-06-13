@@ -211,23 +211,23 @@ class AssetApi {
   //       '/v1/hd/wallet/$chain/$symbol/$txId/transaction_info',
   //     );
 
-  // Future<List<Map<String, dynamic>>> getCoinTransactions({
-  //   @required String chain,
-  //   @required String symbol,
-  //   @required String address,
-  //   @required int page,
-  //   int take = 10,
-  // }) async {
-  //   final dio = Dio();
-  //   final response = await dio.get(
-  //       '${AppConstants.randomApiUrl}/transaction?address=$address&symbol=$symbol&page=$page&take=$take');
-  //   final data = response.data;
-  //   return List<Map<String, dynamic>>.from(
-  //     data.map(
-  //       (e) => Map<String, dynamic>.from(e as Map<String, dynamic>),
-  //     ),
-  //   );
-  // }
+  Future<List<Map<String, dynamic>>> getCoinTransactions({
+    required String chain,
+    required String symbol,
+    required String address,
+    required int page,
+    int take = 10,
+  }) async {
+    final dio = Dio();
+    final response = await dio.get(
+        '${AppConstants.randomApiUrl}/transaction?address=$address&symbol=$symbol&page=$page&take=$take');
+    final data = response.data;
+    return List<Map<String, dynamic>>.from(
+      data.map(
+        (e) => Map<String, dynamic>.from(e as Map<String, dynamic>),
+      ),
+    );
+  }
 
   /*
   =>
