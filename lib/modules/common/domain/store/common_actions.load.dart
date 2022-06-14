@@ -6,10 +6,11 @@ class CommonActionLoadCache extends _BaseAction {
   @override
   Future<AppState?> reduce() async {
     // Load Env
-    //await DotEnv().load();
-    //AppConstants.isBeta = false; //DotEnv().env['IS_BETA'] == 'true';
-    //AppConstants.buildId = '1'; //DotEnv().env['BUILD_ID'] ?? '';
-    //AppConstants.commitHash = '2'; // DotEnv().env['COMMIT_HASH'] ?? '';
+    // await DotEnv().load();
+    // AppConstants.isBeta = false; //DotEnv().env['IS_BETA'] == 'true';
+    // AppConstants.buildId = '1'; //DotEnv().env['BUILD_ID'] ?? '';
+    // AppConstants.commitHash = '2'; // DotEnv().env['COMMIT_HASH'] ?? '';
+
     // Check if is a new installation
     if (Platform.isIOS) {
       final shared = await SharedPreferences.getInstance();
@@ -20,11 +21,12 @@ class CommonActionLoadCache extends _BaseAction {
       }
     }
 
-    // Load DB
-    await AppHiveCache.initHive();
+    if (!Hive.isAdapterRegistered(32)) {
+      await AppHiveCache.initHive();
 
-    // Getit
-    await AppGetIt.initGetIt();
+      // Getit
+      await AppGetIt.initGetIt();
+    }
 
     var initialState = await appPersistor.readState();
     if (initialState == null) {

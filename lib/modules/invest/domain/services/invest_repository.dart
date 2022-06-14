@@ -63,9 +63,9 @@ class InvestRepository {
 
     List<dynamic> d = [];
     Map<String, dynamic> e = {
-      'vote': '1',
-      'extend': '1',
-      'balance': '1',
+      'vote': '5',
+      'extend': '5',
+      'balance': '10',
       'height': '1200',
       'txid': '1',
       'time': '2022-6-10 10:00:00'

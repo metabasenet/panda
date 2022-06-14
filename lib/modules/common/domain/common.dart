@@ -50,7 +50,6 @@ const int kHiveTypeSettings = 1;
 
 Future<void> moduleCommonInitHive() async {
   Hive.registerAdapter(SettingsAdapter());
-
   await CommonRepository().initializeCache();
 }
 

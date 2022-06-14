@@ -21,15 +21,15 @@ class HomePage extends StatelessWidget {
   }
 
   void handleShowNewVersion(BuildContext context, ConfigUpdateData data) {
-    if (data != null) {
-      showUpdateAppDialog(
-        context,
-        downloadUrl: data.downloadUrl ?? '',
-        description: data.description ?? '',
-        version: data.version ?? '',
-      );
-      _hasShownNewVersionDialog = true;
-    }
+    // if (data != null) {
+    //   showUpdateAppDialog(
+    //     context,
+    //     downloadUrl: data.downloadUrl ?? '',
+    //     description: data.description ?? '',
+    //     version: data.version ?? '',
+    //   );
+    //   _hasShownNewVersionDialog = true;
+    // }
   }
 
   Future<void> handleOpenTrade(HomePageVM viewModel, TradePair tradePair) {

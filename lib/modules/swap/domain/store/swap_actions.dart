@@ -2,7 +2,7 @@ part of swap_domain_module;
 
 abstract class _BaseAction extends ReduxAction<AppState> {
   String get walletId => store.state.walletState.activeWalletId!;
-  //SwapConfig get swapConfig => store.state.swapState.config!;
+  SwapConfig get swapConfig => store.state.swapState.config!;
 }
 
 class SwapActionGetApproveBalance extends _BaseAction {

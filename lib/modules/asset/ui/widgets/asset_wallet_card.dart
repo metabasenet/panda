@@ -98,7 +98,7 @@ class AssetWalletCard extends HookWidget {
               Padding(
                 padding: context.edgeHorizontal16,
                 child: Text(
-                  tr('asset:list_lbl_valuation'),
+                  '${tr('asset:list_lbl_valuation')}(${AppConstants.currencySymbol})',
                   style: context.textBody(
                     bold: true,
                     color: context.bodyColor,
@@ -120,7 +120,7 @@ class AssetWalletCard extends HookWidget {
               symbol: 'MNT/USDT',
               builder: (context, price, fiatCurrency, _) => PriceText(
                 wallet.getTotalValuation(fiatCurrency),
-                AppConstants.currencySymbol,
+                '',
                 TextSize.huge,
               ),
             ),

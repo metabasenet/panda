@@ -92,7 +92,7 @@ class AssetDetailPage extends HookWidget {
     });
   }
 
-  Widget buildHeader(BuildContext context) {
+  Widget buildHeader(BuildContext context, AssetDetailVM viewModel) {
     return CSContainer(
       child: CSContainer(
         secondary: true,
@@ -155,8 +155,9 @@ class AssetDetailPage extends HookWidget {
                           ),
                           SizedBox(height: 10),
                           PriceText(
-                            //Wallet().getTotalPrice(coinInfo.symbol,
-                            balance ?? '0.0',
+                            viewModel.activeWallet!.getTotalPrice(
+                                coinInfo.symbol ?? '',
+                                double.tryParse(balance!) ?? 0),
                             '',
                             TextSize.medium,
                           ),
@@ -328,7 +329,7 @@ class AssetDetailPage extends HookWidget {
                     //     background: buildHeader(context),
                     //   ),
                     // ),
-                    SliverToBoxAdapter(child: buildHeader(context)),
+                    SliverToBoxAdapter(child: buildHeader(context, viewModel)),
                   ],
                   onLoadCachedData: (params) {
                     return loadData(
