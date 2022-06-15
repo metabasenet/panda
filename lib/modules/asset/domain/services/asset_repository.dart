@@ -49,19 +49,17 @@ class AssetRepository {
     Map<String, double>? coinPrices,
     Map<String, double>? fiatPrices,
   }) async {
-    /*
-    final prices = _prices?.get(_pricesKey);
-    prices.coinPrices = coinPrices ?? prices.coinPrices;
-    prices.fiatPrices = fiatPrices ?? prices.fiatPrices;
+    final prices = _prices.get(_pricesKey);
+    prices?.coinPrices = coinPrices ?? prices.coinPrices;
+    prices?.fiatPrices = fiatPrices ?? prices.fiatPrices;
     if (coinPrices != null && coinPrices.isNotEmpty) {
-      prices.coinUpdatedAt = DateTime.now();
+      prices?.coinUpdatedAt = DateTime.now();
     }
     if (fiatPrices != null && fiatPrices.isNotEmpty) {
-      prices.fiatUpdatedAt = DateTime.now();
+      prices?.fiatUpdatedAt = DateTime.now();
     }
-    prices.updatedAt = DateTime.now();
-    await prices.save();
-    */
+    prices?.updatedAt = DateTime.now();
+    await prices?.save();
   }
 
   /// Price of coins in USD
