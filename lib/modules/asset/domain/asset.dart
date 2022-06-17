@@ -74,7 +74,7 @@ Future<void> moduleAssetInitHive() async {
   Hive.registerAdapter(PricesAdapter());
   Hive.registerAdapter(TransactionAdapter());
   Hive.registerAdapter(TransactionTypeAdapter());
-  //await AssetRepository().initializeCache();
+  await AssetRepository().initializeCache();
 }
 
 Future<void> moduleAssetInitGetIt() async {

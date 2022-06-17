@@ -60,10 +60,10 @@ class AssetWithdrawProcess {
         chain: AppConstants.mnt_chain,
         symbol: feeSymbol,
       );
-      if (withdrawData.fee.feeValue > feeBalance) {
-        Toast.show(tr('asset:withdraw_msg_error_fee'));
-        return;
-      }
+      // if (withdrawData.fee.feeValue > feeBalance) {
+      //   Toast.show(tr('asset:withdraw_msg_error_fee'));
+      //   return;
+      // }
     }
 
     showPasswordDialog(

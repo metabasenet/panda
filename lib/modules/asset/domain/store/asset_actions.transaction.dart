@@ -6,7 +6,6 @@ class AssetActionAddTransaction extends _BaseAction {
 
   @override
   Future<AppState?> reduce() async {
-    /*
     final allTransactions = await AssetRepository().getTransactionsFromCache(
       symbol: transaction.symbol,
       address: transaction.fromAddress,
@@ -21,8 +20,6 @@ class AssetActionAddTransaction extends _BaseAction {
     );
 
     GetIt.I<AssetTransactionCubit>().updateList(allTransactions);
-    */
-    return null;
   }
 }
 
@@ -45,30 +42,30 @@ class AssetActionGetSingleTransaction extends _BaseAction {
 
   @override
   Future<AppState?> reduce() async {
-    final walletId = store.state.walletState.activeWalletId;
-    /*
-    bool isFailed = false;
-    Transaction newTransaction;
-    try {
-      final json = await AssetRepository().getSingleTransaction(
-        chain: chain,
-        symbol: symbol,
-        txId: txId,
-        walletId: walletId,
-      );
-      newTransaction = Transaction.fromJson(
-        chain: chain,
-        symbol: symbol,
-        json: json,
-        chainPrecision: chainPrecision,
-        fromAddress: fromAddress,
-      );
-    } catch (error) {
-      final responseError = Request().getResponseError(error);
-      if (responseError.message.contains('transaction info not found')) {
-        isFailed = true;
-      }
-    }
+    // final walletId = store.state.walletState.activeWalletId;
+    // bool isFailed = false;
+    // Transaction newTransaction;
+
+    // try {
+    //   final json = await AssetRepository().getSingleTransaction(
+    //     chain: chain,
+    //     symbol: symbol,
+    //     txId: txId,
+    //     walletId: walletId ?? '',
+    //   );
+    //   newTransaction = Transaction.fromJson(
+    //     chain: chain,
+    //     symbol: symbol,
+    //     json: json,
+    //     chainPrecision: chainPrecision,
+    //     fromAddress: fromAddress,
+    //   );
+    // } catch (error) {
+    //   // final responseError = Request().getResponseError(error);
+    //   // if (responseError.message.contains('transaction info not found')) {
+    //   //   isFailed = true;
+    //   // }
+    // }
 
     final coinInfo = store.state.assetState.getCoinInfo(
       chain: chain,
@@ -76,40 +73,40 @@ class AssetActionGetSingleTransaction extends _BaseAction {
     );
     final cachedTransactions = await AssetRepository().getTransactionsFromCache(
       symbol: symbol,
-      address: coinInfo.address,
+      address: coinInfo.address ?? '',
     );
-    for (final item in cachedTransactions) {
-      if (item.txId == txId) {
-        if (item.isConfirming) {
-          item.failed = isFailed;
-        }
-        if (newTransaction?.confirmations != null) {
-          item.confirmations = newTransaction.confirmations;
-        }
-        if (newTransaction?.fee != null && newTransaction.fee > 0) {
-          item.fee = newTransaction.fee;
-        }
-        if (newTransaction?.failed != null) {
-          item.failed = newTransaction.failed;
-        }
-      }
-    }
+
+    // for (final item in cachedTransactions) {
+    //   if (item.txId == txId) {
+    //     if (item.isConfirming) {
+    //       item.failed = isFailed;
+    //     }
+    //     if (newTransaction.confirmations != null) {
+    //       item.confirmations = newTransaction.confirmations;
+    //     }
+    //     if (newTransaction?.fee != null && newTransaction.fee > 0) {
+    //       item.fee = newTransaction.fee;
+    //     }
+    //     if (newTransaction?.failed != null) {
+    //       item.failed = newTransaction.failed;
+    //     }
+    //   }
+    // }
+
     await AssetRepository().saveTransactionsToCache(
       symbol: symbol,
-      address: coinInfo.address,
+      address: coinInfo.address ?? '',
       transactions: cachedTransactions.toList(),
     );
 
     completer.complete(
       cachedTransactions.firstWhere(
         (element) => element.txId == txId,
-        orElse: () => newTransaction,
+        orElse: () => Transaction(),
       ),
     );
 
     GetIt.I<AssetTransactionCubit>().updateList(cachedTransactions);
-    */
-    return null;
   }
 
   @override

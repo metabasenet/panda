@@ -368,7 +368,7 @@ class _$ProfitInvitationItemSerializer
       Serializers serializers, ProfitInvitationItem object,
       {FullType specifiedType = FullType.unspecified}) {
     final result = <Object?>[
-      'address',
+      '_id',
       serializers.serialize(object.address,
           specifiedType: const FullType(String)),
       'amount',
@@ -405,7 +405,7 @@ class _$ProfitInvitationItemSerializer
       iterator.moveNext();
       final Object? value = iterator.current;
       switch (key) {
-        case 'address':
+        case '_id':
           result.address = serializers.deserialize(value,
               specifiedType: const FullType(String))! as String;
           break;

@@ -113,15 +113,15 @@ class ModelPermissionView extends StatelessWidget {
                 ),
               ),
               onPressed: () {
-                if (permission == ModulePermissionState.needUpdate) {
-                  showUpdateAppDialog(
-                    context,
-                    downloadUrl: viewModel.newVersionData?.downloadUrl ?? '',
-                    description: viewModel.newVersionData?.description ?? '',
-                    version: viewModel.newVersionData?.version ?? '',
-                  );
-                  return;
-                }
+                // if (permission == ModulePermissionState.needUpdate) {
+                //   showUpdateAppDialog(
+                //     context,
+                //     downloadUrl: viewModel.newVersionData?.downloadUrl ?? '',
+                //     description: viewModel.newVersionData?.description ?? '',
+                //     version: viewModel.newVersionData?.version ?? '',
+                //   );
+                //   return;
+                // }
                 if (showLoading) {
                   LoadingDialog.show(context);
                 }

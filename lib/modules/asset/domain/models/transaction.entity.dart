@@ -222,39 +222,39 @@ class Transaction extends HiveObject {
         ..amount = amount;
 
   @HiveField(0)
-  late String txId;
+  String txId = '';
   @HiveField(1)
-  late String chain;
+  String chain = '';
   @HiveField(2)
-  late String symbol;
+  String symbol = '';
   @HiveField(3)
-  late int confirmations;
+  int confirmations = 0;
   @HiveField(4)
-  late int timestamp;
+  int timestamp = 0;
   @HiveField(5)
-  late int blockHeight;
+  int blockHeight = 0;
   @HiveField(6)
-  late bool failed;
+  bool failed = false;
 
   @HiveField(7)
-  late String toAddress;
+  String toAddress = '';
   @HiveField(8)
-  late String fromAddress;
+  String fromAddress = '';
 
   @HiveField(9)
-  late double amount;
+  double amount = 0.00;
   @HiveField(10)
-  late double fee;
+  double fee = 0.00;
   @HiveField(11)
-  late String feeSymbol;
+  String feeSymbol = '';
 
   /// ETH: Token contract
   /// MNT: Fork ID/TX
   @HiveField(12)
-  late String contract;
+  String contract = '';
 
   @HiveField(13)
-  late TransactionType type;
+  TransactionType type = TransactionType.deposit;
 
   String get displayTime => formatDate(
         DateTime.fromMillisecondsSinceEpoch(timestamp * 1000),

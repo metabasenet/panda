@@ -134,7 +134,7 @@ class Wallet extends HiveObject {
       total += double.parse(strTotal);
     }
 
-    return NumberUtil.truncateDecimal(total, AppConstants.fiatPrecision);
+    return NumberUtil.getFixed(total.toString(), 6);
   }
 
   String getTotalPrice(String symbol, double balance) {
@@ -144,7 +144,7 @@ class Wallet extends HiveObject {
       amount: balance,
     );
 
-    return strTotal;
+    return NumberUtil.getFixed(strTotal, 6);
   }
 
   AssetPrice getCoinItemPrice(String symbol) {

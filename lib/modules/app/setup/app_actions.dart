@@ -24,16 +24,16 @@ class AppActionInitApp extends _BaseAction {
     await store.dispatchAsync(CommonActionLoadSettings(), notify: false);
 
     // 4- Setup API header with app info
-    /*
-    Request().setup(
-      AppConstants.randomApiUrl,
-      headers: {
-        'app-os': Platform.isIOS ? ' ios' : 'android',
-        'app-build': state.commonState.appInfo.buildNumber,
-        'app-version': state.commonState.appInfo.version,
-        'app-language': state.commonState.languageForApi,
-      },
-    );*/
+
+    // Request().setup(
+    //   AppConstants.randomApiUrl,
+    //   headers: {
+    //     'app-os': Platform.isIOS ? ' ios' : 'android',
+    //     'app-build': state.commonState.appInfo.buildNumber,
+    //     'app-version': state.commonState.appInfo.version,
+    //     'app-language': state.commonState.languageForApi,
+    //   },
+    // );
 
     if (AppConstants.isBeta) {
       /*
@@ -62,10 +62,10 @@ class AppActionInitApp extends _BaseAction {
     });
     store.dispatch(CommonActionLoadConfig(), notify: false);
     //store.dispatch(CommonActionLoadImageConfig(), notify: false);
-    //store.dispatch(TradeActionLoadConfig(), notify: false);
-    //store.dispatch(CommunityActionLoadConfig(), notify: false);
-    //store.dispatch(AdmissionActionLoadConfig(), notify: false);
-    //store.dispatch(SwapActionLoadConfig(), notify: false);
+    store.dispatch(TradeActionLoadConfig(), notify: false);
+    store.dispatch(CommunityActionLoadConfig(), notify: false);
+    store.dispatch(AdmissionActionLoadConfig(), notify: false);
+    store.dispatch(SwapActionLoadConfig(), notify: false);
     if (AppConstants.isBeta) {
       store.dispatch(InvestActionLoadConfig(), notify: false);
     }

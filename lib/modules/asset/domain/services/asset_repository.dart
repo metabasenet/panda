@@ -49,19 +49,17 @@ class AssetRepository {
     Map<String, double>? coinPrices,
     Map<String, double>? fiatPrices,
   }) async {
-    /*
-    final prices = _prices?.get(_pricesKey);
-    prices.coinPrices = coinPrices ?? prices.coinPrices;
-    prices.fiatPrices = fiatPrices ?? prices.fiatPrices;
+    final prices = _prices.get(_pricesKey);
+    prices?.coinPrices = coinPrices ?? prices.coinPrices;
+    prices?.fiatPrices = fiatPrices ?? prices.fiatPrices;
     if (coinPrices != null && coinPrices.isNotEmpty) {
-      prices.coinUpdatedAt = DateTime.now();
+      prices?.coinUpdatedAt = DateTime.now();
     }
     if (fiatPrices != null && fiatPrices.isNotEmpty) {
-      prices.fiatUpdatedAt = DateTime.now();
+      prices?.fiatUpdatedAt = DateTime.now();
     }
-    prices.updatedAt = DateTime.now();
-    await prices.save();
-    */
+    prices?.updatedAt = DateTime.now();
+    await prices?.save();
   }
 
   /// Price of coins in USD
@@ -241,8 +239,8 @@ class AssetRepository {
     required int page,
     required int skip,
   }) async {
-    return MapEntry(0, []);
-    /*
+    //return MapEntry(0, []);
+
     var count = 0;
     var transactions = <Map<String, dynamic>>[];
     switch (symbol) {
@@ -258,21 +256,17 @@ class AssetRepository {
         break;
     }
     return MapEntry(count, transactions);
-    */
   }
 
   Future<List<Transaction>> getTransactionsFromCache({
     required String symbol,
     required String address,
   }) async {
-    /*
     final list = await _transactions.get(
       '$symbol:$address',
       defaultValue: [],
     );
-    return List.from(list);
-    */
-    return Future.value([]);
+    return List.from(list!);
   }
 
   Future<void> saveTransactionsToCache({
@@ -280,21 +274,20 @@ class AssetRepository {
     required String address,
     required List<Transaction> transactions,
   }) async {
-    /*
     await _transactions.put(
       '$symbol:$address',
       transactions,
-    );*/
+    );
   }
 
   Future<void> clearTransactionsCache({
     required String symbol,
     required String address,
   }) async {
-    //await _transactions.put(
-    //  '$symbol:$address',
-    //  [],
-    //);
+    await _transactions.put(
+      '$symbol:$address',
+      [],
+    );
   }
 
   /// ***  Address *** ///

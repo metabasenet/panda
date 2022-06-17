@@ -50,7 +50,7 @@ class _AssetDposList extends State<AssetDposList> {
     }
   }
 
-  Widget buildHeader(BuildContext context) {
+  Widget buildHeader(BuildContext context, AssetDetailVM viewModel) {
     return CSContainer(
       child: CSContainer(
         secondary: true,
@@ -99,7 +99,9 @@ class _AssetDposList extends State<AssetDposList> {
                           Text(
                             tr(
                               'asset:detail_lbl_valuation',
-                              namedArgs: {'symbol': fiatCurrency},
+                              namedArgs: {
+                                'symbol': AppConstants.currencySymbol
+                              },
                             ),
                             style: context.textSecondary(
                               bold: true,
@@ -108,7 +110,10 @@ class _AssetDposList extends State<AssetDposList> {
                           ),
                           SizedBox(height: 10),
                           PriceText(
-                            price,
+                            viewModel.activeWallet!.getTotalPrice(
+                                widget.coinInfo.symbol ?? '',
+                                double.tryParse(balance!) ?? 0),
+                            //price,
                             '',
                             TextSize.medium,
                           ),
@@ -223,7 +228,7 @@ class _AssetDposList extends State<AssetDposList> {
                 padding: context.edgeAll,
                 decoration: context.boxDecorationOnlyTop(),
                 slivers: [
-                  SliverToBoxAdapter(child: buildHeader(context)),
+                  SliverToBoxAdapter(child: buildHeader(context, viewModel)),
                 ],
                 itemHeader: buildTransactionTitle(context),
                 itemCount: voteNodeList.length,

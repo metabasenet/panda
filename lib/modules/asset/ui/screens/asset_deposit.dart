@@ -66,7 +66,7 @@ class AssetDepositPage extends HookWidget {
                       SizedBox(height: context.edgeSize),
                       Center(
                         child: CSContainer(
-                          width: 0,
+                          width: 180,
                           child: QrCodeView(
                             coinInfo.address ?? '',
                             size: context.mediaWidth * 0.437,

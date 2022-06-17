@@ -23,7 +23,7 @@ class AssetBalanceListener extends StatelessWidget {
 
     return StreamBuilder<AssetBalanceState>(
         initialData: cubit.state,
-        //stream: cubit,
+        stream: cubit.stream,
         builder: (context, balanceInfo) {
           final data = balanceInfo.data?.getBalanceInfo(uniqueId) ??
               AssetBalanceInfo(

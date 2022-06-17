@@ -63,9 +63,9 @@ class InvestRepository {
 
     List<dynamic> d = [];
     Map<String, dynamic> e = {
-      'vote': '1',
-      'extend': '1',
-      'balance': '1',
+      'vote': '5',
+      'extend': '5',
+      'balance': '10',
       'height': '1200',
       'txid': '1',
       'time': '2022-6-10 10:00:00'
@@ -93,19 +93,17 @@ class InvestRepository {
     final dio = Dio();
     final response =
         await dio.get('${AppConstants.randomApiUrl}/general_reward?addr=$addr');
+    return response.data as List<dynamic>;
 
-    List<dynamic> d = [];
-    Map<String, dynamic> e = {
-      'address': 'x09883fjjjfff',
-      'amount': '120',
-      'height': '1200',
-      'time': '2022-6-10 10:00:00'
-    };
+    // List<dynamic> d = [];
+    // Map<String, dynamic> e = {
+    //   'address': 'x09883fjjjfff',
+    //   'amount': '120',
+    //   'height': '1200',
+    //   'time': '2022-6-10 10:00:00'
+    // };
 
-    d.add(e);
-
-    return d;
-
-    //return response.data as List<dynamic>;
+    // d.add(e);
+    // return d;
   }
 }
