@@ -292,6 +292,7 @@
   "asset:withdraw_msg_error_balance": "Insufficient balance",
   "asset:withdraw_msg_error_fee": "Insufficient miner fee balance",
   "asset:withdraw_msg_error_amount": "Incorrect transfer amount",
+  "asset:withdraw_msg_error_excess_balance": "The entered amount cannot exceed the balance",
   "asset:withdraw_msg_fee_loading": "Please wait",
   "asset:withdraw_msg_error_unspent": "Please refresh assets before trade",
   "asset:withdraw_req_address": "Please input the withdrawal address",

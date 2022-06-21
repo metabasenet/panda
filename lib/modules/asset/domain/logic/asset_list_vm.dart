@@ -56,17 +56,15 @@ abstract class AssetListVM implements Built<AssetListVM, AssetListVMBuilder> {
         ..isBalanceUpdating = store.state.assetState.isBalanceUpdating
         ..doRefreshList = () {
           return Future.wait([
+            if (store.state.assetState.isBalanceUpdating != true)
+              store.dispatchAsync(
+                AssetActionUpdateWalletBalances(
+                  wallet: store.state.walletState.activeWallet!,
+                ),
+              ),
             store.dispatchAsync(AssetActionUpdatePrices(
               store.state.commonState.fiatCurrency ?? '',
             )),
-            if (store.state.assetState.isBalanceUpdating != true)
-              Future.value(
-                () => store.dispatch(
-                  AssetActionUpdateWalletBalances(
-                    wallet: store.state.walletState.activeWallet!,
-                  ),
-                ),
-              ),
           ]);
         }
         ..doSwitchWallet = (wallet) {

@@ -69,7 +69,7 @@ class AssetWithdrawFee extends StatelessWidget {
         withdrawInfo == null ? '' : withdrawInfo!.chain.toLowerCase();
     final feeLevel = withdrawInfo == null ? '' : withdrawInfo!.fee.feeLevel;
     final feeUnit = withdrawInfo == null ? '' : withdrawInfo!.fee.feeUnit;
-    final feeSymbol = withdrawInfo == null ? '' : withdrawInfo!.fee.feeSymbol;
+    final feeSymbol = withdrawInfo == null ? '' : withdrawInfo!.symbol;
     final feeRate = withdrawInfo == null ? '' : withdrawInfo!.fee.feeRate;
 
     final gasLevel = tr(

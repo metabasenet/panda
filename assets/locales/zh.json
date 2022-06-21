@@ -292,6 +292,7 @@
   "asset:withdraw_msg_error_balance": "余额不足",
   "asset:withdraw_msg_error_fee": "矿工费余额不足",
   "asset:withdraw_msg_error_amount": "转账金额不正确",
+  "asset:withdraw_msg_error_excess_balance": "输入金额不能超过余额",
   "asset:withdraw_msg_fee_loading": "请稍等",
   "asset:withdraw_msg_error_unspent": "请您刷新核对资产后再发起交易",
   "asset:withdraw_req_address": "请输入提现地址",

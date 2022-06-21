@@ -42,12 +42,13 @@ class AssetActionGetCoinBalance extends _BaseAction {
     bool isFailed = false;
     try {
       // Avoid refresh balance too frequently
-      if (ignoreBalanceLock == true ||
-          !wallet.isCoinBalanceLocked(
-            chain: chain,
-            symbol: symbol,
-            address: address,
-          )) {
+      // if (ignoreBalanceLock == true ||
+      //     !wallet.isCoinBalanceLocked(
+      //       chain: chain,
+      //       symbol: symbol,
+      //       address: address,
+      //     ))
+      if (true) {
         final coinInfo = store.state.assetState.getCoinInfo(
           chain: chain,
           symbol: symbol,

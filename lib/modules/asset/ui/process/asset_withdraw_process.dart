@@ -55,16 +55,23 @@ class AssetWithdrawProcess {
     }
 
     // For coin like USDT where the fee is ETH, we need to check ETH balance
-    if (symbol != feeSymbol) {
-      final feeBalance = viewModel.getCoinBalance(
-        chain: AppConstants.mnt_chain,
-        symbol: feeSymbol,
-      );
-      // if (withdrawData.fee.feeValue > feeBalance) {
-      //   Toast.show(tr('asset:withdraw_msg_error_fee'));
-      //   return;
-      // }
+    //if (symbol != feeSymbol) {
+    final feeBalance = viewModel.getCoinBalance(
+      chain: AppConstants.mnt_chain,
+      symbol: feeSymbol,
+    );
+
+//The entered amount cannot exceed the balance
+    if (amount > feeBalance) {
+      Toast.show(tr('asset:withdraw_msg_error_excess_balance'));
+      return;
     }
+
+    if (withdrawData.fee.feeValue > feeBalance) {
+      Toast.show(tr('asset:withdraw_msg_error_fee'));
+      return;
+    }
+    //}
 
     showPasswordDialog(
       context,
