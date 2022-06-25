@@ -73,7 +73,7 @@ class _AssetDposList extends State<AssetDposList> {
             AssetBalanceListener(
               item: widget.coinInfo,
               builder: (context, {balance, unconfirmed, data}) => PriceText(
-                balance ?? '',
+                NumberUtil.getFixedBYSix(balance ?? ''),
                 '',
                 TextSize.big,
               ),

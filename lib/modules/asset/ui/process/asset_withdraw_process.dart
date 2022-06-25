@@ -3,7 +3,7 @@ part of asset_ui_module;
 class AssetWithdrawProcess {
   static const getFeeOnInit = ['BTC', AppConstants.mnt_chain, 'TRX'];
   static const getFeeOnChangeAddress = ['ETH', 'BTC'];
-  static const getFeeOnChangeAmount = ['BTC'];
+  static const getFeeOnChangeAmount = [AppConstants.mnt_chain];
 
   static Future<WalletWithdrawData> getWithdrawFee({
     required VMWithWalletWithdraw viewModel,
@@ -46,8 +46,8 @@ class AssetWithdrawProcess {
     Future<bool> Function()? onConfirmSubmit,
   }) {
     // Check again withdraw data
-    final symbol = withdrawData.symbol;
-    final feeSymbol = withdrawData.fee.feeSymbol;
+    //final symbol = withdrawData.symbol;
+    //final feeSymbol = withdrawData.fee.feeSymbol;
 
     if (amount <= 0) {
       Toast.show(tr('asset:withdraw_msg_error_amount'));
@@ -57,8 +57,8 @@ class AssetWithdrawProcess {
     // For coin like USDT where the fee is ETH, we need to check ETH balance
     //if (symbol != feeSymbol) {
     final feeBalance = viewModel.getCoinBalance(
-      chain: AppConstants.mnt_chain,
-      symbol: feeSymbol,
+      chain: withdrawData.chain, //AppConstants.mnt_chain,
+      symbol: withdrawData.symbol,
     );
 
 //The entered amount cannot exceed the balance

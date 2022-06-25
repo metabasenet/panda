@@ -112,22 +112,34 @@ class AssetWithdrawPage extends HookWidget {
     }
 
     void handleChangeAmount(AssetWithdrawVM viewModel) {
-      if (amount.text.isNotEmpty &&
-          AssetWithdrawProcess.getFeeOnChangeAmount.contains(coinInfo?.chain) &&
-          feeIsRefreshing.value == false) {
-        feeIsRefreshing.value = true;
-        AssetWithdrawProcess.getWithdrawFee(
-          coinInfo: coinInfo!,
-          viewModel: viewModel,
-          previousWithdrawData: withdrawInfo.value!,
-          toAddress: address.text,
-          amount: amount.text,
-        ).then((value) {
-          withdrawInfo.value = value;
-        }).whenComplete(() {
-          feeIsRefreshing.value = false;
-        });
+      if (amount.text.isNotEmpty) {
+        final feeBalance = viewModel.getCoinBalance(
+          chain: withdrawInfo.value!.chain,
+          symbol: withdrawInfo.value!.symbol,
+        );
+
+        if (double.parse(amount.text) > feeBalance) {
+          Toast.show(tr('asset:withdraw_msg_error_excess_balance'));
+          return;
+        }
       }
+
+      // if (amount.text.isNotEmpty &&
+      //     AssetWithdrawProcess.getFeeOnChangeAmount.contains(coinInfo?.chain) &&
+      //     feeIsRefreshing.value == false) {
+      //   feeIsRefreshing.value = true;
+      //   AssetWithdrawProcess.getWithdrawFee(
+      //     coinInfo: coinInfo!,
+      //     viewModel: viewModel,
+      //     previousWithdrawData: withdrawInfo.value!,
+      //     toAddress: address.text,
+      //     amount: amount.text,
+      //   ).then((value) {
+      //     withdrawInfo.value = value;
+      //   }).whenComplete(() {
+      //     feeIsRefreshing.value = false;
+      //   });
+      // }
     }
 
     Future<void> handleChangeGas(String type) async {

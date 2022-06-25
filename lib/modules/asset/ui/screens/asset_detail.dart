@@ -118,7 +118,7 @@ class AssetDetailPage extends HookWidget {
             AssetBalanceListener(
               item: coinInfo,
               builder: (context, {balance, unconfirmed, data}) => PriceText(
-                balance ?? '',
+                NumberUtil.getFixedBYSix(balance ?? ''),
                 '',
                 TextSize.big,
               ),

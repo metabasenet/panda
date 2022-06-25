@@ -116,92 +116,24 @@ class HelpCenterPage extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final links = [
-      // HelpCenterGroup(
-      //   icon: CSIcons.Help,
-      //   title: tr('user:help_quick_title'),
-      //   links: [
-      //     HelpCenterLink(
-      //       title: tr('user:help_quick_question_1'),
-      //       url: tr('user:help_quick_question_1_url'),
-      //     ),
-      //     HelpCenterLink(
-      //       title: tr('user:help_quick_question_2'),
-      //       url: tr('user:help_quick_question_2_url'),
-      //     ),
-      //   ],
-      // ),
       HelpCenterGroup(
         icon: CSIcons.Bookmark,
         title: tr('user:help_manual_title'),
         links: [
           HelpCenterLink(
-            title: tr('user:help_manual_question_1'),
+            title: tr('user:help_manual_help_contact'),
             url: AppLinks.helpContactUrl(context.locale.languageCode),
           ),
-          // HelpCenterLink(
-          //   title: tr('user:help_manual_question_2'),
-          //   url: tr('user:help_manual_question_2_url'),
-          // ),
-          // HelpCenterLink(
-          //   title: tr('user:help_manual_question_3'),
-          //   url: tr('user:help_manual_question_3_url'),
-          // ),
+          HelpCenterLink(
+            title: tr('user:help_manual_vote'),
+            url: AppLinks.voteUrl(context.locale.languageCode),
+          ),
+          HelpCenterLink(
+            title: tr('user:help_manual_transaction'),
+            url: AppLinks.transactionUrl(context.locale.languageCode),
+          ),
         ],
       ),
-      // HelpCenterGroup(
-      //   icon: CSIcons.Hand,
-      //   title: tr('user:help_operation_title'),
-      //   links: [
-      //     HelpCenterLink(
-      //       title: tr('user:help_operation_question_1'),
-      //       url: tr('user:help_operation_question_1_url'),
-      //     ),
-      //     HelpCenterLink(
-      //       title: tr('user:help_operation_question_2'),
-      //       url: tr('user:help_operation_question_2_url'),
-      //     ),
-      //   ],
-      // ),
-      // HelpCenterGroup(
-      //   icon: CSIcons.Mars,
-      //   title: tr('user:help_asset_title'),
-      //   links: [
-      //     HelpCenterLink(
-      //       title: tr('user:help_asset_question_1'),
-      //       url: tr('user:help_asset_question_1_url'),
-      //     ),
-      //     HelpCenterLink(
-      //       title: tr('user:help_asset_question_2'),
-      //       url: tr('user:help_asset_question_2_url'),
-      //     ),
-      //     HelpCenterLink(
-      //       title: tr('user:help_asset_question_3'),
-      //       url: tr('user:help_asset_question_3_url'),
-      //     ),
-      //     HelpCenterLink(
-      //       title: tr('user:help_asset_question_4'),
-      //       url: tr('user:help_asset_question_4_url'),
-      //     ),
-      //   ],
-      // ),
-      // HelpCenterGroup(
-      //   icon: CSIcons.HelpDeposit,
-      //   title: tr('user:help_transaction_title'),
-      //   links: [
-      //     HelpCenterLink(
-      //       title: tr('user:help_transaction_question_1'),
-      //       url: tr('user:help_transaction_question_1_url'),
-      //     ),
-      //     HelpCenterLink(
-      //       title: tr('user:help_transaction_question_2'),
-      //       url: tr('user:help_transaction_question_2_url'),
-      //     ),
-      //     HelpCenterLink(
-      //       title: tr('user:help_transaction_question_3'),
-      //       url: tr('user:help_transaction_question_3_url'),
-      //     ),
-      //   ],
-      // ),
     ];
 
     return CSScaffold(
