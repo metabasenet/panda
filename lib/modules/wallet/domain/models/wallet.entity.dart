@@ -236,6 +236,7 @@ class Wallet extends HiveObject {
     required String address,
     required double balance,
     required double unconfirmed,
+    required double locked,
   }) {
     assert(chain != null, symbol != null);
     assert(address != null);
@@ -258,6 +259,7 @@ class Wallet extends HiveObject {
     if (coinBalance != null) {
       coinBalance.balance = balance;
       coinBalance.unconfirmed = unconfirmed;
+      coinBalance.locked = locked;
       coinBalance.updatedAt = DateTime.now();
       save();
     }

@@ -7,6 +7,7 @@ class CoinBalance extends HiveObject {
     required this.symbol,
     this.balance = 0,
     this.unconfirmed = 0,
+    this.locked = 0,
   }) {
     createdAt = DateTime.now();
   }
@@ -25,4 +26,6 @@ class CoinBalance extends HiveObject {
   DateTime? updatedAt = DateTime.now();
   @HiveField(6)
   DateTime lockUntil = DateTime.now();
+  @HiveField(7)
+  double locked;
 }

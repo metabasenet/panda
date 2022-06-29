@@ -25,7 +25,7 @@ class AppLinks {
   }
 
   static String transactionUrl(String lang) {
-    return '$appHelpeUrl/transaction.html?language$lang';
+    return '$appHelpeUrl/transaction.html?language=$lang';
   }
 
   static const appTwitter = '';

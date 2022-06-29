@@ -16,6 +16,7 @@ import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mars/crypto/mnt.dart';
+import 'package:decimal/decimal.dart';
 
 // Project imports:
 import 'package:mars/dialogs/dialogs.dart';

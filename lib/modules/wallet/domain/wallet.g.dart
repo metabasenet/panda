@@ -652,6 +652,7 @@ class CoinBalanceAdapter extends TypeAdapter<CoinBalance> {
       symbol: fields[1] as String,
       balance: fields[2] as double,
       unconfirmed: fields[3] as double,
+      locked: fields[7] as double,
     )
       ..createdAt = fields[4] as DateTime
       ..updatedAt = fields[5] as DateTime?
@@ -661,7 +662,7 @@ class CoinBalanceAdapter extends TypeAdapter<CoinBalance> {
   @override
   void write(BinaryWriter writer, CoinBalance obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(8)
       ..writeByte(0)
       ..write(obj.chain)
       ..writeByte(1)
@@ -675,7 +676,9 @@ class CoinBalanceAdapter extends TypeAdapter<CoinBalance> {
       ..writeByte(5)
       ..write(obj.updatedAt)
       ..writeByte(6)
-      ..write(obj.lockUntil);
+      ..write(obj.lockUntil)
+      ..writeByte(7)
+      ..write(obj.locked);
   }
 
   @override

@@ -26,7 +26,9 @@ class _AssetDposDetail extends State<AssetDposDetail> {
   String compoundInterestAddress = '';
   String superNodeAddress = '';
   String superNodeName = '';
-  String? addressBalance;
+  String addressBalance = '';
+  String locked = '';
+  String investedAmount = '';
   dynamic nonce;
   //dynamic gas_price;
   //dynamic gas_limit;
@@ -93,8 +95,20 @@ class _AssetDposDetail extends State<AssetDposDetail> {
     setState(() {
       superNodeAddress = widget.voteNodeItem['address'].toString();
       superNodeName = widget.voteNodeItem['name'].toString();
-      addressBalance = widget.coinInfo.balance.toString();
+      addressBalance =
+          NumberUtil.getFixed(widget.coinInfo.balance.toString(), 6);
+      locked = NumberUtil.getFixed(widget.coinInfo.locked.toString(), 6);
+
+      // locked = widget.coinInfo.locked == null
+      //     ? null
+      //     : widget.coinInfo.locked.toString();
     });
+    if ((addressBalance != null && addressBalance.isNotEmpty) &&
+        (locked != null && locked.isNotEmpty)) {
+      investedAmount = (Decimal.parse(addressBalance) + Decimal.parse(locked))
+          .toStringAsFixed(6);
+    }
+
     getVoteAddress();
     getCompoundInterestAddress();
     fetchNosData();
@@ -262,20 +276,13 @@ class _AssetDposDetail extends State<AssetDposDetail> {
                   ),
                   FormBox(
                     type: FormBoxType.inputText,
-//                    title: tr('asset:withdraw_lbl_address'),
-                    title: tr('asset:amount_of_votes'), //Voting amount
-                    // iconName: CSIcons.Scan,
-                    // iconColor: context.bodyColor,
+                    title: tr('asset:amount_of_votes'),
                     readOnly: true,
-                    onPressIcon: () {
-//                      handleOpenAddressScan(viewModel);
-                    },
-//                    controller: address,
+                    onPressIcon: () {},
                     hintText: addressBalance,
                     titleAction: Transform.translate(
                       offset: Offset(context.edgeSize, 0),
                       child: CSButton(
-                        // label: tr('asset:withdraw_btn_address'),
                         height: 30,
                         textStyle: context
                             .textBody(
@@ -294,11 +301,70 @@ class _AssetDposDetail extends State<AssetDposDetail> {
                     maxLines: null,
                     onFocusChanged: (hasFocus) {
                       if (!hasFocus) {
-//                        handleChangeAddress(viewModel);
+                        //handleChangeAddress(viewModel);
                       }
                     },
                   ),
-
+                  //Invested amount
+                  FormBox(
+                    type: FormBoxType.inputText,
+                    title: tr('asset:amount_of_amountvoted'),
+                    readOnly: true,
+                    onPressIcon: () {},
+                    hintText: tr(investedAmount),
+                    titleAction: Transform.translate(
+                      offset: Offset(context.edgeSize, 0),
+                      child: CSButton(
+                        height: 30,
+                        textStyle: context
+                            .textBody(
+                              color: context.placeholderColor,
+                              bold: true,
+                              fontWeight: FontWeight.normal,
+                            )
+                            .copyWith(
+                              decoration: TextDecoration.underline,
+                            ),
+                        autoWidth: true,
+                        backgroundColor: Colors.transparent,
+                        onPressed: () {},
+                      ),
+                    ),
+                    maxLines: null,
+                    onFocusChanged: (hasFocus) {
+                      if (!hasFocus) {}
+                    },
+                  ),
+                  //locked amount
+                  FormBox(
+                    type: FormBoxType.inputText,
+                    title: tr('asset:amount_of_locked'),
+                    readOnly: true,
+                    onPressIcon: () {},
+                    hintText: tr(locked),
+                    titleAction: Transform.translate(
+                      offset: Offset(context.edgeSize, 0),
+                      child: CSButton(
+                        height: 30,
+                        textStyle: context
+                            .textBody(
+                              color: context.placeholderColor,
+                              bold: true,
+                              fontWeight: FontWeight.normal,
+                            )
+                            .copyWith(
+                              decoration: TextDecoration.underline,
+                            ),
+                        autoWidth: true,
+                        backgroundColor: Colors.transparent,
+                        onPressed: () {},
+                      ),
+                    ),
+                    maxLines: null,
+                    onFocusChanged: (hasFocus) {
+                      if (!hasFocus) {}
+                    },
+                  ),
                   FormBox(
                     type: FormBoxType.inputText,
                     title: tr('asset:compound_interest_address'),

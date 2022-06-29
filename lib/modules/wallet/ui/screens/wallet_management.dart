@@ -79,8 +79,13 @@ class WalletManagementPage extends HookWidget {
               title: tr('wallet:management_delete_title'),
               content: tr('wallet:management_delete_msg'),
               cancelBtnText: tr('global:btn_cancel'),
-              confirmBtnText: tr('global:btn_confirm'),
               cancelBtnStyle: context.textBody(
+                color: context.redColor,
+                bold: true,
+                fontWeight: FontWeight.normal,
+              ),
+              confirmBtnText: tr('global:btn_confirm'),
+              confirmBtnStyle: context.textBody(
                 color: context.redColor,
                 bold: true,
                 fontWeight: FontWeight.normal,
@@ -95,6 +100,12 @@ class WalletManagementPage extends HookWidget {
                   LoadingDialog.dismiss(context);
                   Toast.showError(error);
                 });
+              },
+              onCancel: () {
+                final response = Completer<bool>();
+                response.complete(false);
+                AppNavigator.goBack();
+                //completer.complete(false),
               },
             );
             break;

@@ -107,6 +107,7 @@ class AssetActionSyncWalletCoins extends _BaseAction {
         address: coin.address ?? '',
         balance: coin.balance ?? 0,
         unconfirmed: coin.balanceUnconfirmed ?? 0,
+        locked: coin.locked ?? 0,
       );
     }
 

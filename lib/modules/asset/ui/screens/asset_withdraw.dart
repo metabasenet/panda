@@ -304,11 +304,13 @@ class AssetWithdrawPage extends HookWidget {
                     validator: RequiredValidator(
                       errorText: tr('asset:withdraw_req_amount'),
                     ),
-                    // inputFormatters: [
-                    //   DecimalTextInputFormatter(
-                    //     decimalRange: coinInfo?.chainPrecision,
-                    //   ),
-                    // ],
+                    inputFormatters: [
+                      DecimalTextInputFormatter(
+                        //decimalRange:
+                        //amount.text == '' ? 8 : int.tryParse(amount.text),
+                        decimalRange: 6,
+                      ),
+                    ],
                     iconName: CSIcons.All,
                     iconSize: 27,
                     onPressIcon: () {
