@@ -30,7 +30,8 @@ class TradeHomePage extends HookWidget {
               return InAppWebView(
                 initialUrlRequest: URLRequest(
                   url: Uri.parse(
-                      'https://www.shangqingdong.work/?ran=$ranNumber'),
+                    'https://www.shangqingdong.work/?ran=$ranNumber',
+                  ),
                 ),
                 onWebViewCreated: (controller) {
                   webView = controller;
@@ -69,7 +70,9 @@ class TradeHomePage extends HookWidget {
                       if (completer.isCompleted == false) {
                         final txid = ret['txid'] as String;
                         viewModel.transferResult(
-                            param: TradeHomePage.params, txId: txid);
+                          param: TradeHomePage.params,
+                          txId: txid,
+                        );
                         completer.complete(txid);
                       }
                       return ret;

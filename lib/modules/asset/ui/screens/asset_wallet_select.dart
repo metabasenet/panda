@@ -91,9 +91,12 @@ class AssetWalletSelectPage extends StatelessWidget {
             ),
             SizedBox(height: 8),
             Text(
-              tr('asset:lbl_mnt_address', namedArgs: {
-                'address': wallet.mntAddress,
-              }),
+              tr(
+                'asset:lbl_mnt_address',
+                namedArgs: {
+                  'address': wallet.mntAddress,
+                },
+              ),
               maxLines: 1,
               style: context.textSmall(
                 bold: true,

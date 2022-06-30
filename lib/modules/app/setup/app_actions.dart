@@ -129,6 +129,15 @@ class AppActionLoadWallet extends _BaseAction {
 
       // Check wallet status and register
       dispatch(WalletActionWalletRegister(wallet!));
+
+      //doSwitchWallet
+      final ret = {
+        'PrivateKey': '',
+        'Address': wallet?.ethAddress,
+      };
+      final src =
+          'window.dispatchEvent(new CustomEvent("Init",{"detail":${json.encode(ret)}}));';
+      TradeHomePage.webView.evaluateJavascript(source: src);
     }
     return null;
   }
