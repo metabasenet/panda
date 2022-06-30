@@ -29,8 +29,8 @@ class WalletActionCreateFromMnemonic extends _BaseAction {
     final coinList = await WalletRepository().importMnemonic(
       mnemonic: mnemonic,
       options: WalletCoreOptions(
-        useBip44: type == WalletType.mnemonicBip44,
-      ),
+          //useBip44: type == WalletType.mnemonicBip44,
+          ),
     );
 
     // Check mnemonic, if still empty, wallet creation failed
@@ -188,9 +188,9 @@ class WalletActionUpdateAddress extends _BaseAction {
     final coinList = await WalletRepository().importMnemonic(
       mnemonic: mnemonic,
       options: WalletCoreOptions(
-        useBip44: wallet!.type == WalletType.mnemonicBip44,
-      ),
-      symbols: [chain],
+          //useBip44: wallet!.type == WalletType.mnemonicBip44,
+          ),
+      //symbols: [chain],
     );
 
     // 创建本地钱包信息
@@ -206,7 +206,7 @@ class WalletActionUpdateAddress extends _BaseAction {
         .toList();
 
     final item = addresses.firstWhere((e) => e.chain == chain);
-    wallet.updateCoinAddress(
+    wallet?.updateCoinAddress(
       chain: chain,
       address: item.address,
       publicKey: item.publicKey ?? '',
@@ -214,7 +214,7 @@ class WalletActionUpdateAddress extends _BaseAction {
 
     final allWallets = await WalletRepository().saveWallet(
       walletId!,
-      wallet,
+      wallet!,
     );
 
     dispatch(AppActionLoadWallet(wallet));
