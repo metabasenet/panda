@@ -22,4 +22,6 @@ class AppLanguages {
 
   static String getCurrencyByLanguage(String lang) =>
       lang == 'zh' ? 'CNY' : 'USD';
+
+  static bool isSetLanguages = false;
 }

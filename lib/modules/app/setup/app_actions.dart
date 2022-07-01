@@ -5,9 +5,10 @@ abstract class _BaseAction extends ReduxAction<AppState> {
 }
 
 class AppActionInitApp extends _BaseAction {
-  AppActionInitApp(this.progress);
+  AppActionInitApp(this.progress, this.context);
 
   final StreamController<double> progress;
+  final BuildContext context;
 
   @override
   Future<AppState?> reduce() async {
@@ -77,6 +78,13 @@ class AppActionInitApp extends _BaseAction {
       'InitApp',
       {'version': state.commonState.appInfo?.version},
     );
+
+    //get language cache
+    if (!AppLanguages.isSetLanguages) {
+      final settings = CommonRepository().getSettings();
+      final languageCode = settings?.language ?? '';
+      context.setLocale(Locale(languageCode));
+    }
 
     progress.add(1);
     return null;

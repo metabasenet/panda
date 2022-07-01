@@ -52,6 +52,7 @@ class WalletManagementPage extends HookWidget {
     WalletManagementVM viewModel,
     _WalletMenu type,
   ) {
+    bool onCancelFlag = false;
     showPasswordDialog(
       context,
       (password) => viewModel.doUnlockWallet(password),
@@ -85,27 +86,21 @@ class WalletManagementPage extends HookWidget {
                 fontWeight: FontWeight.normal,
               ),
               confirmBtnText: tr('global:btn_confirm'),
-              confirmBtnStyle: context.textBody(
-                color: context.redColor,
-                bold: true,
-                fontWeight: FontWeight.normal,
-              ),
               onConfirm: () {
-                LoadingDialog.show(context);
-                viewModel.deleteWallet().then((value) {
-                  Toast.show(tr('wallet:management_delete_tips'));
-                  LoadingDialog.dismiss(context);
-                  AppNavigator.goBack();
-                }).catchError((error) {
-                  LoadingDialog.dismiss(context);
-                  Toast.showError(error);
-                });
+                if (!onCancelFlag) {
+                  LoadingDialog.show(context);
+                  viewModel.deleteWallet().then((value) {
+                    Toast.show(tr('wallet:management_delete_tips'));
+                    LoadingDialog.dismiss(context);
+                    AppNavigator.goBack();
+                  }).catchError((error) {
+                    LoadingDialog.dismiss(context);
+                    Toast.showError(error);
+                  });
+                }
               },
               onCancel: () {
-                final response = Completer<bool>();
-                response.complete(false);
-                AppNavigator.goBack();
-                //completer.complete(false),
+                onCancelFlag = true;
               },
             );
             break;

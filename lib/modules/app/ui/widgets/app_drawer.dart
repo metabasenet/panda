@@ -65,6 +65,7 @@ class AppDrawer extends StatelessWidget {
                 onSelected: (language) {
                   context.setLocale(Locale(language));
                   viewModel.doChangeLanguage(language);
+                  AppLanguages.isSetLanguages = true;
                 },
               ),
               // if (AppConstants.isBeta)
