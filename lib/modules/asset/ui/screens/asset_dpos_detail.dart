@@ -83,7 +83,18 @@ class _AssetDposDetail extends State<AssetDposDetail> {
             .then((res) {
           AssetRepository()
               .submitTransaction(hex: res.toString())
-              .then((hexRes) => {AppNavigator.goBack()});
+              .then((hexRes) {
+            //Delay refreshing data
+            Future.delayed(Duration(milliseconds: 2000), () {
+              //Update balances list
+              TradeHomeVM.activeStore?.dispatchAsync(
+                AssetActionUpdateWalletBalances(
+                  wallet: viewModel.activeWallet!,
+                ),
+              );
+            });
+            AppNavigator.goBack();
+          });
         });
       },
     );

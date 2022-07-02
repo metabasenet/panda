@@ -55,6 +55,13 @@ abstract class AssetListVM implements Built<AssetListVM, AssetListVMBuilder> {
         ..coins = ListBuilder(assetState.coins)
         ..isBalanceUpdating = store.state.assetState.isBalanceUpdating
         ..doRefreshList = () {
+          //Refresh Synchronous data
+          final InAppWebViewController appWebViewController =
+              TradeHomePage.webView;
+          var srcRefresh =
+              'window.dispatchEvent(new CustomEvent("Refresh",{"detail":"refresh"}));';
+          appWebViewController.evaluateJavascript(source: srcRefresh);
+
           return Future.wait([
             if (store.state.assetState.isBalanceUpdating != true)
               store.dispatchAsync(

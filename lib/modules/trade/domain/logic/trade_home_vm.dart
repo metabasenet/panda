@@ -14,6 +14,8 @@ abstract class TradeHomeVM implements Built<TradeHomeVM, TradeHomeVMBuilder> {
   //String get fiatCurrency;
   //@nullable
   String? get activeWalletId;
+  Wallet? get activeWallet;
+  static Store<AppState>? activeStore;
 
   //@nullable
   //AssetCoin? get priceCoinInfo;
@@ -39,6 +41,8 @@ abstract class TradeHomeVM implements Built<TradeHomeVM, TradeHomeVMBuilder> {
     //final tradeState = store.state.tradeState;
     final activeWalletId = store.state.walletState.activeWalletId;
     //final fiatCurrency = store.state.commonState.fiatCurrency ?? '';
+    final activeWallet = store.state.walletState.activeWallet;
+    activeStore = store;
 
     return TradeHomeVM(
       (viewModel) => viewModel
@@ -48,6 +52,7 @@ abstract class TradeHomeVM implements Built<TradeHomeVM, TradeHomeVMBuilder> {
         //..tradeSide = tradeState.tradeSide
         //..fiatCurrency = fiatCurrency
         ..activeWalletId = activeWalletId
+        ..activeWallet = activeWallet
         ..doUnlockWallet = (password) {
           final completer = Completer<WalletPrivateData>();
           store.dispatch(WalletActionWalletUnlock(password, completer));

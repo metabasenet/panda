@@ -1289,6 +1289,8 @@ class _$TradeHomeVM extends TradeHomeVM {
   @override
   final String? activeWalletId;
   @override
+  final Wallet? activeWallet;
+  @override
   final Future<WalletPrivateData> Function(String password) doUnlockWallet;
   @override
   final Future<void> Function(
@@ -1302,6 +1304,7 @@ class _$TradeHomeVM extends TradeHomeVM {
       {required this.hasWallet,
       required this.ethAddress,
       this.activeWalletId,
+      this.activeWallet,
       required this.doUnlockWallet,
       required this.transferResult})
       : super._() {
@@ -1328,13 +1331,16 @@ class _$TradeHomeVM extends TradeHomeVM {
     return other is TradeHomeVM &&
         hasWallet == other.hasWallet &&
         ethAddress == other.ethAddress &&
-        activeWalletId == other.activeWalletId;
+        activeWalletId == other.activeWalletId &&
+        activeWallet == other.activeWallet;
   }
 
   @override
   int get hashCode {
-    return $jf($jc($jc($jc(0, hasWallet.hashCode), ethAddress.hashCode),
-        activeWalletId.hashCode));
+    return $jf($jc(
+        $jc($jc($jc(0, hasWallet.hashCode), ethAddress.hashCode),
+            activeWalletId.hashCode),
+        activeWallet.hashCode));
   }
 
   @override
@@ -1343,6 +1349,7 @@ class _$TradeHomeVM extends TradeHomeVM {
           ..add('hasWallet', hasWallet)
           ..add('ethAddress', ethAddress)
           ..add('activeWalletId', activeWalletId)
+          ..add('activeWallet', activeWallet)
           ..add('doUnlockWallet', doUnlockWallet)
           ..add('transferResult', transferResult))
         .toString();
@@ -1364,6 +1371,10 @@ class TradeHomeVMBuilder implements Builder<TradeHomeVM, TradeHomeVMBuilder> {
   String? get activeWalletId => _$this._activeWalletId;
   set activeWalletId(String? activeWalletId) =>
       _$this._activeWalletId = activeWalletId;
+
+  Wallet? _activeWallet;
+  Wallet? get activeWallet => _$this._activeWallet;
+  set activeWallet(Wallet? activeWallet) => _$this._activeWallet = activeWallet;
 
   Future<WalletPrivateData> Function(String password)? _doUnlockWallet;
   Future<WalletPrivateData> Function(String password)? get doUnlockWallet =>
@@ -1393,6 +1404,7 @@ class TradeHomeVMBuilder implements Builder<TradeHomeVM, TradeHomeVMBuilder> {
       _hasWallet = $v.hasWallet;
       _ethAddress = $v.ethAddress;
       _activeWalletId = $v.activeWalletId;
+      _activeWallet = $v.activeWallet;
       _doUnlockWallet = $v.doUnlockWallet;
       _transferResult = $v.transferResult;
       _$v = null;
@@ -1422,6 +1434,7 @@ class TradeHomeVMBuilder implements Builder<TradeHomeVM, TradeHomeVMBuilder> {
             ethAddress: BuiltValueNullFieldError.checkNotNull(
                 ethAddress, 'TradeHomeVM', 'ethAddress'),
             activeWalletId: activeWalletId,
+            activeWallet: activeWallet,
             doUnlockWallet: BuiltValueNullFieldError.checkNotNull(
                 doUnlockWallet, 'TradeHomeVM', 'doUnlockWallet'),
             transferResult: BuiltValueNullFieldError.checkNotNull(

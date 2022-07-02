@@ -35,6 +35,22 @@ class TradeHomePage extends HookWidget {
                 ),
                 onWebViewCreated: (controller) {
                   webView = controller;
+
+                  webView.addJavaScriptHandler(
+                    handlerName: 'Refresh',
+                    callback: (args) {
+                      //Update balances list
+                      TradeHomeVM.activeStore?.dispatch(
+                        AssetActionUpdateWalletBalances(
+                          wallet: viewModel.activeWallet!,
+                          skipFrequentUpdate: true,
+                        ),
+                      );
+
+                      return 'refresh';
+                    },
+                  );
+
                   controller.addJavaScriptHandler(
                     handlerName: 'init',
                     callback: (args) {

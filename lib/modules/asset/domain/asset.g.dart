@@ -1392,6 +1392,8 @@ class _$AssetWithdrawVM extends AssetWithdrawVM {
   @override
   final bool hideWithdrawShowcase;
   @override
+  final Wallet? activeWallet;
+  @override
   final Future<WalletWithdrawData> Function(
           WithdrawBeforeParams params, WalletWithdrawData? previousData)
       onWithdrawBefore;
@@ -1414,6 +1416,7 @@ class _$AssetWithdrawVM extends AssetWithdrawVM {
   _$AssetWithdrawVM._(
       {required this.hideDepositShowcase,
       required this.hideWithdrawShowcase,
+      this.activeWallet,
       required this.onWithdrawBefore,
       required this.submit,
       required this.getCoinBalance,
@@ -1448,13 +1451,16 @@ class _$AssetWithdrawVM extends AssetWithdrawVM {
     if (identical(other, this)) return true;
     return other is AssetWithdrawVM &&
         hideDepositShowcase == other.hideDepositShowcase &&
-        hideWithdrawShowcase == other.hideWithdrawShowcase;
+        hideWithdrawShowcase == other.hideWithdrawShowcase &&
+        activeWallet == other.activeWallet;
   }
 
   @override
   int get hashCode {
     return $jf($jc(
-        $jc(0, hideDepositShowcase.hashCode), hideWithdrawShowcase.hashCode));
+        $jc($jc(0, hideDepositShowcase.hashCode),
+            hideWithdrawShowcase.hashCode),
+        activeWallet.hashCode));
   }
 
   @override
@@ -1462,6 +1468,7 @@ class _$AssetWithdrawVM extends AssetWithdrawVM {
     return (newBuiltValueToStringHelper('AssetWithdrawVM')
           ..add('hideDepositShowcase', hideDepositShowcase)
           ..add('hideWithdrawShowcase', hideWithdrawShowcase)
+          ..add('activeWallet', activeWallet)
           ..add('onWithdrawBefore', onWithdrawBefore)
           ..add('submit', submit)
           ..add('getCoinBalance', getCoinBalance)
@@ -1484,6 +1491,10 @@ class AssetWithdrawVMBuilder
   bool? get hideWithdrawShowcase => _$this._hideWithdrawShowcase;
   set hideWithdrawShowcase(bool? hideWithdrawShowcase) =>
       _$this._hideWithdrawShowcase = hideWithdrawShowcase;
+
+  Wallet? _activeWallet;
+  Wallet? get activeWallet => _$this._activeWallet;
+  set activeWallet(Wallet? activeWallet) => _$this._activeWallet = activeWallet;
 
   Future<WalletWithdrawData> Function(
           WithdrawBeforeParams params, WalletWithdrawData? previousData)?
@@ -1543,6 +1554,7 @@ class AssetWithdrawVMBuilder
     if ($v != null) {
       _hideDepositShowcase = $v.hideDepositShowcase;
       _hideWithdrawShowcase = $v.hideWithdrawShowcase;
+      _activeWallet = $v.activeWallet;
       _onWithdrawBefore = $v.onWithdrawBefore;
       _submit = $v.submit;
       _getCoinBalance = $v.getCoinBalance;
@@ -1576,6 +1588,7 @@ class AssetWithdrawVMBuilder
                 hideWithdrawShowcase,
                 'AssetWithdrawVM',
                 'hideWithdrawShowcase'),
+            activeWallet: activeWallet,
             onWithdrawBefore: BuiltValueNullFieldError.checkNotNull(
                 onWithdrawBefore, 'AssetWithdrawVM', 'onWithdrawBefore'),
             submit: BuiltValueNullFieldError.checkNotNull(

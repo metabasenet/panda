@@ -30,6 +30,7 @@ import 'package:mars/routers/navigator.dart';
 import 'package:mars/themes/themes.dart';
 import 'package:mars/utils/utils.dart';
 import 'package:mars/widgets/widgets.dart';
+import 'package:mars/modules/trade/domain/trade.dart';
 
 part 'listeners/asset_balance_listener.dart';
 part 'listeners/asset_price_listener.dart';
