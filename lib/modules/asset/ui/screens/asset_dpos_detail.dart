@@ -135,8 +135,8 @@ class _AssetDposDetail extends State<AssetDposDetail> {
       'to': isTou ? address : widget.coinInfo.address,
       'amount': myController.text,
       'gasprice': '1000000000000',
-      'gaslimit': '40000',
-      'data': '01010146$hex'
+      'gaslimit': '20000',
+      'data': isTou ? '01010146$hex' : '00',
     };
     final ret = getTx(params as Map<String, Object>);
     setState(() {
