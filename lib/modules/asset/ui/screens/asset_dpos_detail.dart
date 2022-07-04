@@ -31,6 +31,7 @@ class _AssetDposDetail extends State<AssetDposDetail> {
   String investedAmount = '';
   String withdrawalAmount = '';
   dynamic nonce;
+  dynamic nonceWithdrawal;
   //dynamic gas_price;
   //dynamic gas_limit;
   dynamic status = 1;
@@ -114,6 +115,7 @@ class _AssetDposDetail extends State<AssetDposDetail> {
     fetchNosData();
     getAvailableAmount();
     getInvestedAmount();
+    fetchWithdrawalNosData();
   }
 
   void assemblyTransaction(bool isTou) {
@@ -128,7 +130,7 @@ class _AssetDposDetail extends State<AssetDposDetail> {
     final params = {
       'time': time,
       'fork': AppConstants.mnt_fork,
-      'nonce': nonce,
+      'nonce': isTou ? nonce : nonceWithdrawal,
       'from': isTou ? widget.coinInfo.address : address,
       'to': isTou ? address : widget.coinInfo.address,
       'amount': myController.text,
@@ -161,7 +163,7 @@ class _AssetDposDetail extends State<AssetDposDetail> {
     });
   }
 
-  // 获取nonce
+  // get nonce
   void fetchNosData() async {
     var res = await AssetRepository().getTransactionFee(
         address: widget.coinInfo.address.toString(), symbol: '');
@@ -169,6 +171,15 @@ class _AssetDposDetail extends State<AssetDposDetail> {
       nonce = res?['nonce'] + 1;
       //gas_price = res['gas_price'];
       //gas_limit = res['gas_limit'];
+    });
+  }
+
+  // Withdrawal nonce
+  void fetchWithdrawalNosData() async {
+    var res = await AssetRepository()
+        .getTransactionFee(address: nodeAddress, symbol: '');
+    setState(() {
+      nonceWithdrawal = res?['nonce'] + 1;
     });
   }
 
