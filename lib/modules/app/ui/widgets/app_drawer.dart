@@ -58,7 +58,7 @@ class AppDrawer extends StatelessWidget {
               AppDrawerMenuVersion(
                 label: tr('user:menu_version'),
                 hasNew: viewModel.hasNewVersion,
-                version: AppConstants.appVersion,
+                version: viewModel.appVersion,
                 onPressed: () {},
               ),
               AppDrawerMenuLanguage(
