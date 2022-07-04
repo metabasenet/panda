@@ -55,6 +55,7 @@ class AssetWithdrawProcess {
     }
 
     // For coin like USDT where the fee is ETH, we need to check ETH balance
+
     //if (symbol != feeSymbol) {
     final feeBalance = viewModel.getCoinBalance(
       chain: withdrawData.chain, //AppConstants.mnt_chain,
@@ -70,6 +71,7 @@ class AssetWithdrawProcess {
     if (withdrawData.fee.feeValue > feeBalance) {
       Toast.show(tr('asset:withdraw_msg_error_fee'));
       return;
+
     }
     //}
 

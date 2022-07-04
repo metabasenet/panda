@@ -57,9 +57,11 @@ class InvestRepository {
     required int take,
   }) async {
     final dio = Dio();
+
     final response = await dio.get(
       '${AppConstants.randomApiUrl}/profit?address=$address&pagenum=1&pagesize=1000',
     );
+
 
     return response.data['data'] as List<dynamic>;
   }
@@ -75,5 +77,6 @@ class InvestRepository {
     final response =
         await dio.get('${AppConstants.randomApiUrl}/general_reward?addr=$addr');
     return response.data as List<dynamic>;
+
   }
 }

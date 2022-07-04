@@ -22,7 +22,9 @@ class CommonActionLoadCache extends _BaseAction {
     }
 
     if (!Hive.isAdapterRegistered(32)) {
+
       // Load DB
+
       await AppHiveCache.initHive();
 
       // Getit
