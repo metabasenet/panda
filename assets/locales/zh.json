@@ -369,6 +369,7 @@
   "asset:amount_of_votes": "可用投票金额",
   "asset:amount_of_amountvoted": "已投票金额",
   "asset:amount_of_locked": "锁定投票金额",
+  "asset:amount_of_withdrawal": "撤投金额",
   "asset:compound_interest_address": "投票地址",
   "asset:defi_vote_number": "请输入投票数量",
   "asset:gas_free": "矿工费",

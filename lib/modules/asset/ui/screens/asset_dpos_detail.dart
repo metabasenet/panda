@@ -29,6 +29,7 @@ class _AssetDposDetail extends State<AssetDposDetail> {
   String addressBalance = '';
   String locked = '';
   String investedAmount = '';
+  String withdrawalAmount = '';
   dynamic nonce;
   //dynamic gas_price;
   //dynamic gas_limit;
@@ -106,23 +107,13 @@ class _AssetDposDetail extends State<AssetDposDetail> {
     setState(() {
       superNodeAddress = widget.voteNodeItem['address'].toString();
       superNodeName = widget.voteNodeItem['name'].toString();
-      addressBalance =
-          NumberUtil.getFixed(widget.coinInfo.balance.toString(), 6);
-      locked = NumberUtil.getFixed(widget.coinInfo.locked.toString(), 6);
-
-      // locked = widget.coinInfo.locked == null
-      //     ? null
-      //     : widget.coinInfo.locked.toString();
     });
-    if ((addressBalance != null && addressBalance.isNotEmpty) &&
-        (locked != null && locked.isNotEmpty)) {
-      investedAmount = (Decimal.parse(addressBalance) + Decimal.parse(locked))
-          .toStringAsFixed(6);
-    }
 
     getVoteAddress();
     getCompoundInterestAddress();
     fetchNosData();
+    getAvailableAmount();
+    getInvestedAmount();
   }
 
   void assemblyTransaction(bool isTou) {
@@ -178,6 +169,39 @@ class _AssetDposDetail extends State<AssetDposDetail> {
       nonce = res?['nonce'] + 1;
       //gas_price = res['gas_price'];
       //gas_limit = res['gas_limit'];
+    });
+  }
+
+// get Available voting amount
+  void getAvailableAmount() async {
+    final apiBalance = await AssetRepository().getCoinBalance(
+      chain: widget.coinInfo.chain.toString(),
+      symbol: widget.coinInfo.symbol.toString(),
+      address: widget.coinInfo.address.toString(),
+      contract: '',
+    );
+
+    setState(() {
+      addressBalance = NumberUtil.getFixed(apiBalance['balance'].toString(), 6);
+    });
+  }
+
+  // get investedAmount
+  void getInvestedAmount() async {
+    final apiBalance = await AssetRepository().getCoinBalance(
+      chain: widget.coinInfo.chain.toString(),
+      symbol: widget.coinInfo.symbol.toString(),
+      address: nodeAddress,
+      contract: '',
+    );
+
+    setState(() {
+      investedAmount = (Decimal.parse(apiBalance['balance'].toString()) +
+              Decimal.parse(apiBalance['locked'].toString()))
+          .toStringAsFixed(6);
+      locked = NumberUtil.getFixed(apiBalance['locked'].toString(), 6);
+      withdrawalAmount =
+          NumberUtil.getFixed(apiBalance['balance'].toString(), 6);
     });
   }
 
@@ -353,6 +377,35 @@ class _AssetDposDetail extends State<AssetDposDetail> {
                     readOnly: true,
                     onPressIcon: () {},
                     hintText: tr(locked),
+                    titleAction: Transform.translate(
+                      offset: Offset(context.edgeSize, 0),
+                      child: CSButton(
+                        height: 30,
+                        textStyle: context
+                            .textBody(
+                              color: context.placeholderColor,
+                              bold: true,
+                              fontWeight: FontWeight.normal,
+                            )
+                            .copyWith(
+                              decoration: TextDecoration.underline,
+                            ),
+                        autoWidth: true,
+                        backgroundColor: Colors.transparent,
+                        onPressed: () {},
+                      ),
+                    ),
+                    maxLines: null,
+                    onFocusChanged: (hasFocus) {
+                      if (!hasFocus) {}
+                    },
+                  ),
+                  FormBox(
+                    type: FormBoxType.inputText,
+                    title: tr('asset:amount_of_withdrawal'),
+                    readOnly: true,
+                    onPressIcon: () {},
+                    hintText: tr(withdrawalAmount),
                     titleAction: Transform.translate(
                       offset: Offset(context.edgeSize, 0),
                       child: CSButton(
