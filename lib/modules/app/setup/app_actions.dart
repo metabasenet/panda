@@ -5,9 +5,10 @@ abstract class _BaseAction extends ReduxAction<AppState> {
 }
 
 class AppActionInitApp extends _BaseAction {
-  AppActionInitApp(this.progress);
+  AppActionInitApp(this.progress, this.context);
 
   final StreamController<double> progress;
+  final BuildContext context;
 
   @override
   Future<AppState?> reduce() async {
@@ -78,6 +79,13 @@ class AppActionInitApp extends _BaseAction {
       {'version': state.commonState.appInfo?.version},
     );
 
+    //get language cache
+    if (!AppLanguages.isSetLanguages) {
+      final settings = CommonRepository().getSettings();
+      final languageCode = settings?.language ?? '';
+      context.setLocale(Locale(languageCode));
+    }
+
     progress.add(1);
     return null;
   }
@@ -129,6 +137,15 @@ class AppActionLoadWallet extends _BaseAction {
 
       // Check wallet status and register
       dispatch(WalletActionWalletRegister(wallet!));
+
+      //doSwitchWallet
+      final ret = {
+        'PrivateKey': '',
+        'Address': wallet?.ethAddress,
+      };
+      final src =
+          'window.dispatchEvent(new CustomEvent("Init",{"detail":${json.encode(ret)}}));';
+      TradeHomePage.webView.evaluateJavascript(source: src);
     }
     return null;
   }

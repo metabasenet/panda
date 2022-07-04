@@ -170,7 +170,8 @@ class AssetRepository {
       );
       return {
         'balance': res['balance'].toString(),
-        'unconfirmed': res['unconfirmed'].toString()
+        'unconfirmed': res['unconfirmed'].toString(),
+        'locked': res['locked'].toString(),
       };
     } else if (chain == 'ETH' && symbol == 'BNB') {
       final res = await _api.getCoinBalanceBNB(
@@ -180,7 +181,8 @@ class AssetRepository {
       );
       return {
         'balance': res['balance'].toString(),
-        'unconfirmed': res['unconfirmed'].toString()
+        'unconfirmed': res['unconfirmed'].toString(),
+        'locked': '0',
       };
     } else if (chain == 'ETH' && (symbol == 'MNT' || symbol == 'USDT')) {
       final res = await _api.getCoinBalanceBMU(
@@ -190,12 +192,14 @@ class AssetRepository {
       );
       return {
         'balance': res['balance'].toString(),
-        'unconfirmed': res['unconfirmed'].toString()
+        'unconfirmed': res['unconfirmed'].toString(),
+        'locked': '0',
       };
     } else {
       return {
         'balance': '0',
         'unconfirmed': '0',
+        'locked': '0',
       };
     }
   }

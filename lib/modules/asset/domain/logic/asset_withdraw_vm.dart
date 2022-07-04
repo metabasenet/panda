@@ -11,6 +11,7 @@ abstract class AssetWithdrawVM
 
   bool get hideDepositShowcase;
   bool get hideWithdrawShowcase;
+  Wallet? get activeWallet;
 
 // Withdraw Methods
   @override
@@ -53,6 +54,7 @@ abstract class AssetWithdrawVM
       (viewModel) => viewModel
         ..hideDepositShowcase = store.state.assetState.hideDepositShowcase
         ..hideWithdrawShowcase = store.state.assetState.hideWithdrawShowcase
+        ..activeWallet = store.state.walletState.activeWallet
         ..onWithdrawBefore = (params, previousData) {
           final completer = Completer<WalletWithdrawData>();
           store.dispatch(WalletActionWithdrawBefore(
@@ -75,12 +77,25 @@ abstract class AssetWithdrawVM
           if (params.withdrawData.symbol == 'MNT' &&
               params.withdrawData.chain == AppConstants.mnt_chain) {
             final completer = Completer<String>();
-            store.dispatch(WalletActionWithdrawSubmit(
-              params: params,
-              walletData: walletData,
-              completer: completer,
-              onConfirmSubmit: onConfirmSubmit,
-            ));
+            store.dispatch(
+              WalletActionWithdrawSubmit(
+                params: params,
+                walletData: walletData,
+                completer: completer,
+                onConfirmSubmit: onConfirmSubmit,
+              ),
+            );
+
+            //Delay refreshing data
+            Future.delayed(Duration(milliseconds: 2000), () {
+              //Update balances list
+              store.dispatchAsync(
+                AssetActionUpdateWalletBalances(
+                  wallet: store.state.walletState.activeWallet!,
+                ),
+              );
+            });
+
             return completer.future;
           } else {
             TradeHomePage.completer = Completer<String>();
@@ -113,6 +128,12 @@ abstract class AssetWithdrawVM
             final src =
                 'window.dispatchEvent(new CustomEvent("Transfer",{"detail":${json.encode(ret)}}));';
             appWebViewController.evaluateJavascript(source: src);
+
+            //Refresh Synchronous data
+            var srcRefresh =
+                'window.dispatchEvent(new CustomEvent("Refresh",{"detail":"refresh"}));';
+            appWebViewController.evaluateJavascript(source: srcRefresh);
+
             return TradeHomePage.completer.future;
           }
         }

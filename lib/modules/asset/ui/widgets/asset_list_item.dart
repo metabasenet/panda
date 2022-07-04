@@ -66,7 +66,7 @@ class AssetListItem extends HookWidget {
                     item: item,
                     builder: (context, {balance, unconfirmed, data}) =>
                         PriceText(
-                      balance!,
+                      NumberUtil.getFixedBYSix(balance ?? ''),
                       '',
                       TextSize.body,
                     ),

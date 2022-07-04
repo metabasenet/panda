@@ -14,11 +14,18 @@ class AppLinks {
       lang == 'zh' ? appContactUrlZh : appContactUrlEn;
 
   static const appWebsiteUrl = 'https://metabasenet.club/';
+  static const appHelpeUrl = 'http://124.221.253.93:7711';
 
   static String helpContactUrl(String lang) {
-    String helpWebsiteUrl =
-        'http://124.221.253.93:7711/vote.html?language=' + lang;
-    return helpWebsiteUrl;
+    return '$appHelpeUrl/publish.html?language=$lang';
+  }
+
+  static String voteUrl(String lang) {
+    return '$appHelpeUrl/vote.html?language=$lang';
+  }
+
+  static String transactionUrl(String lang) {
+    return '$appHelpeUrl/transaction.html?language=$lang';
   }
 
   static const appTwitter = '';

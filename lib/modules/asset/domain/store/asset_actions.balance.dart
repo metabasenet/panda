@@ -33,6 +33,7 @@ class AssetActionGetCoinBalance extends _BaseAction {
     final cachedBalance = balanceInfo!.balance;
     var newBalance = balanceInfo.balance;
     var newUnconfirmed = balanceInfo.unconfirmed;
+    var newLocked = balanceInfo.locked;
 
     if (address == null || address.isEmpty) {
       completer?.complete(newBalance);
@@ -42,12 +43,13 @@ class AssetActionGetCoinBalance extends _BaseAction {
     bool isFailed = false;
     try {
       // Avoid refresh balance too frequently
-      if (ignoreBalanceLock == true ||
-          !wallet.isCoinBalanceLocked(
-            chain: chain,
-            symbol: symbol,
-            address: address,
-          )) {
+      // if (ignoreBalanceLock == true ||
+      //     !wallet.isCoinBalanceLocked(
+      //       chain: chain,
+      //       symbol: symbol,
+      //       address: address,
+      //     ))
+      if (true) {
         final coinInfo = store.state.assetState.getCoinInfo(
           chain: chain,
           symbol: symbol,
@@ -74,6 +76,7 @@ class AssetActionGetCoinBalance extends _BaseAction {
 
         newBalance = NumberUtil.getDouble(apiBalance['balance']);
         newUnconfirmed = NumberUtil.getDouble(apiBalance['unconfirmed']);
+        newLocked = NumberUtil.getDouble(apiBalance['locked']);
 
         // Test refresh balance
         // if (kDebugMode) {
@@ -136,6 +139,7 @@ class AssetActionGetCoinBalance extends _BaseAction {
       address: address,
       balance: newBalance,
       unconfirmed: newUnconfirmed,
+      locked: newLocked,
     );
 
     if (isFailed == false) {
@@ -152,15 +156,19 @@ class AssetActionGetCoinBalance extends _BaseAction {
       address: address,
       balance: newBalance,
       unconfirmed: newUnconfirmed,
+      locked: newLocked,
     );
 
-    await dispatchAsync(_AssetActionUpdateAssetCoinBalance(
-      chain: chain,
-      symbol: symbol,
-      address: address,
-      balance: newBalance,
-      hasError: isFailed,
-    ));
+    await dispatchAsync(
+      _AssetActionUpdateAssetCoinBalance(
+        chain: chain,
+        symbol: symbol,
+        address: address,
+        balance: newBalance,
+        hasError: isFailed,
+        locked: newLocked,
+      ),
+    );
 
     completer?.complete(newBalance);
   }
@@ -188,6 +196,7 @@ class AssetActionResetCoinBalance extends _BaseAction {
   @override
   AppState? reduce() {
     const newBalance = 0.0;
+    const newLocked = 0.0;
 
     wallet.updateCoinBalance(
       chain: chain,
@@ -195,6 +204,7 @@ class AssetActionResetCoinBalance extends _BaseAction {
       address: address,
       balance: newBalance,
       unconfirmed: newBalance,
+      locked: newLocked,
     );
 
     GetIt.I<AssetBalanceCubit>().updateBalance(
@@ -202,6 +212,7 @@ class AssetActionResetCoinBalance extends _BaseAction {
       address: address,
       balance: newBalance,
       unconfirmed: newBalance,
+      locked: newLocked,
     );
 
     dispatch(
@@ -211,6 +222,7 @@ class AssetActionResetCoinBalance extends _BaseAction {
         address: address,
         balance: newBalance,
         hasError: false,
+        locked: newLocked,
       ),
     );
 
@@ -225,6 +237,7 @@ class _AssetActionUpdateAssetCoinBalance extends _BaseAction {
     this.address,
     this.balance,
     this.hasError,
+    this.locked,
   });
 
   final String? chain;
@@ -232,17 +245,20 @@ class _AssetActionUpdateAssetCoinBalance extends _BaseAction {
   final String? address;
   final double? balance;
   final bool? hasError;
+  final double? locked;
 
   @override
   AppState? reduce() {
     final coins = state.assetState.coins.map(
-        (e) => e.chain == chain && e.symbol == symbol && e.address == address
-            ? e.rebuild(
-                (u) => u
-                  ..balance = balance
-                  ..balanceUpdateFailed = hasError,
-              )
-            : e);
+      (e) => e.chain == chain && e.symbol == symbol && e.address == address
+          ? e.rebuild(
+              (u) => u
+                ..balance = balance
+                ..locked = locked
+                ..balanceUpdateFailed = hasError,
+            )
+          : e,
+    );
 
     return state.rebuild(
       (a) => a..assetState.coins.replace(coins),

@@ -162,30 +162,16 @@ class Wallet extends HiveObject {
     }
   }
 
-  /// Get coin balance from this wallet cache
-  // double getCoinBalance({
-  //   required String chain,
-  //   required String symbol,
-  // }) {
-  //   assert(chain != null, symbol != null);
-  //   try {
-  //     if (balances.length > 0) {
-  //       final data =
-  //           balances.firstWhere((e) => e.symbol == symbol && e.chain == chain);
-  //       return data.balance;
-  //     } else {
-  //       return 0.00;
-  //     }
-  //   } catch (e) {
-  //     return 0.00;
-  //   }
-  // }
-
+  // Get coin balance from this wallet cache
   double getCoinBalance({
     required String chain,
     required String symbol,
   }) {
-    return 0.00;
+    final data = balances.firstWhere(
+      (e) => e.symbol == symbol && e.chain == chain,
+      orElse: () => CoinBalance(chain: '', symbol: ''),
+    );
+    return data.chain == null ? 0.00 : data.balance;
   }
 
   /// Get Unconfirmed coin balance
@@ -250,6 +236,7 @@ class Wallet extends HiveObject {
     required String address,
     required double balance,
     required double unconfirmed,
+    required double locked,
   }) {
     assert(chain != null, symbol != null);
     assert(address != null);
@@ -272,6 +259,7 @@ class Wallet extends HiveObject {
     if (coinBalance != null) {
       coinBalance.balance = balance;
       coinBalance.unconfirmed = unconfirmed;
+      coinBalance.locked = locked;
       coinBalance.updatedAt = DateTime.now();
       save();
     }

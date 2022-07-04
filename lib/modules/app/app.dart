@@ -17,6 +17,7 @@ import 'package:built_value/built_value.dart';
 import 'package:convert/convert.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:easy_localization/src/translations.dart';
+
 // Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Builder;

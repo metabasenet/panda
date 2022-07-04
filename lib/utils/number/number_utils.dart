@@ -29,6 +29,77 @@ class NumberUtil {
     }
   }
 
+  static String getFixedBYSix(String number) {
+    String result = '';
+    if (number.isNotEmpty && number != '0') {
+      final listSplit = number.split('.');
+      if (listSplit.length == 2) {
+        if (listSplit[1].length < 6) {
+          switch (listSplit[1].length) {
+            case 1:
+              result = '${listSplit[1]}00000';
+              break;
+            case 2:
+              result = '${listSplit[1]}0000';
+              break;
+            case 3:
+              result = '${listSplit[1]}000';
+              break;
+            case 4:
+              result = '${listSplit[1]}00';
+              break;
+            case 5:
+              result = '${listSplit[1]}0';
+              break;
+          }
+          return '${listSplit[0]}.$result';
+        } else {
+          return double.parse(number).toStringAsFixed(6);
+        }
+      } else {
+        return '0.000000';
+      }
+    } else {
+      return '0.000000';
+    }
+  }
+
+  // static double getFixedBYSix(String number) {
+  //   String result = '';
+  //   if (number.isNotEmpty && number != '0') {
+  //     final listSplit = number.split('.');
+  //     if (listSplit.length == 2) {
+  //       if (listSplit[1].length < 6) {
+  //         switch (listSplit[1].length) {
+  //           case 1:
+  //             result = '${listSplit[1]}00000';
+  //             break;
+  //           case 2:
+  //             result = '${listSplit[1]}0000';
+  //             break;
+  //           case 3:
+  //             result = '${listSplit[1]}000';
+  //             break;
+  //           case 4:
+  //             result = '${listSplit[1]}00';
+  //             break;
+  //           case 5:
+  //             result = '${listSplit[1]}0';
+  //             break;
+  //         }
+  //       } else {
+  //         result = double.parse(number).toStringAsFixed(6);
+  //       }
+
+  //       return double.parse('${listSplit[0]}.$result');
+  //     } else {
+  //       return 0.000000;
+  //     }
+  //   } else {
+  //     return 0.000000;
+  //   }
+  // }
+
   /// Get the minimum value of the specified decimal place
   /// [Examples]
   /// if precision is 0 then return 0.1
@@ -283,7 +354,7 @@ class NumberUtil {
 
   static double getDoubleByTwo(double v1, double v2) {
     try {
-      double value = (v1 / v2);
+      final value = v1 / v2;
       return value;
     } catch (_) {
       return 0.00;

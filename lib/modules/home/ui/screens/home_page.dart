@@ -109,6 +109,12 @@ class HomePage extends StatelessWidget {
                       viewModel.doChangeLanguage(context.locale.languageCode);
                     },
                   );
+                } else {
+                  //context.locale = Locale('en');
+                  //context.setLocale(Locale('en'));
+                  //Locale('zh');
+                  //context.setLocale(Locale('zh'));
+                  //viewModel.doChangeLanguage('en');
                 }
               });
             }

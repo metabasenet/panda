@@ -118,7 +118,7 @@ class AssetDetailPage extends HookWidget {
             AssetBalanceListener(
               item: coinInfo,
               builder: (context, {balance, unconfirmed, data}) => PriceText(
-                balance ?? '',
+                NumberUtil.getFixedBYSix(balance ?? ''),
                 '',
                 TextSize.big,
               ),
@@ -166,56 +166,6 @@ class AssetDetailPage extends HookWidget {
                     ),
                   ),
                 ),
-                if (kChainsHasUnconfirmedBalance.contains(coinInfo.chain))
-                  AssetBalanceListener(
-                    item: coinInfo,
-                    builder: (
-                      context, {
-                      balance,
-                      unconfirmed,
-                      data,
-                    }) =>
-                        data?.unconfirmed != 0
-                            ? Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    CSButton(
-                                      flat: true,
-                                      label: tr('asset:detail_lbl_unconfirmed'),
-                                      textStyle: context.textSecondary(
-                                        bold: true,
-                                        fontWeight: FontWeight.normal,
-                                      ),
-                                      alignment: MainAxisAlignment.start,
-                                      cmpRight: Padding(
-                                        padding: context.edgeLeft5,
-                                        child: Icon(
-                                          CSIcons.Help,
-                                          size: 15,
-                                          color: context.bodyColor,
-                                        ),
-                                      ),
-                                      onPressed: () {
-                                        showAlertDialog(
-                                          context,
-                                          content: tr(
-                                            'asset:detail_msg_unconfirmed',
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                    SizedBox(height: 10),
-                                    PriceText(
-                                      unconfirmed ?? '0.0',
-                                      '',
-                                      TextSize.medium,
-                                    ),
-                                  ],
-                                ),
-                              )
-                            : SizedBox(),
-                  ),
               ],
             ),
             SizedBox(height: 4),

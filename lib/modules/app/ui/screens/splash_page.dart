@@ -35,7 +35,7 @@ class AppSplashPage extends HookWidget {
       });
 
       Future.wait([
-        store.dispatchAsync(AppActionInitApp(progress), notify: false),
+        store.dispatchAsync(AppActionInitApp(progress, context), notify: false),
         loadEnd.stream.firstWhere((end) => end, orElse: () => false),
       ]).catchError((error) {
         Toast.showError(error, defaultMessage: tr('global:msg_app_init_error'));

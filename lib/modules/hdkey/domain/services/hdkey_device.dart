@@ -124,7 +124,6 @@ class HDKeyDevice {
 
     final chainAddress = await WalletRepository().importMnemonic(
       mnemonic: mnemonic,
-      // options: WalletCoreOptions(),
     );
 
     try {
@@ -164,7 +163,6 @@ class HDKeyDevice {
       if (wallet == null) {
         final chainAddress = await WalletRepository().importMnemonic(
           mnemonic: mnemonic,
-          // options: WalletCoreOptions(),
         );
         // Create new wallet locally
         final addresses = kHDKeyChainSoltMapping.entries.map((item) {

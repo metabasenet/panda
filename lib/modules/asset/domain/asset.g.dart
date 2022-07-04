@@ -98,6 +98,13 @@ class _$AssetCoinSerializer implements StructuredSerializer<AssetCoin> {
         ..add(serializers.serialize(value,
             specifiedType: const FullType(double)));
     }
+    value = object.locked;
+    if (value != null) {
+      result
+        ..add('locked')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(double)));
+    }
     value = object.balanceUpdateFailed;
     if (value != null) {
       result
@@ -182,6 +189,10 @@ class _$AssetCoinSerializer implements StructuredSerializer<AssetCoin> {
           break;
         case 'balanceUnconfirmed':
           result.balanceUnconfirmed = serializers.deserialize(value,
+              specifiedType: const FullType(double)) as double?;
+          break;
+        case 'locked':
+          result.locked = serializers.deserialize(value,
               specifiedType: const FullType(double)) as double?;
           break;
         case 'balanceUpdateFailed':
@@ -1381,6 +1392,8 @@ class _$AssetWithdrawVM extends AssetWithdrawVM {
   @override
   final bool hideWithdrawShowcase;
   @override
+  final Wallet? activeWallet;
+  @override
   final Future<WalletWithdrawData> Function(
           WithdrawBeforeParams params, WalletWithdrawData? previousData)
       onWithdrawBefore;
@@ -1403,6 +1416,7 @@ class _$AssetWithdrawVM extends AssetWithdrawVM {
   _$AssetWithdrawVM._(
       {required this.hideDepositShowcase,
       required this.hideWithdrawShowcase,
+      this.activeWallet,
       required this.onWithdrawBefore,
       required this.submit,
       required this.getCoinBalance,
@@ -1437,13 +1451,16 @@ class _$AssetWithdrawVM extends AssetWithdrawVM {
     if (identical(other, this)) return true;
     return other is AssetWithdrawVM &&
         hideDepositShowcase == other.hideDepositShowcase &&
-        hideWithdrawShowcase == other.hideWithdrawShowcase;
+        hideWithdrawShowcase == other.hideWithdrawShowcase &&
+        activeWallet == other.activeWallet;
   }
 
   @override
   int get hashCode {
     return $jf($jc(
-        $jc(0, hideDepositShowcase.hashCode), hideWithdrawShowcase.hashCode));
+        $jc($jc(0, hideDepositShowcase.hashCode),
+            hideWithdrawShowcase.hashCode),
+        activeWallet.hashCode));
   }
 
   @override
@@ -1451,6 +1468,7 @@ class _$AssetWithdrawVM extends AssetWithdrawVM {
     return (newBuiltValueToStringHelper('AssetWithdrawVM')
           ..add('hideDepositShowcase', hideDepositShowcase)
           ..add('hideWithdrawShowcase', hideWithdrawShowcase)
+          ..add('activeWallet', activeWallet)
           ..add('onWithdrawBefore', onWithdrawBefore)
           ..add('submit', submit)
           ..add('getCoinBalance', getCoinBalance)
@@ -1473,6 +1491,10 @@ class AssetWithdrawVMBuilder
   bool? get hideWithdrawShowcase => _$this._hideWithdrawShowcase;
   set hideWithdrawShowcase(bool? hideWithdrawShowcase) =>
       _$this._hideWithdrawShowcase = hideWithdrawShowcase;
+
+  Wallet? _activeWallet;
+  Wallet? get activeWallet => _$this._activeWallet;
+  set activeWallet(Wallet? activeWallet) => _$this._activeWallet = activeWallet;
 
   Future<WalletWithdrawData> Function(
           WithdrawBeforeParams params, WalletWithdrawData? previousData)?
@@ -1532,6 +1554,7 @@ class AssetWithdrawVMBuilder
     if ($v != null) {
       _hideDepositShowcase = $v.hideDepositShowcase;
       _hideWithdrawShowcase = $v.hideWithdrawShowcase;
+      _activeWallet = $v.activeWallet;
       _onWithdrawBefore = $v.onWithdrawBefore;
       _submit = $v.submit;
       _getCoinBalance = $v.getCoinBalance;
@@ -1565,6 +1588,7 @@ class AssetWithdrawVMBuilder
                 hideWithdrawShowcase,
                 'AssetWithdrawVM',
                 'hideWithdrawShowcase'),
+            activeWallet: activeWallet,
             onWithdrawBefore: BuiltValueNullFieldError.checkNotNull(
                 onWithdrawBefore, 'AssetWithdrawVM', 'onWithdrawBefore'),
             submit: BuiltValueNullFieldError.checkNotNull(
@@ -1604,6 +1628,8 @@ class _$AssetCoin extends AssetCoin {
   @override
   final double? balanceUnconfirmed;
   @override
+  final double? locked;
+  @override
   final bool? balanceUpdateFailed;
   @override
   final bool? isEnabled;
@@ -1627,6 +1653,7 @@ class _$AssetCoin extends AssetCoin {
       this.displayPrecision,
       this.balance,
       this.balanceUnconfirmed,
+      this.locked,
       this.balanceUpdateFailed,
       this.isEnabled,
       this.isFixed,
@@ -1655,6 +1682,7 @@ class _$AssetCoin extends AssetCoin {
         displayPrecision == other.displayPrecision &&
         balance == other.balance &&
         balanceUnconfirmed == other.balanceUnconfirmed &&
+        locked == other.locked &&
         balanceUpdateFailed == other.balanceUpdateFailed &&
         isEnabled == other.isEnabled &&
         isFixed == other.isFixed &&
@@ -1677,18 +1705,23 @@ class _$AssetCoin extends AssetCoin {
                                                 $jc(
                                                     $jc(
                                                         $jc(
-                                                            $jc(0,
-                                                                name.hashCode),
-                                                            fullName.hashCode),
-                                                        chain.hashCode),
-                                                    symbol.hashCode),
-                                                address.hashCode),
-                                            iconOnline.hashCode),
-                                        iconLocal.hashCode),
-                                    chainPrecision.hashCode),
-                                displayPrecision.hashCode),
-                            balance.hashCode),
-                        balanceUnconfirmed.hashCode),
+                                                            $jc(
+                                                                $jc(
+                                                                    0,
+                                                                    name
+                                                                        .hashCode),
+                                                                fullName
+                                                                    .hashCode),
+                                                            chain.hashCode),
+                                                        symbol.hashCode),
+                                                    address.hashCode),
+                                                iconOnline.hashCode),
+                                            iconLocal.hashCode),
+                                        chainPrecision.hashCode),
+                                    displayPrecision.hashCode),
+                                balance.hashCode),
+                            balanceUnconfirmed.hashCode),
+                        locked.hashCode),
                     balanceUpdateFailed.hashCode),
                 isEnabled.hashCode),
             isFixed.hashCode),
@@ -1709,6 +1742,7 @@ class _$AssetCoin extends AssetCoin {
           ..add('displayPrecision', displayPrecision)
           ..add('balance', balance)
           ..add('balanceUnconfirmed', balanceUnconfirmed)
+          ..add('locked', locked)
           ..add('balanceUpdateFailed', balanceUpdateFailed)
           ..add('isEnabled', isEnabled)
           ..add('isFixed', isFixed)
@@ -1767,6 +1801,10 @@ class AssetCoinBuilder implements Builder<AssetCoin, AssetCoinBuilder> {
   set balanceUnconfirmed(double? balanceUnconfirmed) =>
       _$this._balanceUnconfirmed = balanceUnconfirmed;
 
+  double? _locked;
+  double? get locked => _$this._locked;
+  set locked(double? locked) => _$this._locked = locked;
+
   bool? _balanceUpdateFailed;
   bool? get balanceUpdateFailed => _$this._balanceUpdateFailed;
   set balanceUpdateFailed(bool? balanceUpdateFailed) =>
@@ -1800,6 +1838,7 @@ class AssetCoinBuilder implements Builder<AssetCoin, AssetCoinBuilder> {
       _displayPrecision = $v.displayPrecision;
       _balance = $v.balance;
       _balanceUnconfirmed = $v.balanceUnconfirmed;
+      _locked = $v.locked;
       _balanceUpdateFailed = $v.balanceUpdateFailed;
       _isEnabled = $v.isEnabled;
       _isFixed = $v.isFixed;
@@ -1837,6 +1876,7 @@ class AssetCoinBuilder implements Builder<AssetCoin, AssetCoinBuilder> {
             displayPrecision: displayPrecision,
             balance: balance,
             balanceUnconfirmed: balanceUnconfirmed,
+            locked: locked,
             balanceUpdateFailed: balanceUpdateFailed,
             isEnabled: isEnabled,
             isFixed: isFixed,

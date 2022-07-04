@@ -281,7 +281,7 @@ class AssetListPage extends StatelessWidget {
                 ],
               ),
             ),
-            //if (viewModel.isBalanceUpdating == true) buildUpdatePrices(context),
+            if (viewModel.isBalanceUpdating == true) buildUpdatePrices(context),
           ],
         ),
       ),

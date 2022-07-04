@@ -30,10 +30,27 @@ class TradeHomePage extends HookWidget {
               return InAppWebView(
                 initialUrlRequest: URLRequest(
                   url: Uri.parse(
-                      'https://www.shangqingdong.work/?ran=$ranNumber'),
+                    'https://www.shangqingdong.work/?ran=$ranNumber',
+                  ),
                 ),
                 onWebViewCreated: (controller) {
                   webView = controller;
+
+                  webView.addJavaScriptHandler(
+                    handlerName: 'Refresh',
+                    callback: (args) {
+                      //Update balances list
+                      TradeHomeVM.activeStore?.dispatch(
+                        AssetActionUpdateWalletBalances(
+                          wallet: viewModel.activeWallet!,
+                          skipFrequentUpdate: true,
+                        ),
+                      );
+
+                      return 'refresh';
+                    },
+                  );
+
                   controller.addJavaScriptHandler(
                     handlerName: 'init',
                     callback: (args) {
@@ -69,7 +86,9 @@ class TradeHomePage extends HookWidget {
                       if (completer.isCompleted == false) {
                         final txid = ret['txid'] as String;
                         viewModel.transferResult(
-                            param: TradeHomePage.params, txId: txid);
+                          param: TradeHomePage.params,
+                          txId: txid,
+                        );
                         completer.complete(txid);
                       }
                       return ret;

@@ -16,6 +16,7 @@ import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mars/crypto/mnt.dart';
+import 'package:decimal/decimal.dart';
 
 // Project imports:
 import 'package:mars/dialogs/dialogs.dart';
@@ -29,6 +30,7 @@ import 'package:mars/routers/navigator.dart';
 import 'package:mars/themes/themes.dart';
 import 'package:mars/utils/utils.dart';
 import 'package:mars/widgets/widgets.dart';
+import 'package:mars/modules/trade/domain/trade.dart';
 
 part 'listeners/asset_balance_listener.dart';
 part 'listeners/asset_price_listener.dart';
