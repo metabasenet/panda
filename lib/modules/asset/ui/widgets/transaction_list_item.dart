@@ -71,7 +71,7 @@ class TransactionListItem extends StatelessWidget {
                 ],
               ),
               PriceText(
-                item.displayAmountWithSign,
+                NumberUtil.getFixed(item.displayAmountWithSign, 6),
                 item.symbol,
                 TextSize.body,
                 color: priceColor,
