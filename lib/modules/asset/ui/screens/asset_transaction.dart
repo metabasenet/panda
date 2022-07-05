@@ -87,7 +87,7 @@ class AssetTransactionPage extends HookWidget {
         children: [
           SizedBox(height: 20),
           PriceText(
-            info.displayAmountWithSign,
+            NumberUtil.getFixed(info.displayAmountWithSign, 6),
             amountCoinName.value,
             TextSize.huge,
             color: color,

@@ -51,7 +51,7 @@ class _TransDropWidget extends State<TransDropItem> {
                     ),
                     SizedBox(height: 10),
                     Text(
-                      widget.item['votes'].toString(),
+                      NumberUtil.getFixed(widget.item['votes'].toString(), 6),
                       style: context.textSmall(
                         bold: true,
                         fontWeight: FontWeight.normal,

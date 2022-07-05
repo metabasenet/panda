@@ -331,7 +331,7 @@ class AssetWithdrawPage extends HookWidget {
                         tr(
                           'asset:lbl_balance',
                           namedArgs: {
-                            'balance': balance ?? '',
+                            'balance': NumberUtil.getFixed(balance!, 6),
                             'symbol': coinInfo?.name ?? '',
                           },
                         ),
