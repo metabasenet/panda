@@ -55,7 +55,7 @@ class MyApp extends StatelessWidget {
                 }
               },
               child: MaterialApp(
-                key: Key(context.locale.languageCode),
+                //key: Key(context.locale.languageCode),
                 theme: AppThemes.getLightTheme(context),
                 locale: context.locale,
                 supportedLocales: context.supportedLocales,
