@@ -64,7 +64,12 @@ class _AssetDposDetail extends State<AssetDposDetail> {
               child: CSButton(
                 label: tr('asset:lbl_withdrawal_button'),
                 onPressed: () {
-                  handleCreateTransaction(context, viewModel, false);
+                  var l1 = double.parse(investedAmount);
+                  if (l1 > 0) {
+                    handleCreateTransaction(context, viewModel, false);
+                  } // else {
+                  //null;
+                  //}
                 },
               ),
             ),
@@ -97,7 +102,6 @@ class _AssetDposDetail extends State<AssetDposDetail> {
             });
             AppNavigator.goBack();
           });
-
         });
       },
     );
@@ -138,7 +142,6 @@ class _AssetDposDetail extends State<AssetDposDetail> {
       'gasprice': '1000000000000',
       'gaslimit': '20000',
       'data': isTou ? '01010146$hex' : '00',
-
     };
     final ret = getTx(params as Map<String, Object>);
     setState(() {
@@ -174,7 +177,6 @@ class _AssetDposDetail extends State<AssetDposDetail> {
       //gas_price = res['gas_price'];
       //gas_limit = res['gas_limit'];
     });
-
   }
 
   // Withdrawal nonce
@@ -217,7 +219,6 @@ class _AssetDposDetail extends State<AssetDposDetail> {
       withdrawalAmount =
           NumberUtil.getFixed(apiBalance['balance'].toString(), 6);
     });
-
   }
 
   @override
