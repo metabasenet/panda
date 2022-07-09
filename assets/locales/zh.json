@@ -96,6 +96,8 @@
   "global:msg_app_offline": "无法连接网络",
   "global:msg_app_confirm_exit": "再一次点击退出应用",
   "global:msg_copy_success": "复制成功",
+  "global:msg_insufficient_withdrawal_amount": "撤投金额不足，无法撤投",
+  "global:msg_insufficient_voting_amount": "投票金额不足，无法投票",
   "global:msg_permission_denied_camera": "相机权限获取失败，扫码功能无法正常启用",
   "global:msg_permission_denied_gallery": "相册权限获取失败，无法选择图片",
   "global:msg_permission_denied_storage": "图片保存失败，请在手机设置中授权存储权限",

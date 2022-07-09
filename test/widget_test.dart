@@ -6,20 +6,23 @@
 // tree, read text, and verify that the values of widget properties are correct.
 
 // Flutter imports:
-//import 'package:flutter/material.dart';
+// import 'package:flutter/material.dart';
 
 // Package imports:
 //import 'package:flutter_test/flutter_test.dart';
 
 // Project imports:
-//import 'package:mars/app.dart';
-//import 'dart:typed_data';
-//import 'package:flutter_test/flutter_test.dart';
-//import 'package:mars/crypto/mnt.dart';
-//import 'package:ed25519_dart_base/ed25519_dart.dart';
-//import 'package:hex/hex.dart';
+import 'package:mars/app.dart';
+import 'dart:typed_data';
+import 'package:flutter_test/flutter_test.dart';
+// import 'package:googleapis/driveactivity/v2.dart';
+import 'package:mars/crypto/mnt.dart';
+import 'package:ed25519_dart_base/ed25519_dart.dart';
+import 'package:hex/hex.dart';
+import 'package:pointycastle/digests/blake2b.dart';
+import 'package:mars/crypto/base32.dart';
 
-import 'package:cryptography/cryptography.dart';
+// import 'package:cryptography/cryptography.dart';
 
 /*
 String formatBytesAsHexString(Uint8List bytes) {
@@ -31,36 +34,57 @@ String formatBytesAsHexString(Uint8List bytes) {
   return result.toString();
 }
 */
-void main() async {
-  final cipher = Chacha20.poly1305Aead();
-  final secretKey = SecretKey(List.filled(32, 0));
-  final nonce = List.filled(12, 0);
-  final ret = await cipher.encrypt(
-    List.filled(32, 0),
-    secretKey: secretKey,
-    nonce: nonce,
-  );
-  final ret_ = List.filled(0, 0, growable: true);
-  ret_.addAll(ret.mac.bytes);
-  ret_.addAll(ret.cipherText);
-  //print(ret_);
-  //print(ret_.length);
 
-  //final ret_ = ret.mac.bytes.addAll(ret.cipherText);
-  //final ret_ = List.from([ret.mac.bytes, ret.cipherText]);
-  //print(ret_.length);
-  final sb = SecretBox(
-    ret_.sublist(16), // ret.cipherText,
-    nonce: nonce,
-    mac: Mac(ret_.sublist(0, 16)), // Mac(expectedMac),
-  );
-  final ret2 = await cipher.decrypt(sb, secretKey: secretKey);
-  print(ret2);
-  print(ret2.length);
-  //print(ret);
-  //print(ret.cipherText);
-  //print(ret.cipherText.length);
-  /*
+void main() async {
+  testWidgets('Counter increments smoke test', (tester) async {
+    const redeem = {
+      "address": "21001cckmj5kzaqezq64j1eysd18vkq0d2htppb95r7dk6dv0wec92gz6",
+      "type": "redeem",
+      "hex":
+          "080001a8446809ceadc19d8b75abf368e8850e1e0e513c5f714205106b1b2e8eb067480000000000000000",
+      "owner": "191kv13he3dnh01a2e5fkrm8e3r78bt38yenqb2wxr6pww2b88jmegmh2",
+      "nonce": 0
+    };
+    const data =
+        '0101012901a8446809ceadc19d8b75abf368e8850e1e0e513c5f714205106b1b2e8eb067480000000000000000';
+    final ret = getRedeem(redeem['owner'] as String, redeem['nonce'] as int);
+    expect('0800${ret['hex']}', equals(redeem['hex']));
+    expect('01010129${ret['hex']}', equals(data));
+    expect(redeem['address'], equals(redeem['address']));
+  });
+}
+
+//   final cipher = Chacha20.poly1305Aead();
+//   final secretKey = SecretKey(List.filled(32, 0));
+//   final nonce = List.filled(12, 0);
+//   final ret = await cipher.encrypt(
+//     List.filled(32, 0),
+//     secretKey: secretKey,
+//     nonce: nonce,
+//   );
+//   final ret_ = List.filled(0, 0, growable: true);
+//   ret_.addAll(ret.mac.bytes);
+//   ret_.addAll(ret.cipherText);
+//   print(ret_);
+//   print(ret_.length);
+
+//final ret_ = ret.mac.bytes.addAll(ret.cipherText);
+//final ret_ = List.from([ret.mac.bytes, ret.cipherText]);
+//print(ret_.length);
+// final sb = SecretBox(
+//   ret_.sublist(16), // ret.cipherText,
+//   nonce: nonce,
+//   mac: Mac(ret_.sublist(0, 16)), // Mac(expectedMac),
+// );
+// final ret2 = await cipher.decrypt(sb, secretKey: secretKey);
+// print(ret2);
+// print(ret2.length);
+// print('6666666');
+
+//print(ret);
+//print(ret.cipherText);
+//print(ret.cipherText.length);
+/*
   final cipher = Chacha20.poly1305Aead();
     final listIntPwd = utf8.encode('$password$uniqueChars'.substring(0, 32));
     final secretKey = SecretKey(listIntPwd);
@@ -83,7 +107,8 @@ void main() async {
       //cipher.decrypt(null, secretKey: secretKey);
     }
 */
-  /*
+
+/*
   testWidgets('Counter increments smoke test', (tester) async {
     const vote = {
       'address': '20w0e9rcg7nq4pet8yz8ch2jt46f7hyjg256ys7dh5gddp0pja5mtm3js',
@@ -95,45 +120,60 @@ void main() async {
     };
     var ret = getVote(vote['delegate'] as String, vote['owner'] as String,
         vote['rewardmode'] as int);
-    expect('0700${ret['hex']}', equals(vote['hex']));
-    expect(ret['address'], equals(vote['address']));
-    const tx = {
-      'txid':
-          '85b36243c17dbe53177be4c900d67b3b82c32ef3f649879b7c671728011ed432',
-      'version': 1,
-      'type': 'token',
-      'time': 1648607613,
-      'nonce': 2,
-      'from': '1632srrskscs1d809y3x5ttf50f0gabf86xjz2s6aetc9h9ewwhm58dj3',
-      'to': '20w0e9rcg7nq4pet8yz8ch2jt46f7hyjg256ys7dh5gddp0pja5mtm3js',
-      'amount': '200.0000000000',
-      'gaslimit': 13700,
-      'gasprice': '0.00000000000001',
-      'gasused': 13700,
-      'txfee': "0.0137000000",
-      'data':
-          '0101014602d46e4656a1728c310f0aed6fe5badcb5871382f02620dfdc15f2094b802600050168e4dca5989876ca64f16537e82d05c103e5695dfaf009a01632cb33639cc53000000000',
-      'sig':
-          '387aa107a4ccd37816f9103cf05d3d37dd980c65db4c8a8e140fdf1b3c65c1b85c97aa06a898d9c3bdf1470618c19644482d768da6439bddf718658914abc705',
-      'fork':
-          '0000000027734445141a588af514fba7f24869c830399fe09a1355815b60040d',
-      'height': 22,
-      'blockhash':
-          '00000016b8b3a1db3bfb02dd4f81e337390962dc89458b82d1f5f2e68007a318',
-      'confirmations': 4,
-      'serialization':
-          '010000007dc143620000000027734445141a588af514fba7f24869c830399fe09a1355815b60040d02000000000000000168e4dca5989876ca64f16537e82d05c103e5695dfaf009a01632cb33639cc530026951d202db1a2cb19dec4d1150fa789e215a8ac8d0f7483b4b6e3d90e1e40007000000000000000000000000000000000000000000000000000001d1a94a2000000000000000000000000000000000000000000000000000000000000000271000000000000000000000000000000000000000000000000000000000000035840101014602d46e4656a1728c310f0aed6fe5badcb5871382f02620dfdc15f2094b802600050168e4dca5989876ca64f16537e82d05c103e5695dfaf009a01632cb33639cc5300000000040387aa107a4ccd37816f9103cf05d3d37dd980c65db4c8a8e140fdf1b3c65c1b85c97aa06a898d9c3bdf1470618c19644482d768da6439bddf718658914abc705'
-    };
+    // expect('0700${ret['hex']}', equals(vote['hex']));
+    // expect(ret['address'], equals(vote['address']));
 
-    ret = getTx(tx);
-    final privateKey = Uint8List.fromList(HEX.decode(
-        'ab14e1de9a0e805df0c79d50e1b065304814a247e7d52fc51fd0782e0eec27d6'));
-    final rpk = Uint8List.fromList(privateKey.reversed.toList());
-    final public = publicKey(rpk);
-    final txHash = HEX.decode(ret['tx_hash']);
-    final signHex = sign(txHash as Uint8List, rpk, public);
-    expect('${ret['tx_hex']}40${HEX.encode(signHex)}',
-        equals(tx['serialization']));
+    // const redeem = {
+    //   "address" : "21001cckmj5kzaqezq64j1eysd18vkq0d2htppb95r7dk6dv0wec92gz6",
+    //   "type" : "redeem",
+    //   "hex" : "080001a8446809ceadc19d8b75abf368e8850e1e0e513c5f714205106b1b2e8eb067480000000000000000",
+    //   "owner" : "191kv13he3dnh01a2e5fkrm8e3r78bt38yenqb2wxr6pww2b88jmegmh2",
+    //   "nonce" : 0
+    // }
+
+    // const data = '0101012901a8446809ceadc19d8b75abf368e8850e1e0e513c5f714205106b1b2e8eb067480000000000000000';
+    // ret = getRedeem(redeem['owner'] as String, redeem['nonce'] as int);
+    // expect('0800${ret['hex']}', equals(redeem['hex']));
+    // expect('01010129${ret['hex']}', equals(data));    
+    // expect(ret['address'], equals(redeem['address']));
+
+    // const tx = {
+    //   'txid':
+    //       '85b36243c17dbe53177be4c900d67b3b82c32ef3f649879b7c671728011ed432',
+    //   'version': 1,
+    //   'type': 'token',
+    //   'time': 1648607613,
+    //   'nonce': 2,
+    //   'from': '1632srrskscs1d809y3x5ttf50f0gabf86xjz2s6aetc9h9ewwhm58dj3',
+    //   'to': '20w0e9rcg7nq4pet8yz8ch2jt46f7hyjg256ys7dh5gddp0pja5mtm3js',
+    //   'amount': '200.0000000000',
+    //   'gaslimit': 13700,
+    //   'gasprice': '0.00000000000001',
+    //   'gasused': 13700,
+    //   'txfee': "0.0137000000",
+    //   'data':
+    //       '0101014602d46e4656a1728c310f0aed6fe5badcb5871382f02620dfdc15f2094b802600050168e4dca5989876ca64f16537e82d05c103e5695dfaf009a01632cb33639cc53000000000',
+    //   'sig':
+    //       '387aa107a4ccd37816f9103cf05d3d37dd980c65db4c8a8e140fdf1b3c65c1b85c97aa06a898d9c3bdf1470618c19644482d768da6439bddf718658914abc705',
+    //   'fork':
+    //       '0000000027734445141a588af514fba7f24869c830399fe09a1355815b60040d',
+    //   'height': 22,
+    //   'blockhash':
+    //       '00000016b8b3a1db3bfb02dd4f81e337390962dc89458b82d1f5f2e68007a318',
+    //   'confirmations': 4,
+    //   'serialization':
+    //       '010000007dc143620000000027734445141a588af514fba7f24869c830399fe09a1355815b60040d02000000000000000168e4dca5989876ca64f16537e82d05c103e5695dfaf009a01632cb33639cc530026951d202db1a2cb19dec4d1150fa789e215a8ac8d0f7483b4b6e3d90e1e40007000000000000000000000000000000000000000000000000000001d1a94a2000000000000000000000000000000000000000000000000000000000000000271000000000000000000000000000000000000000000000000000000000000035840101014602d46e4656a1728c310f0aed6fe5badcb5871382f02620dfdc15f2094b802600050168e4dca5989876ca64f16537e82d05c103e5695dfaf009a01632cb33639cc5300000000040387aa107a4ccd37816f9103cf05d3d37dd980c65db4c8a8e140fdf1b3c65c1b85c97aa06a898d9c3bdf1470618c19644482d768da6439bddf718658914abc705'
+    // };
+
+    // ret = getTx(tx);
+    // final privateKey = Uint8List.fromList(HEX.decode(
+    //     'ab14e1de9a0e805df0c79d50e1b065304814a247e7d52fc51fd0782e0eec27d6'));
+    // final rpk = Uint8List.fromList(privateKey.reversed.toList());
+    // final public = publicKey(rpk);
+    // final txHash = HEX.decode(ret['tx_hash']);
+    // final signHex = sign(txHash as Uint8List, rpk, public);
+    // expect('${ret['tx_hex']}40${HEX.encode(signHex)}',
+    //     equals(tx['serialization']));
 
     /*
     final Blake2bDigest digest = Blake2bDigest(digestSize: 32);
@@ -159,4 +199,4 @@ void main() async {
 	   owner="1965p604xzdrffvg90ax9bk0q3xyqn5zz2vc9zpbe3wdswzazj7d144mm"
     */
   });*/
-}
+// }

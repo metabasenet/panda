@@ -53,7 +53,11 @@ class _AssetDposDetail extends State<AssetDposDetail> {
               child: CSButton(
                 label: tr('asset:lbl_vote_button'),
                 onPressed: () {
-                  handleCreateTransaction(context, viewModel, true);
+                  if (double.parse(addressBalance) > 0) {
+                    handleCreateTransaction(context, viewModel, true);
+                  } else {
+                    Toast.show(tr('global:msg_insufficient_voting_amount'));
+                  }
                 },
                 bordered: true,
                 backgroundColor: context.bgPrimaryColor,
@@ -64,12 +68,11 @@ class _AssetDposDetail extends State<AssetDposDetail> {
               child: CSButton(
                 label: tr('asset:lbl_withdrawal_button'),
                 onPressed: () {
-                  var l1 = double.parse(investedAmount);
-                  if (l1 > 0) {
+                  if (double.parse(investedAmount) > 0) {
                     handleCreateTransaction(context, viewModel, false);
-                  } // else {
-                  //null;
-                  //}
+                  } else {
+                    Toast.show(tr('global:msg_insufficient_withdrawal_amount'));
+                  }
                 },
               ),
             ),
