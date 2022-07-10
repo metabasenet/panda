@@ -30,7 +30,6 @@ Map<String, String> getRedeem(String owner, int nonce) {
   final Blake2bDigest digest = Blake2bDigest(digestSize: 32);
   digest.reset();
   final ret1 = base32Decode(owner);
-  //final ret2 = base32Decode(delegate);
   final prefix = Uint8List.fromList([8, 0]);
   final ret2 = Uint8List.fromList([
     nonce % 256,
