@@ -23,6 +23,7 @@ class AssetDposDetail extends StatefulWidget {
 
 class _AssetDposDetail extends State<AssetDposDetail> {
   String nodeAddress = '';
+  String redeemAddress = '';
   String compoundInterestAddress = '';
   String superNodeAddress = '';
   String superNodeName = '';
@@ -32,12 +33,15 @@ class _AssetDposDetail extends State<AssetDposDetail> {
   String withdrawalAmount = '';
   dynamic nonce;
   dynamic nonceWithdrawal;
+  dynamic nonceRedeem;
   //dynamic gas_price;
   //dynamic gas_limit;
   dynamic status = 1;
   dynamic txData;
   final myController = TextEditingController();
-  late String hex;
+  String hex = '';
+  String hexRedeem = '';
+
   Widget buildFooter(BuildContext context, AssetWithdrawVM viewModel) {
     return Container(
       color: context.bgPrimaryColor,
@@ -54,7 +58,7 @@ class _AssetDposDetail extends State<AssetDposDetail> {
                 label: tr('asset:lbl_vote_button'),
                 onPressed: () {
                   if (double.parse(addressBalance) > 0) {
-                    handleCreateTransaction(context, viewModel, true);
+                    handleCreateTransaction(context, viewModel, 1);
                   } else {
                     Toast.show(tr('global:msg_insufficient_voting_amount'));
                   }
@@ -68,11 +72,25 @@ class _AssetDposDetail extends State<AssetDposDetail> {
               child: CSButton(
                 label: tr('asset:lbl_withdrawal_button'),
                 onPressed: () {
-                  if (double.parse(investedAmount) > 0) {
-                    handleCreateTransaction(context, viewModel, false);
-                  } else {
+                  if (double.parse(investedAmount) <= 0) {
                     Toast.show(tr('global:msg_insufficient_withdrawal_amount'));
+                  } else if (double.parse(myController.text) >
+                      double.parse(investedAmount)) {
+                    Toast.show(
+                      tr('global:msg_insufficient_withdrawal_greater_amount'),
+                    );
+                  } else {
+                    handleCreateTransaction(context, viewModel, 2);
                   }
+                },
+              ),
+            ),
+            SizedBox(width: context.edgeSize),
+            Flexible(
+              child: CSButton(
+                label: tr('asset:lbl_redemption_button'),
+                onPressed: () {
+                  handleCreateTransaction(context, viewModel, 3);
                 },
               ),
             ),
@@ -83,8 +101,11 @@ class _AssetDposDetail extends State<AssetDposDetail> {
   }
 
   void handleCreateTransaction(
-      BuildContext context, AssetWithdrawVM viewModel, bool isTou) {
-    assemblyTransaction(isTou);
+    BuildContext context,
+    AssetWithdrawVM viewModel,
+    int isTouFlag,
+  ) {
+    assemblyTransaction(isTouFlag);
     showPasswordDialog(
       context,
       (password) => viewModel.doUnlockWallet(password),
@@ -119,32 +140,70 @@ class _AssetDposDetail extends State<AssetDposDetail> {
     });
 
     getVoteAddress();
+    getRedeemAddress();
     getCompoundInterestAddress();
     fetchNosData();
     getAvailableAmount();
     getInvestedAmount();
+    getRedeemAmount();
     fetchWithdrawalNosData();
+    fetchRedeemNosData();
   }
 
-  void assemblyTransaction(bool isTou) {
-    // bool isTou = true;
-    dynamic address;
-    if (status == 1) {
-      address = nodeAddress;
-    } else {
-      address = compoundInterestAddress;
+  void assemblyTransaction(int isTouFlag) {
+    dynamic fromAddress;
+    dynamic toAddress;
+    dynamic nonceCount;
+    String data;
+    String amount = '';
+
+    // if (status == 1) {
+    //   address = nodeAddress;
+    // } else {
+    //   address = compoundInterestAddress;
+    // }
+
+    if (isTouFlag == 1) {
+      fromAddress = widget.coinInfo.address;
+      toAddress = nodeAddress;
+      nonceCount = nonce;
+      data = '01010146$hex';
+    } else if (isTouFlag == 2) {
+      fromAddress = nodeAddress;
+      toAddress = redeemAddress;
+      nonceCount = nonceWithdrawal;
+      data = '01010129$hexRedeem';
+    } else if (isTouFlag == 3) {
+      fromAddress = redeemAddress;
+      toAddress = widget.coinInfo.address;
+      nonceCount = nonceRedeem;
+      data = '00';
     }
+
+    if (double.parse(myController.text) == double.parse(investedAmount)) {
+      amount = (double.parse(myController.text) - 0.02).toString();
+    } else if ((double.parse(myController.text) + 0.01) ==
+        double.parse(investedAmount)) {
+      amount = (double.parse(myController.text) + 0.01).toString();
+    } else {
+      amount = myController.text;
+    }
+
     final time = (DateTime.now().millisecondsSinceEpoch ~/ 1000).toInt();
     final params = {
       'time': time,
       'fork': AppConstants.mnt_fork,
-      'nonce': isTou ? nonce : nonceWithdrawal,
-      'from': isTou ? widget.coinInfo.address : address,
-      'to': isTou ? address : widget.coinInfo.address,
-      'amount': myController.text,
+      //'nonce': isTou ? nonce : nonceWithdrawal,
+      'nonce': nonceCount,
+      //'from': isTou ? widget.coinInfo.address : address,
+      //'to': isTou ? address : widget.coinInfo.address,
+      'from': fromAddress,
+      'to': toAddress,
+      'amount': amount,
       'gasprice': '1000000000000',
       'gaslimit': '20000',
-      'data': isTou ? '01010146$hex' : '00',
+      //'data': isTou ? '01010146$hex' : '00',
+      'data': data,
     };
     final ret = getTx(params as Map<String, Object>);
     setState(() {
@@ -159,6 +218,15 @@ class _AssetDposDetail extends State<AssetDposDetail> {
     setState(() {
       nodeAddress = ret['address'].toString();
       hex = ret['hex'].toString();
+    });
+  }
+
+  //get Redeem address
+  void getRedeemAddress() {
+    final ret = getRedeem(widget.coinInfo.address.toString(), 0);
+    setState(() {
+      redeemAddress = ret['address'].toString();
+      hexRedeem = ret['hex'].toString();
     });
   }
 
@@ -191,6 +259,15 @@ class _AssetDposDetail extends State<AssetDposDetail> {
     });
   }
 
+  // Withdrawal nonce
+  void fetchRedeemNosData() async {
+    var res = await AssetRepository()
+        .getTransactionFee(address: redeemAddress, symbol: '');
+    setState(() {
+      nonceRedeem = res?['nonce'] + 1;
+    });
+  }
+
 // get Available voting amount
   void getAvailableAmount() async {
     final apiBalance = await AssetRepository().getCoinBalance(
@@ -215,9 +292,24 @@ class _AssetDposDetail extends State<AssetDposDetail> {
     );
 
     setState(() {
-      investedAmount = (Decimal.parse(apiBalance['balance'].toString()) +
-              Decimal.parse(apiBalance['locked'].toString()))
-          .toStringAsFixed(6);
+      investedAmount =
+          Decimal.parse(apiBalance['balance'].toString()).toStringAsFixed(6);
+      // locked = NumberUtil.getFixed(apiBalance['locked'].toString(), 6);
+      // withdrawalAmount =
+      // NumberUtil.getFixed(apiBalance['balance'].toString(), 6);
+    });
+  }
+
+  // get RedeemAmount
+  void getRedeemAmount() async {
+    final apiBalance = await AssetRepository().getCoinBalance(
+      chain: widget.coinInfo.chain.toString(),
+      symbol: widget.coinInfo.symbol.toString(),
+      address: redeemAddress,
+      contract: '',
+    );
+
+    setState(() {
       locked = NumberUtil.getFixed(apiBalance['locked'].toString(), 6);
       withdrawalAmount =
           NumberUtil.getFixed(apiBalance['balance'].toString(), 6);
@@ -392,7 +484,7 @@ class _AssetDposDetail extends State<AssetDposDetail> {
                   //locked amount
                   FormBox(
                     type: FormBoxType.inputText,
-                    title: tr('asset:amount_of_locked'),
+                    title: tr('asset:amount_of_lock_redemption'),
                     readOnly: true,
                     onPressIcon: () {},
                     hintText: tr(locked),
@@ -421,7 +513,7 @@ class _AssetDposDetail extends State<AssetDposDetail> {
                   ),
                   FormBox(
                     type: FormBoxType.inputText,
-                    title: tr('asset:amount_of_withdrawal'),
+                    title: tr('asset:amount_of_redeemable'),
                     readOnly: true,
                     onPressIcon: () {},
                     hintText: tr(withdrawalAmount),
@@ -501,7 +593,7 @@ class _AssetDposDetail extends State<AssetDposDetail> {
                       type: FormBoxType.inputText,
                       title: tr('asset:gas_free'),
                       iconColor: context.bodyColor,
-                      hintText: tr('0.000001'),
+                      hintText: tr('0.02'),
                       maxLines: null,
                       readOnly: true)
                 ],
