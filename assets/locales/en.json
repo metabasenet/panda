@@ -372,6 +372,7 @@
   "asset:amount_of_votes": "Available voting amount",
   "asset:amount_of_amountvoted": "Invested amount",
   "asset:amount_of_redeemable": "Redeemable amount",
+  "asset:amount_of_Lock redemption amount": "Lock redemption amount",
   "asset:amount_of_locked": "Lock voting amount",
   "asset:amount_of_withdrawal": "Available withdrawal amount",
   "asset:compound_interest_address": "Voting address",

@@ -372,6 +372,7 @@
   "asset:amount_of_votes": "可用投票金额",
   "asset:amount_of_amountvoted": "已投票金额",
   "asset:amount_of_redeemable": "可赎回金额",
+  "asset:amount_of_Lock redemption amount": "锁定赎回金额",
   "asset:amount_of_locked": "锁定投票金额",
   "asset:amount_of_withdrawal": "可撤投金额",
   "asset:compound_interest_address": "投票地址",
