@@ -254,6 +254,7 @@
   "asset:lbl_withdraw": "Withdraw",
   "asset:lbl_vote_button": "Vote",
   "asset:lbl_withdrawal_button": "Withdrawal",
+  "asset:lbl_redemption_button": "redemption",
   "asset:lbl_vote_detail": "Voting details",
   "asset:lbl_vote_currency": "Voting currency",
   "asset:lbl_vote_address": "Voting address",

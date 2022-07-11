@@ -254,6 +254,7 @@
   "asset:lbl_withdraw": "提现",
   "asset:lbl_vote_button": "投票",
   "asset:lbl_withdrawal_button": "撤投",
+  "asset:lbl_redemption_button": "赎回",
   "asset:lbl_vote_detail": "投票详情",
   "asset:lbl_vote_currency": "投票币种",
   "asset:lbl_vote_address": "投票地址",
