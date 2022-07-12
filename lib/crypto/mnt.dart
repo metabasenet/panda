@@ -26,6 +26,29 @@ Map<String, String> getVote(String delegate, String owner, int rewardmode) {
   return {'hex': hex, 'address': voteAddr};
 }
 
+Map<String, String> getRedeem(String owner, int nonce) {
+  final Blake2bDigest digest = Blake2bDigest(digestSize: 32);
+  digest.reset();
+  final ret1 = base32Decode(owner);
+  final prefix = Uint8List.fromList([8, 0]);
+  final ret2 = Uint8List.fromList([
+    nonce % 256,
+    (nonce >> 8) % 256,
+    (nonce >> 16) % 256,
+    (nonce >> 24) % 256,
+    0,
+    0,
+    0,
+    0
+  ]);
+  final ret = ret1 + ret2;
+  final hashRet = digest.process(Uint8List.fromList(ret));
+  final hexAddr = prefix + hashRet.sublist(0, 30);
+  final redeemAddr = '2${base32Encode(Uint8List.fromList(hexAddr))}';
+  final hex = HEX.encode(ret1 + ret2);
+  return {'hex': hex, 'address': redeemAddr};
+}
+
 Uint8List float2hex(String str, {bool enlarge = false}) {
   final ret = List.filled(32, 0); // List<int>(32);
   var value = Decimal.parse(str);
