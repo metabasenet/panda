@@ -31,6 +31,8 @@ class _AssetDposDetail extends State<AssetDposDetail> {
   String locked = '';
   String investedAmount = '';
   String withdrawalAmount = '';
+  String redeemAmount = '';
+  double redeemDoubleAmount = 0;
   dynamic nonce;
   dynamic nonceWithdrawal;
   dynamic nonceRedeem;
@@ -86,12 +88,15 @@ class _AssetDposDetail extends State<AssetDposDetail> {
               ),
             ),
             SizedBox(width: context.edgeSize),
-            Flexible(
-              child: CSButton(
-                label: tr('asset:lbl_redemption_button'),
-                onPressed: () {
-                  handleCreateTransaction(context, viewModel, 3);
-                },
+            Visibility(
+              visible: redeemDoubleAmount > 0 ? true : false,
+              child: Flexible(
+                child: CSButton(
+                  label: tr('asset:lbl_redemption_button'),
+                  onPressed: () {
+                    handleCreateTransaction(context, viewModel, 3);
+                  },
+                ),
               ),
             ),
           ],
@@ -154,55 +159,49 @@ class _AssetDposDetail extends State<AssetDposDetail> {
     dynamic fromAddress;
     dynamic toAddress;
     dynamic nonceCount;
-    String data;
+    dynamic data;
     String amount = '';
-
-    // if (status == 1) {
-    //   address = nodeAddress;
-    // } else {
-    //   address = compoundInterestAddress;
-    // }
 
     if (isTouFlag == 1) {
       fromAddress = widget.coinInfo.address;
       toAddress = nodeAddress;
       nonceCount = nonce;
       data = '01010146$hex';
+      amount = myController.text;
     } else if (isTouFlag == 2) {
       fromAddress = nodeAddress;
       toAddress = redeemAddress;
       nonceCount = nonceWithdrawal;
       data = '01010129$hexRedeem';
+      if (myController.text.isNotEmpty) {
+        if (double.parse(myController.text) == double.parse(investedAmount)) {
+          amount = (double.parse(myController.text) - 0.02).toString();
+        } else if ((double.parse(myController.text) + 0.01) ==
+            double.parse(investedAmount)) {
+          amount = (double.parse(myController.text) - 0.01).toString();
+        } else {
+          amount = myController.text;
+        }
+      }
     } else if (isTouFlag == 3) {
       fromAddress = redeemAddress;
       toAddress = widget.coinInfo.address;
       nonceCount = nonceRedeem;
       data = '00';
-    }
-
-    if (double.parse(myController.text) == double.parse(investedAmount)) {
-      amount = (double.parse(myController.text) - 0.02).toString();
-    } else if ((double.parse(myController.text) + 0.01) ==
-        double.parse(investedAmount)) {
-      amount = (double.parse(myController.text) + 0.01).toString();
-    } else {
-      amount = myController.text;
+      amount = redeemAmount;
+      //amount = myController.text;
     }
 
     final time = (DateTime.now().millisecondsSinceEpoch ~/ 1000).toInt();
     final params = {
       'time': time,
       'fork': AppConstants.mnt_fork,
-      //'nonce': isTou ? nonce : nonceWithdrawal,
       'nonce': nonceCount,
-      //'from': isTou ? widget.coinInfo.address : address,
-      //'to': isTou ? address : widget.coinInfo.address,
       'from': fromAddress,
       'to': toAddress,
       'amount': amount,
       'gasprice': '1000000000000',
       'gaslimit': '20000',
-      //'data': isTou ? '01010146$hex' : '00',
       'data': data,
     };
     final ret = getTx(params as Map<String, Object>);
@@ -313,6 +312,9 @@ class _AssetDposDetail extends State<AssetDposDetail> {
       locked = NumberUtil.getFixed(apiBalance['locked'].toString(), 6);
       withdrawalAmount =
           NumberUtil.getFixed(apiBalance['balance'].toString(), 6);
+      redeemDoubleAmount = double.parse(apiBalance['balance'].toString());
+      redeemAmount = (double.parse(apiBalance['balance'].toString()) - 0.01)
+          .toStringAsFixed(6);
     });
   }
 
