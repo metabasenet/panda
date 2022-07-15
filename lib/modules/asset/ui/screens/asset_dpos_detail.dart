@@ -161,18 +161,22 @@ class _AssetDposDetail extends State<AssetDposDetail> {
     dynamic nonceCount;
     dynamic data;
     String amount = '';
+    String gaslimit = '';
 
     if (isTouFlag == 1) {
       fromAddress = widget.coinInfo.address;
       toAddress = nodeAddress;
       nonceCount = nonce;
+      gaslimit = '20000';
       data = '01010146$hex';
       amount = myController.text;
     } else if (isTouFlag == 2) {
       fromAddress = nodeAddress;
       toAddress = redeemAddress;
       nonceCount = nonceWithdrawal;
-      data = '01010129$hexRedeem';
+      //data = '01010129$hexRedeem';
+      gaslimit = '10000';
+      data = '00';
       if (myController.text.isNotEmpty) {
         if (double.parse(myController.text) == double.parse(investedAmount)) {
           amount = (double.parse(myController.text) - 0.02).toString();
@@ -187,6 +191,7 @@ class _AssetDposDetail extends State<AssetDposDetail> {
       fromAddress = redeemAddress;
       toAddress = widget.coinInfo.address;
       nonceCount = nonceRedeem;
+      gaslimit = '10000';
       data = '00';
       amount = redeemAmount;
       //amount = myController.text;
@@ -201,7 +206,7 @@ class _AssetDposDetail extends State<AssetDposDetail> {
       'to': toAddress,
       'amount': amount,
       'gasprice': '1000000000000',
-      'gaslimit': '20000',
+      'gaslimit': gaslimit,
       'data': data,
     };
     final ret = getTx(params as Map<String, Object>);
@@ -293,9 +298,6 @@ class _AssetDposDetail extends State<AssetDposDetail> {
     setState(() {
       investedAmount =
           Decimal.parse(apiBalance['balance'].toString()).toStringAsFixed(6);
-      // locked = NumberUtil.getFixed(apiBalance['locked'].toString(), 6);
-      // withdrawalAmount =
-      // NumberUtil.getFixed(apiBalance['balance'].toString(), 6);
     });
   }
 
@@ -312,7 +314,15 @@ class _AssetDposDetail extends State<AssetDposDetail> {
       locked = NumberUtil.getFixed(apiBalance['locked'].toString(), 6);
       withdrawalAmount =
           NumberUtil.getFixed(apiBalance['balance'].toString(), 6);
-      redeemDoubleAmount = double.parse(apiBalance['balance'].toString());
+
+      double douBalance = double.parse(apiBalance['balance'].toString());
+      if (douBalance <= 0) {
+        redeemDoubleAmount = 0;
+      } else {
+        redeemDoubleAmount =
+            douBalance - double.parse(apiBalance['unconfirmed'].toString());
+      }
+
       redeemAmount = (double.parse(apiBalance['balance'].toString()) - 0.01)
           .toStringAsFixed(6);
     });
@@ -518,7 +528,7 @@ class _AssetDposDetail extends State<AssetDposDetail> {
                     title: tr('asset:amount_of_redeemable'),
                     readOnly: true,
                     onPressIcon: () {},
-                    hintText: tr(withdrawalAmount),
+                    hintText: tr(redeemDoubleAmount.toString()),
                     titleAction: Transform.translate(
                       offset: Offset(context.edgeSize, 0),
                       child: CSButton(
