@@ -10,6 +10,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_page_indicator/flutter_page_indicator.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:built_collection/src/list.dart';
+import 'package:flutter_hooks/flutter_hooks.dart' hide Store;
 
 // Project imports:
 import 'package:mars/dialogs/dialogs.dart';

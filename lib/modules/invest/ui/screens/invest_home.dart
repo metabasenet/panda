@@ -36,6 +36,17 @@ class InvestHomePage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final backLastTime = useState(0);
+
+    useEffect(
+      () {
+        // When change language, force refresh
+        backLastTime.value = backLastTime.value - 1;
+        return null;
+      },
+      [context.locale.languageCode],
+    );
+
     final selectedTab = useState(InvestTabs.loading);
 
     final isLoaded = selectedTab.value != InvestTabs.loading &&

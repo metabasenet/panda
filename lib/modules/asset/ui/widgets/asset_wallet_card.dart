@@ -17,6 +17,17 @@ class AssetWalletCard extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final backLastTime = useState(0);
+
+    useEffect(
+      () {
+        // When change language, force refresh
+        backLastTime.value = backLastTime.value - 1;
+        return null;
+      },
+      [context.locale.languageCode],
+    );
+
     return CSContainer(
       margin: EdgeInsets.zero,
       padding: context.edgeVertical5,

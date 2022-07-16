@@ -2,7 +2,7 @@ part of asset_ui_module;
 
 // var _ignoreIndexChange = false;
 
-class AssetListPage extends StatelessWidget {
+class AssetListPage extends HookWidget {
   final refreshController = CSRefresherController();
   final scrollController = ScrollController();
   final swiperController = SwiperController();
@@ -218,6 +218,17 @@ class AssetListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final backLastTime = useState(0);
+
+    useEffect(
+      () {
+        // When change language, force refresh
+        backLastTime.value = backLastTime.value - 1;
+        return null;
+      },
+      [context.locale.languageCode],
+    );
+
     return CSScaffold(
       hideLeading: true,
       titleCenter: false,

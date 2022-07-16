@@ -2,7 +2,7 @@ part of home_ui_module;
 
 var _hasShownNewVersionDialog = kDebugMode;
 
-class HomePage extends StatelessWidget {
+class HomePage extends HookWidget {
   final refreshController = CSRefresherController();
 
   void handleOpenBannerPage(HomeBanner bannerItem) {
@@ -40,6 +40,17 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final backLastTime = useState(0);
+
+    useEffect(
+      () {
+        // When change language, force refresh
+        backLastTime.value = backLastTime.value - 1;
+        return null;
+      },
+      [context.locale.languageCode],
+    );
+
     return CSScaffold(
       hideLeading: true,
       titleCenter: false,
