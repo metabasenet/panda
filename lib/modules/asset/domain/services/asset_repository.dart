@@ -130,8 +130,8 @@ class AssetRepository {
     return res;
   }
 
-  Future<List<dynamic>?> getVoteNode() async {
-    final res = await _api.getVoteNodeList();
+  Future<List<dynamic>?> getVoteNode({required String address}) async {
+    final res = await _api.getVoteNodeList(address: address);
     return res;
   }
 

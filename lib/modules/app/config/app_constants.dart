@@ -2,7 +2,7 @@ part of app_module;
 
 class AppConstants {
   static const mnt_fork =
-      '000000007b3d3956a54c231f74ed02f621c71f62aa9f7def149050d55085f93f';
+      '00000000ed7baa7cd66a44d0c6f98efa3c3e8972bf30ef7fc3b50f043ebe5b30';
 
   static const mnt_chain = '\u{0042}\u{0042}\u{0043}';
 
@@ -18,10 +18,10 @@ class AppConstants {
 
   // Api/Service data
   static const apiUrl = [
-    'http://124.221.253.93:7711',
+    'https://browser.Metabasenet.site/api',
   ];
   static const apiUrlDev = [
-    'http://124.221.253.93:7711/mars_api',
+    'https://browser.Metabasenet.site/api/mars_api',
   ];
   static const imageUrl = 'https://image.mars.com/';
 
@@ -57,6 +57,8 @@ class AppConstants {
   static const bridge_bsc = '0x0873093DEb492A6425d85906E2CE6E856BCDC71F';
 
   static const fiatPrecision = 2;
+  static const dposAddress =
+      '20m0ev7vq3eaef86yjb1asn83naskyy8m26nsf9jkbbvjvsb4tnnztspr';
 
   static String get sentryDns => isBeta ? sentryDnsBeta : sentryDnsProd;
 

@@ -146,11 +146,13 @@ class _AssetDposList extends State<AssetDposList> {
 
   @override
   void initState() {
-    AssetRepository().getVoteNode().then((res) => {
-          setState(() {
-            voteNodeList = res as List<dynamic>;
-          }),
-        });
+    AssetRepository()
+        .getVoteNode(address: AppConstants.dposAddress)
+        .then((res) => {
+              setState(() {
+                voteNodeList = res as List<dynamic>;
+              }),
+            });
   }
 
   void onChanged() {

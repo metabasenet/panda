@@ -50,16 +50,16 @@ class FiatPriceState {
     double amount = 1,
   }) {
     if (prices == null) {
-      return '-';
+      return '0';
     }
     final price = coinPrice.price;
 
     if (price <= 0) {
-      return '-';
+      return '0';
     }
 
     if (amount <= 0) {
-      return '0.0';
+      return '0';
     }
 
     final total = price * amount;

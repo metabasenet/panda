@@ -35,9 +35,10 @@ class AssetApi {
     return data as Map<String, dynamic>;
   }
 
-  Future<List<dynamic>> getVoteNodeList() async {
+  Future<List<dynamic>> getVoteNodeList({required String address}) async {
     final dio = Dio();
-    final response = await dio.get('${AppConstants.randomApiUrl}/listdelegate');
+    final response = await dio
+        .get('${AppConstants.randomApiUrl}/listdelegate?address=$address');
     final data = response.data;
     return data as List<dynamic>;
   }
