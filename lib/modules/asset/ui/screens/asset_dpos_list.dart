@@ -175,6 +175,8 @@ class _AssetDposList extends State<AssetDposList> {
           children: [
             Expanded(
               child: CSListViewStream<_GetAssetListParams>(
+                enablePullDown: false,
+                enablePullUp: false,
                 margin: context.edgeHorizontal,
                 padding: context.edgeAll,
                 decoration: context.boxDecorationOnlyTop(),
