@@ -14,7 +14,8 @@ class AppLinks {
       lang == 'zh' ? appContactUrlZh : appContactUrlEn;
 
   static const appWebsiteUrl = 'https://metabasenet.club/';
-  static const appHelpeUrl = 'https://browser.Metabasenet.site/api';
+  static const appHelpeUrl =
+      'http://124.221.253.93:7711'; //'https://browser.Metabasenet.site/api';
 
   static String helpContactUrl(String lang) {
     return '$appHelpeUrl/publish.html?language=$lang';

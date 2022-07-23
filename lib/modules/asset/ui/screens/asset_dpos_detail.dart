@@ -146,7 +146,6 @@ class _AssetDposDetail extends State<AssetDposDetail> {
 
     getVoteAddress();
     getRedeemAddress();
-    getCompoundInterestAddress();
     fetchNosData();
     getAvailableAmount();
     getInvestedAmount();
@@ -174,9 +173,9 @@ class _AssetDposDetail extends State<AssetDposDetail> {
       fromAddress = nodeAddress;
       toAddress = redeemAddress;
       nonceCount = nonceWithdrawal;
-      //data = '01010129$hexRedeem';
-      gaslimit = '10000';
-      data = '00';
+      data = '01010129$hexRedeem';
+      gaslimit = '20000';
+      //data = '00';
       if (myController.text.isNotEmpty) {
         if (double.parse(myController.text) == double.parse(investedAmount)) {
           amount = (double.parse(myController.text) - 0.02).toString();
@@ -217,8 +216,11 @@ class _AssetDposDetail extends State<AssetDposDetail> {
 
   //get vote address
   void getVoteAddress() {
-    final ret = getVote(widget.voteNodeItem['address'].toString(),
-        widget.coinInfo.address.toString(), 1);
+    final ret = getVote(
+      widget.voteNodeItem['address'].toString(),
+      widget.coinInfo.address.toString(),
+      0,
+    );
     setState(() {
       nodeAddress = ret['address'].toString();
       hex = ret['hex'].toString();
@@ -235,13 +237,13 @@ class _AssetDposDetail extends State<AssetDposDetail> {
   }
 
   //Get compound interest address
-  void getCompoundInterestAddress() {
-    final ret = getVote(widget.voteNodeItem['address'].toString(),
-        widget.coinInfo.address.toString(), 0);
-    setState(() {
-      compoundInterestAddress = ret['address'].toString();
-    });
-  }
+  // void getCompoundInterestAddress() {
+  //   final ret = getVote(widget.voteNodeItem['address'].toString(),
+  //       widget.coinInfo.address.toString(), 0);
+  //   setState(() {
+  //     compoundInterestAddress = ret['address'].toString();
+  //   });
+  // }
 
   // get nonce
   void fetchNosData() async {

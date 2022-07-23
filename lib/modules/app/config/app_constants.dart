@@ -18,10 +18,12 @@ class AppConstants {
 
   // Api/Service data
   static const apiUrl = [
-    'https://browser.Metabasenet.site/api',
+    //'https://browser.Metabasenet.site/api',
+    'http://124.221.253.93:7711',
   ];
   static const apiUrlDev = [
-    'https://browser.Metabasenet.site/api/mars_api',
+    //'https://browser.Metabasenet.site/api/mars_api',
+    'http://124.221.253.93:7711/mars_api',
   ];
   static const imageUrl = 'https://image.mars.com/';
 

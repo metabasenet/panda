@@ -1,6 +1,6 @@
 part of wallet_ui_module;
 
-class WalletCreateButtons extends StatelessWidget {
+class WalletCreateButtons extends HookWidget {
   const WalletCreateButtons({
     this.isEmptyPage = false,
     this.isUseDialog = false,
@@ -11,6 +11,17 @@ class WalletCreateButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final backLastTime = useState(0);
+
+    useEffect(
+      () {
+        // When change language, force refresh
+        backLastTime.value = backLastTime.value - 1;
+        return null;
+      },
+      [context.locale.languageCode],
+    );
+
     return Padding(
       padding: context.edgeAll,
       child: Column(
