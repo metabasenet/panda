@@ -356,7 +356,7 @@ class AssetWithdrawPage extends HookWidget {
                       type: FormBoxType.inputText,
                       title: tr('asset:gas_free'),
                       iconColor: context.bodyColor,
-                      hintText: tr('0.02'),
+                      hintText: tr('0.01'),
                       maxLines: null,
                       readOnly: true),
                 ],
