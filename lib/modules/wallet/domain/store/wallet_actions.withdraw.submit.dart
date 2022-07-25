@@ -338,14 +338,19 @@ class WalletActionMNTTxSubmit extends _BaseAction {
       signedTx: signedTx,
       walletId: walletData.walletId!,
     );
-    dispatch(
-      AssetActionAddTransaction(
-        Transaction.fromSubmit(
-          params: params,
-          txId: txId,
+
+    if (txId.contains('-10')) {
+    } else {
+      dispatch(
+        AssetActionAddTransaction(
+          Transaction.fromSubmit(
+            params: params,
+            txId: txId,
+          ),
         ),
-      ),
-    );
+      );
+    }
+
     completer.complete(txId);
     return null;
   }
