@@ -18,6 +18,7 @@ class InvestActionGetProfitRecordList extends _BaseAction {
         .where((element) => element.chain == AppConstants.mnt_chain)
         .first;
 
+    //get nodeAddress
     final ret = getVote(
       coin.address,
       coin.address,
