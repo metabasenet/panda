@@ -17,7 +17,6 @@ cp -r ./resources/image/$1/image/* ./assets/images/
 #cp -r /home/rui/wang/image/$1/image/* /home/rui/mnt/mars/assets/images/2.0x/
 #cp -r /home/rui/wang/image/$1/image/* /home/rui/mnt/mars/assets/images/3.0x/
 #version
-
 version='applicationId "com.'$1'.mnt"'
 #echo $version
 sed -i "41c${version}" ./android/app/build.gradle
@@ -27,10 +26,15 @@ walletpath="name: '"$1"',"
 sed -i "6c${walletpath}" ./lib/modules/wallet/domain/utils/wallet_path_utils.dart
 #dpos
 dpos='\"'$2'\";'
-#echo dpos
+# echo dpos
 sed -i "63c${dpos}" ./lib/modules/app/config/app_constants.dart
-cd ./
+#Version download
 dposname=${2:47:10}
+download="return 'https://browser.metabasenet.site/api/download.html?language=\$lang&fruits="$dposname"';"
+sed -i "35c${download}" ./lib/modules/app/config/app_links.dart
+# echo $download
+cd ./
+
 # echo $dposname
 #if ["$3" = '1']; then
 flutter build apk --no-sound-null-safety
