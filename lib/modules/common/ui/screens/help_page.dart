@@ -132,6 +132,10 @@ class HelpCenterPage extends HookWidget {
             title: tr('user:help_manual_transaction'),
             url: AppLinks.transactionUrl(context.locale.languageCode),
           ),
+          HelpCenterLink(
+            title: tr('user:help_manual_edition'),
+            url: AppLinks.editionUrl(context.locale.languageCode),
+          ),
         ],
       ),
     ];

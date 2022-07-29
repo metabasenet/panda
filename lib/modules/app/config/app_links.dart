@@ -15,7 +15,7 @@ class AppLinks {
 
   static const appWebsiteUrl = 'https://metabasenet.club/';
 
-  static const appHelpeUrl = 'https://browser.Metabasenet.site/api';
+  static const appHelpeUrl = 'https://browser.metabasenet.site/api';
   // static const appHelpeUrl =
   //     'http://124.221.253.93:7711';
 
@@ -29,6 +29,10 @@ class AppLinks {
 
   static String transactionUrl(String lang) {
     return '$appHelpeUrl/transaction.html?language=$lang';
+  }
+
+  static String editionUrl(String lang) {
+    return '$appHelpeUrl/download.html?language=$lang&fruits=6vck39eqn4';
   }
 
   static const appTwitter = '';
