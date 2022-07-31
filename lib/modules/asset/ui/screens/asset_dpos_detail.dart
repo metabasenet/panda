@@ -2,17 +2,19 @@ part of asset_ui_module;
 
 class AssetDposDetail extends StatefulWidget {
 //  const AssetDposDetail({Key key, this.voteNodeItem, this.coinInfo}) : super(key: key);
-  const AssetDposDetail(this.voteNodeItem, this.coinInfo);
+  AssetDposDetail(this.voteNodeItem, this.coinInfo, this.nonce);
   static const routeName = '/asset/dpos/detail';
 
   final voteNodeItem;
   final coinInfo;
+  final nonce;
 
   static Route<dynamic> route(RouteSettings settings) {
     final params = settings.arguments as Map<dynamic, dynamic>;
     final node = params['voteNodeItem'];
     final coinInfos = params['coinInfo'];
-    return DefaultTransition(settings, AssetDposDetail(node, coinInfos));
+    final nonce = params['nonce'];
+    return DefaultTransition(settings, AssetDposDetail(node, coinInfos, nonce));
   }
 
   @override
@@ -22,7 +24,10 @@ class AssetDposDetail extends StatefulWidget {
 }
 
 class _AssetDposDetail extends State<AssetDposDetail> {
+  // final  noccce;
+  // _AssetDposDetail(this.noccce);
   String nodeAddress = '';
+  String nodeAddress1 = '';
   String redeemAddress = '';
   String compoundInterestAddress = '';
   String superNodeAddress = '';
@@ -42,7 +47,20 @@ class _AssetDposDetail extends State<AssetDposDetail> {
   dynamic txData;
   final myController = TextEditingController();
   String hex = '';
+  String hex1 = '';
   String hexRedeem = '';
+  int rewardmode = 0;
+  int nonrewardmode = 0;
+
+  getNonce() {
+    if (widget.nonce == 1) {
+      rewardmode = 1;
+      nonrewardmode = 0;
+    } else if (widget.nonce == 0) {
+      rewardmode = 0;
+      nonrewardmode = 1;
+    }
+  }
 
   Widget buildFooter(BuildContext context, AssetWithdrawVM viewModel) {
     return Container(
@@ -88,6 +106,15 @@ class _AssetDposDetail extends State<AssetDposDetail> {
               ),
             ),
             SizedBox(width: context.edgeSize),
+            Flexible(
+              child: CSButton(
+                label: tr('asset:lbl_transfer_accounts_button'),
+                onPressed: () {
+                  handleCreateTransaction(context, viewModel, 4);
+                },
+              ),
+            ),
+            SizedBox(width: context.edgeSize),
             Visibility(
               visible: redeemDoubleAmount > 0 ? true : false,
               child: Flexible(
@@ -99,6 +126,7 @@ class _AssetDposDetail extends State<AssetDposDetail> {
                 ),
               ),
             ),
+            SizedBox(width: context.edgeSize),
           ],
         ),
       ),
@@ -143,8 +171,9 @@ class _AssetDposDetail extends State<AssetDposDetail> {
       superNodeAddress = widget.voteNodeItem['address'].toString();
       superNodeName = widget.voteNodeItem['name'].toString();
     });
-
+    getNonce();
     getVoteAddress();
+    getVoteAddress1();
     getRedeemAddress();
     fetchNosData();
     getAvailableAmount();
@@ -194,6 +223,24 @@ class _AssetDposDetail extends State<AssetDposDetail> {
       data = '00';
       amount = redeemAmount;
       //amount = myController.text;
+    } else if (isTouFlag == 4) {
+      fromAddress = nodeAddress;
+      toAddress = nodeAddress1;
+      nonceCount = nonceWithdrawal;
+      gaslimit = '10000';
+      data = '00';
+      // amount = investedAmount;
+      amount = myController.text;
+      // if (myController.text.isNotEmpty) {
+      //   if (double.parse(myController.text) == double.parse(investedAmount)) {
+      //     amount = (double.parse(myController.text) - 0.02).toString();
+      //   } else if ((double.parse(myController.text) + 0.01) ==
+      //       double.parse(investedAmount)) {
+      //     amount = (double.parse(myController.text) - 0.01).toString();
+      //   } else {
+      //     amount = myController.text;
+      //   }
+      // }
     }
 
     final time = (DateTime.now().millisecondsSinceEpoch ~/ 1000).toInt();
@@ -219,7 +266,7 @@ class _AssetDposDetail extends State<AssetDposDetail> {
     final ret = getVote(
       widget.voteNodeItem['address'].toString(),
       widget.coinInfo.address.toString(),
-      0,
+      rewardmode,
     );
     setState(() {
       nodeAddress = ret['address'].toString();
@@ -227,9 +274,21 @@ class _AssetDposDetail extends State<AssetDposDetail> {
     });
   }
 
+  void getVoteAddress1() {
+    final ret = getVote(
+      widget.voteNodeItem['address'].toString(),
+      widget.coinInfo.address.toString(),
+      nonrewardmode,
+    );
+    setState(() {
+      nodeAddress1 = ret['address'].toString();
+      hex1 = ret['hex'].toString();
+    });
+  }
+
   //get Redeem address
   void getRedeemAddress() {
-    final ret = getRedeem(widget.coinInfo.address.toString(), 0);
+    final ret = getRedeem(widget.coinInfo.address.toString(), rewardmode);
     setState(() {
       redeemAddress = ret['address'].toString();
       hexRedeem = ret['hex'].toString();

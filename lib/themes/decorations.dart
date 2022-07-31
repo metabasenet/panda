@@ -14,9 +14,9 @@ extension DecorationStyles on BuildContext {
 
   BoxDecoration boxDecorationOnlyTop({Color? color, double? radius}) {
     return BoxDecoration(
-      borderRadius: BorderRadius.vertical(
-        top: Radius.circular(radius ?? edgeSize),
-      ),
+      // borderRadius: BorderRadius.vertical(
+      //     // top: Radius.circular(radius ?? edgeSize),
+      //     ),
       color: color ?? bgPrimaryColor,
     );
   }

@@ -5,12 +5,14 @@ class TransDropItem extends StatefulWidget {
     required this.item,
     required this.coinInfo,
     required this.onChanged,
+    required this.nonce,
     Key? key,
   }) : super(key: key);
 
   final item;
   final coinInfo;
   final onChanged;
+  final int nonce;
 
   @override
   State<StatefulWidget> createState() {
@@ -19,6 +21,8 @@ class TransDropItem extends StatefulWidget {
 }
 
 class _TransDropWidget extends State<TransDropItem> {
+  // final int noccce;
+  // _TransDropWidget(this.noccce);
   @override
   Widget build(BuildContext context) {
     return CSContainer(
@@ -29,7 +33,8 @@ class _TransDropWidget extends State<TransDropItem> {
         // print("点击了${widget.coinInfo}")
         AppNavigator.push('/asset/dpos/detail', params: {
           'voteNodeItem': widget.item,
-          'coinInfo': widget.coinInfo
+          'coinInfo': widget.coinInfo,
+          'nonce': widget.nonce,
         }).then((val) => {widget.onChanged()})
       },
       child: Column(

@@ -132,16 +132,33 @@ class _AssetDposList extends State<AssetDposList> {
   }
 
   Widget buildTransactionTitle(BuildContext context) {
-    return Padding(
-      padding: context.edgeBottom5.copyWith(left: 4),
-      child: Text(
-        tr('asset:dpos_node_infor'),
-        style: context.textMedium(
-          bold: true,
-          fontWeight: FontWeight.normal,
-        ),
+    return
+        // Padding(
+        // padding: context.edgeBottom5.copyWith(left: 4),
+
+        // child:
+        Text(
+      tr('asset:dpos_node_infor'),
+      style: context.textMedium(
+        bold: true,
+        fontWeight: FontWeight.normal,
       ),
     );
+  }
+
+  Widget buildTransactionTitle1(BuildContext context) {
+    return
+        //  Padding(
+        //   padding: context.edgeBottom5.copyWith(left: 4),
+        //   child:
+        Text(
+      tr('asset:non_dpos_node_infor'),
+      style: context.textMedium(
+        bold: true,
+        fontWeight: FontWeight.normal,
+      ),
+    );
+    // );
   }
 
   @override
@@ -186,9 +203,38 @@ class _AssetDposList extends State<AssetDposList> {
                 itemHeader: buildTransactionTitle(context),
                 itemCount: voteNodeList.length,
                 itemBuilder: (context, index) => TransDropItem(
-                    item: voteNodeList[index],
-                    coinInfo: widget.coinInfo,
-                    onChanged: onChanged),
+                  item: voteNodeList[index],
+                  coinInfo: widget.coinInfo,
+                  onChanged: onChanged,
+                  nonce: 0,
+                ),
+                emptyLabel: tr('asset:detail_msg_empty'),
+                emptyImageUrl: 'assets/images/empty_record.png',
+                requestStream: null,
+                onLoadData: (_) => Future<int>.value(0),
+              ),
+            ),
+            SizedBox(
+              height: context.edgeSize,
+            ),
+            Expanded(
+              child: CSListViewStream<_GetAssetListParams>(
+                enablePullDown: false,
+                enablePullUp: false,
+                margin: context.edgeHorizontal,
+                padding: context.edgeAll,
+                decoration: context.boxDecorationOnlyTop(),
+                // slivers: [
+                //   SliverToBoxAdapter(child: buildHeader(context, viewModel)),
+                // ],
+                itemHeader: buildTransactionTitle1(context),
+                itemCount: voteNodeList.length,
+                itemBuilder: (context, index) => TransDropItem(
+                  item: voteNodeList[index],
+                  coinInfo: widget.coinInfo,
+                  onChanged: onChanged,
+                  nonce: 1,
+                ),
                 emptyLabel: tr('asset:detail_msg_empty'),
                 emptyImageUrl: 'assets/images/empty_record.png',
                 requestStream: null,
