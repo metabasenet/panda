@@ -17,7 +17,6 @@ class InvestActionGetProfitRecordList extends _BaseAction {
     final coin = store.state.walletState.activeWallet!.addresses
         .where((element) => element.chain == AppConstants.mnt_chain)
         .first;
-
     //get nodeAddress
     final ret = getVote(
       coin.address,
@@ -26,17 +25,20 @@ class InvestActionGetProfitRecordList extends _BaseAction {
     );
 
     final nodeAddress = ret['address'].toString();
+    //get ordinaryAddress
+    final ordinaryAddress = coin.address.toString();
 
     final result = await InvestRepository().getProfitRecordList(
       fork: activeMint?.forkId ?? '',
-      address: nodeAddress,
+      address: '$nodeAddress,$ordinaryAddress',
       take: take,
       skip: skip,
     );
+
     final data = deserializeListOf<ProfitRecordItem>(result);
-    return state.rebuild(
-      (a) => a.investState.profitRecordList.replace(data),
-    );
+    return state.rebuild((a) {
+      a.investState.profitRecordList.replace(data);
+    });
   }
 }
 

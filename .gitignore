@@ -46,3 +46,5 @@ third_party/wallet_sdk_flutter
 
 #android build RenameApp apk
 RenameApp/*
+
+
