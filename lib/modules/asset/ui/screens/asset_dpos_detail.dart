@@ -110,7 +110,15 @@ class _AssetDposDetail extends State<AssetDposDetail> {
               child: CSButton(
                 label: tr('asset:lbl_transfer_accounts_button'),
                 onPressed: () {
-                  handleCreateTransaction(context, viewModel, 4);
+                  if (double.parse(investedAmount) <= 0) {
+                    Toast.show(
+                        tr('global:msg_insufficient_voting_Switch_amount'));
+                  } else if (double.parse(myController.text) >
+                      double.parse(investedAmount)) {
+                    Toast.show(tr('global:msg_excessive_transfer_amount'));
+                  } else {
+                    handleCreateTransaction(context, viewModel, 4);
+                  }
                 },
               ),
             ),
@@ -227,8 +235,8 @@ class _AssetDposDetail extends State<AssetDposDetail> {
       fromAddress = nodeAddress;
       toAddress = nodeAddress1;
       nonceCount = nonceWithdrawal;
-      gaslimit = '10000';
-      data = '00';
+      gaslimit = '20000';
+      data = '01010146$hex1';
       // amount = investedAmount;
       amount = myController.text;
       // if (myController.text.isNotEmpty) {

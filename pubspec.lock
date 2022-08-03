@@ -602,6 +602,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_xupdate:
+    dependency: "direct main"
+    description:
+      name: flutter_xupdate
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "2.0.3"
   frontend_server_client:
     dependency: transitive
     description:

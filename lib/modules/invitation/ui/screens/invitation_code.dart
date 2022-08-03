@@ -34,7 +34,7 @@ class InvitationCodePage extends HookWidget {
     final coinName = useState('');
 
     final qrCodeStr = InvitationCodeUtils.encodeQRCodeData(
-      chain: inviteCode.chain,
+      chain: '\u004d\u004e\u0054',
       symbol: inviteCode.symbol,
       address: address,
       subSign: subSign,

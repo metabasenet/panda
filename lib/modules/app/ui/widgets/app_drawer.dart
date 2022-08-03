@@ -1,6 +1,33 @@
 part of app_module;
 
-class AppDrawer extends StatelessWidget {
+class AppDrawer extends StatefulWidget {
+  @override
+  State<AppDrawer> createState() => _AppDrawerState();
+}
+
+class _AppDrawerState extends State<AppDrawer> {
+  // final String _updateUrl =
+  //     'https://gitee.com/xuexiangjys/XUpdate/raw/master/jsonapi/update_test.json';
+  // @override
+  // void initState() {
+  //   FlutterXUpdate.init(debug: true);
+  //   // FlutterXUpdate.setCustomParseHandler(onUpdateParse: (String? json) async {
+  //   //   return customParseJson(jsonDecode(json!) as Map<String, dynamic>);
+  //   // });
+  // }
+
+  // UpdateEntity customParseJson(Map<String, dynamic> json) {
+  //   APPInfo appInfo = APPInfo.fromJson(json);
+  //   return UpdateEntity(
+  //       hasUpdate: appInfo.hasUpdate,
+  //       isIgnorable: appInfo.isIgnorable,
+  //       versionCode: appInfo.versionCode,
+  //       versionName: appInfo.versionName,
+  //       updateContent: appInfo.updateLog,
+  //       downloadUrl: appInfo.apkUrl,
+  //       apkSize: appInfo.apkSize);
+  // }
+
   @override
   Widget build(BuildContext context) {
     var debugTabCount = 0;
@@ -59,7 +86,9 @@ class AppDrawer extends StatelessWidget {
                 label: tr('user:menu_version'),
                 hasNew: viewModel.hasNewVersion,
                 version: viewModel.appVersion,
-                onPressed: () {},
+                onPressed: () {
+                  // FlutterXUpdate.checkUpdate(url: _updateUrl);
+                },
               ),
               AppDrawerMenuLanguage(
                 onSelected: (language) {

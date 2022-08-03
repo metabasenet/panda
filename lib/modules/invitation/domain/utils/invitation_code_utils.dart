@@ -23,7 +23,7 @@ class InvitationCodeUtils {
           return Future.error(InvitationCodeDecodeError());
         }
       }
-      if (list[0] == chain && list[1] == symbol) {
+      if (list[0] == 'MNT' && list[1] == symbol) {
         return Future.value(list.sublist(2, list.length));
       } else {
         return Future.error(InvitationCodeDecodeSymbolError(symbol));

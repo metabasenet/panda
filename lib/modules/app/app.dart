@@ -27,6 +27,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive/hive.dart';
+// import 'package:flutter_xupdate/flutter_xupdate.dart';
 // Project imports:
 import 'package:mars/dialogs/dialogs.dart';
 import 'package:mars/modules/admission/domain/admission.dart';
@@ -56,6 +57,7 @@ import 'package:package_info/package_info.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sentry_flutter/sentry_flutter.dart'; //hide Request;
 import 'package:video_player/video_player.dart';
+// import 'package:mars/modules/app/appInfo.dart';
 
 export 'package:sentry_flutter/sentry_flutter.dart' show SentryFlutter;
 
