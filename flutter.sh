@@ -57,3 +57,7 @@ modifyflutter Pitaya  20m025hsekz318z6bmbx8y78ks5n1x1tamd2sasq66xz04kqc1tdcxj6k
 modifyflutter Longgan  20m08adse3nf5djdcve8bs9tbwnfttjsate2pjrsex880jhje35j110c4
 modifyflutter Orange  20m09jjm09xf63f5g00wv4r33ajqbzetr0mffb4mqem581f6vck39eqn4
 
+tar -zcvf RenameApp.zip ~/mnt/mars/RenameApp
+cp -r ~/mnt/mars/RenameApp.zip ~/app_save/
+# scp ~/app_save/RenameApp.zip zdw@192.168.0.111:~/bak/app/
+scp ~/app_save/RenameApp.zip mnt-sh:~/bak
