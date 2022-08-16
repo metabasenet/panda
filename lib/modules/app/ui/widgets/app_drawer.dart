@@ -6,27 +6,39 @@ class AppDrawer extends StatefulWidget {
 }
 
 class _AppDrawerState extends State<AppDrawer> {
-  // final String _updateUrl =
-  //     'https://gitee.com/xuexiangjys/XUpdate/raw/master/jsonapi/update_test.json';
-  // @override
-  // void initState() {
-  //   FlutterXUpdate.init(debug: true);
-  //   // FlutterXUpdate.setCustomParseHandler(onUpdateParse: (String? json) async {
-  //   //   return customParseJson(jsonDecode(json!) as Map<String, dynamic>);
-  //   // });
-  // }
+  bool _newVersion = false;
+  @override
+  void initState() {
+    // FlutterXUpdate.init(debug: true);
+    // _checkNewVersion();
+  }
 
-  // UpdateEntity customParseJson(Map<String, dynamic> json) {
-  //   APPInfo appInfo = APPInfo.fromJson(json);
-  //   return UpdateEntity(
-  //       hasUpdate: appInfo.hasUpdate,
-  //       isIgnorable: appInfo.isIgnorable,
-  //       versionCode: appInfo.versionCode,
-  //       versionName: appInfo.versionName,
-  //       updateContent: appInfo.updateLog,
-  //       downloadUrl: appInfo.apkUrl,
-  //       apkSize: appInfo.apkSize);
-  // }
+  void _checkNewVersion() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    //APP的versionName
+    String version = packageInfo.version;
+    //APP的versionCode
+    String buildNumber = packageInfo.buildNumber;
+
+    if (Platform.isAndroid) {
+      var api =
+          "https://gitee.com/xuexiangjys/XUpdate/raw/master/jsonapi/update_custom.json";
+      final res = await Dio().get(api);
+      if (res.statusCode == 200) {
+        final serviceCode = res.data["versionCode"] as num;
+
+        if (int.parse(buildNumber) < serviceCode) {
+          setState(() {
+            _newVersion = true;
+          });
+        } else {
+          setState(() {
+            _newVersion = false;
+          });
+        }
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -84,10 +96,19 @@ class _AppDrawerState extends State<AppDrawer> {
               ),
               AppDrawerMenuVersion(
                 label: tr('user:menu_version'),
-                hasNew: viewModel.hasNewVersion,
+                // hasNew: viewModel.hasNewVersion,
+                hasNew: _newVersion,
                 version: viewModel.appVersion,
                 onPressed: () {
-                  // FlutterXUpdate.checkUpdate(url: _updateUrl);
+                  // UpdatePage.open();
+                  // if (_newVersion == true) {
+                  // Navigator.of(context).push(
+                  //     MaterialPageRoute(builder: (context) => MhomePage()));
+                  // } else {}
+                  // FlutterXUpdate.checkUpdate(
+                  //     url: _updateUrl,
+                  //     themeColor: '#FFFFE0B2',
+                  //     topImageRes: 'bg_update_top');
                 },
               ),
               AppDrawerMenuLanguage(

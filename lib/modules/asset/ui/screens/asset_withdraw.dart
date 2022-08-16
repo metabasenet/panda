@@ -262,33 +262,33 @@ class AssetWithdrawPage extends HookWidget {
                     },
                     controller: address,
                     hintText: tr('asset:withdraw_hint_address'),
-                    titleAction: Transform.translate(
-                      offset: Offset(context.edgeSize, 0),
-                      child: CSButton(
-                        label: tr('asset:withdraw_btn_address'),
-                        height: 30,
-                        textStyle: context
-                            .textBody(
-                              color: context.placeholderColor,
-                              bold: true,
-                              fontWeight: FontWeight.normal,
-                            )
-                            .copyWith(
-                              decoration: TextDecoration.underline,
-                            ),
-                        autoWidth: true,
-                        backgroundColor: Colors.transparent,
-                        onPressed: () {
-                          AssetAddressListPage.open(coinInfo!, address.text)
-                              .then((value) {
-                            if (value != address.text) {
-                              address.text = value!;
-                              handleChangeAddress(viewModel);
-                            }
-                          });
-                        },
-                      ),
-                    ),
+                    // titleAction: Transform.translate(
+                    //   offset: Offset(context.edgeSize, 0),
+                    //   child: CSButton(
+                    //     label: tr('asset:withdraw_btn_address'),
+                    //     height: 30,
+                    //     textStyle: context
+                    //         .textBody(
+                    //           color: context.placeholderColor,
+                    //           bold: true,
+                    //           fontWeight: FontWeight.normal,
+                    //         )
+                    //         .copyWith(
+                    //           decoration: TextDecoration.underline,
+                    //         ),
+                    //     autoWidth: true,
+                    //     backgroundColor: Colors.transparent,
+                    //     onPressed: () {
+                    //       AssetAddressListPage.open(coinInfo!, address.text)
+                    //           .then((value) {
+                    //         if (value != address.text) {
+                    //           address.text = value!;
+                    //           handleChangeAddress(viewModel);
+                    //         }
+                    //       });
+                    //     },
+                    //   ),
+                    // ),
                     maxLines: null,
                     onFocusChanged: (hasFocus) {
                       if (!hasFocus) {
@@ -382,7 +382,12 @@ class AssetWithdrawPage extends HookWidget {
                   label: tr('asset:withdraw_btn_withdraw'),
                   disabled: disabled,
                   onPressed: () {
-                    handleSubmit(viewModel);
+                    if (address.text.substring(0, 4) == '20m0') {
+                      return Toast.show(
+                          tr('asset:withdraw_ticket collection reminder'));
+                    } else {
+                      handleSubmit(viewModel);
+                    }
                   },
                 );
               },

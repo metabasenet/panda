@@ -17,6 +17,7 @@ import 'package:dio/dio.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:mars/modules/common/ui/screens/update_page.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
@@ -54,6 +55,8 @@ Route? moduleCommonInitRoutes(RouteSettings settings) {
       return WebViewPage.route(settings);
     case HelpCenterPage.routeName:
       return HelpCenterPage.route(settings);
+    case UpdatePage.routeName:
+      return UpdatePage.route(settings);
     default:
       return null;
   }

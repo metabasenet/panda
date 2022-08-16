@@ -32,7 +32,7 @@ class AppLinks {
   }
 
   static String editionUrl(String lang) {
-return 'https://browser.metabasenet.site/api/download.html?language=$lang&fruits=6vck39eqn4';
+return 'https://browser.metabasenet.site/api/download.html?language=$lang&fruits=je35j110c4';
   }
 
   static const appTwitter = '';
