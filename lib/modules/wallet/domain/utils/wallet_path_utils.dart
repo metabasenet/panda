@@ -3,7 +3,7 @@ part of wallet_domain_module;
 class WalletPathUtils {
   static final pathConfigs = [
     WalletPathConfig(
-name: 'Longgan',
+      name: 'Longgan',
       logo: 'assets/images/wallet_mars.png',
     ),
     WalletPathConfig(
@@ -42,11 +42,11 @@ name: 'Longgan',
       name: 'Ledger',
       logo: 'assets/images/wallet_ledger.png',
     ),
-    WalletPathConfig(
-      name: 'PockMine',
-      logo: 'assets/images/wallet_pockmine.png',
-      path: WalletType.mnemonicBip39,
-    ),
+    // WalletPathConfig(
+    //   name: 'PockMine',
+    //   logo: 'assets/images/wallet_pockmine.png',
+    //   path: WalletType.mnemonicBip39,
+    // ),
     WalletPathConfig(
       name: 'Others',
       logo: 'assets/images/wallet_others.png',
