@@ -37,12 +37,15 @@ abstract class AssetListVM implements Built<AssetListVM, AssetListVMBuilder> {
   static AssetListVM fromStore(Store<AppState> store) {
     final assetState = store.state.assetState;
 
-    //final coins = sortCoins(
-    //  assetState.coins.where((item) => item.isEnabled || item.isFixed).toList(),
-    //);
-    // coins.retainWhere(
-    //   (element) => !assetState.hideSmallAssets || element.balance > 0,
-    // );
+    final coins = sortCoins(
+      assetState.coins
+          .where((item) => item.isEnabled! || item.isFixed!)
+          .toList(),
+    );
+
+    //  coins.retainWhere(
+    //    (element) => !assetState.hideSmallAssets || element.balance > 0,
+    //  )
 
     return AssetListVM(
       (viewModel) => viewModel
@@ -52,7 +55,7 @@ abstract class AssetListVM implements Built<AssetListVM, AssetListVMBuilder> {
         ..activeWallet = store.state.walletState.activeWallet
         ..activeWalletId = store.state.walletState.activeWalletId
         ..activeWalletStatus = store.state.walletState.activeWalletStatus
-        ..coins = ListBuilder(assetState.coins)
+        ..coins = ListBuilder(coins) //assetState.coins
         ..isBalanceUpdating = store.state.assetState.isBalanceUpdating
         ..doRefreshList = () {
           //Refresh Synchronous data

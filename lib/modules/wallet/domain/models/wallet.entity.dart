@@ -129,8 +129,12 @@ class Wallet extends HiveObject {
   String getTotalValuation(String fiatCurrency) {
     final fiatPriceCubit = GetIt.I<FiatPriceCubit>();
     double total = 0.00;
-    for (int i = 0; i < balances.length; i++) {
-      String strTotal = getTotalPrice(balances[i].symbol, balances[i].balance);
+    final balancesTemp = balances
+        .where((element) => element.chain == AppConstants.mnt_chain)
+        .toList();
+    for (int i = 0; i < balancesTemp.length; i++) {
+      String strTotal =
+          getTotalPrice(balancesTemp[i].symbol, balancesTemp[i].balance);
       total += double.parse(strTotal);
     }
 
