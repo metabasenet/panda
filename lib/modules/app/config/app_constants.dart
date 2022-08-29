@@ -55,12 +55,12 @@ class AppConstants {
   static const swapUUID = '4b19a2cabd0d4e859b02bc776af87d01';
 
   static const bridge_mnt =
-      '1231kgws0rhjtfewv57jegfe5bp4dncax60szxk8f4y546jsfkap3t5ws';
+      '20m07b974wdrzrwtxghteg223fae28awc3srnvp4ypxg87p0mf5hrtr6t';
   static const bridge_bsc = '0x0873093DEb492A6425d85906E2CE6E856BCDC71F';
 
   static const fiatPrecision = 2;
   static const dposAddress =
-"20m08adse3nf5djdcve8bs9tbwnfttjsate2pjrsex880jhje35j110c4";
+"20m09jjm09xf63f5g00wv4r33ajqbzetr0mffb4mqem581f6vck39eqn4";
 
   static String get sentryDns => isBeta ? sentryDnsBeta : sentryDnsProd;
 
