@@ -60,15 +60,15 @@ class AppMainPage extends HookWidget {
       'home',
       'Home',
     ),
-    // TabBarItem(
-    //   TradeMainTab(),
-    //   //Center(),
-    //   'global:main_tab_trade',
-    //   '',
-    //   '',
-    //   'trade',
-    //   'Trading',
-    // ),
+    TabBarItem(
+      TradeMainTab(),
+      //Center(),
+      'global:main_tab_trade',
+      '',
+      '',
+      'trade',
+      'Trading',
+    ),
     TabBarItem(
       AssetMainTab(),
       //Center(),
@@ -254,7 +254,7 @@ class AppMainPage extends HookWidget {
                   tabBarItems[0].screen,
                   tabBarItems[1].screen,
                   tabBarItems[2].screen,
-                  //tabBarItems[3].screen
+                  tabBarItems[3].screen
                 ],
               ), //tabBarItems[currentTab.value].screen,
             ),

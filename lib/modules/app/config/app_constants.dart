@@ -16,7 +16,7 @@ class AppConstants {
   // App Info
   static const appName = 'Mars';
 
-  // Api/Service data
+  // Api/Service data browser
   static const apiUrl = [
     'https://browser.Metabasenet.site/api',
     //'http://124.221.253.93:7711',
@@ -55,12 +55,12 @@ class AppConstants {
   static const swapUUID = '4b19a2cabd0d4e859b02bc776af87d01';
 
   static const bridge_mnt =
-      '20m07b974wdrzrwtxghteg223fae28awc3srnvp4ypxg87p0mf5hrtr6t';
-  static const bridge_bsc = '0x0873093DEb492A6425d85906E2CE6E856BCDC71F';
+      '184aph9nn415fam29hwmk5h19kc1724ysqjsfm8j1gndm3j32ywyvj796';
+  static const bridge_bsc = '0x08f9BA8014Ba6f2150287F778f03E9aE6b1FF398';
 
   static const fiatPrecision = 2;
   static const dposAddress =
-"20m09jjm09xf63f5g00wv4r33ajqbzetr0mffb4mqem581f6vck39eqn4";
+      "20m09jjm09xf63f5g00wv4r33ajqbzetr0mffb4mqem581f6vck39eqn4";
 
   static String get sentryDns => isBeta ? sentryDnsBeta : sentryDnsProd;
 

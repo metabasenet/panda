@@ -129,12 +129,17 @@ class Wallet extends HiveObject {
   String getTotalValuation(String fiatCurrency) {
     final fiatPriceCubit = GetIt.I<FiatPriceCubit>();
     double total = 0.00;
-    final balancesTemp = balances
-        .where((element) => element.chain == AppConstants.mnt_chain)
-        .toList();
-    for (int i = 0; i < balancesTemp.length; i++) {
-      String strTotal =
-          getTotalPrice(balancesTemp[i].symbol, balancesTemp[i].balance);
+    // final balancesTemp = balances
+    //     .where((element) => element.chain == AppConstants.mnt_chain)
+    //     .toList();
+    // for (int i = 0; i < balancesTemp.length; i++) {
+    //   String strTotal =
+    //       getTotalPrice(balancesTemp[i].symbol, balancesTemp[i].balance);
+    //   total += double.parse(strTotal);
+    // }
+
+    for (int i = 0; i < balances.length; i++) {
+      String strTotal = getTotalPrice(balances[i].symbol, balances[i].balance);
       total += double.parse(strTotal);
     }
 
@@ -160,9 +165,21 @@ class Wallet extends HiveObject {
         price24h: 0,
       );
     } else {
-      return HomePricesCard.homePrices!
-          .where((item) => item.tradePairId == '${symbol}/USDT')
-          .toList()[0];
+      if (HomePricesCard.homePrices!
+              .where((item) => item.tradePairId == '${symbol}/USDT')
+              .length >
+          0) {
+        return HomePricesCard.homePrices!
+            .where((item) => item.tradePairId == '${symbol}/USDT')
+            .toList()[0];
+      } else {
+        return AssetPrice.fromPrice(
+          tradePairId: 'USDT/USDT',
+          precision: 0,
+          price: 1.00,
+          price24h: 0,
+        );
+      }
     }
   }
 

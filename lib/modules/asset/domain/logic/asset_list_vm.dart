@@ -37,11 +37,11 @@ abstract class AssetListVM implements Built<AssetListVM, AssetListVMBuilder> {
   static AssetListVM fromStore(Store<AppState> store) {
     final assetState = store.state.assetState;
 
-    final coins = sortCoins(
-      assetState.coins
-          .where((item) => item.isEnabled! || item.isFixed!)
-          .toList(),
-    );
+    // final coins = sortCoins(
+    //   assetState.coins
+    //       .where((item) => item.isEnabled! || item.isFixed!)
+    //       .toList(),
+    // );
 
     //  coins.retainWhere(
     //    (element) => !assetState.hideSmallAssets || element.balance > 0,
@@ -55,15 +55,15 @@ abstract class AssetListVM implements Built<AssetListVM, AssetListVMBuilder> {
         ..activeWallet = store.state.walletState.activeWallet
         ..activeWalletId = store.state.walletState.activeWalletId
         ..activeWalletStatus = store.state.walletState.activeWalletStatus
-        ..coins = ListBuilder(coins) //assetState.coins
+        ..coins = ListBuilder(assetState.coins)
         ..isBalanceUpdating = store.state.assetState.isBalanceUpdating
         ..doRefreshList = () {
           //Refresh Synchronous data
-          // final InAppWebViewController appWebViewController =
-          //     TradeHomePage.webView;
-          // var srcRefresh =
-          //     'window.dispatchEvent(new CustomEvent("Refresh",{"detail":"refresh"}));';
-          // appWebViewController.evaluateJavascript(source: srcRefresh);
+          final InAppWebViewController appWebViewController =
+              TradeHomePage.webView;
+          var srcRefresh =
+              'window.dispatchEvent(new CustomEvent("Refresh",{"detail":"refresh"}));';
+          appWebViewController.evaluateJavascript(source: srcRefresh);
 
           return Future.wait([
             if (store.state.assetState.isBalanceUpdating != true)

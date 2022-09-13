@@ -7,6 +7,17 @@ class TradeHomePage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final backLastTime = useState(0);
+
+    useEffect(
+      () {
+        // When change language, force refresh
+        backLastTime.value = backLastTime.value - 1;
+        return null;
+      },
+      [context.locale.languageCode],
+    );
+
     //random number
     final ranNumber = formatDate(DateTime.now(), 'yyyyMMddHHmm');
 
@@ -30,7 +41,7 @@ class TradeHomePage extends HookWidget {
               return InAppWebView(
                 initialUrlRequest: URLRequest(
                   url: Uri.parse(
-                    'https://www.shangqingdong.work/?ran=$ranNumber',
+                    'https://totems.metabasenet.site/?ran=$ranNumber',
                   ),
                 ),
                 onWebViewCreated: (controller) {

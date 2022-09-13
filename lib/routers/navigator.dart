@@ -25,9 +25,9 @@ final navigatorKey = GlobalKey<NavigatorState>();
 
 enum AppTabBarPages {
   home,
+  trade,
   wallet,
   investment,
-  trade,
 }
 
 class AppNavigator {
