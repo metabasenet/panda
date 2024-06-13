@@ -1,98 +1,134 @@
-# Mars
+# OneKey - Open Source Crypto Wallet
 
-A Sweet Flutter project made with Love and Overtime.
+[![Github Stars](https://img.shields.io/github/stars/OneKeyHQ/app-monorepo?t&logo=github&style=for-the-badge&labelColor=000)](https://github.com/OneKeyHQ/app-monorepo/stargazers)
+[![Version](https://img.shields.io/github/release/OneKeyHQ/app-monorepo.svg?style=for-the-badge&labelColor=000)](https://github.com/OneKeyHQ/app-monorepo/releases)
+[![](https://img.shields.io/github/contributors-anon/OneKeyHQ/app-monorepo?style=for-the-badge&labelColor=000)](https://github.com/OneKeyHQ/app-monorepo/graphs/contributors)
+[![Last commit](https://img.shields.io/github/last-commit/OneKeyHQ/app-monorepo.svg?style=for-the-badge&labelColor=000)](https://github.com/OneKeyHQ/app-monorepo/commits/onekey)
+[![Issues](https://img.shields.io/github/issues-raw/OneKeyHQ/app-monorepo.svg?style=for-the-badge&labelColor=000)](https://github.com/OneKeyHQ/app-monorepo/issues?q=is%3Aissue+is%3Aopen)
+[![Pull Requests](https://img.shields.io/github/issues-pr-raw/OneKeyHQ/app-monorepo.svg?style=for-the-badge&labelColor=000)](https://github.com/OneKeyHQ/app-monorepo/pulls?q=is%3Apr+is%3Aopen)
+[![Discord](https://img.shields.io/discord/868309113942196295?style=for-the-badge&labelColor=000)](https://discord.gg/onekey)
+[![Twitter Follow](https://img.shields.io/twitter/follow/OneKeyHQ?style=for-the-badge&labelColor=000)](https://twitter.com/OneKeyHQ)
 
-## Getting Started
 
-### flutter version
-```sh
-flutter --version  
+[![Appstore](https://github.com/rayston92/graph_bed/blob/275d053220d5b54b32b01ce4c4985210951043c5/img/app_store.svg)](https://apps.apple.com/us/app/onekey-open-source-wallet/id1609559473)
+[![Playstore](https://github.com/rayston92/graph_bed/blob/275d053220d5b54b32b01ce4c4985210951043c5/img/play.svg
+)](https://play.google.com/store/apps/details?id=so.onekey.app.wallet)
+
+- [Desktop clients: macOS, Windows & Linux](https://onekey.so/zh_CN/download?client=desktop)
+- [Browser extensions: Chrome, Firefox, Edge & Brave](https://onekey.so/zh_CN/download?client=browserExtension)
+- [Bridge](https://onekey.so/zh_CN/download?client=bridge)
+
+## Community & Enterprise Edition
+
+- 🏡 🧔🏻‍♂️ For Community Edition. It will always remain FREE FOREVER for open-source projects by individuals and communities.
+- 🏦 💼 For Enterprise Edition. We've got this plan on the radar, but we're not quite ready yet. Just star our repo, and you'll be pinged as soon as we're all set.
+
+
+
+
+
+
+
+## Support
+
+- [Community Forum](https://github.com/orgs/OneKeyHQ/discussions). Best for: help with building, discussion about best practices.
+- [GitHub Issues](https://github.com/OneKeyHQ/app-monorepo/issues). Best for: bugs and errors you encounter using OneKey.
+- [Discord](https://discord.gg/onekey). Best for: sharing your ideas and hanging out with the community.
+
+## Repo Status
+
+- ✅ Public: Production-ready
+
+We really need your support, star or watch this repo for latest updates.
+
+<kbd><img src="https://github.com/rayston92/graph_bed/blob/e3b2c938fc5b17d68531f69178908afb16266e6a/img/onekey_monorepo_star.gif?raw=true" alt="Star this repo"/></kbd>
+
+
+## 🚀 Getting Onboard
+
+1. Install [node.js LTS version](https://nodejs.org/en/)
+2. Install [yarn package management tool](https://yarnpkg.com/)
+3. Install [git lfs](https://git-lfs.github.com/) (some binaries are required for pulling and updating)
+4. To start the iOS project, make sure that the local XCode version is greater than or equal to 13.3
+5. To start the Android project, make sure that the local JDK version is greater than or equal to 11
+
+After pulling the latest code via the git command line tool, install the project dependencies in the root directory via the `yarn` command
+
 ```
-use Flutter 1.22.6
-### Install
-
-```sh
-# Git Pre-Hooks
-
-brew install Arkweid/lefthook/lefthook
-
-yarn global add commitlint
-
-lefthook install
-
+yarn
 ```
 
-### Commands 
+## 🧑‍💻 Develop
 
-```sh
-# Code generation (.g.dart)
-flutter packages pub run build_runner build
-```
+Execute the following commands in the root directory to develop different business code
 
-```sh
-# App icons
-flutter pub run flutter_launcher_icons:main
-```
+- `yarn app:web`: Develop web mode, which starts a static server on port 3000 locally
+- `yarn app:ios`: connect to iphone device via USB for development debugging
+- `yarn app:android`: develop android
+- `yarn app:desktop`: development in desktop mode
+- `yarn app:web`: development in extension mode
 
-```sh
-# App Splash Screen
-flutter pub pub run flutter_native_splash:create
-```
 
-```sh
-# Update all packages
-flutter packages upgrade
-```
+## 💬 Docs in your languages
+| Available Languages               |
+| :--------------------------- |
+| [Simplified Chinese / 简体中文](docs/i18n/README.zh-cn.md)|
+| [German / Deutsch](docs/i18n/README.de.md)|
+| [Japanese / 日本語](docs/i18n/README.jp.md)|
+| [French / Français](docs/i18n/README.fr.md)|
+| [Italian / Italiano](docs/i18n/README.it.md)|
 
-```sh
-# Update translations
-flutter packages pub run tool/build_locales
-```
+## 🪄 Repo Activity
 
-```sh
-# Run dev tool locally
-flutter pub global run devtools
-```
+![Repo Activity](https://repobeats.axiom.co/api/embed/5f8b83656094956b2d6274929f6eaa2e068a6cfb.svg "Repobeats analytics image")
 
-```sh
-# lint error `flutter analyze` error because of analyzer state leftover from a different flutter revision
-git clean -xffd
-```
-### 
-name: A
-pass: 1234qweR  
-mnemonic: retire turtle lazy eager churn alcohol cup cannon frequent romance wink better
-pri: d2feeab10e27831b0a3aa8d9b1040bc722975cf9d050d66cd3732c8a90915903
-pub: 77f2b1217377f62cbb34c5b72b63c6c17fdb5e9e0b6173b4edcb19d03922c0f5
-addr: 1yq024eeg375yvd3kc45swqpvfz0wcrsbpz2k9escysvq68dhy9vtqe58
 
-fork: 00000000a137256624bda82aec19645b1dd8d41311ceac9b5c3e49d2822cd49f
-fork: 0000000190e31a56bea3d263cc271649bf72ef1bf5ca8aa7e271ba9dd754f2da
+## 🔰 Security
 
-addr2: 1549pyzf8dhx7r4x40k5j80f12btkpqfprjp134bcgcrjn963nzsx57xb
+- Please read [Bug Bunty Rules](https://github.com/OneKeyHQ/app-monorepo/blob/onekey/docs/BUG_RULES.md), we have detailed the exact plan in this article.
+- Please report suspected security vulnerabilities in private to dev@onekey.so
+- Please do NOT create publicly viewable issues for suspected security vulnerabilities.
+- As an open source project, although we are not yet profitable, we try to give some rewards to white hat hackers who disclose vulnerabilities to us in a timely manner.
 
-```json
-{
-    "transaction" : {
-        "txid" : "3cd2623a8cfbbef88fa78a98890fcc5af59fd31d293c4cb8ad870cb0fa4d87c8",
-        "version" : 1,
-        "type" : "token",
-        "time" : 1648004347,
-        "nonce" : 1,
-        "from" : "1yq024eeg375yvd3kc45swqpvfz0wcrsbpz2k9escysvq68dhy9vtqe58",
-        "to" : "1549pyzf8dhx7r4x40k5j80f12btkpqfprjp134bcgcrjn963nzsx57xb",
-        "amount" : "1.0000000000",
-        "gaslimit" : 10000,
-        "gasprice" : "0.00000000000001",
-        "gasused" : 10000,
-        "txfee" : "0.0100000000",
-        "data" : "00",
-        "sig" : "3985419e7727d474f520a132badf62c9c93b95827f4144319451a560b8fe39997dbfa678dc3bfb87c0d70d31b468dc505ff0c97fffa8d80a203052b0af2f3708",
-        "fork" : "00000000769872b2afcc290a025b23362202fc3ba715c7fc27bd96b2aec73e4b",
-        "height" : 5996,
-        "blockhash" : "0000176c8f363ae096c8c403ee93286e43c70126c5271e92b3c355a631d18baa",
-        "confirmations" : 0,
-        "serialization" : "01000000fb8c3a6200000000769872b2afcc290a025b23362202fc3ba715c7fc27bd96b2aec73e4b01000000000000000177f2b1217377f62cbb34c5b72b63c6c17fdb5e9e0b6173b4edcb19d03922c0f501f3afc3a42a31836c9111acc4f65d3bf512e10124cb04a4137c7a6ce87d6f132900000000000000000000000000000000000000000000000000000002540be4000000000000000000000000000000000000000000000000000000000000002710000000000000000000000000000000000000000000000000000000000000271000403985419e7727d474f520a132badf62c9c93b95827f4144319451a560b8fe39997dbfa678dc3bfb87c0d70d31b468dc505ff0c97fffa8d80a203052b0af2f3708"
-    }
-}
-```
+## 🙋‍♂️We're Hiring!
+
+<table>
+    <thead>
+        <tr>
+            <th colspan="2"> We are hiring many roles (Remote)
+            <a href="https://onekeyhq.atlassian.net/wiki/spaces/OC/overview">👉 Click here to check all open positions</a>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+            <li>Remote (Live anywhere)</li>
+            <li>Global Pay (Literally)</li>
+            <li>ESOP (For everybody)</li>
+            <li>Open Source (As you see)</li>
+            <li>Awesome Colleagues (Hell Yeah!)</li>
+            </td>
+            <td>
+            <li>远程 (生活在哪个城市都可以)</li>
+            <li>全球一致的薪酬 (真的)</li>
+            <li>全员持股计划 (每个人都有)</li>
+            <li>开源 (如你所见)</li>
+            <li>超级棒的同事 (爽呆!)</li>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+## ✨ Salute!
+
+[![](https://img.shields.io/github/contributors-anon/OneKeyHQ/app-monorepo?style=for-the-badge&labelColor=000)](https://github.com/OneKeyHQ/app-monorepo/graphs/contributors)
+
+<a href="https://github.com/onekeyhq/app-monorepo/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=onekeyhq/app-monorepo&max=240&columns=24"/>
+</a>
+
+## ⚖️ License
+
+OneKey is available under the [Apache-2.0 license](https://github.com/OneKeyHQ/app-monorepo/blob/onekey/LICENSE) license.
+Free for commercial and non-commercial use.
