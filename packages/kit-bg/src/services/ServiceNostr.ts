@@ -1,21 +1,35 @@
+import axios from 'axios';
 import ExpiryMap from 'expiry-map';
 
+import { getFiatEndpoint } from '@onekeyhq/engine/src/endpoint';
 import {
+  NOSTR_ADDRESS_INDEX,
   getEventHash,
+  getNostrPath,
   validateEvent,
-} from '@onekeyhq/core/src/chains/nostr/sdkNostr';
-import type { INostrEvent } from '@onekeyhq/core/src/chains/nostr/types';
-import type IVaultNostr from '@onekeyhq/kit-bg/src/vaults/impls/nostr/Vault';
+} from '@onekeyhq/engine/src/vaults/impl/nostr/helper/NostrSDK';
+import type {
+  INostrRelays,
+  NostrEvent,
+} from '@onekeyhq/engine/src/vaults/impl/nostr/helper/types';
+import type VaultNostr from '@onekeyhq/engine/src/vaults/impl/nostr/Vault';
+import { getTimeDurationMs } from '@onekeyhq/kit/src/utils/helper';
 import {
   backgroundClass,
   backgroundMethod,
 } from '@onekeyhq/shared/src/background/backgroundDecorators';
-import timerUtils from '@onekeyhq/shared/src/utils/timerUtils';
-import { EMessageTypesCommon } from '@onekeyhq/shared/types/message';
-
-import { vaultFactory } from '../vaults/factory';
+import { OnekeyNetwork } from '@onekeyhq/shared/src/config/networkIds';
+import { isHardwareWallet } from '@onekeyhq/shared/src/engine/engineUtils';
+import debugLogger from '@onekeyhq/shared/src/logger/debugLogger';
 
 import ServiceBase from './ServiceBase';
+
+type IGetNostrParams = {
+  walletId: string;
+  networkId: string;
+  accountId: string;
+  password: string;
+};
 
 type IPersistEncryptData = {
   pubkey: string;
@@ -24,42 +38,156 @@ type IPersistEncryptData = {
 };
 
 @backgroundClass()
-class ServiceNostr extends ServiceBase {
+export default class ServiceNostr extends ServiceBase {
   expiryMap = new ExpiryMap<string, IPersistEncryptData>(
-    timerUtils.getTimeDurationMs({
+    getTimeDurationMs({
       minute: 5,
     }),
   );
 
   cacheAutoSignMap = new Map<string, boolean>();
 
-  constructor({ backgroundApi }: { backgroundApi: any }) {
-    super({ backgroundApi });
-  }
-
-  @backgroundMethod()
-  async getAutoSignStatus(accountId: string, origin: string) {
-    const key = `${accountId}-${origin}`;
-    if (!this.cacheAutoSignMap.has(key)) {
-      return Promise.resolve(false);
+  private async getCurrentAccountIndex(
+    activeAccountId: string,
+    activeNetworkId: string,
+  ) {
+    const account = await this.backgroundApi.engine.getAccount(
+      activeAccountId,
+      activeNetworkId,
+    );
+    if (!account) {
+      throw new Error('Invalid account');
     }
-    return Promise.resolve(this.cacheAutoSignMap.get(key));
+    const index = this.backgroundApi.serviceAllNetwork.getAccountIndex(
+      account,
+      account?.template ?? '',
+    );
+    if (index < 0 || Number.isNaN(index)) {
+      throw new Error('Invalid account index');
+    }
+    return index;
   }
 
   @backgroundMethod()
-  public async signEvent({
+  async getNostrAccount({
+    walletId,
+    currentAccountId,
+    currentNetworkId,
+  }: {
+    walletId: string;
+    currentAccountId: string;
+    currentNetworkId: string;
+  }) {
+    const accountIndex = await this.getCurrentAccountIndex(
+      currentAccountId,
+      currentNetworkId,
+    );
+    const networkId = OnekeyNetwork.nostr;
+    const path = `${getNostrPath(accountIndex)}/${NOSTR_ADDRESS_INDEX}`;
+    const accountId = `${walletId}--${path}`;
+    try {
+      const account = await this.backgroundApi.engine.getAccount(
+        accountId,
+        networkId,
+      );
+      return account;
+    } catch (e) {
+      debugLogger.backgroundApi.error(
+        'Nostr: get nostr account failed: ',
+        accountId,
+      );
+      throw e;
+    }
+  }
+
+  @backgroundMethod()
+  async getOrCreateNostrAccount({
+    walletId,
+    currentAccountId,
+    currentNetworkId,
+    password,
+  }: {
+    walletId: string;
+    currentAccountId: string;
+    currentNetworkId: string;
+    password: string;
+  }) {
+    const accountIndex = await this.getCurrentAccountIndex(
+      currentAccountId,
+      currentNetworkId,
+    );
+    const networkId = OnekeyNetwork.nostr;
+    try {
+      const path = `${getNostrPath(accountIndex)}/${NOSTR_ADDRESS_INDEX}`;
+      const accountId = `${walletId}--${path}`;
+      const account = await this.backgroundApi.engine.getAccount(
+        accountId,
+        networkId,
+      );
+      return account;
+    } catch (e) {
+      try {
+        const [account] = await this.backgroundApi.engine.addHdOrHwAccounts({
+          password,
+          walletId,
+          networkId,
+          indexes: [accountIndex],
+        });
+        return account;
+      } catch (createError) {
+        console.error(createError);
+        throw createError;
+      }
+    }
+  }
+
+  @backgroundMethod()
+  async getPublicKeyHex({
     walletId,
     networkId,
     accountId,
+    password,
+  }: IGetNostrParams): Promise<string> {
+    const nostrAccount = await this.getOrCreateNostrAccount({
+      walletId,
+      currentAccountId: accountId,
+      currentNetworkId: networkId,
+      password,
+    });
+    if (!nostrAccount.pubKey) {
+      throw new Error('Nostr: public key not found');
+    }
+    return nostrAccount.pubKey;
+  }
+
+  @backgroundMethod()
+  async getPublicKeyEncodedByNip19({
+    walletId,
+    networkId,
+    accountId,
+    password,
+  }: IGetNostrParams): Promise<string> {
+    const nostrAccount = await this.getOrCreateNostrAccount({
+      walletId,
+      currentAccountId: accountId,
+      currentNetworkId: networkId,
+      password,
+    });
+    return nostrAccount.address;
+  }
+
+  @backgroundMethod()
+  async signEvent({
+    walletId,
+    networkId,
+    accountId,
+    password,
     event,
     options,
-  }: {
-    walletId: string;
-    networkId: string;
-    accountId: string;
-    event: INostrEvent;
+  }: IGetNostrParams & {
+    event: NostrEvent;
     options?: {
-      origin: string;
+      host: string;
       autoSign: boolean;
     };
   }) {
@@ -67,52 +195,55 @@ class ServiceNostr extends ServiceBase {
       if (!validateEvent(event)) {
         throw new Error('Invalid event');
       }
+
       // update cache by options.autoSign
-      if (options?.origin) {
+      if (options?.host) {
         this.cacheAutoSignMap.set(
-          `${accountId}-${options.origin}`,
+          `${accountId}-${options.host}`,
           !!options?.autoSign,
         );
       }
 
-      const account = await this.backgroundApi.serviceAccount.getAccount({
-        accountId,
-        networkId,
+      const nostrAccount = await this.getOrCreateNostrAccount({
+        walletId,
+        currentAccountId: accountId,
+        currentNetworkId: networkId,
+        password,
       });
       if (!event.pubkey) {
-        event.pubkey = account.pub;
+        event.pubkey = nostrAccount.pubKey;
       }
       if (!event.id) {
         event.id = getEventHash(event);
       }
-
-      const { password, deviceParams } =
-        await this.backgroundApi.servicePassword.getCachedPasswordOrDeviceParams(
-          { walletId },
-        );
-      const vault = await vaultFactory.getVault({ networkId, accountId });
-      const signedEvent =
-        await this.backgroundApi.serviceHardwareUI.withHardwareProcessing(
-          async () => {
-            const signedTx = await vault.signTransaction({
-              unsignedTx: {
-                encodedTx: { event },
-              },
-              password: password ?? '',
-              deviceParams,
-              signOnly: true,
-            });
-            return signedTx;
-          },
-          { deviceParams },
-        );
+      const vault = await this.backgroundApi.engine.getVault({
+        networkId: OnekeyNetwork.nostr,
+        accountId: nostrAccount.id,
+      });
+      const signedEvent = await vault.keyring.signTransaction(
+        {
+          encodedTx: { event },
+          inputs: [],
+          outputs: [],
+          payload: {},
+        },
+        { password },
+      );
       return {
         data: JSON.parse(signedEvent.rawTx),
       };
     } catch (e) {
-      console.error('signEvent', e);
-      throw e;
+      console.error(e);
     }
+  }
+
+  @backgroundMethod()
+  async getAutoSignStatus(accountId: string, host: string) {
+    const key = `${accountId}-${host}`;
+    if (!this.cacheAutoSignMap.has(key)) {
+      return Promise.resolve(false);
+    }
+    return Promise.resolve(this.cacheAutoSignMap.get(key));
   }
 
   @backgroundMethod()
@@ -120,40 +251,24 @@ class ServiceNostr extends ServiceBase {
     walletId,
     networkId,
     accountId,
+    password,
     pubkey,
     plaintext,
-  }: {
-    walletId: string;
-    networkId: string;
-    accountId: string;
-    pubkey: string;
-    plaintext: string;
-  }) {
+  }: IGetNostrParams & { pubkey: string; plaintext: string }) {
     if (!pubkey || !plaintext) {
       throw new Error('Invalid encrypt params');
     }
-
-    const { password, deviceParams } =
-      await this.backgroundApi.servicePassword.getCachedPasswordOrDeviceParams({
-        walletId,
-      });
-    const vault = (await vaultFactory.getVault({
-      networkId,
-      accountId,
-    })) as IVaultNostr;
-    const encrypted =
-      await this.backgroundApi.serviceHardwareUI.withHardwareProcessing(
-        async () => {
-          const signedTx = await vault.encrypt({
-            pubkey,
-            plaintext,
-            password: password ?? '',
-            deviceParams,
-          });
-          return signedTx;
-        },
-        { deviceParams },
-      );
+    const nostrAccount = await this.getOrCreateNostrAccount({
+      walletId,
+      currentAccountId: accountId,
+      currentNetworkId: networkId,
+      password,
+    });
+    const vault = (await this.backgroundApi.engine.getVault({
+      networkId: OnekeyNetwork.nostr,
+      accountId: nostrAccount.id,
+    })) as VaultNostr;
+    const encrypted = await vault.encrypt({ pubkey, plaintext }, { password });
     return {
       data: encrypted,
     };
@@ -164,32 +279,24 @@ class ServiceNostr extends ServiceBase {
     walletId,
     networkId,
     accountId,
+    password,
     pubkey,
     ciphertext,
-  }: {
-    walletId: string;
-    networkId: string;
-    accountId: string;
-    pubkey: string;
-    ciphertext: string;
-  }) {
+  }: IGetNostrParams & { pubkey: string; ciphertext: string }) {
     if (!pubkey || !ciphertext) {
       throw new Error('Invalid encrypt params');
     }
-    const { password, deviceParams } =
-      await this.backgroundApi.servicePassword.getCachedPasswordOrDeviceParams({
-        walletId,
-      });
-    const vault = (await vaultFactory.getVault({
-      networkId,
-      accountId,
-    })) as IVaultNostr;
-    const decrypted = await vault.decrypt({
-      pubkey,
-      ciphertext,
-      password: password ?? '',
-      deviceParams,
+    const nostrAccount = await this.getOrCreateNostrAccount({
+      walletId,
+      currentAccountId: accountId,
+      currentNetworkId: networkId,
+      password,
     });
+    const vault = (await this.backgroundApi.engine.getVault({
+      networkId: OnekeyNetwork.nostr,
+      accountId: nostrAccount.id,
+    })) as VaultNostr;
+    const decrypted = await vault.decrypt({ pubkey, ciphertext }, { password });
     return {
       data: decrypted,
     };
@@ -219,45 +326,64 @@ class ServiceNostr extends ServiceBase {
     walletId,
     networkId,
     accountId,
+    password,
     sigHash,
-  }: {
-    walletId: string;
-    networkId: string;
-    accountId: string;
-    sigHash: string;
-  }) {
+  }: IGetNostrParams & { sigHash: string }) {
     if (!sigHash) {
-      throw new Error('Invalid signSchnorr params');
+      throw new Error('Invalid sigHash');
     }
-    const { password, deviceParams } =
-      await this.backgroundApi.servicePassword.getCachedPasswordOrDeviceParams({
-        walletId,
-      });
-    const vault = (await vaultFactory.getVault({
-      networkId,
-      accountId,
-    })) as IVaultNostr;
-    const signedMessage =
-      await this.backgroundApi.serviceHardwareUI.withHardwareProcessing(
-        async () => {
-          const signedTx = await vault.keyring.signMessage({
-            messages: [
-              {
-                type: EMessageTypesCommon.SIGN_MESSAGE,
-                message: sigHash,
-              },
-            ],
-            password: password ?? '',
-            deviceParams,
-          });
-          return signedTx;
-        },
-        { deviceParams },
-      );
+    const nostrAccount = await this.getOrCreateNostrAccount({
+      walletId,
+      currentAccountId: accountId,
+      currentNetworkId: networkId,
+      password,
+    });
+    const vault = (await this.backgroundApi.engine.getVault({
+      networkId: OnekeyNetwork.nostr,
+      accountId: nostrAccount.id,
+    })) as VaultNostr;
+    const signedHash = await vault.keyring.signMessage([{ message: sigHash }], {
+      password,
+    });
+    if (signedHash.length !== 1) {
+      throw new Error('Nostr: wrong signature type');
+    }
     return {
-      data: signedMessage[0],
+      data: signedHash[0],
     };
   }
-}
 
-export default ServiceNostr;
+  @backgroundMethod()
+  async getRelays() {
+    const { data } = await axios.get<INostrRelays>(
+      `${getFiatEndpoint()}/nostr/getRelays`,
+    );
+    return data;
+  }
+
+  @backgroundMethod()
+  async validateNpubOnHardware({
+    walletId,
+    networkId,
+    accountId,
+  }: IGetNostrParams) {
+    if (!isHardwareWallet({ walletId })) {
+      throw new Error('Wallet is not hardware wallet');
+    }
+    const nostrAccount = await this.getOrCreateNostrAccount({
+      walletId,
+      currentAccountId: accountId,
+      currentNetworkId: networkId,
+      password: '',
+    });
+    const vault = (await this.backgroundApi.engine.getVault({
+      networkId: OnekeyNetwork.nostr,
+      accountId: nostrAccount.id,
+    })) as VaultNostr;
+    const npub = await vault.keyring.getAddress({
+      path: nostrAccount.path,
+      showOnOneKey: true,
+    });
+    return npub;
+  }
+}

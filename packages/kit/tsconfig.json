@@ -1,19 +1,3 @@
 {
-  "extends": "../../tsconfig.json",
-  "compilerOptions": {
-    "plugins": [
-      {
-        "name": "@nderscore/tamagui-typescript-plugin",
-        "pathToApp": "./apps/web",
-        "defaultTheme": "light",
-        "colorTileSize": 18,
-        "completionFilters": {
-          "showColorTokens": true,
-          "showTrueTokens": true,
-          "custom": {
-          }
-        }
-      }
-    ]
-  }
+  "extends": "../../tsconfig.json"
 }

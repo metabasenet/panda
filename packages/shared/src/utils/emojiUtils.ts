@@ -1,11 +1,3 @@
-import { HdWalletAvatarImageNames } from './avatarUtils';
-
-import type {
-  IHdWalletAvatarImageNames,
-  IHwWalletAvatarImageNames,
-  IOthersWalletAvatarImageNames,
-} from './avatarUtils';
-
 export const emojiList = [
   '😀',
   '😃',
@@ -1840,35 +1832,88 @@ export const emojiList = [
   '🏴󠁧󠁢󠁷󠁬󠁳󠁿',
 ] as const;
 
-export type IEmojiTypes = (typeof emojiList)[number];
+const randomList = [
+  '🐯',
+  '🦁',
+  '🐶',
+  '🐼',
+  '🐵',
+  '🦊',
+  '🐭',
+  '🐻',
+  '🐹',
+  '🐨',
+  '🐷',
+  '🐮',
+  '🐰',
+  '🐸',
+  '🐱',
+  '🐔',
+  '🐧',
+  '🐣',
+  '🦄',
+  '🐺',
+  '🐴',
+  '🐳',
+  '🦋',
+  '🐙',
+  '🦖',
+  '🦑',
+  '🐡',
+  '🐠',
+  '🐬',
+  '🐲',
+  '🤑',
+  '🤠',
+  '😎',
+  '🤩',
+  '🤯',
+  '😋',
+  '😛',
+  '🤪',
+  '😀',
+  '😷',
+  '💩',
+  '👽',
+  '🤖',
+  '👻',
+  '🦸‍♀️',
+  '🦸‍♂️',
+  '🦸',
+  '🧙🏼‍♂️',
+  '👩‍🚀',
+  '👨🏽‍🚀',
+  '👨‍🚀',
+  '🌈',
+] as const;
 
-export const colors = [];
+export type EmojiTypes = typeof emojiList[number];
 
-export type IAvatarInfo = {
-  img:
-    | IHdWalletAvatarImageNames
-    | IHwWalletAvatarImageNames
-    | IOthersWalletAvatarImageNames;
-  emoji?: IEmojiTypes | 'img';
-  bgColor?: string;
+export const colors = [
+  'surface-neutral-default',
+  '#E49090',
+  '#E3B167',
+  '#91BC76',
+  '#67BEA9',
+  '#55A9D9',
+  '#AB7DCF',
+  '#DF9BD0',
+];
+
+export type Avatar = {
+  emoji: EmojiTypes | 'img';
+  bgColor: string;
 };
 
-export const defaultAvatar: IAvatarInfo = {
-  img: 'bear',
-  emoji: undefined,
-  bgColor: undefined,
-};
+export const defaultAvatar: Avatar = { emoji: '🤑', bgColor: '#55A9D9' };
 
 function getRandomInt(max: number) {
   return Math.floor(Math.random() * max);
 }
 
-export function randomAvatar(): IAvatarInfo {
+export function randomAvatar(): Avatar {
   return {
-    img: HdWalletAvatarImageNames[
-      getRandomInt(HdWalletAvatarImageNames.length)
-    ],
-    emoji: undefined,
-    bgColor: undefined,
+    emoji: randomList[getRandomInt(randomList.length)],
+    bgColor: colors[getRandomInt(colors.length)],
   };
 }

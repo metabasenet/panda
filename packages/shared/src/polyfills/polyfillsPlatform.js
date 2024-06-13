@@ -1,15 +1,14 @@
 /* eslint-disable global-require, no-restricted-syntax, import/no-unresolved */
-require('setimmediate');
-require('./intlShim');
-require('react-native-url-polyfill/auto');
-const platformEnv = require('@onekeyhq/shared/src/platformEnv');
+import './intlShim';
+import 'react-native-url-polyfill/auto';
+import platformEnv from '@onekeyhq/shared/src/platformEnv';
 
-const shimsInjectedLog = (str) => console.log(`Shims Injected log: ${str}`);
+const shimsLog = (str) => console.log(`Shims Injected: ${str}`);
 
 if (typeof __dirname === 'undefined') global.__dirname = '/';
 if (typeof __filename === 'undefined') global.__filename = '';
 if (typeof process === 'undefined') {
-  shimsInjectedLog('process');
+  shimsLog('process');
   global.process = require('process');
 } else {
   const bProcess = require('process');
@@ -23,18 +22,18 @@ if (typeof process === 'undefined') {
 
 // TextEncoder and TextDecoder polyfill for starcoin
 if (typeof TextDecoder === 'undefined') {
-  shimsInjectedLog('TextDecoder');
+  shimsLog('TextDecoder');
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   global.TextDecoder = require('text-encoding').TextDecoder;
 }
 if (typeof TextEncoder === 'undefined') {
-  shimsInjectedLog('TextEncoder');
+  shimsLog('TextEncoder');
   global.TextEncoder = require('text-encoding').TextEncoder;
 }
 
 // Buffer polyfill
 if (typeof Buffer === 'undefined') {
-  shimsInjectedLog('Buffer');
+  shimsLog('Buffer');
   // global.Buffer = require('@craftzdog/react-native-buffer').Buffer;
   global.Buffer = require('buffer').Buffer;
 }
@@ -43,10 +42,9 @@ if (typeof Buffer === 'undefined') {
 
 if (typeof crypto === 'undefined') {
   try {
-    // check packages/shared/src/modules3rdParty/cross-crypto/verify.ts
-    shimsInjectedLog('crypto');
+    shimsLog('crypto');
     // eslint-disable-next-line no-const-assign
-    global.crypto = require('crypto'); // cross-crypto/index.native.js
+    global.crypto = require('crypto');
   } catch (error) {
     console.error(error);
   }
@@ -54,6 +52,7 @@ if (typeof crypto === 'undefined') {
 
 // https://docs.ethers.io/v5/cookbook/react-native/
 // Import the crypto getRandomValues shim (**BEFORE** the shims)
+require('react-native-get-random-values');
 // Import the the ethers shims (**BEFORE** ethers)
 /*
 Shims Injected:
@@ -63,21 +62,20 @@ Shims Injected:
   - FileReader.prototype.readAsArrayBuffer
  */
 // Shim atob and btoa
-// js-base64 lib cannot import by `require` function in React Native 0.72.
 const { Base64 } = require('js-base64');
 
 if (!global.atob) {
-  shimsInjectedLog('atob');
+  shimsLog('atob');
   global.atob = Base64.atob;
 }
 if (!global.btoa) {
-  shimsInjectedLog('btoa');
+  shimsLog('btoa');
   global.btoa = Base64.btoa;
 }
 
 // Shim nextTick
 if (!global.nextTick) {
-  shimsInjectedLog('nextTick');
+  shimsLog('nextTick');
   global.nextTick = function (callback) {
     setTimeout(callback, 0);
   };
@@ -92,7 +90,7 @@ try {
   try {
     fr.readAsArrayBuffer(new Blob(['hello'], { type: 'text/plain' }));
   } catch (error) {
-    shimsInjectedLog('FileReader.prototype.readAsArrayBuffer');
+    shimsLog('FileReader.prototype.readAsArrayBuffer');
     FileReader.prototype.readAsArrayBuffer = function (blob) {
       if (this.readyState === this.LOADING) {
         throw new Error('InvalidStateError');

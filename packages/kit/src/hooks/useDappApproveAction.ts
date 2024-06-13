@@ -1,9 +1,10 @@
+/* eslint-disable  @typescript-eslint/no-unused-vars */
 import { useCallback, useEffect, useState } from 'react';
 
 import { web3Errors } from '@onekeyfe/cross-inpage-provider-errors';
 
-import { toPlainErrorObject } from '@onekeyhq/shared/src/errors/utils/errorUtils';
 import platformEnv from '@onekeyhq/shared/src/platformEnv';
+import { toPlainErrorObject } from '@onekeyhq/shared/src/utils/errorUtils';
 
 import backgroundApiProxy from '../background/instance/backgroundApiProxy';
 
@@ -24,13 +25,11 @@ function useDappApproveAction({
   // TODO ignore multiple times reject/resolve
   const reject = useCallback(
     ({ close, error }: { close?: () => void; error?: Error } = {}) => {
-      if (!id) return;
       // eslint-disable-next-line no-param-reassign
-      const newError =
-        error || rejectError || web3Errors.provider.userRejectedRequest();
-      void backgroundApiProxy.servicePromise.rejectCallback({
+      error = error || rejectError || web3Errors.provider.userRejectedRequest();
+      backgroundApiProxy.servicePromise.rejectCallback({
         id,
-        error: toPlainErrorObject(newError),
+        error: toPlainErrorObject(error),
       });
       if (isExtStandaloneWindow) {
         // timeout wait reject done.
@@ -47,11 +46,11 @@ function useDappApproveAction({
 
   const resolve = useCallback(
     async ({ close, result }: { close?: () => void; result?: any } = {}) => {
-      if (!id) return;
       try {
         setRejectError(null);
+        // throw new Error('simulate something is wrong');
         const data = result ?? (await getResolveData?.());
-        void backgroundApiProxy.servicePromise.resolveCallback({
+        backgroundApiProxy.servicePromise.resolveCallback({
           id,
           data,
         });
@@ -80,7 +79,7 @@ function useDappApproveAction({
   useEffect(() => {
     // const registerWindowUnload = isExt && !platformEnv.isDev;
     const registerWindowUnload = isExtStandaloneWindow;
-    // TODO do not reject with hardware interaction when before-unload
+    // TODO do not reject with hardware interaction when beforeunload
     if (registerWindowUnload) {
       window.addEventListener('beforeunload', () => reject());
     }

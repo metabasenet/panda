@@ -13,5 +13,3 @@ export function useDebounce<T>(
   const [debounce] = useDebounceOriginal(value, delay, options);
   return debounce;
 }
-
-export { useDebouncedCallback } from 'use-debounce';

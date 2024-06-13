@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-
 declare module '@mymonero/mymonero-lws-client' {
   interface MoneroTransaction {
     coinbase: boolean;
@@ -89,5 +87,5 @@ declare module '@mymonero/mymonero-lws-client' {
     ) => Promise<{ amount_outs: AmountOut[] }>;
   }
 
-  export { MoneroAddressInfo, MoneroTransaction, SpentOutout };
+  export { MoneroAddressInfo, SpentOutout, MoneroTransaction };
 }

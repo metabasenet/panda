@@ -1,7 +1,4 @@
-// require('react-native-reanimated').setUpTests();
-
-// FIX:     ReferenceError: self is not defined
-global.self = global.self || global;
+require('react-native-reanimated').setUpTests();
 
 class LocalStorageMock {
   constructor() {
@@ -26,14 +23,8 @@ class LocalStorageMock {
 }
 
 global.localStorage = new LocalStorageMock();
-global.$$onekeyAppStorage = new LocalStorageMock();
-global.addEventListener = jest.fn;
 global.fetch = require('node-fetch');
 global.WebSocket = require('isomorphic-ws');
-
-if (typeof structuredClone === 'undefined') {
-  global.structuredClone = require('@ungap/structured-clone').default;
-}
 
 jest.mock('react-native-zip-archive', () => ({
   zip: jest.fn(),
@@ -63,17 +54,13 @@ jest.mock('react-native-device-info', () => ({
   getUsedMemorySync: jest.fn(),
 }));
 
-jest.mock('expo-localization', () => ({
-  locale: '',
-}));
-
 // ** shim TextEncoder
 // const { TextEncoder, TextDecoder } = require('util');
 // global.TextEncoder = TextEncoder;
 // global.TextDecoder = TextDecoder;
 
 // ** shim App variables
-// require('./apps/shim');
+// require('./packages/app/shim');
 
 // ** Array, Buffer, Error
 // https://github.com/facebook/jest/issues/2549

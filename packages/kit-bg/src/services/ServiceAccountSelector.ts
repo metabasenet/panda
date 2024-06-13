@@ -1,559 +1,213 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { cloneDeep } from 'lodash';
+/* eslint-disable @typescript-eslint/require-await */
+import { debounce } from 'lodash';
 
-import type { IAccountSelectorActiveAccountInfo } from '@onekeyhq/kit/src/states/jotai/contexts/accountSelector';
+import { isAccountCompatibleWithNetwork } from '@onekeyhq/engine/src/managers/account';
+import type { INetwork, IWallet } from '@onekeyhq/engine/src/types';
+import { ACCOUNT_SELECTOR_REFRESH_DEBOUNCE } from '@onekeyhq/kit/src/components/NetworkAccountSelector/consts';
+import type { AccountGroup } from '@onekeyhq/kit/src/components/NetworkAccountSelector/types';
+import {
+  getActiveWalletAccount,
+  getManageNetworks,
+} from '@onekeyhq/kit/src/hooks/crossHooks';
+import reducerAccountSelector from '@onekeyhq/kit/src/store/reducers/reducerAccountSelector';
+import { wait } from '@onekeyhq/kit/src/utils/helper';
 import {
   backgroundClass,
   backgroundMethod,
+  bindThis,
 } from '@onekeyhq/shared/src/background/backgroundDecorators';
-import {
-  WALLET_TYPE_EXTERNAL,
-  WALLET_TYPE_IMPORTED,
-  WALLET_TYPE_WATCHING,
-} from '@onekeyhq/shared/src/consts/dbConsts';
-import accountSelectorUtils from '@onekeyhq/shared/src/utils/accountSelectorUtils';
-import accountUtils from '@onekeyhq/shared/src/utils/accountUtils';
-import type { IServerNetwork } from '@onekeyhq/shared/types';
-import { EAccountSelectorSceneName } from '@onekeyhq/shared/types';
-import type { INetworkAccount } from '@onekeyhq/shared/types/account';
-
-import { settingsAtom } from '../states/jotai/atoms';
+import debugLogger from '@onekeyhq/shared/src/logger/debugLogger';
 
 import ServiceBase from './ServiceBase';
 
-import type {
-  IDBAccount,
-  IDBDevice,
-  IDBIndexedAccount,
-  IDBWallet,
-} from '../dbs/local/types';
-import type {
-  IAccountSelectorAccountsListSectionData,
-  IAccountSelectorFocusedWallet,
-  IAccountSelectorSelectedAccount,
-  IAccountSelectorSelectedAccountsMap,
-} from '../dbs/simple/entity/SimpleDbEntityAccountSelector';
-import type { IAccountDeriveInfo, IAccountDeriveTypes } from '../vaults/types';
+const {
+  updateSelectedWalletId,
+  updateSelectedNetworkId,
+  updatePreloadingCreateAccount,
+} = reducerAccountSelector.actions;
 
 @backgroundClass()
-class ServiceAccountSelector extends ServiceBase {
-  constructor({ backgroundApi }: { backgroundApi: any }) {
-    super({ backgroundApi });
-  }
-
+export default class ServiceAccountSelector extends ServiceBase {
+  @bindThis()
   @backgroundMethod()
-  async shouldSyncWithHome({
-    sceneName,
-    sceneUrl,
-    num,
-  }: {
-    sceneName: EAccountSelectorSceneName;
-    sceneUrl?: string;
-    num: number;
-  }) {
-    const syncScenes: {
-      sceneName: EAccountSelectorSceneName;
-      num: number;
-    }[] = [
-      {
-        sceneName: EAccountSelectorSceneName.home,
-        num: 0,
-      },
-      {
-        sceneName: EAccountSelectorSceneName.swap,
-        num: 0,
-      },
-    ];
-
-    const { swapToAnotherAccountSwitchOn } = await settingsAtom.get();
-    if (!swapToAnotherAccountSwitchOn) {
-      syncScenes.push({
-        sceneName: EAccountSelectorSceneName.swap,
-        num: 1,
-      });
-    }
-
-    return syncScenes.some((item) =>
-      accountSelectorUtils.isEqualAccountSelectorScene({
-        scene1: item,
-        scene2: { sceneName, sceneUrl, num },
-      }),
+  async setSelectedWalletToActive() {
+    const { network, wallet } = getActiveWalletAccount();
+    debugLogger.accountSelector.info(
+      'ServiceAccountSelector.setSelectedWalletToActive >>>> ',
+      wallet?.id,
     );
+    return this.updateSelectedWalletAndNetwork({
+      walletId: wallet?.id,
+      networkId: network?.id,
+    });
   }
 
+  @bindThis()
   @backgroundMethod()
-  public async mergeHomeDataToSwapMap({
-    swapMap,
+  async updateSelectedWalletAndNetwork({
+    walletId,
+    networkId,
   }: {
-    swapMap: IAccountSelectorSelectedAccountsMap | undefined;
+    walletId?: string;
+    networkId?: string;
   }) {
-    const homeData: IAccountSelectorSelectedAccount | undefined =
-      await this.backgroundApi.simpleDb.accountSelector.getSelectedAccount({
-        sceneName: EAccountSelectorSceneName.home,
-        num: 0,
-      });
-    if (homeData) {
-      // eslint-disable-next-line no-param-reassign
-      swapMap = cloneDeep(swapMap || {});
-
-      const updateSwapMap = (num: number) => {
-        if (!swapMap) {
-          return;
-        }
-        const swapDataMerged = accountSelectorUtils.buildMergedSelectedAccount({
-          data: swapMap[num],
-          mergedByData: homeData,
-        });
-        if (swapDataMerged) {
-          const usedNetworkId =
-            // swapDataMerged.networkId ??
-            // swapMap[num]?.networkId ??
-            homeData?.networkId;
-          swapMap[num] = swapDataMerged;
-          if (swapMap && swapMap[num]) {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            swapMap[num]!.networkId = usedNetworkId;
-          }
-        }
-      };
-
-      updateSwapMap(0);
-
-      const { swapToAnotherAccountSwitchOn } = await settingsAtom.get();
-      if (!swapToAnotherAccountSwitchOn) {
-        updateSwapMap(1);
-      }
-    }
-    return swapMap;
-  }
-
-  @backgroundMethod()
-  async buildActiveAccountInfoFromSelectedAccount({
-    selectedAccount,
-    nonce,
-  }: {
-    selectedAccount: IAccountSelectorSelectedAccount;
-    nonce?: number;
-  }): Promise<{
-    selectedAccount: IAccountSelectorSelectedAccount;
-    activeAccount: IAccountSelectorActiveAccountInfo;
-    nonce?: number;
-  }> {
-    const {
-      othersWalletAccountId,
-      indexedAccountId,
-      deriveType,
-      networkId,
-      walletId,
-    } = selectedAccount;
-
-    let account: INetworkAccount | undefined;
-    // NetworkAccount is undefined if others wallet account not compatible with network
-    // in this case, we should use dbAccount
-    let dbAccount: IDBAccount | undefined;
-    let wallet: IDBWallet | undefined;
-    let device: IDBDevice | undefined;
-    let network: IServerNetwork | undefined;
-    let indexedAccount: IDBIndexedAccount | undefined;
-    let deriveInfo: IAccountDeriveInfo | undefined;
-    const { serviceAccount, serviceNetwork } = this.backgroundApi;
-
+    const { dispatch } = this.backgroundApi;
+    const actions = [];
     if (walletId) {
-      try {
-        wallet = await serviceAccount.getWallet({
-          walletId,
-        });
-      } catch (e) {
-        console.error(e);
-      }
+      actions.push(updateSelectedWalletId(walletId || undefined));
     }
-
-    if (indexedAccountId && wallet) {
-      try {
-        indexedAccount = await serviceAccount.getIndexedAccount({
-          id: indexedAccountId,
-        });
-      } catch (e) {
-        console.error(e);
-      }
-    }
-
-    if (othersWalletAccountId) {
-      try {
-        const r = await serviceAccount.getDBAccount({
-          accountId: othersWalletAccountId,
-        });
-        dbAccount = r;
-      } catch (e) {
-        console.error(e);
-      }
-    }
-
     if (networkId) {
-      try {
-        network = await serviceNetwork.getNetwork({
-          networkId,
-        });
-      } catch (e) {
-        console.error(e);
-      }
-
-      if ((indexedAccountId && wallet) || othersWalletAccountId) {
-        try {
-          const r = await serviceAccount.getNetworkAccount({
-            indexedAccountId,
-            accountId: othersWalletAccountId,
-            deriveType,
-            networkId,
-          });
-          account = r;
-        } catch (e) {
-          // account may not compatible with network
-          console.error(e);
-        }
-      }
-
-      if (deriveType) {
-        try {
-          deriveInfo =
-            await this.backgroundApi.serviceNetwork.getDeriveInfoOfNetwork({
-              networkId,
-              deriveType,
-            });
-        } catch (error) {
-          //
-        }
-      }
+      actions.push(updateSelectedNetworkId(networkId || undefined));
     }
-
-    if (wallet && (await serviceAccount.isTempWalletRemoved({ wallet }))) {
-      wallet = undefined;
-      account = undefined;
-      indexedAccount = undefined;
-    }
-
-    const isOthersWallet = Boolean(account && !indexedAccountId);
-    const universalAccountName = (() => {
-      // hd account or others account
-      if (account) {
-        // localDB should replace account name from indexedAccount name if hd or hw
-        return account.name;
-      }
-      // hd index account but account not create yet
-      if (indexedAccount) {
-        return indexedAccount.name;
-      }
-      // others account but not compatible with network, account is undefined, so use dbAccount
-      if (dbAccount) {
-        return dbAccount.name;
-      }
-      return '';
-    })();
-
-    if (
-      (accountUtils.isHwWallet({
-        walletId: wallet?.id,
-      }) ||
-        accountUtils.isQrWallet({
-          walletId: wallet?.id,
-        })) &&
-      wallet?.associatedDevice
-    ) {
-      try {
-        device = await serviceAccount.getDevice({
-          dbDeviceId: wallet?.associatedDevice,
-        });
-      } catch (e) {
-        //
-      }
-    }
-
-    const activeAccount: IAccountSelectorActiveAccountInfo = {
-      account,
-      dbAccount,
-      indexedAccount,
-      accountName: universalAccountName,
-      wallet,
-      device,
-      network,
-      deriveType,
-      deriveInfo,
-      deriveInfoItems: await serviceNetwork.getDeriveInfoItemsOfNetwork({
-        networkId,
-      }),
-      ready: true,
-      isOthersWallet,
-    };
-    const selectedAccountFixed: IAccountSelectorSelectedAccount = {
-      othersWalletAccountId: isOthersWallet
-        ? activeAccount?.account?.id
-        : undefined,
-      indexedAccountId: activeAccount.indexedAccount?.id,
-      deriveType: activeAccount.deriveType,
-      networkId: activeAccount.network?.id,
-      walletId: activeAccount.wallet?.id,
-      focusedWallet: activeAccount.wallet?.id,
-    };
-    return { activeAccount, selectedAccount: selectedAccountFixed, nonce };
-  }
-
-  @backgroundMethod()
-  async getGlobalDeriveType({
-    selectedAccount,
-  }: {
-    selectedAccount: IAccountSelectorSelectedAccount;
-  }) {
-    const { networkId, walletId } = selectedAccount;
-    if (!networkId) {
-      return undefined;
-    }
-    if (walletId && accountUtils.isOthersWallet({ walletId })) {
-      return undefined;
-    }
-    const currentGlobalDeriveType =
-      await this.backgroundApi.simpleDb.accountSelector.getGlobalDeriveType({
-        networkId,
-      });
-
-    return currentGlobalDeriveType;
-  }
-
-  @backgroundMethod()
-  async saveGlobalDeriveType({
-    selectedAccount,
-    sceneName,
-    sceneUrl,
-    num,
-    eventEmitDisabled,
-  }: {
-    selectedAccount: IAccountSelectorSelectedAccount;
-    sceneName: EAccountSelectorSceneName;
-    sceneUrl?: string;
-    num: number;
-    eventEmitDisabled?: boolean;
-  }) {
-    const { serviceNetwork } = this.backgroundApi;
-    // TODO add whitelist
-    const { networkId, deriveType, walletId } = selectedAccount;
-
-    // skip others wallet global derive type save
-    if (
-      walletId &&
-      accountUtils.isOthersWallet({
-        walletId,
-      })
-    ) {
-      return;
-    }
-    if (networkId && deriveType) {
-      const currentGlobalDeriveType = await this.getGlobalDeriveType({
-        selectedAccount,
-      });
-      if (currentGlobalDeriveType !== deriveType) {
-        const deriveInfoItems =
-          await serviceNetwork.getDeriveInfoItemsOfNetwork({
-            networkId,
-          });
-        if (deriveInfoItems.find((item) => item.value === deriveType)) {
-          await this.backgroundApi.simpleDb.accountSelector.saveGlobalDeriveType(
-            {
-              eventEmitDisabled,
-              networkId,
-              deriveType,
-            },
-          );
-        }
-      } else {
-        console.log('syncDeriveType currentGlobalDeriveType !== deriveType', {
-          currentGlobalDeriveType,
-          deriveType,
-        });
-      }
+    if (actions.length) {
+      dispatch(...actions);
     }
   }
 
+  @bindThis()
   @backgroundMethod()
-  async fixDeriveTypesForInitAccountSelectorMap({
-    selectedAccountsMapInDB,
-    sceneName,
-    sceneUrl,
-  }: {
-    selectedAccountsMapInDB: IAccountSelectorSelectedAccountsMap;
-    sceneName: EAccountSelectorSceneName;
-    sceneUrl?: string;
-  }) {
-    await Promise.all(
-      Object.entries(selectedAccountsMapInDB).map(
-        async (item: [string, IAccountSelectorSelectedAccount | undefined]) => {
-          // TODO add whitelist
-          const [num, v] = item;
-          if (v && v.networkId) {
-            const globalDeriveType = await this.getGlobalDeriveType({
-              selectedAccount: v,
-            });
-            const deriveType: IAccountDeriveTypes =
-              globalDeriveType || v.deriveType || 'default';
-            v.deriveType = deriveType;
-
-            if (
-              v.walletId &&
-              accountUtils.isOthersWallet({ walletId: v.walletId })
-            ) {
-              v.deriveType = 'default';
-            }
-          }
-        },
-      ),
-    );
-    return selectedAccountsMapInDB;
-  }
-
-  @backgroundMethod()
-  async getAccountSelectorAccountsListSectionData({
-    focusedWallet,
-    othersNetworkId,
-    linkedNetworkId,
-    deriveType,
-  }: {
-    focusedWallet: IAccountSelectorFocusedWallet;
-    othersNetworkId?: string;
-    linkedNetworkId?: string;
-    deriveType: IAccountDeriveTypes;
-  }): Promise<Array<IAccountSelectorAccountsListSectionData>> {
-    const { serviceAccount } = this.backgroundApi;
-    if (!focusedWallet) {
-      return [];
-    }
-    const buildAccountsData = ({
-      accounts,
+  async updateSelectedWallet(walletId?: string) {
+    debugLogger.accountSelector.info(
+      'ServiceAccountSelector.updateSelectedWallet >>>> ',
       walletId,
-      title,
-    }: {
-      accounts: IDBAccount[] | IDBIndexedAccount[];
-      walletId: string;
-      title?: string;
-    }): IAccountSelectorAccountsListSectionData => {
-      if (walletId === WALLET_TYPE_WATCHING) {
-        return {
-          title: title ?? 'Watchlist',
-          data: accounts,
-          walletId,
-          emptyText:
-            'Your watchlist is empty. Import a address to start monitoring.',
-        };
-      }
-      if (walletId === WALLET_TYPE_IMPORTED) {
-        return {
-          title: title ?? 'Private Key',
-          data: accounts,
-          walletId,
-          emptyText:
-            'No private key accounts. Add a new account to manage your assets.',
-        };
-      }
-      if (walletId === WALLET_TYPE_EXTERNAL) {
-        return {
-          title: title ?? 'External account',
-          data: accounts,
-          walletId,
-          emptyText:
-            'No external wallets connected. Link a third-party wallet to view here.',
-        };
-      }
-      // hw and hd accounts
-      return {
-        title: title ?? '',
-        data: accounts,
-        walletId,
-        emptyText: 'No account',
-      };
-    };
-    if (focusedWallet === '$$others') {
-      const { accounts: accountsWatching } =
-        await serviceAccount.getSingletonAccountsOfWallet({
-          walletId: WALLET_TYPE_WATCHING,
-          activeNetworkId: othersNetworkId,
-        });
-      const { accounts: accountsImported } =
-        await serviceAccount.getSingletonAccountsOfWallet({
-          walletId: WALLET_TYPE_IMPORTED,
-          activeNetworkId: othersNetworkId,
-        });
-      const { accounts: accountsExternal } =
-        await serviceAccount.getSingletonAccountsOfWallet({
-          walletId: WALLET_TYPE_EXTERNAL,
-          activeNetworkId: othersNetworkId,
-        });
-
-      return [
-        buildAccountsData({
-          accounts: accountsImported,
-          walletId: WALLET_TYPE_IMPORTED,
-        }),
-        buildAccountsData({
-          accounts: accountsWatching,
-          walletId: WALLET_TYPE_WATCHING,
-        }),
-        buildAccountsData({
-          accounts: accountsExternal,
-          walletId: WALLET_TYPE_EXTERNAL,
-        }),
-      ];
-    }
-    const walletId = focusedWallet;
-    try {
-      await serviceAccount.getWallet({ walletId });
-    } catch (error) {
-      // wallet may be removed
-      console.error(error);
-      return [];
-    }
-
-    // others singleton wallet
-    if (accountUtils.isOthersWallet({ walletId })) {
-      const { accounts } = await serviceAccount.getSingletonAccountsOfWallet({
-        walletId: walletId as any,
-        activeNetworkId: othersNetworkId,
-      });
-      return [
-        buildAccountsData({
-          accounts,
-          walletId,
-          title: '',
-        }),
-      ];
-    }
-
-    // hd hw accounts
-    const { accounts } = await serviceAccount.getIndexedAccountsOfWallet({
+    );
+    // TODO ignore update if create new account loading
+    return this.updateSelectedWalletAndNetwork({
       walletId,
     });
-    if (linkedNetworkId) {
-      await Promise.all(
-        accounts.map(async (indexedAccount: IDBIndexedAccount) => {
-          try {
-            const realAccount = await serviceAccount.getNetworkAccount({
-              accountId: undefined,
-              indexedAccountId: indexedAccount.id,
-              deriveType,
-              networkId: linkedNetworkId,
-            });
-            indexedAccount.associateAccount = realAccount;
-          } catch (e) {
-            //
-          }
+  }
+
+  @bindThis()
+  @backgroundMethod()
+  async updateSelectedNetwork(networkId?: string) {
+    return this.updateSelectedWalletAndNetwork({
+      networkId,
+    });
+  }
+
+  async getAccountsByGroup() {
+    const { appSelector, engine } = this.backgroundApi;
+
+    debugLogger.accountSelector.info('calling getAccountsByGroup');
+    let groupData: AccountGroup[] = [];
+    const { networkId, walletId } = appSelector((s) => s.accountSelector);
+    if (!walletId) {
+      return groupData;
+    }
+    const selectedNetworkId = networkId;
+    const selectedWalletId = walletId;
+    let network: INetwork | null = null;
+    let wallet: IWallet | null = null;
+    if (selectedNetworkId) {
+      network = await engine.getNetwork(selectedNetworkId);
+    }
+    if (selectedWalletId) {
+      wallet = await engine.getWallet(selectedWalletId);
+    }
+    const walletAccounts = wallet?.accounts || [];
+    const accountsIdInSelected = walletAccounts.filter((accountId) =>
+      selectedNetworkId
+        ? isAccountCompatibleWithNetwork(accountId, selectedNetworkId)
+        : true,
+    );
+    const accountsList = await engine.getAccounts(accountsIdInSelected);
+
+    if (network) {
+      if (accountsList && accountsList.length)
+        groupData = [
+          {
+            // TODO use network id
+            title: network,
+            // TODO use account id
+            data: accountsList,
+          },
+        ];
+    } else {
+      const { enabledNetworks } = getManageNetworks(undefined);
+      enabledNetworks.forEach((networkItem) => {
+        const data = accountsList.filter((account) =>
+          isAccountCompatibleWithNetwork(account.id, networkItem.id),
+        );
+        if (data && data.length) {
+          groupData.push({
+            // TODO use network id
+            title: networkItem,
+            // TODO use account id
+            data,
+          });
+        }
+      });
+    }
+
+    return groupData;
+  }
+
+  _refreshAccountsGroup = debounce(
+    async () => {
+      // noop
+    },
+    ACCOUNT_SELECTOR_REFRESH_DEBOUNCE,
+    {
+      leading: false,
+      trailing: true,
+    },
+  );
+
+  @bindThis()
+  @backgroundMethod()
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async refreshAccountsGroup({ delay = 0 }: { delay?: number } = {}) {
+    // noop
+  }
+
+  @bindThis()
+  @backgroundMethod()
+  async preloadingCreateAccount(info: {
+    networkId: string;
+    walletId: string;
+    template?: string;
+  }) {
+    const { dispatch } = this.backgroundApi;
+
+    const { networkId, walletId } = info;
+
+    await this.updateSelectedWallet(walletId);
+    await this.updateSelectedNetwork(networkId);
+
+    dispatch(updatePreloadingCreateAccount(info));
+  }
+
+  @bindThis()
+  @backgroundMethod()
+  async preloadingCreateAccountDone({
+    networkId,
+    walletId,
+    accountId,
+    template,
+    delay = 600,
+  }: {
+    networkId?: string;
+    walletId?: string;
+    accountId?: string;
+    template?: string;
+    delay?: number;
+  } = {}) {
+    const { dispatch } = this.backgroundApi;
+
+    if (walletId) await this.updateSelectedWallet(walletId);
+    if (networkId) await this.updateSelectedNetwork(networkId);
+
+    if (delay > 0) {
+      dispatch(
+        updatePreloadingCreateAccount({
+          networkId,
+          walletId,
+          accountId,
+          template,
         }),
       );
     }
-
-    return [
-      buildAccountsData({
-        accounts,
-        walletId,
-        title: '',
-      }),
-    ];
+    await wait(delay);
+    dispatch(updatePreloadingCreateAccount(undefined));
   }
 }
-
-export default ServiceAccountSelector;

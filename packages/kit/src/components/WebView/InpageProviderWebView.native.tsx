@@ -2,18 +2,21 @@ import type { FC } from 'react';
 import { forwardRef, useImperativeHandle, useMemo, useState } from 'react';
 
 import { useWebViewBridge } from '@onekeyfe/onekey-cross-webview';
+import { Box, Progress } from 'native-base';
 
-import { Progress, Spinner, Stack } from '@onekeyhq/components';
+import { Center, Spinner } from '@onekeyhq/components';
 
-// @ts-expect-error
+// injected hot-reload cache update: 21334400088746
+// eslint-disable-next-line import/order
+// @ts-ignore
 import injectedNativeCode from './injectedNative.text-js';
 import { NativeWebView } from './NativeWebView';
 
-import type { IInpageProviderWebViewProps } from './types';
+import type { InpageProviderWebViewProps } from './types';
 import type { IWebViewWrapperRef } from '@onekeyfe/onekey-cross-webview';
 import type { WebViewProps } from 'react-native-webview';
 
-const InpageProviderWebView: FC<IInpageProviderWebViewProps> = forwardRef(
+const InpageProviderWebView: FC<InpageProviderWebViewProps> = forwardRef(
   (
     {
       src = '',
@@ -26,14 +29,8 @@ const InpageProviderWebView: FC<IInpageProviderWebViewProps> = forwardRef(
       isSpinnerLoading,
       onContentLoaded,
       onOpenWindow,
-      onLoad,
-      onLoadStart,
-      onLoadEnd,
-      onScroll,
       androidLayerType,
-      displayProgressBar,
-      onProgress,
-    }: IInpageProviderWebViewProps,
+    }: InpageProviderWebViewProps,
     ref: any,
   ) => {
     const [progress, setProgress] = useState(5);
@@ -56,6 +53,7 @@ const InpageProviderWebView: FC<IInpageProviderWebViewProps> = forwardRef(
       // https://github.com/react-native-webview/react-native-webview/issues/1915#issuecomment-880989194
       props.androidLayerType = androidLayerType;
       props.onShouldStartLoadWithRequest = onShouldStartLoadWithRequest;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return props;
     }, [
       androidLayerType,
@@ -69,7 +67,7 @@ const InpageProviderWebView: FC<IInpageProviderWebViewProps> = forwardRef(
         code += `
         ;(function() {
             ;
-            ${nativeInjectedJavaScriptBeforeContentLoaded ?? ''}
+            ${nativeInjectedJavaScriptBeforeContentLoaded}
             ;
         })();
         `;
@@ -78,46 +76,45 @@ const InpageProviderWebView: FC<IInpageProviderWebViewProps> = forwardRef(
     }, [nativeInjectedJavaScriptBeforeContentLoaded]);
 
     const progressLoading = useMemo(() => {
-      if (!displayProgressBar) {
-        return null;
-      }
       if (progress < 100) {
         if (isSpinnerLoading) {
           // should be absolute position, otherwise android will crashed!
           return (
-            <Stack
+            <Center
               position="absolute"
               left={0}
               top={0}
               right={0}
-              w="100%"
-              h="100%"
+              w="full"
+              h="full"
               flex={1}
-              alignItems="center"
-              justifyContent="center"
             >
-              <Spinner size="large" />
-            </Stack>
+              <Spinner size="lg" />
+            </Center>
           );
         }
         return (
           <Progress
             value={progress}
-            width="100%"
             position="absolute"
             left={0}
             top={0}
             right={0}
             zIndex={10}
-            borderRadius={0}
+            rounded={0}
+            size="xs"
+            bg="surface-neutral-default"
+            _filledTrack={{
+              bg: 'interactive-default',
+            }}
           />
         );
       }
       return null;
-    }, [isSpinnerLoading, progress, displayProgressBar]);
+    }, [isSpinnerLoading, progress]);
 
     return (
-      <Stack flex={1}>
+      <Box flex={1}>
         {progressLoading}
         <NativeWebView
           ref={setWebViewRef}
@@ -127,7 +124,7 @@ const InpageProviderWebView: FC<IInpageProviderWebViewProps> = forwardRef(
           injectedJavaScriptBeforeContentLoaded={nativeInjectedJsCode}
           onLoadProgress={({ nativeEvent }) => {
             const p = Math.ceil(nativeEvent.progress * 100);
-            onProgress?.(p);
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
             setProgress(p);
             if (p >= 100) {
               onContentLoaded?.();
@@ -137,10 +134,6 @@ const InpageProviderWebView: FC<IInpageProviderWebViewProps> = forwardRef(
           onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
           textInteractionEnabled={undefined}
           minimumFontSize={undefined}
-          onLoad={onLoad}
-          onLoadStart={onLoadStart}
-          onLoadEnd={onLoadEnd}
-          onScroll={onScroll}
           // allowFileAccessFromFileURLs
           // allowFileAccess
           // allowUniversalAccessFromFileURLs
@@ -149,7 +142,7 @@ const InpageProviderWebView: FC<IInpageProviderWebViewProps> = forwardRef(
           originWhitelist={['*']}
           {...nativeWebviewProps}
         />
-      </Stack>
+      </Box>
     );
   },
 );

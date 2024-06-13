@@ -2,13 +2,15 @@
 import { web3Errors } from '@onekeyfe/cross-inpage-provider-errors';
 import { IInjectedProviderNames } from '@onekeyfe/cross-inpage-provider-types';
 
+import type VaultNear from '@onekeyhq/engine/src/vaults/impl/near/Vault';
+import { getActiveWalletAccount } from '@onekeyhq/kit/src/hooks';
 import {
   backgroundClass,
   permissionRequired,
   providerApiMethod,
 } from '@onekeyhq/shared/src/background/backgroundDecorators';
-
-import { getPublicKey } from '../vaults/impls/near/utils';
+import { IMPL_NEAR } from '@onekeyhq/shared/src/engine/engineConsts';
+import debugLogger from '@onekeyhq/shared/src/logger/debugLogger';
 
 import ProviderApiBase from './ProviderApiBase';
 
@@ -25,48 +27,39 @@ class ProviderApiNear extends ProviderApiBase {
 
   public notifyDappAccountsChanged(info: IProviderBaseBackgroundNotifyInfo) {
     const data = async ({ origin }: { origin: string }) => {
-      const params = await this.near_accounts({
-        origin,
-        scope: this.providerName,
-      });
+      const params = await this.near_accounts({ origin });
       const result = {
         method: 'wallet_events_accountsChanged',
         params,
       };
       return result;
     };
-    info.send(data, info.targetOrigin);
+    info.send(data);
   }
 
   public notifyDappChainChanged(info: IProviderBaseBackgroundNotifyInfo) {
-    const data = async ({ origin }: { origin: string }) => {
-      const params = await this.near_network({
-        origin,
-        scope: this.providerName,
-      });
+    const data = async () => {
+      const params = await this.near_network();
       const result = {
+        // TODO do not emit events to EVM Dapps, injected provider check scope
         method: 'wallet_events_chainChanged',
         params,
       };
       return result;
     };
-    info.send(data, info.targetOrigin);
+    info.send(data);
   }
 
-  public async rpcCall(request: IJsBridgeMessagePayload): Promise<any> {
-    const { data } = request;
-    const { accountInfo: { networkId } = {} } = (
-      await this.getAccountsInfo(request)
-    )[0];
-    const rpcRequest = data as IJsonRpcRequest;
+  public async rpcCall(request: IJsonRpcRequest) {
+    const { networkId, networkImpl } = getActiveWalletAccount();
 
-    console.log(`${this.providerName} RpcCall=====>>>> : BgApi:`, request);
-
-    const [result] = await this.backgroundApi.serviceDApp.proxyRPCCall({
-      networkId: networkId ?? '',
-      request: rpcRequest,
-    });
-
+    if (networkImpl !== IMPL_NEAR) {
+      return;
+    }
+    const result = await this.backgroundApi.engine.proxyJsonRPCCall(
+      networkId,
+      request,
+    );
     return result;
   }
 
@@ -78,57 +71,68 @@ class ProviderApiNear extends ProviderApiBase {
       allKeys?: string[];
     }[];
   }> {
-    const accountsInfo =
-      await this.backgroundApi.serviceDApp.dAppGetConnectedAccountsInfo(
-        request,
-      );
-    if (!accountsInfo) {
-      return Promise.resolve({ accounts: [] });
+    const { networkId, networkImpl, accountId } = getActiveWalletAccount();
+    const connectedAccounts =
+      this.backgroundApi.serviceDapp?.getActiveConnectedAccounts({
+        origin: request.origin as string,
+        impl: IMPL_NEAR,
+      });
+    if (!connectedAccounts) {
+      return { accounts: [] };
     }
-    return Promise.resolve({
-      accounts: accountsInfo.map((i) => ({
-        accountId: i.account?.address,
-        publicKey: getPublicKey({ accountPub: i.account.pub }),
-        allKeys: [],
-      })),
-    });
-  }
-
-  @providerApiMethod()
-  public async near_network(request: IJsBridgeMessagePayload): Promise<{
-    networkId: string;
-    nodeUrls: string[];
-  }> {
-    const networks = await this.backgroundApi.serviceDApp.getConnectedNetworks(
-      request,
-    );
-
-    if (networks[0]) {
-      return {
-        networkId: networks[0].isTestnet ? 'testnet' : 'mainnet',
-        nodeUrls: [],
-      };
+    if (networkImpl !== IMPL_NEAR) {
+      return { accounts: [] };
     }
-
+    const vault = (await this.backgroundApi.engine.getVault({
+      networkId,
+      accountId,
+    })) as VaultNear;
+    const address = await vault.getAccountAddress();
+    const addresses = connectedAccounts.map((account) => account.address);
+    if (!addresses.includes(address)) {
+      return { accounts: [] };
+    }
+    const publicKey = await vault._getPublicKey();
     return {
-      networkId: '',
-      nodeUrls: [],
+      accounts: [
+        {
+          accountId: address,
+          publicKey,
+          allKeys: [],
+        },
+      ],
     };
   }
 
   @providerApiMethod()
-  public near_networkInfo(request: IJsBridgeMessagePayload) {
-    return this.near_network(request);
+  public async near_network(): Promise<{
+    networkId: string;
+    nodeUrls: string[];
+  }> {
+    const { networkId } = getActiveWalletAccount();
+    const network = await this.backgroundApi.engine.getNetwork(networkId);
+    return {
+      networkId: network.isTestnet ? 'testnet' : 'mainnet',
+      nodeUrls: [network.rpcURL],
+    };
+  }
+
+  @providerApiMethod()
+  public near_networkInfo() {
+    return this.near_network();
   }
 
   @providerApiMethod()
   public async near_requestAccounts(request: IJsBridgeMessagePayload) {
-    console.log('ProviderApiNear.near_requestAccounts', request);
+    debugLogger.providerApi.info(
+      'ProviderApiNear.near_requestAccounts',
+      request,
+    );
     const res = await this.near_accounts(request);
     if (res.accounts && res.accounts.length) {
       return res;
     }
-    await this.backgroundApi.serviceDApp.openConnectionModal(request);
+    await this.backgroundApi.serviceDapp.openConnectionModal(request);
     return this.near_accounts(request);
   }
 
@@ -139,7 +143,7 @@ class ProviderApiNear extends ProviderApiBase {
 
   // signOut, sign out, logOut, log out, disconnect
   @providerApiMethod()
-  public async near_signOut(
+  public near_signOut(
     request: IJsBridgeMessagePayload,
     accountInfo: { accountId?: string },
   ) {
@@ -147,9 +151,10 @@ class ProviderApiNear extends ProviderApiBase {
     if (!origin || !accountInfo.accountId) {
       return false;
     }
-    await this.backgroundApi.serviceDApp.disconnectWebsite({
+    this.backgroundApi.serviceDapp.removeConnectedAccounts({
       origin,
-      storageType: 'injectedProvider',
+      networkImpl: IMPL_NEAR,
+      addresses: [accountInfo.accountId],
     });
     return true;
   }
@@ -166,22 +171,18 @@ class ProviderApiNear extends ProviderApiBase {
   ): Promise<{ transactionHashes: string[] }> {
     const { transactions } = params;
     const transactionHashes: string[] = [];
-
-    const { accountInfo: { accountId, networkId } = {} } = (
-      await this.getAccountsInfo(request)
-    )[0];
-
     for (let i = 0; i < transactions.length; i += 1) {
-      const tx = transactions[i];
-
-      const result =
-        (await this.backgroundApi.serviceDApp.openSignAndSendTransactionModal({
-          accountId: accountId ?? '',
-          networkId: networkId ?? '',
-          request,
-          encodedTx: tx,
-        })) as string;
-      transactionHashes.push(result);
+      await this.backgroundApi.serviceDapp.processBatchTransactionOneByOne({
+        run: async () => {
+          const tx = transactions[i];
+          const result =
+            (await this.backgroundApi.serviceDapp.openSignAndSendModal(
+              request,
+              { encodedTx: tx },
+            )) as string;
+          transactionHashes.push(result);
+        },
+      });
     }
     return { transactionHashes };
   }
@@ -218,10 +219,10 @@ class ProviderApiNear extends ProviderApiBase {
   }
 
   @providerApiMethod()
-  wallet_getConnectWalletInfo(request: IJsBridgeMessagePayload) {
+  wallet_getConnectWalletInfo(req: IJsBridgeMessagePayload) {
     const privateProvider = this.backgroundApi.providers
       .$private as ProviderApiPrivate;
-    return privateProvider.wallet_getConnectWalletInfo(request);
+    return privateProvider.wallet_getConnectWalletInfo(req);
   }
 
   @providerApiMethod()

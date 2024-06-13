@@ -1,87 +1,60 @@
-import { SEARCH_KEY_MIN_LENGTH } from '../consts/walletConsts';
+import type { BRC20TextProps } from '@onekeyhq/engine/src/managers/nft';
+import {
+  BRC20TokenOperation,
+  BRCTokenType,
+} from '@onekeyhq/engine/src/types/token';
 
-import type { IAccountToken, ITokenData } from '../../types/token';
-
-export function getMergedTokenData({
-  tokens,
-  smallBalanceTokens,
-  riskTokens,
-}: {
-  tokens: ITokenData;
-  smallBalanceTokens: ITokenData;
-  riskTokens: ITokenData;
-}) {
-  const mergedTokens = [
-    ...tokens.data,
-    ...smallBalanceTokens.data,
-    ...riskTokens.data,
-  ];
-
-  const mergedKeys = `${tokens.keys}_${smallBalanceTokens.keys}_${riskTokens.keys}`;
-
-  const mergedTokenMap = {
-    ...tokens.map,
-    ...smallBalanceTokens.map,
-    ...riskTokens.map,
-  };
-
-  return {
-    allTokens: {
-      data: mergedTokens,
-      keys: mergedKeys,
-      map: mergedTokenMap,
-    },
-    tokens,
-    riskTokens,
-    smallBalanceTokens,
-  };
-}
-
-export function getEmptyTokenData() {
-  return {
-    allTokens: {
-      data: [],
-      keys: '',
-      map: {},
-    },
-    tokens: {
-      data: [],
-      keys: '',
-      map: {},
-    },
-    riskTokens: {
-      data: [],
-      keys: '',
-      map: {},
-    },
-    smallBalanceTokens: {
-      data: [],
-      keys: '',
-      map: {},
-    },
-  };
-}
-
-export function getFilteredTokenBySearchKey({
-  tokens,
-  searchKey,
-}: {
-  tokens: IAccountToken[];
-  searchKey: string;
-}) {
-  if (!searchKey || searchKey.length < SEARCH_KEY_MIN_LENGTH) {
-    return tokens;
-  }
-
-  // eslint-disable-next-line no-param-reassign
-  searchKey = searchKey.trim().toLowerCase();
-
-  const filteredTokens = tokens.filter(
-    (token) =>
-      token.name?.toLowerCase().includes(searchKey) ||
-      token.symbol?.toLowerCase().includes(searchKey) ||
-      token.address?.toLowerCase() === searchKey,
+export function isBRC20Token(tokenAddress?: string) {
+  return (
+    tokenAddress?.startsWith('brc20') || tokenAddress?.startsWith('brc-20')
   );
+}
 
-  return filteredTokens;
+export function parseTextProps(content: string) {
+  try {
+    const json = JSON.parse(content) as BRC20TextProps;
+    return json;
+  } catch (error) {
+    console.log('parse InscriptionText error = ', error);
+  }
+}
+
+export async function parseBRC20Content({
+  content,
+  contentType,
+  contentUrl,
+}: {
+  content: string | null;
+  contentType: string;
+  contentUrl?: string;
+}) {
+  let brc20Content = content;
+
+  if (contentType === 'text/plain;charset=utf-8') {
+    if (!brc20Content && contentUrl) {
+      const response = await fetch(contentUrl);
+      brc20Content = await response.text();
+    }
+
+    const props = parseTextProps(brc20Content ?? '');
+    if (props?.p === 'brc-20') {
+      return {
+        isBRC20Content: true,
+        brc20Content: props,
+      };
+    }
+  }
+  return {
+    isBRC20Content: false,
+    brc20Content: null,
+  };
+}
+
+export function createBRC20TransferText(amount: string, tick: string) {
+  return JSON.stringify({
+    p: BRCTokenType.BRC20,
+    op: BRC20TokenOperation.Transfer,
+    tick,
+    amt: amount,
+  });
 }

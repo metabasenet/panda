@@ -1,10 +1,10 @@
-import adaWebSdk from '@onekeyhq/core/src/chains/ada/sdkAda/sdk/adaWebSdk';
-import type { IAdaSdkApi } from '@onekeyhq/core/src/chains/ada/sdkAda/sdk/types';
-import timerUtils from '@onekeyhq/shared/src/utils/timerUtils';
+import adaWebSdk from '@onekeyhq/engine/src/vaults/impl/ada/helper/sdk/adaWebSdk';
+import type { IAdaSdkApi } from '@onekeyhq/engine/src/vaults/impl/ada/helper/sdk/types';
+import { wait } from '@onekeyhq/kit/src/utils/helper';
 
 export default class OffscreenApiAdaSdk implements IAdaSdkApi {
   async sayHello() {
-    await timerUtils.wait(3000);
+    await wait(3000);
     return 'Hello World: OffscreenApiAdaSdk';
   }
 

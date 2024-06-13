@@ -1,30 +1,30 @@
 import { web3Errors } from '@onekeyfe/cross-inpage-provider-errors';
 import { IInjectedProviderNames } from '@onekeyfe/cross-inpage-provider-types';
-import BigNumber from 'bignumber.js';
 
+import { CommonMessageTypes } from '@onekeyhq/engine/src/types/message';
+import {
+  findLnurl,
+  getLnurlDetails,
+  isLNURLRequestError,
+} from '@onekeyhq/engine/src/vaults/impl/lightning-network/helper/lnurl';
+import type {
+  RequestInvoiceArgs,
+  RequestInvoiceResponse,
+  SignMessageResponse,
+  VerifyMessageArgs,
+} from '@onekeyhq/engine/src/vaults/impl/lightning-network/types/webln';
+import { getActiveWalletAccount } from '@onekeyhq/kit/src/hooks';
+import {
+  ModalRoutes,
+  SendModalRoutes,
+  WeblnModalRoutes,
+} from '@onekeyhq/kit/src/routes/routesEnum';
 import {
   backgroundClass,
   providerApiMethod,
 } from '@onekeyhq/shared/src/background/backgroundDecorators';
-import {
-  NotImplemented,
-  OneKeyInternalError,
-} from '@onekeyhq/shared/src/errors';
-import {
-  EDAppConnectionModal,
-  EModalRoutes,
-  EModalSendRoutes,
-} from '@onekeyhq/shared/src/routes';
-import type { ILNURLDetails } from '@onekeyhq/shared/types/lightning';
-import type {
-  IRequestInvoiceArgs,
-  IRequestInvoiceResponse,
-  ISignMessageResponse,
-  IVerifyMessageArgs,
-} from '@onekeyhq/shared/types/lightning/webln';
-import { EMessageTypesCommon } from '@onekeyhq/shared/types/message';
-
-import { findLnurl } from '../vaults/impls/lightning/sdkLightning/lnurl';
+import { IMPL_LIGHTNING } from '@onekeyhq/shared/src/engine/engineConsts';
+import debugLogger from '@onekeyhq/shared/src/logger/debugLogger';
 
 import ProviderApiBase from './ProviderApiBase';
 
@@ -38,55 +38,85 @@ import type {
 class ProviderApiWebln extends ProviderApiBase {
   public providerName = IInjectedProviderNames.webln;
 
-  public override notifyDappAccountsChanged(
-    info: IProviderBaseBackgroundNotifyInfo,
-  ): void {
-    const data = () => {
+  public notifyDappAccountsChanged(info: IProviderBaseBackgroundNotifyInfo) {
+    const data = async ({ origin }: { origin: string }) => {
       const result = {
         method: 'wallet_events_accountChanged',
         params: {
-          accounts: undefined,
+          accounts: await this.getConnectedAccount({ origin }),
         },
       };
       return result;
     };
 
-    info.send(data, info.targetOrigin);
+    info.send(data);
   }
 
-  public override notifyDappChainChanged(): void {
-    throw new NotImplemented();
+  private getConnectedAccount(request: IJsBridgeMessagePayload) {
+    const [account] = this.backgroundApi.serviceDapp.getActiveConnectedAccounts(
+      {
+        origin: request.origin as string,
+        impl: IMPL_LIGHTNING,
+      },
+    );
+
+    return Promise.resolve({ address: account?.address });
   }
 
-  public async rpcCall(request: IJsBridgeMessagePayload): Promise<any> {
-    console.log('webln rpcCall: ', request);
+  public notifyDappChainChanged(info: IProviderBaseBackgroundNotifyInfo) {
+    // TODO
+    debugLogger.providerApi.info(info);
+  }
+
+  public async rpcCall(request: IJsonRpcRequest): Promise<any> {
+    debugLogger.providerApi.info('webln rpcCall: ', request);
     return Promise.resolve();
   }
-
-  _getAccountsInfo = async (request: IJsBridgeMessagePayload) => {
-    const accountsInfo =
-      await this.backgroundApi.serviceDApp.dAppGetConnectedAccountsInfo(
-        request,
-      );
-    if (!accountsInfo) {
-      throw web3Errors.provider.unauthorized();
-    }
-    return accountsInfo;
-  };
 
   // WEBLN API
   @providerApiMethod()
   public async enable(request: IJsBridgeMessagePayload) {
     try {
-      const accountsInfo = await this._getAccountsInfo(request);
-      if (accountsInfo.length > 0) {
+      const accountEnabled = await this.getEnabledAccount(request);
+      if (accountEnabled) {
         return { enabled: true };
       }
-      throw web3Errors.provider.unauthorized();
-    } catch (e) {
-      await this.backgroundApi.serviceDApp.openConnectionModal(request);
-      const accountsInfo = await this._getAccountsInfo(request);
-      return { enabled: accountsInfo.length > 0 };
+      await this.backgroundApi.serviceDapp.openConnectionModal(request);
+      return { enabled: true };
+    } catch (error) {
+      debugLogger.providerApi.error(`webln.enable error: `, error);
+      throw error;
+    }
+  }
+
+  private async getEnabledAccount(request: IJsBridgeMessagePayload) {
+    const { networkId, accountId } = getActiveWalletAccount();
+    try {
+      const accounts =
+        this.backgroundApi.serviceDapp?.getActiveConnectedAccounts({
+          origin: request.origin as string,
+          impl: IMPL_LIGHTNING,
+        });
+      if (!accounts) {
+        return false;
+      }
+      const accountAddresses = accounts.map((account) => account.address);
+
+      const account = await this.backgroundApi.engine.getAccount(
+        accountId,
+        networkId,
+      );
+      if (account.addresses) {
+        const addresses = JSON.parse(account.addresses) as {
+          hashAddress?: string;
+        };
+        if (addresses.hashAddress) {
+          return accountAddresses.includes(addresses.hashAddress);
+        }
+      }
+      return false;
+    } catch {
+      return false;
     }
   }
 
@@ -113,44 +143,32 @@ class ProviderApiWebln extends ProviderApiBase {
 
   @providerApiMethod()
   public async makeInvoice(request: IJsBridgeMessagePayload) {
-    const { accountInfo: { accountId, networkId } = {} } = (
-      await this._getAccountsInfo(request)
-    )[0];
     try {
       const params = (request.data as IJsonRpcRequest)
-        ?.params as IRequestInvoiceArgs;
+        ?.params as RequestInvoiceArgs;
       const { paymentRequest, paymentHash } =
-        (await this.backgroundApi.serviceDApp.openModal({
+        (await this.backgroundApi.serviceDapp.openModal({
           request,
-          screens: [
-            EModalRoutes.DAppConnectionModal,
-            EDAppConnectionModal.MakeInvoice,
-          ],
-          params: {
-            ...params,
-            accountId,
-            networkId,
-          },
-        })) as IRequestInvoiceResponse;
-      console.log('webln.makeInvoice: ', paymentRequest);
+          screens: [ModalRoutes.Webln, WeblnModalRoutes.MakeInvoice],
+          params,
+        })) as RequestInvoiceResponse;
+      debugLogger.providerApi.info('webln.makeInvoice: ', paymentRequest);
       return { paymentRequest, paymentHash, rHash: paymentHash };
     } catch (e) {
-      console.log(`webln.makeInvoice error: `, e);
+      debugLogger.providerApi.error(`webln.makeInvoice error: `, e);
       throw e;
     }
   }
 
   @providerApiMethod()
   public async sendPayment(request: IJsBridgeMessagePayload) {
-    const { accountInfo: { accountId, networkId } = {} } = (
-      await this._getAccountsInfo(request)
-    )[0];
     try {
       const paymentRequest = (request.data as IJsonRpcRequest)
         ?.params as string;
-      const txid = (await this.backgroundApi.serviceDApp.openModal({
+      const { networkId, accountId } = getActiveWalletAccount();
+      const txid = (await this.backgroundApi.serviceDapp.openModal({
         request,
-        screens: [EModalRoutes.SendModal, EModalSendRoutes.WeblnSendPayment],
+        screens: [ModalRoutes.Send, SendModalRoutes.WeblnSendPayment],
         params: {
           paymentRequest,
           networkId,
@@ -158,24 +176,21 @@ class ProviderApiWebln extends ProviderApiBase {
         },
       })) as string;
       const invoice =
-        await this.backgroundApi.serviceLightning.fetchSpecialInvoice({
+        await this.backgroundApi.serviceLightningNetwork.fetchSpecialInvoice({
           paymentHash: txid,
-          networkId: networkId ?? '',
-          accountId: accountId ?? '',
+          networkId,
+          accountId,
         });
-      console.log('webln.sendPayment: ', txid, invoice);
+      debugLogger.providerApi.info('webln.sendPayment: ', txid, invoice);
       return { preimage: invoice.payment_preimage };
     } catch (e) {
-      console.error(`webln.sendPayment error: `, e);
+      debugLogger.providerApi.error(`webln.sendPayment error: `, e);
       throw e;
     }
   }
 
   @providerApiMethod()
   public async signMessage(request: IJsBridgeMessagePayload) {
-    const { accountInfo: { accountId, networkId } = {} } = (
-      await this._getAccountsInfo(request)
-    )[0];
     try {
       const message = (request.data as IJsonRpcRequest)?.params as string;
       if (typeof message !== 'string') {
@@ -183,58 +198,48 @@ class ProviderApiWebln extends ProviderApiBase {
       }
 
       const signature =
-        await this.backgroundApi.serviceDApp.openSignMessageModal({
-          request,
+        await this.backgroundApi.serviceDapp?.openSignAndSendModal(request, {
           unsignedMessage: {
-            type: EMessageTypesCommon.SIMPLE_SIGN,
+            type: CommonMessageTypes.SIMPLE_SIGN,
             message,
           },
-          accountId: accountId ?? '',
-          networkId: networkId ?? '',
         });
-      console.log('webln.signMessage: ', message, signature);
-
-      return JSON.parse(signature as any) as ISignMessageResponse;
+      debugLogger.providerApi.info('webln.signMessage: ', message, signature);
+      return JSON.parse(signature as string) as SignMessageResponse;
     } catch (e) {
-      console.error(`webln.signMessage error: `, e);
+      debugLogger.providerApi.error(`webln.signMessage error: `, e);
       throw e;
     }
   }
 
   @providerApiMethod()
   public async verifyMessage(request: IJsBridgeMessagePayload) {
-    const { accountInfo: { accountId, networkId } = {} } = (
-      await this._getAccountsInfo(request)
-    )[0];
     try {
       const { message, signature } = (request.data as IJsonRpcRequest)
-        ?.params as IVerifyMessageArgs;
+        ?.params as VerifyMessageArgs;
       if (typeof message !== 'string' || typeof signature !== 'string') {
         throw web3Errors.rpc.invalidInput();
       }
-      const result = await this.backgroundApi.serviceLightning.verifyMessage({
-        accountId: accountId ?? '',
-        networkId: networkId ?? '',
-        message,
-        signature,
+      const { networkId, accountId } = getActiveWalletAccount();
+      await this.backgroundApi.serviceDapp.openModal({
+        request,
+        screens: [ModalRoutes.Webln, WeblnModalRoutes.VerifyMessage],
+        params: {
+          message,
+          signature,
+          networkId,
+          accountId,
+        },
       });
-      console.log('webln.verifyMessage: ', message, signature);
-      if (!result.isValid) {
-        throw new Error('Invalid signature');
-      }
-      return result.isValid;
+      debugLogger.providerApi.info('webln.verifyMessage: ', message, signature);
     } catch (e) {
-      console.error(`webln.verifyMessage error: `, e);
+      debugLogger.providerApi.error(`webln.verifyMessage error: `, e);
       throw e;
     }
   }
 
   @providerApiMethod()
   public async lnurl(request: IJsBridgeMessagePayload) {
-    const { accountInfo: { accountId, networkId } = {} } = (
-      await this._getAccountsInfo(request)
-    )[0];
-
     const originLnurl = (request.data as IJsonRpcRequest)?.params as string;
     if (typeof originLnurl !== 'string') {
       throw web3Errors.rpc.invalidInput();
@@ -243,28 +248,26 @@ class ProviderApiWebln extends ProviderApiBase {
     if (!lnurlEncoded) {
       return { error: 'Invalid LNURL' };
     }
-    let lnurlDetails: ILNURLDetails | null;
+    let lnurlDetails;
     try {
-      lnurlDetails =
-        await this.backgroundApi.serviceLightning.findAndValidateLnurl({
-          networkId: networkId ?? '',
-          toVal: originLnurl,
-        });
-      if (!lnurlDetails) {
-        return { error: 'Invalid LNURL' };
+      lnurlDetails = await getLnurlDetails(lnurlEncoded);
+      if (isLNURLRequestError(lnurlDetails)) {
+        return { error: lnurlDetails.reason };
       }
-      console.log('webln.lnurl: ', lnurlDetails);
+      debugLogger.providerApi.info('webln.lnurl: ', lnurlDetails);
     } catch (e) {
-      console.error(`webln.lnurl error: `, e);
+      debugLogger.providerApi.error(`webln.lnurl error: `, e);
       return { error: 'Failed to parse LNURL' };
     }
 
+    const { networkId, accountId, walletId } = getActiveWalletAccount();
     switch (lnurlDetails.tag) {
       case 'login': {
-        return this.backgroundApi.serviceDApp.openModal({
+        return this.backgroundApi.serviceDapp.openModal({
           request,
-          screens: [EModalRoutes.SendModal, EModalSendRoutes.LnurlAuth],
+          screens: [ModalRoutes.Send, SendModalRoutes.LNURLAuth],
           params: {
+            walletId,
             networkId,
             accountId,
             lnurlDetails,
@@ -272,30 +275,30 @@ class ProviderApiWebln extends ProviderApiBase {
         });
       }
       case 'payRequest': {
-        return this.backgroundApi.serviceDApp.openModal({
+        return this.backgroundApi.serviceDapp.openModal({
           request,
-          screens: [EModalRoutes.SendModal, EModalSendRoutes.LnurlPayRequest],
+          screens: [ModalRoutes.Send, SendModalRoutes.LNURLPayRequest],
           params: {
             networkId,
             accountId,
+            walletId,
             lnurlDetails,
-            transfersInfo: [
-              {
-                accountId,
-                networkId,
-                to: lnurlEncoded,
-              },
-            ],
+            transferInfo: {
+              accountId,
+              networkId,
+              to: lnurlEncoded,
+            },
           },
         });
       }
       case 'withdrawRequest': {
-        return this.backgroundApi.serviceDApp.openModal({
+        return this.backgroundApi.serviceDapp.openModal({
           request,
-          screens: [EModalRoutes.SendModal, EModalSendRoutes.LnurlWithdraw],
+          screens: [ModalRoutes.Send, SendModalRoutes.LNURLWithdraw],
           params: {
             networkId,
             accountId,
+            walletId,
             lnurlDetails,
           },
         });
@@ -306,26 +309,15 @@ class ProviderApiWebln extends ProviderApiBase {
   }
 
   @providerApiMethod()
-  public async getBalance(request: IJsBridgeMessagePayload) {
-    const { accountInfo: { accountId, networkId } = {} } = (
-      await this._getAccountsInfo(request)
-    )[0];
-    const accountAddress =
-      await this.backgroundApi.serviceAccount.getAccountAddressForApi({
-        accountId: accountId ?? '',
-        networkId: networkId ?? '',
+  public async getBalance() {
+    const { networkId, accountId } = getActiveWalletAccount();
+    const result =
+      await this.backgroundApi.serviceLightningNetwork.weblnGetBalance({
+        accountId,
+        networkId,
       });
-    if (accountAddress) {
-      const accountInfo =
-        await this.backgroundApi.serviceAccountProfile.fetchAccountDetails({
-          networkId: networkId ?? '',
-          accountAddress,
-        });
-      return {
-        balance: new BigNumber(accountInfo.balance ?? 0).toNumber(),
-        currency: 'sats',
-      };
-    }
+    debugLogger.providerApi.info('webln.getBalance: ', result, accountId);
+    return result;
   }
 }
 

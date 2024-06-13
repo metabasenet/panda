@@ -83,16 +83,8 @@ input {
   min-width: 0;
 }
 
-[role='button'] {
+[role="button"] {
   outline: none;
-}
-
-button,
-input,
-[role='button'],
-/* `Select` and `Toggle` are typically wrapped by a `Group`, so we handle them consistently. */
-.is_GroupFrame {
-  -webkit-app-region: no-drag;
 }
 
 textarea {
@@ -116,7 +108,7 @@ textarea {
 
 .debug-render-tracker-animated-bg:before {
   pointer-events: none;
-  content: '';
+  content: "";
   position: absolute;
   z-index: 999999;
   top: 0;
@@ -128,7 +120,7 @@ textarea {
 
 @keyframes debugRenderTrackerColorFade {
   from {
-    background-color: #e2c6c4;
+    background-color: #E2C6C4;
   }
   to {
     background-color: transparent;
@@ -141,7 +133,7 @@ textarea {
 
 .debug-render-tracker-animated-bg0:before {
   pointer-events: none;
-  content: '';
+  content: "";
   position: absolute;
   z-index: 999999;
   top: 0;
@@ -153,14 +145,9 @@ textarea {
 
 @keyframes debugRenderTrackerColorFade0 {
   from {
-    background-color: #aab8ab;
+    background-color: #AAB8AB;
   }
   to {
     background-color: transparent;
   }
-}
-
-/* custom sonner toast styles, should remove if the burnt library support such api to custom styles */
-[data-sonner-toast] {
-  max-width: calc(100vw - 32px);
 }

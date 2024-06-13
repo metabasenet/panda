@@ -6,25 +6,25 @@ export const appSetting = new MMKV({
   id: `onekey-app-setting`,
 });
 
-export enum EAppSettingKey {
+export enum AppSettingKey {
   rrt = 'rrt',
   perf_switch = 'perf_switch',
 }
 
-export interface IAppStorage extends AsyncStorageStatic {
-  setSetting: (key: EAppSettingKey, value: boolean | string | number) => void;
-  getSettingString: (key: EAppSettingKey) => string | undefined;
-  getSettingNumber: (key: EAppSettingKey) => number | undefined;
-  getSettingBoolean: (key: EAppSettingKey) => boolean | undefined;
-  deleteSetting: (key: EAppSettingKey) => void;
+export interface AppStorage extends AsyncStorageStatic {
+  setSetting: (key: AppSettingKey, value: boolean | string | number) => void;
+  getSettingString: (key: AppSettingKey) => string | undefined;
+  getSettingNumber: (key: AppSettingKey) => number | undefined;
+  getSettingBoolean: (key: AppSettingKey) => boolean | undefined;
+  deleteSetting: (key: AppSettingKey) => void;
   clearSetting: typeof appSetting.clearAll;
   getAllKeysOfSetting: typeof appSetting.getAllKeys;
 }
 
 export const buildAppStorageFactory = (
   appStorage: AsyncStorageStatic,
-): IAppStorage => {
-  const storage = appStorage as IAppStorage;
+): AppStorage => {
+  const storage = appStorage as AppStorage;
   storage.setSetting = appSetting.set.bind(appSetting);
   storage.getSettingString = appSetting.getString.bind(appSetting);
   storage.getSettingNumber = appSetting.getNumber.bind(appSetting);

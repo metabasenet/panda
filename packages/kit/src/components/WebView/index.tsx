@@ -1,25 +1,23 @@
 import type { ComponentProps, FC } from 'react';
 import { useCallback } from 'react';
 
-import { Button, Stack } from '@onekeyhq/components';
-import backgroundApiProxy from '@onekeyhq/kit/src/background/instance/backgroundApiProxy';
+import { Box, Button, Center } from '@onekeyhq/components';
 import platformEnv from '@onekeyhq/shared/src/platformEnv';
-import extUtils from '@onekeyhq/shared/src/utils/extUtils';
+
+import backgroundApiProxy from '../../background/instance/backgroundApiProxy';
+import extUtils from '../../utils/extUtils';
 
 import InpageProviderWebView from './InpageProviderWebView';
 
-import type { IElectronWebViewEvents, IWebViewOnScroll } from './types';
 import type { IJsBridgeReceiveHandler } from '@onekeyfe/cross-inpage-provider-types';
 import type { IWebViewWrapperRef } from '@onekeyfe/onekey-cross-webview';
 import type {
-  WebViewErrorEvent,
   WebViewNavigation,
-  WebViewNavigationEvent,
   WebViewOpenWindowEvent,
   WebViewSource,
 } from 'react-native-webview/lib/WebViewTypes';
 
-interface IWebViewProps extends IElectronWebViewEvents {
+interface WebViewProps {
   id?: string;
   src?: string;
   onSrcChange?: (src: string) => void;
@@ -28,7 +26,7 @@ interface IWebViewProps extends IElectronWebViewEvents {
   onNavigationStateChange?: (event: WebViewNavigation) => void;
   onShouldStartLoadWithRequest?: (event: WebViewNavigation) => boolean;
   allowpopups?: boolean;
-  containerProps?: ComponentProps<typeof Stack>;
+  containerProps?: ComponentProps<typeof Box>;
   customReceiveHandler?: IJsBridgeReceiveHandler;
   nativeWebviewSource?: WebViewSource | undefined;
   nativeInjectedJavaScriptBeforeContentLoaded?: string;
@@ -36,15 +34,10 @@ interface IWebViewProps extends IElectronWebViewEvents {
   onContentLoaded?: () => void; // currently works in NativeWebView only
   onOpenWindow?: (event: WebViewOpenWindowEvent) => void;
   androidLayerType?: 'none' | 'software' | 'hardware';
-  onLoadStart?: (event: WebViewNavigationEvent) => void;
-  onLoad?: (event: WebViewNavigationEvent) => void;
-  onLoadEnd?: (event: WebViewNavigationEvent | WebViewErrorEvent) => void;
-  onScroll?: IWebViewOnScroll;
-  displayProgressBar?: boolean;
-  onProgress?: (progress: number) => void;
+  scrolling?: 'auto' | 'yes' | 'no';
 }
 
-const WebView: FC<IWebViewProps> = ({
+const WebView: FC<WebViewProps> = ({
   src = '',
   openUrlInExt = false,
   allowpopups = false,
@@ -72,13 +65,13 @@ const WebView: FC<IWebViewProps> = ({
     openUrlInExt
   ) {
     return (
-      <Stack flex={1} alignItems="center" justifyContent="center">
+      <Center flex={1}>
         <Button onPress={() => extUtils.openUrlInTab(src)}>Open</Button>
-      </Stack>
+      </Center>
     );
   }
   return (
-    <Stack flex={1} bg="background-default" {...containerProps}>
+    <Box flex={1} bg="background-default" {...containerProps}>
       <InpageProviderWebView
         ref={onWebViewRef}
         src={src}
@@ -86,7 +79,7 @@ const WebView: FC<IWebViewProps> = ({
         receiveHandler={receiveHandler}
         {...rest}
       />
-    </Stack>
+    </Box>
   );
 };
 

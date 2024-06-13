@@ -1,6 +1,6 @@
 import { IInjectedProviderNames } from '@onekeyfe/cross-inpage-provider-types';
 
-import ProviderApiAlgo from './ProviderApiAlgo';
+import ProviderAlgo from './ProviderAlgo';
 import ProviderApiAptos from './ProviderApiAptos';
 import ProviderApiBtc from './ProviderApiBtc';
 import ProviderApiCardano from './ProviderApiCardano';
@@ -11,18 +11,14 @@ import ProviderApiNear from './ProviderApiNear';
 import ProviderApiNostr from './ProviderApiNostr';
 import ProviderApiPolkadot from './ProviderApiPolkadot';
 import ProviderApiPrivate from './ProviderApiPrivate';
-import ProviderApiPrivateExternalAccount from './ProviderApiPrivateExternalAccount';
 import ProviderApiSolana from './ProviderApiSolana';
-// import ProviderApiStarcoin from './ProviderApiStarcoin';
+import ProviderApiStarcoin from './ProviderApiStarcoin';
 import ProviderApiSui from './ProviderApiSui';
 import ProviderApiTron from './ProviderApiTron';
 import ProviderApiWebln from './ProviderApiWebln';
 
+import type { IBackgroundApi, IBackgroundApiBridge } from '../IBackgroundApi';
 import type ProviderApiBase from './ProviderApiBase';
-import type {
-  IBackgroundApi,
-  IBackgroundApiBridge,
-} from '../apis/IBackgroundApi';
 
 function createBackgroundProviders({
   backgroundApi,
@@ -39,9 +35,9 @@ function createBackgroundProviders({
     [IInjectedProviderNames.solana]: new ProviderApiSolana({
       backgroundApi,
     }),
-    // [IInjectedProviderNames.starcoin]: new ProviderApiStarcoin({
-    //   backgroundApi,
-    // }),
+    [IInjectedProviderNames.starcoin]: new ProviderApiStarcoin({
+      backgroundApi,
+    }),
     [IInjectedProviderNames.near]: new ProviderApiNear({
       backgroundApi,
     }),
@@ -54,7 +50,7 @@ function createBackgroundProviders({
     [IInjectedProviderNames.tron]: new ProviderApiTron({
       backgroundApi,
     }),
-    [IInjectedProviderNames.algo]: new ProviderApiAlgo({
+    [IInjectedProviderNames.algo]: new ProviderAlgo({
       backgroundApi,
     }),
     [IInjectedProviderNames.sui]: new ProviderApiSui({
@@ -74,12 +70,7 @@ function createBackgroundProviders({
     [IInjectedProviderNames.btc]: new ProviderApiBtc({
       backgroundApi,
     }),
-    [IInjectedProviderNames.$privateExternalAccount]:
-      new ProviderApiPrivateExternalAccount({
-        backgroundApi,
-      }),
     // near
-    // eslint-disable-next-line spellcheck/spell-checker
     // sollet
   };
 

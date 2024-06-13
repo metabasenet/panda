@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-// import '../background/instance/backgroundApiProxy';
+import '../background/instance/backgroundApiProxy';
 
 export function createLazyKitProviderLegacy({
   displayName,
@@ -13,8 +13,8 @@ export function createLazyKitProviderLegacy({
     useEffect(() => {
       setTimeout(() => {
         // KitProviderMock index
-        void import('.').then((module) => {
-          const { KitProvider } = module;
+        import('./KitProvider').then((module) => {
+          const KitProvider = module.default;
           setCmp(<KitProvider {...propsRef.current} />);
         });
       }, 0);
@@ -39,7 +39,7 @@ export function createLazyKitProvider({
 }: {
   displayName?: string;
 } = {}) {
-  const { KitProvider } = require('.');
+  const KitProvider = require('./KitProvider');
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-member-access
-  return KitProvider;
+  return KitProvider.default;
 }

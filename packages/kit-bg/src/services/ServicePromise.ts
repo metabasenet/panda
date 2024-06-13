@@ -4,28 +4,28 @@ import {
   backgroundClass,
   backgroundMethod,
 } from '@onekeyhq/shared/src/background/backgroundDecorators';
-import timerUtils from '@onekeyhq/shared/src/utils/timerUtils';
+import debugLogger from '@onekeyhq/shared/src/logger/debugLogger';
 
 import ServiceBase from './ServiceBase';
 
-export type IPromiseContainerCallbackCreate = {
-  resolve: (value: unknown | any) => void;
-  reject: (value: unknown | any) => void;
+export type PromiseContainerCallbackCreate = {
+  resolve: (value: unknown) => void;
+  reject: (value: unknown) => void;
   data?: any;
 };
-export type IPromiseContainerCallback = IPromiseContainerCallbackCreate & {
+export type PromiseContainerCallback = PromiseContainerCallbackCreate & {
   id: number;
   created: number;
 };
 
-export type IPromiseContainerResolve = {
+export type PromiseContainerResolve = {
   id: number | string;
   data?: unknown;
 };
 
-export type IPromiseContainerReject = {
+export type PromiseContainerReject = {
   id: number | string;
-  error?: unknown; // toPlainErrorObject()
+  error?: unknown;
 };
 
 let latestId = 1;
@@ -38,19 +38,17 @@ class ServicePromise extends ServiceBase {
     this._rejectExpiredCallbacks();
   }
 
-  private callbacks: Array<IPromiseContainerCallback> = [];
+  private callbacks: Array<PromiseContainerCallback> = [];
 
   // TODO increase timeout as hardware sign transaction may take a long time
   //    can set timeout for each callback
-  protected callbacksExpireTimeout: number = timerUtils.getTimeDurationMs({
-    minute: 10,
-  });
+  protected callbacksExpireTimeout: number = 10 * 60 * 1000;
 
   public createCallback({
     resolve,
     reject,
     data,
-  }: IPromiseContainerCallbackCreate) {
+  }: PromiseContainerCallbackCreate) {
     latestId += 1;
     if (latestId <= 0) {
       throw new Error(
@@ -75,7 +73,7 @@ class ServicePromise extends ServiceBase {
   }
 
   @backgroundMethod()
-  async rejectCallback({ id, error }: IPromiseContainerReject) {
+  rejectCallback({ id, error }: PromiseContainerReject) {
     this._processCallback({
       method: 'reject',
       id,
@@ -84,17 +82,12 @@ class ServicePromise extends ServiceBase {
   }
 
   @backgroundMethod()
-  async resolveCallback({ id, data }: IPromiseContainerResolve) {
+  resolveCallback({ id, data }: PromiseContainerResolve) {
     this._processCallback({
       method: 'resolve',
       id,
       data,
     });
-  }
-
-  @backgroundMethod()
-  testHelloWorld2(name: string) {
-    return Promise.resolve(`hello world %%%%:   ${name} ${Date.now()}`);
   }
 
   _processCallback({
@@ -116,12 +109,18 @@ class ServicePromise extends ServiceBase {
       if (method === 'reject') {
         if (callbackInfo.reject) {
           callbackInfo.reject(error);
+          debugLogger.dappApprove.info(
+            'rejectCallback',
+            id,
+            (error as Error)?.message,
+          );
         }
         // this.emit('error', error);
       }
       if (method === 'resolve') {
         if (callbackInfo.resolve) {
           callbackInfo.resolve(data);
+          debugLogger.dappApprove.info('resolveCallback', id, data);
         }
       }
       this.removeCallback(id);
@@ -145,7 +144,7 @@ class ServicePromise extends ServiceBase {
       if (callbackInfo && callbackInfo.created) {
         if (now - callbackInfo.created > this.callbacksExpireTimeout) {
           const error = web3Errors.provider.requestTimeout();
-          void this.rejectCallback({ id, error });
+          this.rejectCallback({ id, error });
         }
       }
     }

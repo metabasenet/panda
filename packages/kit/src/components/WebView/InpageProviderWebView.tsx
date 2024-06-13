@@ -1,11 +1,11 @@
 import type { FC } from 'react';
 import { forwardRef, useImperativeHandle, useRef } from 'react';
 
-import type { IInpageProviderWebViewProps } from './types';
+import type { InpageProviderWebViewProps } from './types';
 import type { IWebViewWrapperRef } from '@onekeyfe/onekey-cross-webview';
 
-const InpageProviderWebView: FC<IInpageProviderWebViewProps> = forwardRef(
-  ({ src = '' }: IInpageProviderWebViewProps, ref: any) => {
+const InpageProviderWebView: FC<InpageProviderWebViewProps> = forwardRef(
+  ({ src = '', scrolling }: InpageProviderWebViewProps, ref: any) => {
     const iframeRef = useRef<HTMLIFrameElement>(null);
     const iframeWebviewRef = useRef<IWebViewWrapperRef>({
       reload: () => {
@@ -23,16 +23,10 @@ const InpageProviderWebView: FC<IInpageProviderWebViewProps> = forwardRef(
       },
     });
 
-    useImperativeHandle(ref, (): IWebViewWrapperRef => {
-      const wrapper = {
-        innerRef: iframeWebviewRef.current,
-        reload: () => iframeWebviewRef.current?.reload(),
-        loadURL: (url: string) => {
-          iframeWebviewRef.current?.loadURL(url);
-        },
-      };
-      return wrapper as IWebViewWrapperRef;
-    });
+    useImperativeHandle(
+      ref,
+      (): IWebViewWrapperRef | null => iframeWebviewRef.current,
+    );
 
     return (
       <iframe
@@ -40,6 +34,7 @@ const InpageProviderWebView: FC<IInpageProviderWebViewProps> = forwardRef(
         title="iframe-web"
         src={src}
         frameBorder="0"
+        scrolling={scrolling}
         style={{ height: '100%', width: '100%' }}
       />
     );

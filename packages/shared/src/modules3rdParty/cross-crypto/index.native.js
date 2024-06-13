@@ -1,8 +1,7 @@
 // react-native-crypto
 //      react-native-quick-crypto
 // react-native-get-random-values
-//      (react-native-crypto depend on) react-native-randombytes (deprecated)
-console.log('================ cross-crypto (native)');
+//      react-native-randombytes (deprecated)
 
 if (global.crypto && global.crypto.getRandomValues) {
   delete global.crypto.getRandomValues;
@@ -13,10 +12,7 @@ require('react-native-get-random-values');
 if (process.env.NODE_ENV !== 'production') {
   const getRandomValuesOld = global.crypto.getRandomValues;
   global.crypto.getRandomValues = function (...args) {
-    console.log(
-      '------------ call global.crypto.getRandomValues (native)',
-      getRandomValuesOld,
-    );
+    console.log('------------ call global.crypto.getRandomValues (native)');
     return getRandomValuesOld.apply(global.crypto, args);
   };
 }

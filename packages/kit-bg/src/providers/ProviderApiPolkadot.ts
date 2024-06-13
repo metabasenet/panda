@@ -1,47 +1,51 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/naming-convention */
+/* eslint-disable camelcase */
 import { web3Errors } from '@onekeyfe/cross-inpage-provider-errors';
 import { IInjectedProviderNames } from '@onekeyfe/cross-inpage-provider-types';
-import { decodeAddress, encodeAddress } from '@polkadot/util-crypto/address';
 
-import type { IEncodedTxDot } from '@onekeyhq/core/src/chains/dot/types';
-import type { ISignedTxPro } from '@onekeyhq/core/src/types';
+import type { CommonMessage } from '@onekeyhq/engine/src/types/message';
+import { CommonMessageTypes } from '@onekeyhq/engine/src/types/message';
+import polkadotSdk from '@onekeyhq/engine/src/vaults/impl/dot/sdk/polkadotSdk';
+import type {
+  InjectedAccount,
+  SignerPayloadJSON,
+  SignerPayloadRaw,
+} from '@onekeyhq/engine/src/vaults/impl/dot/sdk/polkadotSdkTypes';
+import type { IEncodedTxDot } from '@onekeyhq/engine/src/vaults/impl/dot/types';
+import type VaultDot from '@onekeyhq/engine/src/vaults/impl/dot/Vault';
+import type { ISignedTxPro } from '@onekeyhq/engine/src/vaults/types';
+import { getActiveWalletAccount } from '@onekeyhq/kit/src/hooks';
 import {
   backgroundClass,
   permissionRequired,
   providerApiMethod,
 } from '@onekeyhq/shared/src/background/backgroundDecorators';
-import {
-  NotImplemented,
-  OneKeyInternalError,
-} from '@onekeyhq/shared/src/errors';
-import { EMessageTypesCommon } from '@onekeyhq/shared/types/message';
+import { IMPL_DOT } from '@onekeyhq/shared/src/engine/engineConsts';
+import debugLogger from '@onekeyhq/shared/src/logger/debugLogger';
 
 import ProviderApiBase from './ProviderApiBase';
 
 import type { IProviderBaseBackgroundNotifyInfo } from './ProviderApiBase';
 import type { IJsBridgeMessagePayload } from '@onekeyfe/cross-inpage-provider-types';
-import type { InjectedAccount } from '@polkadot/extension-inject/types';
-import type {
-  SignerPayloadJSON,
-  SignerPayloadRaw,
-} from '@polkadot/types/types';
 
-export interface IRequestRpcSend {
+const { decodeAddress, encodeAddress } = polkadotSdk;
+
+export interface RequestRpcSend {
   method: string;
   params: unknown[];
 }
 
-export interface IRequestRpcSubscribe extends IRequestRpcSend {
+export interface RequestRpcSubscribe extends RequestRpcSend {
   type: string;
 }
 
-export interface IRequestRpcUnsubscribe {
+export interface RequestRpcUnsubscribe {
   type: string;
   method: string;
   id: string;
 }
 
-export interface ISignerResult {
+export interface SignerResult {
   /**
    * @description The id for this request
    */
@@ -60,20 +64,19 @@ class ProviderApiPolkadot extends ProviderApiBase {
   public notifyDappAccountsChanged(info: IProviderBaseBackgroundNotifyInfo) {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const data = async ({ origin }: { origin: string }) => {
-      const params = await this.account({ origin, scope: 'polkadot' });
+      const params = await this.account({ origin });
       const result = {
         method: 'wallet_events_accountChanged',
         params,
       };
       return result;
     };
-    info.send(data, info.targetOrigin);
+    info.send(data);
   }
 
   public notifyDappChainChanged(info: IProviderBaseBackgroundNotifyInfo) {
-    const data = async ({ origin }: { origin: string }) => {
-      const account = await this.account({ origin });
-      const networkId = account?.networkId;
+    const data = () => {
+      const { networkId } = getActiveWalletAccount();
       const result = {
         // TODO do not emit events to EVM Dapps, injected provider check scope
         method: 'wallet_events_networkChange',
@@ -81,7 +84,7 @@ class ProviderApiPolkadot extends ProviderApiBase {
       };
       return result;
     };
-    info.send(data, info.targetOrigin);
+    info.send(data);
   }
 
   public rpcCall() {
@@ -89,16 +92,21 @@ class ProviderApiPolkadot extends ProviderApiBase {
   }
 
   @providerApiMethod()
-  public async web3Enable(request: IJsBridgeMessagePayload): Promise<boolean> {
-    if (await this.account(request)) {
+  public async web3Enable(
+    request: IJsBridgeMessagePayload,
+    params: string,
+  ): Promise<boolean> {
+    debugLogger.providerApi.info('Polkadot web3Enable', request, params);
+
+    if (await this.account(request, params)) {
       return true;
     }
 
-    const res = await this.backgroundApi.serviceDApp.openConnectionModal(
+    const [address] = (await this.backgroundApi.serviceDapp.openConnectionModal(
       request,
-    );
+    )) as string[];
 
-    return !!res;
+    return !!address;
   }
 
   @permissionRequired()
@@ -108,6 +116,7 @@ class ProviderApiPolkadot extends ProviderApiBase {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     params: boolean,
   ): Promise<InjectedAccount[]> {
+    debugLogger.providerApi.info('Polkadot getAccounts', request);
     let account = await this.account(request);
 
     if (account) {
@@ -129,49 +138,89 @@ class ProviderApiPolkadot extends ProviderApiBase {
   }
 
   @providerApiMethod()
-  public async disconnect(request: IJsBridgeMessagePayload) {
+  public disconnect(request: IJsBridgeMessagePayload) {
     const { origin } = request;
     if (!origin) {
       return;
     }
-    await this.backgroundApi.serviceDApp.disconnectWebsite({
+    this.backgroundApi.serviceDapp.removeConnectedAccounts({
       origin,
-      storageType: request.isWalletConnectRequest
-        ? 'walletConnect'
-        : 'injectedProvider',
+      networkImpl: IMPL_DOT,
+      addresses: this.backgroundApi.serviceDapp
+        .getActiveConnectedAccounts({ origin, impl: IMPL_DOT })
+        .map(({ address }) => address),
     });
+    debugLogger.providerApi.info('Polkadot disconnect', origin);
   }
 
-  private async account(request: IJsBridgeMessagePayload): Promise<
+  private async account(
+    request: IJsBridgeMessagePayload,
+    dappName?: string,
+  ): Promise<
     | {
         address: string;
         name: string;
-        networkId?: string;
-        id?: string;
       }
     | undefined
   > {
-    const accounts =
-      await this.backgroundApi.serviceDApp.dAppGetConnectedAccountsInfo(
-        request,
-      );
-    if (!accounts) {
+    debugLogger.providerApi.info('Polkadot account');
+    const { networkId, networkImpl, accountId } = getActiveWalletAccount();
+    if (networkImpl !== IMPL_DOT) {
       return undefined;
     }
-    const { account, accountInfo } = accounts[0];
 
-    return {
-      address: account.address,
-      name: account.name,
-      networkId: accountInfo?.networkId,
-      id: account.id,
-    };
+    const connectedAccounts =
+      this.backgroundApi.serviceDapp?.getActiveConnectedAccounts({
+        origin: request.origin ?? dappName ?? '',
+        impl: IMPL_DOT,
+      });
+
+    if (!connectedAccounts || !connectedAccounts.length) {
+      return undefined;
+    }
+
+    const vault = (await this.backgroundApi.engine.getVault({
+      networkId,
+      accountId,
+    })) as VaultDot;
+    const address = await vault.getAccountAddress();
+    const dbAccount = await vault.getDbAccount();
+
+    const addresses = connectedAccounts.map((account) => account.address);
+    if (!addresses.includes(address)) {
+      return undefined;
+    }
+
+    debugLogger.providerApi.info('Polkadot account:', {
+      address,
+      name: dbAccount.name,
+    });
+
+    return Promise.resolve({
+      address,
+      name: dbAccount.name,
+    });
   }
 
-  private async findAccount(request: IJsBridgeMessagePayload, address: string) {
-    const accounts = await this.getAccountsInfo(request);
+  private async findAccount(
+    walletId: string,
+    networkId: string,
+    address: string,
+  ) {
+    const wallet = await this.backgroundApi.engine.getWalletSafe(walletId);
 
-    const selectAccount = accounts.find(({ account }) => {
+    if (!wallet)
+      throw web3Errors.provider.custom({
+        code: 4001,
+        message: 'Wallet not found',
+      });
+
+    const accounts = await this.backgroundApi.engine.getAccounts(
+      wallet.accounts,
+      networkId,
+    );
+
+    const selectAccount = accounts.find((account) => {
       if (account.address === address) {
         return account;
       }
@@ -201,24 +250,38 @@ class ProviderApiPolkadot extends ProviderApiBase {
   public async web3SignPayload(
     request: IJsBridgeMessagePayload,
     params: SignerPayloadJSON,
-  ): Promise<ISignerResult> {
-    const { account, accountInfo } = await this.findAccount(
-      request,
+  ): Promise<SignerResult> {
+    debugLogger.providerApi.info('Polkadot signAndSubmitTransaction', params);
+
+    const { walletId, networkId, accountId } = getActiveWalletAccount();
+    const selectAccount = await this.findAccount(
+      walletId,
+      networkId,
       params.address,
     );
+
+    if (selectAccount.id !== accountId) {
+      throw web3Errors.provider.custom({
+        code: 4003,
+        message: 'Account not match',
+      });
+    }
+
+    const vault = (await this.backgroundApi.engine.getChainOnlyVault(
+      networkId,
+    )) as VaultDot;
+
+    const metadata = await vault.getMetadataRpcCache();
+
     const encodeTx: IEncodedTxDot = {
       ...params,
-      metadataRpc: '' as `0x${string}`,
+      metadataRpc: metadata.toHex(),
     };
 
-    const result =
-      (await this.backgroundApi.serviceDApp.openSignAndSendTransactionModal({
-        request,
-        encodedTx: encodeTx,
-        signOnly: true,
-        accountId: account.id,
-        networkId: accountInfo?.networkId ?? '',
-      })) as ISignedTxPro;
+    const result = (await this.backgroundApi.serviceDapp.openSignAndSendModal(
+      request,
+      { encodedTx: encodeTx, signOnly: true },
+    )) as ISignedTxPro;
 
     return Promise.resolve({
       id: request.id ?? 0,
@@ -232,23 +295,35 @@ class ProviderApiPolkadot extends ProviderApiBase {
     request: IJsBridgeMessagePayload,
     params: SignerPayloadRaw,
   ) {
-    const { account, accountInfo } = await this.findAccount(
-      request,
+    debugLogger.providerApi.info('Polkadot executeMoveCall', params);
+
+    const { walletId, networkId, accountId } = getActiveWalletAccount();
+    const selectAccount = await this.findAccount(
+      walletId,
+      networkId,
       params.address,
     );
 
-    const unsignedMessage = {
-      type: EMessageTypesCommon.SIGN_MESSAGE,
+    if (selectAccount.id !== accountId) {
+      throw web3Errors.provider.custom({
+        code: 4003,
+        message: 'Account not match',
+      });
+    }
+
+    const unsignedMessage: CommonMessage = {
+      type: CommonMessageTypes.SIGN_MESSAGE,
       message: params.data,
       secure: true,
     };
 
-    const result = (await this.backgroundApi.serviceDApp.openSignMessageModal({
+    const result = (await this.backgroundApi.serviceDapp.openSignAndSendModal(
       request,
-      unsignedMessage,
-      accountId: account.id,
-      networkId: accountInfo?.networkId ?? '',
-    })) as string;
+      {
+        unsignedMessage,
+        signOnly: true,
+      },
+    )) as string;
 
     return Promise.resolve({
       id: request.id ?? 0,
@@ -259,41 +334,123 @@ class ProviderApiPolkadot extends ProviderApiBase {
   @providerApiMethod()
   public async web3RpcSubscribe(
     request: IJsBridgeMessagePayload,
-    params: IRequestRpcSubscribe,
+    params: RequestRpcSubscribe,
   ) {
-    throw new NotImplemented();
+    debugLogger.providerApi.info('Polkadot web3RpcSubscribe', params);
+
+    const { networkId, accountId } = getActiveWalletAccount();
+
+    const vault = (await this.backgroundApi.engine.getVault({
+      networkId,
+      accountId,
+    })) as VaultDot;
+
+    const { rpcURL } = await this.backgroundApi.engine.getNetwork(networkId);
+    const provider = vault.getNodeProviderCache(rpcURL);
+
+    return provider.subscribe(
+      params.type,
+      params.method,
+      params.params,
+      (error, result) => {
+        const response = {
+          method: 'wallet_events_accountChanged',
+          result: JSON.stringify({
+            error,
+            result,
+          }),
+        };
+
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        this.backgroundApi.sendForProvider(this.providerName).send(response);
+      },
+    );
   }
 
   @providerApiMethod()
   public async web3RpcUnSubscribe(
     request: IJsBridgeMessagePayload,
-    params: IRequestRpcUnsubscribe,
+    params: RequestRpcUnsubscribe,
   ) {
-    throw new NotImplemented();
+    debugLogger.providerApi.info('Polkadot web3RpcUnSubscribe', params);
+
+    const { networkId, accountId } = getActiveWalletAccount();
+
+    const vault = (await this.backgroundApi.engine.getVault({
+      networkId,
+      accountId,
+    })) as VaultDot;
+
+    const { rpcURL } = await this.backgroundApi.engine.getNetwork(networkId);
+    const provider = vault.getNodeProviderCache(rpcURL);
+
+    return provider.unsubscribe(params.type, params.method, params.id);
   }
 
   @providerApiMethod()
   public async web3RpcSend(
     request: IJsBridgeMessagePayload,
-    params: IRequestRpcSend,
+    params: RequestRpcSend,
   ) {
-    throw new NotImplemented();
+    debugLogger.providerApi.info('Polkadot web3RpcSend', params);
+
+    const { networkId, accountId } = getActiveWalletAccount();
+
+    const vault = (await this.backgroundApi.engine.getVault({
+      networkId,
+      accountId,
+    })) as VaultDot;
+
+    const { rpcURL } = await this.backgroundApi.engine.getNetwork(networkId);
+    const provider = vault.getNodeProviderCache(rpcURL);
+
+    return provider.send(params.method, params.params);
   }
 
   @providerApiMethod()
   public async web3RpcListProviders(
     request: IJsBridgeMessagePayload,
-    params: IRequestRpcSend,
+    params: RequestRpcSend,
   ) {
-    throw new NotImplemented();
+    debugLogger.providerApi.info('Polkadot web3RpcListProviders', params);
+
+    const { networkId, accountId } = getActiveWalletAccount();
+
+    const vault = (await this.backgroundApi.engine.getVault({
+      networkId,
+      accountId,
+    })) as VaultDot;
+
+    const { rpcURL } = await this.backgroundApi.engine.getNetwork(networkId);
+    const provider = vault.getNodeProviderCache(rpcURL);
+
+    return Promise.resolve({
+      // @ts-expect-error
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      rpcURL: provider.start().meta,
+    });
   }
 
   @providerApiMethod()
   public async web3RpcStartProvider(
     request: IJsBridgeMessagePayload,
-    params: IRequestRpcSend,
+    params: RequestRpcSend,
   ) {
-    throw new NotImplemented();
+    debugLogger.providerApi.info('Polkadot web3RpcStartProvider', params);
+
+    const { networkId, accountId } = getActiveWalletAccount();
+
+    const vault = (await this.backgroundApi.engine.getVault({
+      networkId,
+      accountId,
+    })) as VaultDot;
+
+    const { rpcURL } = await this.backgroundApi.engine.getNetwork(networkId);
+    const provider = vault.getNodeProviderCache(rpcURL);
+
+    // @ts-expect-error
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    return Promise.resolve(provider.start().meta);
   }
 }
 

@@ -1,42 +1,31 @@
-import MobileDetect from 'mobile-detect';
 import { Platform } from 'react-native';
-
-import { isWebInDappMode } from './utils/devModeUtils';
 
 /*
 DO NOT Expose any sensitive data here, this file will be injected to Dapp!!!!
  */
-export type IAppPlatform =
-  | 'extension'
-  | 'ios'
-  | 'android'
-  | 'desktop'
-  | 'web'
-  | 'webEmbed';
-export type IPlatformLegacy = 'native' | 'desktop' | 'ext' | 'web' | 'webEmbed';
-export type IAppChannel =
-  | 'chrome'
-  | 'firefox'
-  | 'edge'
-  | 'phone'
-  | 'pad'
-  | 'apk'
-  | 'googlePlay'
-  | 'huaweiStore'
-  | 'macosARM'
-  | 'macosX86'
-  | 'macosStore'
-  | 'win'
-  | 'winStore'
-  | 'linux'
-  | 'linuxSnap';
+export type IPlatform = 'native' | 'desktop' | 'ext' | 'web' | 'webEmbed';
+export type IDistributionChannel =
+  | 'ext-chrome'
+  | 'ext-firefox'
+  | 'desktop-mac'
+  | 'desktop-mac-arm64'
+  | 'desktop-win'
+  | 'desktop-win-ms-store'
+  | 'desktop-linux'
+  | 'desktop-linux-snap'
+  | 'native-ios'
+  | 'native-ios-store'
+  | 'native-android'
+  | 'native-android-google'
+  | 'native-android-huawei'
+  | 'native-ios-pad'
+  | 'native-ios-pad-store';
 
 export type IPlatformEnv = {
   isNewRouteMode: boolean;
 
   version: string | undefined;
   buildNumber: string | undefined;
-  githubSHA: string | undefined;
   NODE_ENV?: string;
   JEST_WORKER_ID?: string;
 
@@ -48,18 +37,10 @@ export type IPlatformEnv = {
   isDev?: boolean;
   /** production mode */
   isProduction?: boolean;
-  /** e2e mode */
-  isE2E?: boolean;
 
   /** running in the browsers */
   isWeb?: boolean;
-  isWebDappMode?: boolean;
-  isWebTouchable?: boolean;
   isWebEmbed?: boolean;
-  isWebMobile?: boolean;
-  isWebMobileAndroid?: boolean;
-  isWebMobileIOS?: boolean;
-  isWebSafari?: boolean;
   /** running in the desktop system APP */
   isDesktop?: boolean;
   /** running in the browser extension */
@@ -94,10 +75,8 @@ export type IPlatformEnv = {
   isNativeAndroidGooglePlay?: boolean;
   isNativeAndroidHuawei?: boolean;
 
-  appPlatform: IAppPlatform | undefined;
-  symbol: IPlatformLegacy | undefined;
-  appChannel: IAppChannel | undefined;
-  browserInfo?: string;
+  symbol: IPlatform | undefined;
+  distributionChannel: IDistributionChannel | undefined;
 
   isManifestV3?: boolean;
   isExtensionBackground?: boolean;
@@ -115,6 +94,7 @@ export type IPlatformEnv = {
   isRuntimeChrome?: boolean;
   isRuntimeEdge?: boolean;
 
+  canGetClipboard?: boolean;
   supportAutoUpdate?: boolean;
 
   isAppleStoreEnv?: boolean;
@@ -131,8 +111,6 @@ const {
   isNative,
   isExtChrome,
   isExtFirefox,
-  isExtEdge,
-  isE2E,
 }: {
   isJest: boolean;
   isDev: boolean;
@@ -144,8 +122,6 @@ const {
   isNative: boolean;
   isExtChrome: boolean;
   isExtFirefox: boolean;
-  isExtEdge: boolean;
-  isE2E: boolean;
 } = require('./buildTimeEnv.js');
 
 const isDesktopMac = isDesktop && window?.desktopApi?.platform === 'darwin';
@@ -171,16 +147,7 @@ const isNativeAndroidHuawei =
 const isMas = isDesktop && window?.desktopApi?.isMas;
 
 // for platform building by file extension
-const getAppPlatform = (): IAppPlatform | undefined => {
-  if (isWeb) return 'web';
-  if (isWebEmbed) return 'webEmbed';
-  if (isDesktop) return 'desktop';
-  if (isExtension) return 'extension';
-  if (isNativeIOS) return 'ios';
-  if (isNativeAndroid) return 'android';
-};
-
-const getPlatformSymbolLegacy = (): IPlatformLegacy | undefined => {
+const getPlatformSymbol = (): IPlatform | undefined => {
   if (isWeb) return 'web';
   if (isWebEmbed) return 'webEmbed';
   if (isDesktop) return 'desktop';
@@ -188,25 +155,24 @@ const getPlatformSymbolLegacy = (): IPlatformLegacy | undefined => {
   if (isNative) return 'native';
 };
 
-const getAppChannel = (): IAppChannel | undefined => {
-  if (isExtChrome) return 'chrome';
-  if (isExtFirefox) return 'firefox';
-  if (isExtEdge) return 'edge';
+const getDistributionChannel = (): IDistributionChannel | undefined => {
+  if (isExtChrome) return 'ext-chrome';
+  if (isExtFirefox) return 'ext-firefox';
 
-  if (isNativeIOSPad) return 'pad';
-  if (isNativeIOSPhone) return 'phone';
+  if (isDesktopMacArm64) return 'desktop-mac-arm64';
+  if (isDesktopMac) return 'desktop-mac';
+  if (isDesktopWinMsStore) return 'desktop-win-ms-store';
+  if (isDesktopWin) return 'desktop-win';
+  if (isDesktopLinuxSnap) return 'desktop-linux-snap';
+  if (isDesktopLinux) return 'desktop-linux';
 
-  if (isNativeAndroidHuawei) return 'huaweiStore';
-  if (isNativeAndroidGooglePlay) return 'googlePlay';
-  if (isNativeAndroid) return 'apk';
-
-  if (isDesktopWinMsStore) return 'winStore';
-  if (isDesktopWin) return 'win';
-  if (isMas) return 'macosStore';
-  if (isDesktopMacArm64) return 'macosARM';
-  if (isDesktopMac) return 'macosX86';
-  if (isDesktopLinuxSnap) return 'linuxSnap';
-  if (isDesktopLinux) return 'linux';
+  if (isNativeIOSPadStore) return 'native-ios-pad-store';
+  if (isNativeIOSPad) return 'native-ios-pad';
+  if (isNativeIOSStore) return 'native-ios-store';
+  if (isNativeIOS) return 'native-ios';
+  if (isNativeAndroidGooglePlay) return 'native-android-google';
+  if (isNativeAndroidHuawei) return 'native-android-huawei';
+  if (isNativeAndroid) return 'native-android';
 };
 
 const isRuntimeBrowser: boolean = typeof window !== 'undefined' && !isNative;
@@ -220,9 +186,9 @@ const checkIsRuntimeEdge = (): boolean => {
   }
   const isChromium = window.chrome;
   const winNav = window.navigator as typeof window.navigator | undefined;
-  const isIEEdge = winNav ? winNav.userAgent.indexOf('Edg') > -1 : false;
+  const isIEedge = winNav ? winNav.userAgent.indexOf('Edg') > -1 : false;
 
-  if (isChromium && isIEEdge === true) return true;
+  if (isChromium && isIEedge === true) return true;
 
   return false;
 };
@@ -243,7 +209,7 @@ const checkIsRuntimeChrome = (): boolean => {
   const vendorName = winNav ? winNav.vendor : '';
   // @ts-ignore
   const isOpera = typeof window.opr !== 'undefined';
-  const isIEEdge = winNav ? winNav.userAgent.indexOf('Edg') > -1 : false;
+  const isIEedge = winNav ? winNav.userAgent.indexOf('Edg') > -1 : false;
   const isIOSChrome = /CriOS/.exec(winNav ? winNav.userAgent : '');
 
   if (isIOSChrome) {
@@ -255,7 +221,7 @@ const checkIsRuntimeChrome = (): boolean => {
     typeof isChromium !== 'undefined' &&
     vendorName === 'Google Inc.' &&
     !isOpera &&
-    !isIEEdge
+    !isIEedge
   ) {
     // is Google Chrome
     return true;
@@ -263,69 +229,6 @@ const checkIsRuntimeChrome = (): boolean => {
   // not Google Chrome
   return false;
 };
-
-const getBrowserInfo = () => {
-  const browserInfo = {
-    name: 'unknown',
-    version: 'unknown',
-  };
-  if (isRuntimeBrowser) {
-    try {
-      const userAgent = window.navigator.userAgent.toLowerCase();
-
-      if (userAgent.indexOf('firefox') > -1) {
-        browserInfo.name = 'Firefox';
-        browserInfo.version =
-          userAgent.match(/firefox\/([\d.]+)/)?.[1] ?? 'unknown';
-      } else if (userAgent.indexOf('chrome') > -1) {
-        browserInfo.name = 'Chrome';
-        browserInfo.version =
-          userAgent.match(/chrome\/([\d.]+)/)?.[1] ?? 'unknown';
-      } else if (userAgent.indexOf('safari') > -1) {
-        browserInfo.name = 'Safari';
-        browserInfo.version =
-          userAgent.match(/version\/([\d.]+)/)?.[1] ?? 'unknown';
-      } else if (
-        userAgent.indexOf('msie') > -1 ||
-        userAgent.indexOf('trident') > -1
-      ) {
-        browserInfo.name = 'Internet Explorer';
-        browserInfo.version =
-          userAgent.match(/(?:msie |rv:)(\d+(\.\d+)?)/)?.[1] ?? 'unknown';
-      }
-    } catch (e) {
-      console.error('getBrowserInfo error:', e);
-    }
-  }
-  return `browser name: ${browserInfo.name}, browser version: ${browserInfo.version}`;
-};
-
-const isWebTouchable =
-  isRuntimeBrowser &&
-  ('ontouchstart' in window || navigator.maxTouchPoints > 0);
-
-let isWebMobile = false;
-let isWebMobileAndroid = false;
-let isWebMobileIOS = false;
-let isWebSafari = false;
-let isWebDappMode = false;
-(function () {
-  if (!isWeb) {
-    return;
-  }
-  // https://hgoebl.github.io/mobile-detect.js/doc/MobileDetect.html
-  const md = new MobileDetect(window.navigator?.userAgent);
-  const mobileInfo = md.mobile();
-  isWebMobile = Boolean(mobileInfo);
-  const os = md.os();
-  const ua = md.userAgent();
-
-  isWebMobileAndroid = os === 'AndroidOS';
-  isWebMobileIOS = os === 'iOS' || os === 'iPadOS';
-  isWebSafari =
-    ua === 'Safari' || window.navigator?.userAgent?.includes('Safari');
-  isWebDappMode = isWebInDappMode();
-})();
 
 const isRuntimeChrome = checkIsRuntimeChrome();
 const isRuntimeEdge = checkIsRuntimeEdge();
@@ -375,6 +278,8 @@ export const isManifestV3: boolean =
   // TODO firefox check v3
   isExtension && chrome?.runtime?.getManifest?.()?.manifest_version === 3;
 
+export const canGetClipboard: boolean = !isWeb && !isExtension;
+
 export const supportAutoUpdate: boolean =
   isDesktop && !(isMas || isDesktopLinuxSnap || isDesktopWinMsStore);
 
@@ -385,7 +290,6 @@ const platformEnv: IPlatformEnv = {
 
   version: process.env.VERSION,
   buildNumber: process.env.BUILD_NUMBER,
-  githubSHA: process.env.GITHUB_SHA,
 
   isJest,
 
@@ -393,16 +297,9 @@ const platformEnv: IPlatformEnv = {
 
   isDev,
   isProduction,
-  isE2E,
 
   isWeb,
-  isWebDappMode,
-  isWebTouchable,
   isWebEmbed,
-  isWebMobile,
-  isWebMobileAndroid,
-  isWebMobileIOS,
-  isWebSafari,
   isDesktop,
   isExtension,
   isNative,
@@ -427,10 +324,8 @@ const platformEnv: IPlatformEnv = {
   isNativeAndroidGooglePlay,
   isNativeAndroidHuawei,
 
-  symbol: getPlatformSymbolLegacy(),
-  appPlatform: getAppPlatform(),
-  appChannel: getAppChannel(),
-  browserInfo: getBrowserInfo(),
+  symbol: getPlatformSymbol(),
+  distributionChannel: getDistributionChannel(),
 
   isManifestV3,
   isExtensionBackground,
@@ -449,6 +344,7 @@ const platformEnv: IPlatformEnv = {
   isRuntimeChrome,
   isRuntimeEdge,
 
+  canGetClipboard,
   supportAutoUpdate,
   isAppleStoreEnv,
 };

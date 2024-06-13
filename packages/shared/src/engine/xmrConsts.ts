@@ -1,4 +1,4 @@
-export enum EMoneroEvent {
+export enum MoneroEvent {
   getKeyPairFromRawPrivatekey = 'Monero_getKeyPairFromRawPrivatekey',
   generateKeyImage = 'Monero_generateKeyImage',
   decodeAddress = 'Monero_decodeAddress',

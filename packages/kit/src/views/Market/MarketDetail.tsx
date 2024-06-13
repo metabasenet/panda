@@ -1,337 +1,279 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+/* eslint-disable react/no-unstable-nested-components */
+import type { FC, ReactElement } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 
-import { CommonActions } from '@react-navigation/native';
-import * as ExpoSharing from 'expo-sharing';
+import { useNavigation, useRoute } from '@react-navigation/core';
 import { useIntl } from 'react-intl';
-import { BackHandler } from 'react-native';
 
 import {
-  HeaderIconButton,
-  Image,
-  NavBackButton,
-  NumberSizeableText,
-  Page,
-  ScrollView,
-  SizableText,
-  Skeleton,
-  View,
-  XStack,
-  YStack,
-  useClipboard,
-  useMedia,
+  Box,
+  IconButton,
+  ToastManager,
+  Token,
+  Typography,
+  useIsVerticalLayout,
 } from '@onekeyhq/components';
-import type { IPageScreenProps } from '@onekeyhq/components';
-import { EJotaiContextStoreNames } from '@onekeyhq/kit-bg/src/states/jotai/atoms';
-import { EOneKeyDeepLinkPath } from '@onekeyhq/shared/src/consts/deeplinkConsts';
-import { ETranslations } from '@onekeyhq/shared/src/locale';
+import { SCREEN_SIZE } from '@onekeyhq/components/src/Provider/device';
 import platformEnv from '@onekeyhq/shared/src/platformEnv';
-import { ETabMarketRoutes } from '@onekeyhq/shared/src/routes';
-import type { ITabMarketParamList } from '@onekeyhq/shared/src/routes';
-import uriUtils from '@onekeyhq/shared/src/utils/uriUtils';
-import type { IMarketTokenDetail } from '@onekeyhq/shared/types/market';
 
 import backgroundApiProxy from '../../background/instance/backgroundApiProxy';
-import { OpenInAppButton } from '../../components/OpenInAppButton';
-import useAppNavigation from '../../hooks/useAppNavigation';
+import { TabRoutes } from '../../routes/routesEnum';
+import { openUrlExternal } from '../../utils/openUrl';
+import { coingeckoId2StakingTypes } from '../Staking/utils';
+import { MarketStakeButton } from '../Staking/Widgets/MarketStakingButton';
+import { SwapPlugins } from '../Swap/Plugins/Swap';
+import { ButtonItem } from '../TokenDetail/TokenDetailHeader/ButtonItem';
 
-import { MarketDetailOverview } from './components/MarketDetailOverview';
-import { MarketHomeHeaderSearchBar } from './components/MarketHomeHeaderSearchBar';
-import { MarketStar } from './components/MarketStar';
-import { PriceChangePercentage } from './components/PriceChangePercentage';
-import { TextCell } from './components/TextCell';
-import { TokenDetailTabs } from './components/TokenDetailTabs';
-import { TokenPriceChart } from './components/TokenPriceChart';
-import { buildMarketFullUrl } from './marketUtils';
-import { MarketWatchListProviderMirror } from './MarketWatchListProviderMirror';
+import MarketDetailContent from './Components/MarketDetail/MarketDetailContent';
+import { useMarketDetail } from './hooks/useMarketDetail';
+import { useMarketTokenItem } from './hooks/useMarketToken';
 
-function TokenDetailHeader({
-  coinGeckoId,
-  token,
+import type { FiatPayModalRoutesParams } from '../../routes/Root/Modal/FiatPay';
+import type { HomeRoutes } from '../../routes/routesEnum';
+import type {
+  HomeRoutesParams,
+  ModalScreenProps,
+  TabRoutesParams,
+} from '../../routes/types';
+import type { MarketTokenItem } from '../../store/reducers/market';
+import type { RouteProp } from '@react-navigation/core';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { LayoutChangeEvent } from 'react-native';
+
+type RouteProps = RouteProp<HomeRoutesParams, HomeRoutes.MarketDetail>;
+
+type NavigationProps = NativeStackNavigationProp<TabRoutesParams> &
+  ModalScreenProps<FiatPayModalRoutesParams>;
+
+export const FavoritButton = ({
+  tokenItem,
 }: {
-  coinGeckoId: string;
-  token: IMarketTokenDetail;
-}) {
+  tokenItem?: MarketTokenItem;
+}) => {
   const intl = useIntl();
-  const {
-    name,
-    stats: {
-      performance,
-      volume24h,
-      marketCap,
-      marketCapRank,
-      fdv,
-      currentPrice,
-    },
-  } = token;
-  const { gtMd } = useMedia();
-  return (
-    <YStack px="$5" $md={{ minHeight: 150 }}>
-      <YStack flex={1}>
-        <SizableText size="$headingMd" color="$textSubdued">
-          {name}
-        </SizableText>
-        <XStack ai="center" jc="space-between" pt="$2">
-          <NumberSizeableText
-            size="$heading3xl"
-            formatterOptions={{ currency: '$' }}
-            formatter="price"
-          >
-            {currentPrice || 0}
-          </NumberSizeableText>
-          <MarketStar coingeckoId={coinGeckoId} mr="$-2" size="medium" />
-        </XStack>
-        <PriceChangePercentage pt="$0.5">
-          {performance.priceChangePercentage24h}
-        </PriceChangePercentage>
-      </YStack>
-      {gtMd ? (
-        <MarketDetailOverview token={token} onContentSizeChange={() => {}} />
-      ) : (
-        <XStack pt="$6" flex={1} ai="center" jc="center" space="$2">
-          <TextCell
-            title={intl.formatMessage({ id: ETranslations.market_24h_vol_usd })}
-          >
-            {volume24h}
-          </TextCell>
-          <TextCell
-            title={intl.formatMessage({ id: ETranslations.global_market_cap })}
-            rank={marketCapRank}
-          >
-            {marketCap}
-          </TextCell>
-          <TextCell
-            title={intl.formatMessage({ id: ETranslations.global_fdv })}
-          >
-            {fdv}
-          </TextCell>
-        </XStack>
-      )}
-    </YStack>
-  );
-}
-
-function SkeletonHeader() {
-  return (
-    <YStack>
-      <Skeleton w="$24" h="$4" />
-      <View pt="$5" pb="$3.5">
-        <Skeleton w="$40" h="$7" />
-      </View>
-      <Skeleton w="$24" h="$3" />
-    </YStack>
-  );
-}
-
-function SkeletonHeaderOverItemItem() {
-  return (
-    <YStack space="$2" flexGrow={1} flexBasis={0}>
-      <Skeleton w="$10" h="$3" />
-      <Skeleton w="$24" h="$3" />
-    </YStack>
-  );
-}
-
-function MarketDetail({
-  route,
-}: IPageScreenProps<ITabMarketParamList, ETabMarketRoutes.MarketDetail>) {
-  const { icon, coinGeckoId, symbol } = route.params;
-  const { gtMd } = useMedia();
-
-  const [tokenDetail, setTokenDetail] = useState<
-    IMarketTokenDetail | undefined
-  >(undefined);
-
-  useEffect(() => {
-    void backgroundApiProxy.serviceMarket
-      .fetchTokenDetail(coinGeckoId)
-      .then(setTokenDetail);
-  }, [coinGeckoId]);
-
-  const renderHeaderTitle = useCallback(
-    () => (
-      <XStack space="$2">
-        <Image
-          width="$6"
-          height="$6"
-          borderRadius="$full"
-          src={decodeURIComponent(tokenDetail?.image || icon || '')}
-        />
-        <SizableText>
-          {(tokenDetail?.symbol || symbol)?.toUpperCase()}
-        </SizableText>
-      </XStack>
-    ),
-    [icon, symbol, tokenDetail?.image, tokenDetail?.symbol],
-  );
-  const { copyText } = useClipboard();
-
-  const buildDeepLinkUrl = useCallback(
-    () =>
-      uriUtils.buildDeepLinkUrl({
-        path: EOneKeyDeepLinkPath.market_detail,
-        query: {
-          coinGeckoId,
-        },
-      }),
-    [coinGeckoId],
-  );
-
-  const buildFullUrl = useCallback(
-    () => buildMarketFullUrl({ coinGeckoId }),
-    [coinGeckoId],
-  );
-
-  const renderHeaderRight = useCallback(
-    () => (
-      <XStack space="$6" ai="center">
-        {platformEnv.isNative ? null : (
-          <OpenInAppButton
-            buildDeepLinkUrl={buildDeepLinkUrl}
-            buildFullUrl={buildFullUrl}
-          />
-        )}
-        <HeaderIconButton
-          icon="ShareOutline"
-          onPress={async () => {
-            const url = buildMarketFullUrl({ coinGeckoId });
-            if (await ExpoSharing.isAvailableAsync()) {
-              // https://docs.expo.dev/versions/latest/sdk/sharing/
-              await ExpoSharing.shareAsync(url);
-            } else {
-              copyText(url);
-            }
-          }}
-        />
-        {gtMd ? <MarketHomeHeaderSearchBar /> : null}
-      </XStack>
-    ),
-    [buildDeepLinkUrl, buildFullUrl, coinGeckoId, copyText, gtMd],
-  );
-
-  const navigation = useAppNavigation();
-
-  const popPage = useCallback(() => {
-    navigation.dispatch((state) => {
-      console.log(state);
-      if (state.routes.length > 1) {
-        return CommonActions.goBack();
-      }
-      return CommonActions.reset({
-        index: 0,
-        routes: [
-          {
-            name: ETabMarketRoutes.TabMarket,
-          },
-        ],
-      });
-    });
-  }, [navigation]);
-
-  const renderHeaderLeft = useCallback(
-    () => <NavBackButton onPress={popPage} />,
-    [popPage],
-  );
-
-  const tokenDetailHeader = useMemo(() => {
-    if (tokenDetail) {
-      return (
-        <TokenDetailHeader coinGeckoId={coinGeckoId} token={tokenDetail} />
-      );
+  const isVertical = useIsVerticalLayout();
+  const onPress = useCallback(() => {
+    if (!tokenItem) {
+      return;
     }
+    if (tokenItem.favorited) {
+      backgroundApiProxy.serviceMarket.cancelMarketFavoriteToken(
+        tokenItem.coingeckoId,
+      );
+      ToastManager.show({
+        title: intl.formatMessage({ id: 'msg__removed' }),
+      });
+    } else {
+      backgroundApiProxy.serviceMarket.saveMarketFavoriteTokens([
+        {
+          coingeckoId: tokenItem.coingeckoId,
+          symbol: tokenItem.symbol,
+        },
+      ]);
+      ToastManager.show({
+        title: intl.formatMessage({ id: 'msg__added_to_favorites' }),
+      });
+    }
+  }, [intl, tokenItem]);
+  if (isVertical) {
     return (
-      <YStack px="$5">
-        {gtMd ? (
-          <YStack space="$12" width={336}>
-            <SkeletonHeader />
-            <YStack space="$3">
-              <Skeleton w={252} h="$3" />
-            </YStack>
-            <YStack space="$6">
-              <XStack>
-                <SkeletonHeaderOverItemItem />
-                <SkeletonHeaderOverItemItem />
-              </XStack>
-              <XStack>
-                <SkeletonHeaderOverItemItem />
-                <SkeletonHeaderOverItemItem />
-              </XStack>
-              <XStack>
-                <SkeletonHeaderOverItemItem />
-                <SkeletonHeaderOverItemItem />
-              </XStack>
-            </YStack>
-            <YStack space="$6">
-              <Skeleton w="$10" h="$3" />
-              <Skeleton w={252} h="$3" />
-              <Skeleton w={252} h="$3" />
-              <Skeleton w={252} h="$3" />
-            </YStack>
-          </YStack>
-        ) : (
-          <YStack space="$6" pt="$1">
-            <SkeletonHeader />
-            <XStack>
-              <SkeletonHeaderOverItemItem />
-              <SkeletonHeaderOverItemItem />
-              <SkeletonHeaderOverItemItem />
-            </XStack>
-          </YStack>
-        )}
-      </YStack>
+      <Box>
+        <IconButton
+          ml={4}
+          mr={2}
+          type={isVertical ? 'plain' : 'basic'}
+          name={tokenItem?.favorited ? 'StarSolid' : 'StarOutline'}
+          size={isVertical ? 'xl' : 'base'}
+          circle
+          iconColor={tokenItem?.favorited ? 'icon-warning' : 'icon-default'}
+          onPress={onPress}
+        />
+      </Box>
     );
-  }, [coinGeckoId, gtMd, tokenDetail]);
-
-  const tokenPriceChart = useMemo(
-    () => <TokenPriceChart coinGeckoId={coinGeckoId} />,
-    [coinGeckoId],
-  );
-
+  }
   return (
-    <Page>
-      <Page.Header
-        headerTitle={renderHeaderTitle}
-        headerRight={renderHeaderRight}
-        headerLeft={renderHeaderLeft}
+    <ButtonItem
+      icon={tokenItem?.favorited ? 'StarSolid' : 'StarOutline'}
+      text={
+        tokenItem?.favorited
+          ? intl.formatMessage({ id: 'action__unlike' })
+          : intl.formatMessage({ id: 'action__like' })
+      }
+      color={tokenItem?.favorited ? 'icon-warning' : 'icon-default'}
+      onPress={onPress}
+    />
+  );
+};
+
+const SwapButton = ({ onPress }: { onPress: () => void }) => {
+  const intl = useIntl();
+  return (
+    <ButtonItem
+      icon="ArrowsRightLeftMini"
+      text={intl.formatMessage({ id: 'title__swap' })}
+      onPress={onPress}
+    />
+  );
+};
+
+const PurchaseButton = ({ onPress }: { onPress: () => void }) => {
+  const intl = useIntl();
+  return (
+    <ButtonItem
+      icon="PlusMini"
+      text={intl.formatMessage({ id: 'Market__buy' })}
+      onPress={onPress}
+    />
+  );
+};
+
+const HeaderTitle = ({ tokenItem }: { tokenItem?: MarketTokenItem }) => {
+  const isVertical = useIsVerticalLayout();
+  return (
+    <Box flexDirection="row" alignItems="center">
+      <Token
+        size={isVertical ? 6 : 8}
+        token={{
+          logoURI: tokenItem?.logoURI,
+          symbol: tokenItem?.symbol,
+          name: tokenItem?.name,
+        }}
       />
-      <Page.Body>
-        {gtMd ? (
-          <YStack flex={1}>
-            <XStack flex={1} pt="$5">
-              <ScrollView minWidth={336} maxWidth={336}>
-                {tokenDetailHeader}
-              </ScrollView>
-              <YStack flex={1}>
-                <TokenDetailTabs
-                  token={tokenDetail}
-                  listHeaderComponent={tokenPriceChart}
-                />
-              </YStack>
-            </XStack>
-          </YStack>
-        ) : (
-          <TokenDetailTabs
-            token={tokenDetail}
-            listHeaderComponent={
-              <YStack>
-                {tokenDetailHeader}
-                {tokenPriceChart}
-              </YStack>
-            }
-          />
-        )}
-      </Page.Body>
-    </Page>
+      <Typography.Heading ml="2">{tokenItem?.symbol}</Typography.Heading>
+    </Box>
   );
-}
+};
 
-export default function MarketDetailWithProvider(
-  props: IPageScreenProps<ITabMarketParamList, ETabMarketRoutes.MarketDetail>,
-) {
+type MarketDetailLayoutProps = {
+  marketTokenId: string;
+  children: ReactElement<any, any>;
+};
+const MarketDetailLayout: FC<MarketDetailLayoutProps> = ({
+  marketTokenId,
+  children,
+}) => {
+  const navigation = useNavigation<
+    NavigationProps & NavigationProps['navigation']
+  >();
+  const isVertical = useIsVerticalLayout();
+  const [show, setShow] = useState(false);
+  const marketTokenItem = useMarketTokenItem({ coingeckoId: marketTokenId });
+  const onBack = useCallback(() => {
+    navigation.goBack();
+  }, [navigation]);
+  useLayoutEffect(() => {
+    if (!isVertical) {
+      navigation.setOptions({ headerShown: false });
+    } else {
+      navigation.setOptions({
+        headerRight: () => <FavoritButton tokenItem={marketTokenItem} />,
+        headerTitle: () => <HeaderTitle tokenItem={marketTokenItem} />,
+      });
+    }
+  });
+  const token = marketTokenItem?.tokens?.[0];
+
+  const [signedUrl, updateUrl] = useState('');
+  useEffect(() => {
+    if (token?.address !== undefined && token?.networkId !== undefined) {
+      backgroundApiProxy.serviceFiatPay
+        .getFiatPayUrl({
+          type: 'buy',
+          tokenAddress: token?.address,
+          networkId: token?.networkId,
+        })
+        .then((url) => updateUrl(url));
+    }
+  }, [token?.address, token?.networkId]);
+
+  const onLayout = useCallback((event: LayoutChangeEvent) => {
+    const {
+      nativeEvent: {
+        layout: { width },
+      },
+    } = event;
+    setShow(width > 1280);
+  }, []);
+
+  const stakingType = coingeckoId2StakingTypes[marketTokenId];
+
+  if (isVertical) {
+    return children ?? null;
+  }
+
   return (
-    <MarketWatchListProviderMirror
-      storeName={EJotaiContextStoreNames.marketWatchList}
-    >
-      <MarketDetail {...props} />
-    </MarketWatchListProviderMirror>
+    <Box bg="background-default" w="full" h="full" p="4">
+      <Box w="full" flexDirection="row" alignItems="center" py="5">
+        <IconButton onPress={onBack} type="plain" name="ArrowLeftOutline" />
+      </Box>
+      <Box
+        flex={1}
+        flexDirection="row"
+        justifyContent="center"
+        onLayout={onLayout}
+      >
+        <Box flex={1} maxW={SCREEN_SIZE.LARGE}>
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            flexDirection="row"
+            mb="8"
+          >
+            <HeaderTitle tokenItem={marketTokenItem} />
+            <Box
+              flexDirection="row"
+              alignItems="center"
+              justifyContent="space-around"
+            >
+              {token ? (
+                <SwapButton
+                  onPress={() => {
+                    if (token) {
+                      backgroundApiProxy.serviceSwap.setOutputToken(token);
+                      navigation.navigate(TabRoutes.Swap);
+                    }
+                  }}
+                />
+              ) : null}
+              {stakingType ? (
+                <MarketStakeButton stakingType={stakingType} />
+              ) : null}
+              {signedUrl.length > 0 && !platformEnv.isAppleStoreEnv ? (
+                <PurchaseButton
+                  onPress={() => {
+                    openUrlExternal(signedUrl);
+                  }}
+                />
+              ) : null}
+              <FavoritButton tokenItem={marketTokenItem} />
+            </Box>
+          </Box>
+          {children}
+        </Box>
+        {token && show ? (
+          <Box width="360px" ml="4">
+            <SwapPlugins
+              networkId={token.networkId}
+              tokenId={token.tokenIdOnNetwork}
+            />
+          </Box>
+        ) : null}
+      </Box>
+    </Box>
   );
-}
+};
+
+const MarketDetail: FC = () => {
+  const route = useRoute<RouteProps>();
+  const { marketTokenId } = route.params;
+  const { tokenDetail } = useMarketDetail({ coingeckoId: marketTokenId });
+  return (
+    <MarketDetailLayout marketTokenId={marketTokenId}>
+      <MarketDetailContent
+        tokenDetail={tokenDetail}
+        marketTokenId={marketTokenId}
+      />
+    </MarketDetailLayout>
+  );
+};
+export default MarketDetail;

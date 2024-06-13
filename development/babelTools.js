@@ -69,10 +69,17 @@ function normalizeConfig({ platform, config }) {
       },
     };
   }
+  const customAliasForComponents = (name, file) => {
+    // const filename = file.opts.filename;
+    if (name.startsWith('use')) {
+      return `@onekeyhq/components/src/Provider/hooks/${name}`;
+    }
+    return `@onekeyhq/components/src/${name}`;
+  };
+
   const {
     isJest,
     isDev,
-    isE2E,
     isProduction,
     isWeb,
     isWebEmbed,
@@ -91,11 +98,9 @@ function normalizeConfig({ platform, config }) {
       {
         // *** ATTENTION: DO NOT expose any sensitive variable here ***
         // ***        like password, secretKey, etc.                ***
-        'include': [
-          ...envExposedToClient.buildEnvExposedToClientDangerously({
-            platform,
-          }),
-        ],
+        'include': envExposedToClient.buildEnvExposedToClientDangerously({
+          platform,
+        }),
       },
     ],
     [
@@ -105,7 +110,6 @@ function normalizeConfig({ platform, config }) {
         // so it can do more tree shaking
         'platformEnv.isJest': isJest,
         'platformEnv.isDev': isDev,
-        'platformEnv.isE2E': isE2E,
         'platformEnv.isProduction': isProduction,
         'platformEnv.isWeb': isWeb,
         'platformEnv.isWebEmbed': isWebEmbed,
@@ -135,15 +139,31 @@ function normalizeConfig({ platform, config }) {
       'lodash',
     ],
     [
+      'babel-plugin-import',
+      {
+        'libraryName': '@onekeyhq/components',
+        'camel2DashComponentName': false, // default: true
+        'customName': customAliasForComponents,
+      },
+      '@onekeyhq_components',
+    ],
+    [
+      'babel-plugin-import',
+      {
+        'libraryName': '@onekeyhq/components/src',
+        'camel2DashComponentName': false, // default: true
+        'customName': customAliasForComponents,
+      },
+      '@onekeyhq_components_src',
+    ],
+    [
       'babel-plugin-inline-import',
       {
         'extensions': ['.text-js'],
       },
     ],
     /* FIX:
-       TypeError: undefined is not an object. (evaluating 'this._callListeners.bind')
-       And Don't remove any plugin here, it will cause other error.
-        https://github.com/facebook/react-native/issues/36828
+       TypeError: undefiend is not an object (evaluating 'this._callListeners.bind')
      */
     ['@babel/plugin-transform-flow-strip-types'],
     ['@babel/plugin-proposal-decorators', { 'legacy': true }],
@@ -153,20 +173,16 @@ function normalizeConfig({ platform, config }) {
     ['@babel/plugin-proposal-export-namespace-from'],
     ['@babel/plugin-proposal-nullish-coalescing-operator'],
     ['@babel/plugin-proposal-class-static-block'],
-    isDev && !isJest && !isNative && ['react-refresh/babel'],
-    // Need to adapt to the new version of the metro build system.
-    isDev &&
-      !isJest &&
-      !isNative && [
-        'babel-plugin-catch-logger',
-        {
-          source: '@onekeyhq/shared/src/logger/autoLogger',
-          name: 'autoLogger',
-          methodName: 'error',
-          catchPromise: false,
-          namespaced: false,
-        },
-      ],
+    isDev && [
+      'babel-plugin-catch-logger',
+      {
+        source: '@onekeyhq/shared/src/logger/autoLogger',
+        name: 'autoLogger',
+        methodName: 'error',
+        catchPromise: false,
+        namespaced: false,
+      },
+    ],
     moduleResolver && ['module-resolver', moduleResolver],
   ].filter(Boolean);
   // console.log('babelToolsConfig > moduleResolver: ', moduleResolver);

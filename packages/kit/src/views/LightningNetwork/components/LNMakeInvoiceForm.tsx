@@ -1,12 +1,17 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
-import BigNumber from 'bignumber.js';
+import { BigNumber } from 'bignumber.js';
 import { useIntl } from 'react-intl';
+import { StyleSheet } from 'react-native';
 
-import { Form, Input, TextArea } from '@onekeyhq/components';
+import { Box, Form, Text, useIsVerticalLayout } from '@onekeyhq/components';
+import type { Token } from '@onekeyhq/engine/src/types/token';
+import type { IInvoiceConfig } from '@onekeyhq/engine/src/vaults/impl/lightning-network/types/invoice';
+import { FormatCurrencyTokenOfAccount } from '@onekeyhq/kit/src/components/Format';
+import { TxInteractInfo } from '@onekeyhq/kit/src/views/TxDetail/components/TxInteractInfo';
 
 import backgroundApiProxy from '../../../background/instance/backgroundApiProxy';
-import { usePromiseResult } from '../../../hooks/usePromiseResult';
+import { useInteractWithInfo } from '../../../hooks/useDecodedTx';
 
 import type { UseFormReturn } from 'react-hook-form';
 import type { MessageDescriptor } from 'react-intl';
@@ -24,35 +29,86 @@ export type IMakeInvoiceFormProps = {
   amount?: number;
   minimumAmount?: number;
   maximumAmount?: number;
+  origin: string;
   descriptionLabelId?: MessageDescriptor['id'];
   memo?: string;
+  nativeToken?: Token;
   isWebln?: boolean;
   amountReadOnly?: boolean;
 };
 
-function LNMakeInvoiceForm(props: IMakeInvoiceFormProps) {
+const LNMakeInvoiceForm = (props: IMakeInvoiceFormProps) => {
   const {
+    accountId,
     networkId,
     useFormReturn,
     amount,
     minimumAmount,
     maximumAmount,
+    origin,
     descriptionLabelId,
     memo,
+    nativeToken,
+    isWebln,
     amountReadOnly,
   } = props;
   const intl = useIntl();
+  const isVerticalLayout = useIsVerticalLayout();
 
-  const { result: invoiceConfig } = usePromiseResult(
-    () =>
-      backgroundApiProxy.serviceLightning.getInvoiceConfig({
-        networkId,
-      }),
-    [networkId],
+  const { control, watch } = useFormReturn;
+  const amountValue = watch('amount');
+
+  const minAmount = useMemo(() => Number(minimumAmount), [minimumAmount]);
+  const maxAmount = useMemo(() => Number(maximumAmount), [maximumAmount]);
+
+  const interactInfo = useInteractWithInfo({
+    sourceInfo: {
+      id: 'mockId',
+      hostname: '',
+      scope: 'webln',
+      origin,
+      data: {
+        method: 'makeInvoice',
+      },
+    },
+  });
+
+  const [invoiceConfig, setInvoiceConfig] = useState<IInvoiceConfig | null>(
+    null,
   );
+  useEffect(() => {
+    if (!networkId || !accountId) return;
+    backgroundApiProxy.serviceLightningNetwork
+      .getInvoiceConfig({ networkId, accountId })
+      .then((config) => {
+        setInvoiceConfig(config);
+      });
+  }, [networkId, accountId]);
 
-  const minAmount = new BigNumber(minimumAmount ?? 0).toNumber();
-  const maxAmount = new BigNumber(maximumAmount ?? 0).toNumber();
+  const renderLabelAddon = useMemo(() => {
+    if (Number(amount) > 0 || (minAmount > 0 && minAmount === maxAmount)) {
+      return;
+    }
+    if (minAmount > 0 && maxAmount > 0) {
+      return (
+        <Text typography="Body2Strong" color="text-subdued">
+          {intl.formatMessage(
+            { id: 'form__between_int_and_int_sats' },
+            {
+              min: minAmount,
+              max:
+                maxAmount < minAmount
+                  ? invoiceConfig?.maxReceiveAmount
+                  : Math.min(
+                      maxAmount,
+                      Number(invoiceConfig?.maxReceiveAmount),
+                    ),
+            },
+          )}
+        </Text>
+      );
+    }
+  }, [amount, minAmount, maxAmount, invoiceConfig, intl]);
 
   const amountRules = useMemo(() => {
     let max;
@@ -122,67 +178,152 @@ function LNMakeInvoiceForm(props: IMakeInvoiceFormProps) {
     };
   }, [minAmount, maxAmount, invoiceConfig, intl]);
 
-  const amountLabelAddon = useMemo(() => {
-    if (Number(amount) > 0 || (minAmount > 0 && minAmount === maxAmount)) {
-      return;
-    }
-    if (minAmount > 0 && maxAmount > 0) {
-      return intl.formatMessage(
-        { id: 'form__between_int_and_int_sats' },
-        {
-          min: minAmount,
-          max:
-            maxAmount < minAmount
-              ? invoiceConfig?.maxReceiveAmount
-              : Math.min(maxAmount, Number(invoiceConfig?.maxReceiveAmount)),
-        },
-      );
-    }
-  }, [amount, minAmount, maxAmount, invoiceConfig, intl]);
-
   return (
-    <Form form={useFormReturn}>
-      <Form.Field
-        label={intl.formatMessage({
-          id: 'content__amount',
-        })}
-        name="amount"
-        rules={amountRules}
-        labelAddon={amountLabelAddon}
-        // TODO: price
-        // description="$40"
+    <Form>
+      <Form.Item
+        label={intl.formatMessage({ id: 'form__request_from' })}
+        name="requestFrom"
+        control={control}
+        formControlProps={{ width: 'full' }}
       >
-        <Input
-          readonly={amountReadOnly}
-          placeholder={intl.formatMessage({ id: 'form__enter_amount' })}
-          flex={1}
-          addOns={[
-            {
-              label: intl.formatMessage({ id: 'form__sats__units' }),
-            },
-          ]}
+        <TxInteractInfo
+          origin={interactInfo?.url ?? ''}
+          name={interactInfo?.name}
+          icon={interactInfo?.icons[0]}
+          networkId={networkId}
+          mb={0}
         />
-      </Form.Field>
-      <Form.Field
-        label={intl.formatMessage({
-          id: descriptionLabelId ?? 'form__description',
-        })}
-        name="description"
-        rules={{
-          maxLength: {
-            value: 40,
-            message: intl.formatMessage(
-              { id: 'msg_description_can_be_up_to_int_characters' },
-              { 0: '40' },
-            ),
-          },
-        }}
+      </Form.Item>
+      {!isWebln ? (
+        <Form.Item
+          label={intl.formatMessage({
+            id: descriptionLabelId ?? 'form__description',
+          })}
+          control={control}
+          name="description"
+          formControlProps={{ width: 'full' }}
+          rules={{
+            maxLength: {
+              value: 40,
+              message: intl.formatMessage(
+                { id: 'msg_description_can_be_up_to_int_characters' },
+                { 0: '40' },
+              ),
+            },
+          }}
+          defaultValue=""
+        >
+          <Box
+            display="flex"
+            flexDirection="row"
+            justifyContent="flex-start"
+            alignItems="center"
+            borderWidth={StyleSheet.hairlineWidth}
+            borderColor="border-default"
+            borderRadius="xl"
+            py={2}
+            px={3}
+            bgColor="action-secondary-default"
+          >
+            <Text
+              typography="Body2Mono"
+              color="text-subdued"
+              lineHeight="1.5em"
+              numberOfLines={10}
+            >
+              {memo}
+            </Text>
+          </Box>
+        </Form.Item>
+      ) : null}
+      <Form.Item
+        label={`${intl.formatMessage({
+          id: 'content__amount',
+        })}`}
+        control={control}
+        name="amount"
+        formControlProps={{ width: 'full' }}
+        // @ts-expect-error
+        rules={amountRules}
         defaultValue=""
+        isLabelAddonActions={false}
+        labelAddon={renderLabelAddon}
       >
-        <TextArea editable={!memo} />
-      </Form.Field>
+        {amountReadOnly ? (
+          <Box
+            display="flex"
+            flexDirection="row"
+            justifyContent="flex-start"
+            alignItems="center"
+            borderWidth={StyleSheet.hairlineWidth}
+            borderColor="border-default"
+            borderRadius="xl"
+            py={2}
+            px={3}
+            bgColor="action-secondary-default"
+          >
+            <Text
+              typography="Body2Mono"
+              color="text-subdued"
+              lineHeight="1.5em"
+            >
+              {`${Number(amount)} ${intl.formatMessage({
+                id: 'form__sats__units',
+              })}`}
+            </Text>
+          </Box>
+        ) : (
+          <Form.Input
+            type="number"
+            size={isVerticalLayout ? 'xl' : 'default'}
+            placeholder={intl.formatMessage({ id: 'form__enter_amount' })}
+            isReadOnly={amountReadOnly}
+            rightCustomElement={
+              <Text px={4} typography="Button1" color="text-subdued">
+                {intl.formatMessage({ id: 'form__sats__units' })}
+              </Text>
+            }
+          />
+        )}
+      </Form.Item>
+      <FormatCurrencyTokenOfAccount
+        accountId={accountId}
+        networkId={networkId}
+        token={nativeToken}
+        value={new BigNumber(amountValue)}
+        render={(ele) => (
+          <Text typography="Body2" color="text-subdued" mt="-18px">
+            {ele}
+          </Text>
+        )}
+      />
+      {isWebln ? (
+        <Form.Item
+          label={intl.formatMessage({ id: 'form__description' })}
+          control={control}
+          name="description"
+          formControlProps={{ width: 'full' }}
+          rules={{
+            maxLength: {
+              value: 40,
+              message: intl.formatMessage(
+                { id: 'msg_description_can_be_up_to_int_characters' },
+                { 0: '40' },
+              ),
+            },
+          }}
+          defaultValue=""
+        >
+          <Form.Textarea
+            size={isVerticalLayout ? 'xl' : 'default'}
+            totalLines={isVerticalLayout ? 3 : 5}
+            placeholder={intl.formatMessage({
+              id: 'form__a_message_to_the_payer_optional',
+            })}
+          />
+        </Form.Item>
+      ) : null}
     </Form>
   );
-}
-
+};
 export default LNMakeInvoiceForm;

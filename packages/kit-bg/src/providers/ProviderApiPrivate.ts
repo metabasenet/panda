@@ -3,25 +3,31 @@
 /* eslint-disable camelcase */
 import { IInjectedProviderNames } from '@onekeyfe/cross-inpage-provider-types';
 
+import walletConnectUtils from '@onekeyhq/kit/src/components/WalletConnect/utils/walletConnectUtils';
+import extUtils from '@onekeyhq/kit/src/utils/extUtils';
+import { timeout } from '@onekeyhq/kit/src/utils/helper';
+import { scanFromURLAsync } from '@onekeyhq/kit/src/views/ScanQrcode/scanFromURLAsync';
 import {
   backgroundClass,
   providerApiMethod,
 } from '@onekeyhq/shared/src/background/backgroundDecorators';
-import {
-  EAppEventBusNames,
-  appEventBus,
-} from '@onekeyhq/shared/src/eventBus/appEventBus';
+import debugLogger, {
+  getDebugLoggerSettings,
+} from '@onekeyhq/shared/src/logger/debugLogger';
 import platformEnv from '@onekeyhq/shared/src/platformEnv';
-import { isWebEmbedApiAllowedOrigin } from '@onekeyhq/shared/src/utils/originUtils';
-import { waitForDataLoaded } from '@onekeyhq/shared/src/utils/promiseUtils';
-import timerUtils from '@onekeyhq/shared/src/utils/timerUtils';
 
 import ProviderApiBase from './ProviderApiBase';
 
 import type { IProviderBaseBackgroundNotifyInfo } from './ProviderApiBase';
-import type BackgroundApiBase from '../apis/BackgroundApiBase';
-import type { IBackgroundApiWebembedCallMessage } from '../apis/IBackgroundApi';
-import type { IJsBridgeMessagePayload } from '@onekeyfe/cross-inpage-provider-types';
+import type ProviderApiEthereum from './ProviderApiEthereum';
+import type {
+  IJsBridgeMessagePayload,
+  IJsonRpcRequest,
+} from '@onekeyfe/cross-inpage-provider-types';
+import type {
+  IWebViewWrapperRef,
+  JsBridgeDesktopHost,
+} from '@onekeyfe/onekey-cross-webview';
 
 export interface IOneKeyWalletInfo {
   enableExtContentScriptReloadButton?: boolean;
@@ -29,8 +35,7 @@ export interface IOneKeyWalletInfo {
   version?: string;
   buildNumber?: string;
   disableExt: boolean;
-  isDefaultWallet?: boolean;
-  excludedDappList: string[];
+  walletSwitchConfig: Record<string, string[]>;
   isLegacy: boolean;
   platformEnv: {
     isRuntimeBrowser?: boolean;
@@ -68,31 +73,117 @@ class ProviderApiPrivate extends ProviderApiBase {
     // noop
   }
 
-  public async notifyExtSwitchChanged(info: IProviderBaseBackgroundNotifyInfo) {
-    const params = await this.getWalletInfo();
-    info.send(
-      { method: 'wallet_events_ext_switch_changed', params },
-      info.targetOrigin,
-    );
+  public notifyExtSwitchChanged(info: IProviderBaseBackgroundNotifyInfo) {
+    const params = this.getWalletInfo();
+    info.send({ method: 'wallet_events_ext_switch_changed', params });
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public rpcCall(request: IJsBridgeMessagePayload): any {
+  public rpcCall(request: IJsonRpcRequest): any {
     // noop
   }
 
   // ----------------------------------------------
-  async getWalletInfo(): Promise<IOneKeyWalletInfo> {
-    const { isDefaultWallet, excludedDappList } =
-      await this.backgroundApi.serviceContextMenu.getDefaultWalletSettings();
+  @providerApiMethod()
+  async wallet_scanQrcode(
+    request: IJsonRpcRequest,
+    { base64 }: { base64: string },
+  ): Promise<{ result: string; base64?: string; error?: string }> {
+    try {
+      const result = await timeout(
+        scanFromURLAsync(base64),
+        3000,
+        'wallet_scanQrcode timeout',
+      );
+      return { result: result || '', base64 };
+    } catch (error) {
+      console.error(error);
+      return { result: '', base64, error: (error as Error)?.message };
+    }
+  }
+
+  @providerApiMethod()
+  async wallet_connectToWalletConnect(
+    request: IJsonRpcRequest,
+    { uri }: { uri: string },
+  ): Promise<any> {
+    if (uri) {
+      if (platformEnv.isExtension) {
+        // extension can not show Modal UI directly from background
+        this.backgroundApi.walletConnect.connect({ uri });
+      } else {
+        walletConnectUtils.openConnectToDappModal({ uri });
+      }
+    }
+    return Promise.resolve(`uri=${uri}`);
+  }
+
+  /*
+    window.$onekey.$private.request({
+      method: 'wallet_openUrl',
+      params: { url: 'https://www.baidu.com' },
+    });
+  */
+  @providerApiMethod()
+  wallet_openUrl(request: IJsonRpcRequest, { url }: { url: string }) {
+    console.log('wallet_openUrl', request, url);
+
+    if (platformEnv.isExtension) {
+      extUtils.openUrlInTab(url);
+    }
+    if (platformEnv.isDesktop || platformEnv.isNative) {
+      const bridge = this.backgroundApi.bridge as JsBridgeDesktopHost;
+      const webview = bridge.webviewWrapper as IWebViewWrapperRef;
+      webview.loadURL(url);
+    }
+    if (platformEnv.isWeb) {
+      extUtils.openUrl(url);
+    }
+  }
+
+  // $onekey.$private.request({method:'wallet_sendSiteMetadata'})
+  @providerApiMethod()
+  wallet_sendSiteMetadata() {
+    // TODO save to DB
+    return { success: 'wallet_sendSiteMetadata: save to DB' };
+  }
+
+  getWalletInfo(): IOneKeyWalletInfo {
+    const disableExt = !!this.backgroundApi.appSelector(
+      (s) => s.settings.disableExt,
+    );
+    const walletSwitchData = this.backgroundApi.appSelector(
+      (s) => s.settings.walletSwitchData,
+    );
+    const showContentScriptReloadButton = this.backgroundApi.appSelector(
+      (s) => s.settings?.devMode?.showContentScriptReloadButton,
+    );
+    const walletSwitchConfig: Record<string, string[]> = {
+      enable: [],
+      disable: [],
+    };
+    if (walletSwitchData && Object.values(walletSwitchData).length) {
+      Object.values(walletSwitchData).forEach((item) => {
+        if (item.enable) {
+          walletSwitchConfig.enable = [
+            ...walletSwitchConfig.enable,
+            ...item.propertyKeys,
+          ];
+        } else {
+          walletSwitchConfig.disable = [
+            ...walletSwitchConfig.disable,
+            ...item.propertyKeys,
+          ];
+        }
+      });
+    }
     return {
-      enableExtContentScriptReloadButton: false,
+      enableExtContentScriptReloadButton: showContentScriptReloadButton,
       platform: process.env.ONEKEY_PLATFORM,
       version: process.env.VERSION,
       buildNumber: process.env.BUILD_NUMBER,
-      disableExt: false,
-      isDefaultWallet,
-      excludedDappList,
+      disableExt,
+      walletSwitchConfig,
       isLegacy: false,
       platformEnv: {
         isRuntimeBrowser: platformEnv.isRuntimeBrowser,
@@ -120,16 +211,15 @@ class ProviderApiPrivate extends ProviderApiBase {
   // $onekey.$private.request({method:'wallet_getConnectWalletInfo'})
   @providerApiMethod()
   async wallet_getConnectWalletInfo(
-    request: IJsBridgeMessagePayload,
+    req: IJsBridgeMessagePayload,
     { time = 0 }: { time?: number } = {},
   ) {
     // const manifest = chrome.runtime.getManifest();
     // pass debugLoggerSettings to dapp injected provider
-    // TODO: (await getDebugLoggerSettings())
-    const debugLoggerSettings = '';
-    // const ethereum = this.backgroundApi.providers
-    //   .ethereum as ProviderApiEthereum;
-    // const providerState = await ethereum.metamask_getProviderState(request);
+    const debugLoggerSettings: string = (await getDebugLoggerSettings()) || '';
+    const ethereum = this.backgroundApi.providers
+      .ethereum as ProviderApiEthereum;
+    const providerState = await ethereum.metamask_getProviderState(req);
     return {
       pong: true,
       time: Date.now(),
@@ -148,90 +238,22 @@ class ProviderApiPrivate extends ProviderApiBase {
         // ** or you can update logger settings in Dapp console directly
         //    ** (all logger settings in Wallet should be disabled first)
         /*
-          window.localStorage.setItem('$$ONEKEY_DEBUG_LOGGER', 'jsBridge,ethereum');
-          window.location.reload();
-           */
+        window.localStorage.setItem('$$ONEKEY_DEBUG_LOGGER', 'jsBridge,ethereum');
+        window.location.reload();
+         */
       },
-      walletInfo: await this.getWalletInfo(),
-      providerState: {},
+      walletInfo: this.getWalletInfo(),
+      providerState,
     };
-  }
-
-  // $onekey.$private.request({method:'wallet_sendSiteMetadata'})
-  @providerApiMethod()
-  wallet_sendSiteMetadata() {
-    // TODO save to DB
-    return { success: 'wallet_sendSiteMetadata: save to DB' };
-  }
-
-  /*
-    window.$onekey.$private.request({
-      method: 'wallet_detectRiskLevel',
-      params: { url: 'https://www.google.com' },
-    });
-  */
-  @providerApiMethod()
-  async wallet_detectRiskLevel(request: IJsBridgeMessagePayload) {
-    console.log('ProviderApiPrivate.detectRiskLevel', request);
-    if (request.origin) {
-      const securityInfo =
-        await this.backgroundApi.serviceDiscovery.checkUrlSecurity(
-          request.origin,
-        );
-      return {
-        securityInfo,
-        isExtension: !!platformEnv.isExtension,
-        i18n: {
-          title: 'Malicious Dapp',
-          description:
-            'The current website may be malicious. Continue visiting could result in loss of assets.',
-          continueMessage:
-            'If you understand the risks and want to proceed, you can',
-          continueLink: 'dismiss',
-          addToWhiteListLink: 'add to whitelist',
-          sourceMessage: 'Powered by',
-        },
-      };
-    }
-    throw new Error('Invalid request');
-  }
-
-  /*
-    Only use for native and desktop browser
-    window.$onekey.$private.request({
-      method: 'wallet_closeCurrentBrowserTab',
-    });
-  */
-  @providerApiMethod()
-  async wallet_closeCurrentBrowserTab() {
-    if (platformEnv.isExtension) {
-      return;
-    }
-    console.log('wallet_closeCurrentBrowserTab');
-    appEventBus.emit(EAppEventBusNames.CloseCurrentBrowserTab, undefined);
-  }
-
-  /*
-    window.$onekey.$private.request({
-      method: 'wallet_addBrowserUrlToRiskWhiteList',
-    });
-  */
-  @providerApiMethod()
-  async wallet_addBrowserUrlToRiskWhiteList(request: IJsBridgeMessagePayload) {
-    console.log('ProviderApiPrivate.addBrowserUrlToRiskWhiteList', request);
-    if (request.origin) {
-      await this.backgroundApi.serviceDiscovery.addBrowserUrlToRiskWhiteList(
-        request.origin,
-      );
-      return;
-    }
-    throw new Error('Invalid request');
   }
 
   @providerApiMethod()
   callChainWebEmbedMethod(payload: any) {
     const method: string = payload.data?.method;
-    console.log('ProviderApiPrivate.callChainWebEmbedMethod', payload);
+    debugLogger.providerApi.info(
+      'ProviderApiPrivate.callChainWebEmbedMethod',
+      payload,
+    );
     const data = ({ origin }: { origin: string }) => {
       const result = {
         method,
@@ -241,7 +263,7 @@ class ProviderApiPrivate extends ProviderApiBase {
           params: { ...payload.data?.params },
         },
       };
-      console.log(
+      debugLogger.providerApi.info(
         'ProviderApiPrivate.callChainWebEmbedMethod',
         method,
         origin,
@@ -254,61 +276,14 @@ class ProviderApiPrivate extends ProviderApiBase {
 
   @providerApiMethod()
   chainWebEmbedResponse(payload: any) {
-    console.log('ProviderApiPrivate.chainWebEmbedResponse', payload);
-    void this.backgroundApi.servicePromise.resolveCallback({
+    debugLogger.providerApi.info(
+      'ProviderApiPrivate.chainWebEmbedResponse',
+      payload,
+    );
+    this.backgroundApi.servicePromise.resolveCallback({
       id: payload?.data?.promiseId,
       data: { ...(payload?.data?.data ?? {}) },
     });
-  }
-
-  isWebEmbedApiReady = false;
-
-  @providerApiMethod()
-  async webEmbedApiReady(): Promise<void> {
-    this.isWebEmbedApiReady = true;
-    appEventBus.emit(EAppEventBusNames.LoadWebEmbedWebViewComplete, undefined);
-    return Promise.resolve();
-  }
-
-  @providerApiMethod()
-  async webEmbedApiNotReady(): Promise<void> {
-    this.isWebEmbedApiReady = false;
-    return Promise.resolve();
-  }
-
-  async callWebEmbedApiProxy(data: IBackgroundApiWebembedCallMessage) {
-    if (!platformEnv.isNative) {
-      throw new Error('call webembed api only support native env');
-    }
-    const bg = this.backgroundApi as unknown as BackgroundApiBase;
-
-    await waitForDataLoaded({
-      data: () => this.isWebEmbedApiReady && Boolean(bg?.webEmbedBridge),
-      logName: `ProviderApiPrivate.callWebEmbedApiProxy: ${
-        data?.module || ''
-      } - ${data?.method || ''}`,
-      wait: 1000,
-      timeout: timerUtils.getTimeDurationMs({ minute: 3 }),
-    });
-
-    if (!bg?.webEmbedBridge?.request) {
-      throw new Error('webembed webview bridge not ready.');
-    }
-
-    const webviewOrigin = `${bg?.webEmbedBridge?.remoteInfo?.origin || ''}`;
-    if (!isWebEmbedApiAllowedOrigin(webviewOrigin)) {
-      throw new Error(
-        `callWebEmbedApiProxy not allowed origin: ${
-          webviewOrigin || 'undefined'
-        }`,
-      );
-    }
-
-    const result = await bg?.webEmbedBridge?.request?.({
-      scope: '$private',
-      data,
-    });
-    return result;
   }
 }
 

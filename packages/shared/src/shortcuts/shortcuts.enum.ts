@@ -1,33 +1,44 @@
-export enum EBrowserShortcutEvents {
-  GoBackHistory = 'GoBackHistory',
-  GoForwardHistory = 'GoForwardHistory',
-  Refresh = 'Refresh',
+export enum ExplorerShortcutEvents {
   NewTab = 'NewTab',
+  NewTabAndFocus = 'NewTabAndFocus',
+  JumpToNextTab = 'JumpToNextTab',
+  GobackHistory = 'GobackHistory',
+  GoForwardHistory = 'GoForwardHistory',
   CloseTab = 'CloseTab',
+  CloseTabOnWinOrLinux = 'CloseTabOnWinOrLinux',
 }
 
-export const getShortcutsMap: () => Record<
-  EBrowserShortcutEvents,
-  { keys: string | null; desc: string }
-> = () => ({
-  [EBrowserShortcutEvents.GoBackHistory]: {
-    keys: 'CmdOrCtrl+[',
-    desc: 'Go back history',
+export const getShortcutsMap: (
+  isMac?: boolean,
+) => Record<ExplorerShortcutEvents, { keys: string | null; desc: string }> = (
+  isMac,
+) => ({
+  [ExplorerShortcutEvents.NewTab]: {
+    keys: 'CmdOrCtrl+N',
+    desc: 'New Tab',
   },
-  [EBrowserShortcutEvents.GoForwardHistory]: {
-    keys: 'CmdOrCtrl+]',
-    desc: 'Go forward history',
-  },
-  [EBrowserShortcutEvents.Refresh]: {
-    keys: 'CmdOrCtrl+R',
-    desc: 'Refresh',
-  },
-  [EBrowserShortcutEvents.NewTab]: {
+  [ExplorerShortcutEvents.NewTabAndFocus]: {
     keys: 'CmdOrCtrl+T',
     desc: 'New Tab',
   },
-  [EBrowserShortcutEvents.CloseTab]: {
+  [ExplorerShortcutEvents.JumpToNextTab]: {
+    keys: isMac ? 'Cmd+Alt+Right' : 'Ctrl+Tab',
+    desc: 'New Tab',
+  },
+  [ExplorerShortcutEvents.GobackHistory]: {
+    keys: 'Alt+Left',
+    desc: 'New Tab',
+  },
+  [ExplorerShortcutEvents.GoForwardHistory]: {
+    keys: 'Alt+Right',
+    desc: 'New Tab',
+  },
+  [ExplorerShortcutEvents.CloseTab]: {
     keys: 'CmdOrCtrl+W',
+    desc: 'Close Tab',
+  },
+  [ExplorerShortcutEvents.CloseTabOnWinOrLinux]: {
+    keys: isMac ? null : 'Ctrl+F4',
     desc: 'Close Tab',
   },
 });
@@ -40,5 +51,4 @@ export const getDisplayKeysMap = (isMac?: boolean) => ({
   Right: '→',
   Up: '↑',
   Down: '↓',
-  Search: '/',
 });

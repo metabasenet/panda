@@ -1,436 +1,203 @@
-import {
-  type ComponentProps,
-  type FC,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import type { ComponentProps, FC } from 'react';
+import { useCallback, useState } from 'react';
 
-import { useFormContext } from 'react-hook-form';
 import { useIntl } from 'react-intl';
-import { useDebouncedCallback } from 'use-debounce';
 
-import type { TextArea } from '@onekeyhq/components';
 import {
-  Badge,
+  Box,
+  Divider,
   Icon,
-  IconButton,
-  Select,
-  Spinner,
-  Stack,
-  XStack,
+  Pressable,
+  Textarea,
+  Typography,
 } from '@onekeyhq/components';
-import backgroundApiProxy from '@onekeyhq/kit/src/background/instance/backgroundApiProxy';
-import { ETranslations } from '@onekeyhq/shared/src/locale';
-import accountUtils from '@onekeyhq/shared/src/utils/accountUtils';
-import { EAccountSelectorSceneName } from '@onekeyhq/shared/types';
-import type {
-  IAddressInteractionStatus,
-  IAddressValidateStatus,
-  IQueryCheckAddressArgs,
-} from '@onekeyhq/shared/types/address';
+import { getClipboard } from '@onekeyhq/components/src/utils/ClipboardUtils';
+import platformEnv from '@onekeyhq/shared/src/platformEnv';
 
-import { BaseInput } from '../BaseInput';
+import backgroundApiProxy from '../../background/instance/backgroundApiProxy';
+import { useNavigation } from '../../hooks';
+import { ModalRoutes, RootRoutes } from '../../routes/routesEnum';
+import { gotoScanQrcode } from '../../utils/gotoScanQrcode';
+import { parseUriScheme } from '../../utils/uriScheme';
+import { AddressBookRoutes } from '../../views/AddressBook/routes';
 
-import { ClipboardPlugin } from './plugins/clipboard';
-import { ScanPlugin } from './plugins/scan';
-import { SelectorPlugin } from './plugins/selector';
+type AddressInputPlugin = 'paste' | 'contact' | 'scan';
 
-type IResolvedAddressProps = {
-  value: string;
-  options: string[];
-  onChange?: (value: string) => void;
-};
-
-const ResolvedAddress: FC<IResolvedAddressProps> = ({
-  value,
-  options,
-  onChange,
-}) => {
-  const intl = useIntl();
-  if (options.length <= 1) {
-    return (
-      <Badge badgeSize="sm">
-        <Badge.Text>
-          {accountUtils.shortenAddress({
-            address: value,
-          })}
-        </Badge.Text>
-      </Badge>
-    );
-  }
-  return (
-    <Select
-      title={intl.formatMessage({
-        id: ETranslations.send_ens_choose_address_title,
-      })}
-      placeholder={intl.formatMessage({
-        id: ETranslations.send_ens_choose_address_title,
-      })}
-      renderTrigger={() => (
-        <Badge badgeSize="sm" userSelect="none">
-          <Badge.Text>
-            {accountUtils.shortenAddress({
-              address: value,
-            })}
-          </Badge.Text>
-          <Icon name="ChevronDownSmallOutline" color="$iconSubdued" size="$4" />
-        </Badge>
-      )}
-      items={options.map((o) => ({ label: o, value: o }))}
-      value={value}
-      onChange={onChange}
-      floatingPanelProps={{
-        width: '$80',
-      }}
-    />
-  );
-};
-
-type IAddressInteractionStatusProps = {
-  status?: IAddressInteractionStatus;
-};
-
-const AddressInteractionStatus: FC<IAddressInteractionStatusProps> = ({
-  status,
-}) => {
-  const intl = useIntl();
-  if (status === 'not-interacted') {
-    return (
-      <Badge badgeType="warning" badgeSize="sm">
-        {intl.formatMessage({ id: ETranslations.send_label_first_transfer })}
-      </Badge>
-    );
-  }
-  if (status === 'interacted') {
-    return (
-      <Badge badgeType="success" badgeSize="sm">
-        {intl.formatMessage({ id: ETranslations.send_label_transferred })}
-      </Badge>
-    );
-  }
-  return null;
-};
-
-export type IAddressInputValue = {
-  raw?: string;
-  resolved?: string;
-  pending?: boolean;
-  validateError?: {
-    type?: Exclude<IAddressValidateStatus, 'valid'>;
-    message?: string;
-  };
-};
-
-type IAddressInputProps = Omit<
-  ComponentProps<typeof TextArea>,
-  'value' | 'onChange'
-> & {
-  networkId: string;
-  value?: IAddressInputValue;
-  onChange?: (value: IAddressInputValue) => void;
+type AddressInputProps = ComponentProps<typeof Textarea> & {
+  networkId?: string;
+  value?: string;
+  onChange?: (address: string) => void;
+  onChangeAddressName?: (address: string) => void;
+  plugins?: AddressInputPlugin[];
+  contactExcludeWalletAccount?: boolean;
   placeholder?: string;
-  name?: string;
-  autoError?: boolean;
-
-  // plugins options for control button display
-  clipboard?: boolean;
-  scan?: { sceneName: EAccountSelectorSceneName };
-  contacts?: boolean;
-  accountSelector?: { num: number; onBeforeAccountSelectorOpen?: () => void };
-
-  // query options for control query behavior
-  enableNameResolve?: boolean;
-  enableAddressBook?: boolean;
-  enableWalletName?: boolean;
-
-  accountId?: string;
-  enableAddressInteractionStatus?: boolean; // for check address interaction
-  enableVerifySendFundToSelf?: boolean; // To verify whether funds can be sent to one's own address.
+  description?: string;
+  addressFilter?: (address: string) => Promise<boolean>;
 };
 
-export type IAddressQueryResult = {
-  input?: string;
-  validStatus?: IAddressValidateStatus;
-  walletAccountName?: string;
-  addressBookName?: string;
-  resolveAddress?: string;
-  resolveOptions?: string[];
-  addressInteractionStatus?: IAddressInteractionStatus;
-};
-
-type IAddressInputBadgeGroupProps = {
-  loading?: boolean;
-  result?: IAddressQueryResult;
-  setResolveAddress?: (address: string) => void;
-  onRefresh?: () => void;
-};
-
-function AddressInputBadgeGroup(props: IAddressInputBadgeGroupProps) {
-  const { loading, result, setResolveAddress, onRefresh } = props;
-  if (loading) {
-    return <Spinner />;
-  }
-  if (result?.validStatus === 'unknown') {
-    return (
-      <IconButton
-        variant="tertiary"
-        icon="RotateClockwiseSolid"
-        size="small"
-        onPress={onRefresh}
-      />
-    );
-  }
-  if (result) {
-    return (
-      <XStack space="$2" flex={1} flexWrap="wrap">
-        {result.walletAccountName ? (
-          <Badge badgeType="success" badgeSize="sm" mb="$1">
-            {result.walletAccountName}
-          </Badge>
-        ) : null}
-        {result.addressBookName ? (
-          <Badge badgeType="success" badgeSize="sm" mb="$1">
-            {result.addressBookName}
-          </Badge>
-        ) : null}
-        {result.resolveAddress ? (
-          <Stack mb="$1">
-            <ResolvedAddress
-              value={result.resolveAddress}
-              options={result.resolveOptions ?? []}
-              onChange={setResolveAddress}
-            />
-          </Stack>
-        ) : null}
-        <Stack mb="$1">
-          <AddressInteractionStatus status={result.addressInteractionStatus} />
-        </Stack>
-      </XStack>
-    );
-  }
-  return null;
-}
-
-export function AddressInput(props: IAddressInputProps) {
-  const {
-    name = '',
-    value,
-    onChange,
-    networkId,
-    placeholder,
-    clipboard = true,
-    scan = { sceneName: EAccountSelectorSceneName.home },
-    contacts,
-    accountSelector,
-    enableNameResolve = true,
-    enableAddressBook,
-    enableWalletName,
-    accountId,
-    enableAddressInteractionStatus,
-    enableVerifySendFundToSelf,
-    ...rest
-  } = props;
+const AddressInput: FC<AddressInputProps> = ({
+  value,
+  onChange,
+  onChangeAddressName,
+  plugins = ['paste', 'scan'],
+  networkId,
+  contactExcludeWalletAccount,
+  placeholder,
+  description,
+  addressFilter,
+  ...rest
+}) => {
   const intl = useIntl();
-  const [inputText, setInputText] = useState<string>(value?.raw ?? '');
-  const { setError, clearErrors, watch } = useFormContext();
-  const [loading, setLoading] = useState(false);
-  const textRef = useRef('');
-  const rawAddress = watch([name, 'raw'].join('.'));
-
-  const [queryResult, setQueryResult] = useState<IAddressQueryResult>({});
-  const [refreshNum, setRefreshNum] = useState(1);
-
-  const setResolveAddress = useCallback((text: string) => {
-    setQueryResult((prev) => ({ ...prev, resolveAddress: text }));
-  }, []);
-
-  const onChangeText = useCallback(
-    (text: string) => {
-      if (textRef.current !== text) {
-        textRef.current = text;
-        setInputText(text);
-        onChange?.({ raw: text, pending: text.length > 0 });
-      }
-    },
-    [onChange],
-  );
-
-  const onRefresh = useCallback(() => setRefreshNum((prev) => prev + 1), []);
-
-  useEffect(() => {
-    if (rawAddress && textRef.current !== rawAddress) {
-      onChangeText(rawAddress);
-    }
-  }, [rawAddress, onChangeText]);
-
-  const queryAddress = useDebouncedCallback(
-    async (params: IQueryCheckAddressArgs) => {
-      if (!params.address) {
-        setQueryResult({});
-        return;
-      }
-      setLoading(true);
-      try {
-        const result =
-          await backgroundApiProxy.serviceAccountProfile.queryAddress(params);
-        if (result.input === textRef.current) {
-          setQueryResult(result);
+  const navigation = useNavigation();
+  const [isFocus, setFocus] = useState(false);
+  const onChangeValue = useCallback(
+    async (text: string, verify: boolean) => {
+      if (text !== value) {
+        let result = text;
+        const uriInfo = parseUriScheme(text);
+        if (uriInfo !== false) {
+          result = uriInfo.address;
         }
-      } finally {
-        setLoading(false);
+        if (verify && networkId) {
+          try {
+            await backgroundApiProxy.validator.validateAddress(
+              networkId,
+              result,
+            );
+            onChange?.(result);
+          } catch (error: any) {
+            onChange?.(text);
+          }
+        } else {
+          onChange?.(text);
+        }
       }
     },
-    300,
+    [value, networkId, onChange],
   );
-
-  useEffect(() => {
-    void queryAddress({
-      address: inputText,
-      networkId,
-      accountId,
-      enableAddressBook,
-      enableAddressInteractionStatus,
-      enableNameResolve,
-      enableWalletName,
-      enableVerifySendFundToSelf,
+  const onPaste = useCallback(async () => {
+    const text = await getClipboard();
+    onChangeValue?.(text, true);
+  }, [onChangeValue]);
+  const onScan = useCallback(() => {
+    gotoScanQrcode((text) => {
+      onChangeValue?.(text, true);
+    });
+  }, [onChangeValue]);
+  const onContacts = useCallback(() => {
+    navigation.navigate(RootRoutes.Modal, {
+      screen: ModalRoutes.AddressBook,
+      params: {
+        screen: AddressBookRoutes.PickAddressRoute,
+        params: {
+          networkId,
+          contactExcludeWalletAccount,
+          addressFilter,
+          onSelected: ({ address, name }) => {
+            onChangeValue?.(address, false);
+            if (name) {
+              onChangeAddressName?.(name);
+            }
+          },
+        },
+      },
     });
   }, [
-    inputText,
+    navigation,
     networkId,
-    accountId,
-    enableNameResolve,
-    enableAddressBook,
-    enableWalletName,
-    enableAddressInteractionStatus,
-    enableVerifySendFundToSelf,
-    refreshNum,
-    queryAddress,
+    contactExcludeWalletAccount,
+    addressFilter,
+    onChangeValue,
+    onChangeAddressName,
   ]);
 
-  const getValidateMessage = useCallback(
-    (status?: Exclude<IAddressValidateStatus, 'valid'>) => {
-      if (!status) return;
-      const message: Record<
-        Exclude<IAddressValidateStatus, 'valid'>,
-        string
-      > = {
-        'unknown': intl.formatMessage({
-          id: ETranslations.send_check_request_error,
-        }),
-        'prohibit-send-to-self': intl.formatMessage({
-          id: ETranslations.send_cannot_send_to_self,
-        }),
-        'invalid': intl.formatMessage({
-          id: ETranslations.send_address_invalid,
-        }),
-      };
-      return message[status];
-    },
-    [intl],
-  );
-
-  useEffect(() => {
-    if (Object.keys(queryResult).length === 0) return;
-    if (queryResult.validStatus === 'valid') {
-      clearErrors(name);
-      onChange?.({
-        raw: queryResult.input,
-        resolved: queryResult.resolveAddress ?? queryResult.input,
-        pending: false,
-      });
-    } else {
-      onChange?.({
-        raw: queryResult.input,
-        pending: false,
-        validateError: {
-          type: queryResult.validStatus,
-          message: getValidateMessage(queryResult.validStatus),
-        },
-      });
-    }
-  }, [
-    queryResult,
-    intl,
-    clearErrors,
-    setError,
-    name,
-    onChange,
-    getValidateMessage,
-  ]);
-
-  const AddressInputExtension = useMemo(
-    () => (
-      <XStack
-        justifyContent="space-between"
-        flexWrap="nowrap"
-        alignItems="center"
-      >
-        <XStack space="$2" flex={1}>
-          <AddressInputBadgeGroup
-            loading={loading}
-            result={queryResult}
-            setResolveAddress={setResolveAddress}
-            onRefresh={onRefresh}
-          />
-        </XStack>
-        <XStack space="$6">
-          {clipboard ? (
-            <ClipboardPlugin
-              onChange={onChangeText}
-              testID={`${rest.testID ?? ''}-clip`}
-            />
-          ) : null}
-          {scan ? (
-            <ScanPlugin
-              sceneName={scan.sceneName}
-              onChange={onChangeText}
-              testID={`${rest.testID ?? ''}-scan`}
-            />
-          ) : null}
-          {contacts || accountSelector ? (
-            <SelectorPlugin
-              onChange={onChangeText}
-              networkId={networkId}
-              num={accountSelector?.num}
-              currentAddress={inputText}
-              onBeforeAccountSelectorOpen={
-                accountSelector?.onBeforeAccountSelectorOpen
-              }
-              testID={`${rest.testID ?? ''}-selector`}
-            />
-          ) : null}
-        </XStack>
-      </XStack>
-    ),
-    [
-      loading,
-      onChangeText,
-      clipboard,
-      scan,
-      contacts,
-      accountSelector,
-      queryResult,
-      setResolveAddress,
-      networkId,
-      rest.testID,
-      onRefresh,
-      inputText,
-    ],
-  );
-
+  const onBlur = useCallback(() => {
+    setFocus(false);
+  }, []);
   return (
-    <BaseInput
-      value={inputText}
-      onChangeText={onChangeText}
-      placeholder={
-        placeholder ??
-        intl.formatMessage({ id: ETranslations.send_to_placeholder })
-      }
-      extension={AddressInputExtension}
-      {...rest}
-    />
+    <Box>
+      <Box
+        w="full"
+        borderRadius={12}
+        overflow="hidden"
+        borderWidth="1"
+        borderColor={isFocus ? 'focused-default' : 'border-default'}
+      >
+        <Textarea
+          trimValue
+          borderRadius={0}
+          w="full"
+          value={value}
+          onChangeText={onChange}
+          placeholder={
+            placeholder ||
+            intl.formatMessage({
+              id: 'form__address_and_domain_placeholder',
+            })
+          }
+          borderWidth="0"
+          onFocus={() => {
+            setFocus(true);
+          }}
+          {...rest}
+          onBlur={onBlur}
+        />
+        <Divider />
+        <Box display="flex" flexDirection="row" bg="action-secondary-default">
+          {plugins.includes('paste') && platformEnv.canGetClipboard ? (
+            <Pressable
+              flex="1"
+              justifyContent="center"
+              alignItems="center"
+              py="3"
+              onPress={onPaste}
+              flexDirection="row"
+            >
+              <Icon size={20} name="ClipboardMini" />
+              <Typography.Body2 ml="3">
+                {intl.formatMessage({ id: 'action__paste' })}
+              </Typography.Body2>
+            </Pressable>
+          ) : null}
+          {plugins.includes('contact') ? (
+            <Pressable
+              flex="1"
+              justifyContent="center"
+              alignItems="center"
+              py="3"
+              onPress={onContacts}
+              flexDirection="row"
+            >
+              <Icon size={20} name="BookOpenMini" />
+              <Typography.Body2 ml="3">
+                {intl.formatMessage({ id: 'action__contact' })}
+              </Typography.Body2>
+            </Pressable>
+          ) : null}
+          {plugins.includes('scan') ? (
+            <Pressable
+              flex="1"
+              justifyContent="center"
+              alignItems="center"
+              py="3"
+              onPress={onScan}
+              flexDirection="row"
+            >
+              <Icon size={20} name="ViewfinderCircleMini" />
+              <Typography.Body2 ml="3">
+                {intl.formatMessage({ id: 'action__scan' })}
+              </Typography.Body2>
+            </Pressable>
+          ) : null}
+        </Box>
+      </Box>
+      {description && (
+        <Typography.Body2 mt="8px" color="text-subdued">
+          {description}
+        </Typography.Body2>
+      )}
+    </Box>
   );
-}
+};
+
+export default AddressInput;

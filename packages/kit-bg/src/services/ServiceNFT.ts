@@ -1,109 +1,316 @@
-import qs from 'querystring';
+import { groupBy } from 'lodash';
 
-import { isNil, omitBy } from 'lodash';
-
+import simpleDb from '@onekeyhq/engine/src/dbs/simple/simpleDb';
+import { getFiatEndpoint } from '@onekeyhq/engine/src/endpoint';
+import { OneKeyInternalError } from '@onekeyhq/engine/src/errors';
+import * as nft from '@onekeyhq/engine/src/managers/nft';
+import { NFTDataType } from '@onekeyhq/engine/src/managers/nft';
+import type {
+  Collection,
+  MarketPlace,
+  NFTAssetMeta,
+  NFTBTCAssetModel,
+  NFTListItems,
+  NFTMarketRanking,
+  NFTPNL,
+  NFTServiceResp,
+  NFTTransaction,
+} from '@onekeyhq/engine/src/types/nft';
+import { setNFTPriceType } from '@onekeyhq/kit/src/store/reducers/nft';
+import { EOverviewScanTaskType } from '@onekeyhq/kit/src/views/Overview/types';
 import {
   backgroundClass,
   backgroundMethod,
 } from '@onekeyhq/shared/src/background/backgroundDecorators';
-import { memoizee } from '@onekeyhq/shared/src/utils/cacheUtils';
-import timerUtils from '@onekeyhq/shared/src/utils/timerUtils';
-import { EServiceEndpointEnum } from '@onekeyhq/shared/types/endpoint';
-import type {
-  IFetchAccountNFTsParams,
-  IFetchAccountNFTsResp,
-  IFetchNFTDetailsParams,
-  IFetchNFTDetailsResp,
-} from '@onekeyhq/shared/types/nft';
+import { OnekeyNetwork } from '@onekeyhq/shared/src/config/networkIds';
 
 import ServiceBase from './ServiceBase';
 
 @backgroundClass()
 class ServiceNFT extends ServiceBase {
-  constructor({ backgroundApi }: { backgroundApi: any }) {
-    super({ backgroundApi });
+  get baseUrl() {
+    return `${getFiatEndpoint()}/NFT`;
   }
 
   @backgroundMethod()
-  public async fetchAccountNFTs(params: IFetchAccountNFTsParams) {
-    const client = await this.getClient(EServiceEndpointEnum.Wallet);
-    const resp = await client.get<{
-      data: IFetchAccountNFTsResp;
-    }>(`/wallet/v1/account/nft/list?${qs.stringify(omitBy(params, isNil))}`);
-    return resp.data.data;
+  async fetchAsset(params: {
+    chain: string;
+    contractAddress?: string;
+    tokenId: string;
+    showAttribute?: boolean;
+  }) {
+    return nft.fetchAsset(params);
   }
 
   @backgroundMethod()
-  public async fetchNFTDetails(params: IFetchNFTDetailsParams) {
-    const client = await this.getClient(EServiceEndpointEnum.Wallet);
-    const { nfts, ...rest } = params;
-    const resp = await client.post<IFetchNFTDetailsResp>(
-      '/wallet/v1/account/nft/detail',
-      {
-        ...rest,
-        nftIds: nfts.map((nft) =>
-          isNil(nft.itemId)
-            ? nft.collectionAddress
-            : `${nft.collectionAddress}:${nft.itemId}`,
-        ),
-      },
-    );
-    const result = resp.data.data;
+  async getCollection({
+    chain,
+    contractAddress,
+    showStatistics = false,
+  }: {
+    chain: string;
+    contractAddress: string;
+    showStatistics?: boolean;
+  }) {
+    const urlParams = new URLSearchParams({ chain, contractAddress });
+    if (showStatistics) {
+      urlParams.append('showStatistics', 'true');
+    }
+    const url = `${this.baseUrl}/collection?${urlParams.toString()}`;
 
-    return result.map((nft) => {
-      if (nft.metadata?.attributes) {
-        nft.metadata.attributes = nft.metadata.attributes.map((attr) => ({
-          ...attr,
-          traitType: attr.trait_type,
-          displayType: attr.display_type,
-        }));
+    const { data, success } = await this.client
+      .get<NFTServiceResp<Collection>>(url)
+      .then((resp) => resp.data)
+      .catch(() => ({ success: false, data: {} as Collection }));
+    if (!success) {
+      return undefined;
+    }
+    return data;
+  }
+
+  @backgroundMethod()
+  async searchCollections({ chain, name }: { chain: string; name: string }) {
+    const url = `${this.baseUrl}/collection/search?chain=${chain}&name=${name}`;
+    const { data, success } = await this.client
+      .get<NFTServiceResp<Collection[]>>(url)
+      .then((resp) => resp.data)
+      .catch(() => ({ success: false, data: [] as Collection[] }));
+    if (!success) {
+      return undefined;
+    }
+    return data;
+  }
+
+  @backgroundMethod()
+  async getCollectionTransactions({
+    chain,
+    contractAddress,
+    cursor,
+    limit = 50,
+    eventTypes,
+    showAsset,
+  }: {
+    chain: string;
+    contractAddress: string;
+    cursor?: string;
+    eventTypes?: string;
+    limit?: number;
+    showAsset?: boolean;
+  }) {
+    let url = `${this.baseUrl}/collection/transactions?chain=${chain}&contractAddress=${contractAddress}&limit=${limit}`;
+    if (eventTypes) {
+      url += `&event_type=${eventTypes}`;
+    }
+    if (showAsset === true) {
+      url += `&show_asset=true`;
+    }
+    if (cursor) {
+      url += `&cursor=${cursor}`;
+    }
+    const { data, success } = await this.client
+      .get<
+        NFTServiceResp<{
+          total: number;
+          next: string;
+          content: NFTTransaction[];
+        }>
+      >(url)
+      .then((resp) => resp.data)
+      .catch(() => ({
+        success: false,
+        data: { total: 0, next: undefined, content: [] as NFTTransaction[] },
+      }));
+    if (!success) {
+      return undefined;
+    }
+    return data;
+  }
+
+  @backgroundMethod()
+  async getMarketRanking({ chain, time }: { chain?: string; time?: string }) {
+    const url = `${this.baseUrl}/market/ranking?chain=${
+      chain ?? OnekeyNetwork.eth
+    }&time=${time ?? '1d'}`;
+    const { data, success } = await this.client
+      .get<NFTServiceResp<NFTMarketRanking[]>>(url)
+      .then((resp) => resp.data)
+      .catch(() => ({ success: false, data: [] as NFTMarketRanking[] }));
+    if (!success) {
+      return [];
+    }
+    return data;
+  }
+
+  @backgroundMethod()
+  async batchAsset(params: {
+    ignoreError?: boolean;
+    chain: string;
+    items: { contract_address?: string; token_id?: any }[];
+  }) {
+    return nft.batchAsset(params);
+  }
+
+  @backgroundMethod()
+  async getPNLData({
+    address,
+    ignoreError = true,
+  }: {
+    address: string;
+    ignoreError?: boolean;
+  }) {
+    const url = `${this.baseUrl}/account/pnl?&address=${address}`;
+    const { data, success } = await this.client
+      .get<NFTServiceResp<NFTPNL[]>>(url)
+      .then((resp) => resp.data)
+      .catch(() => ({ success: false, data: [] as NFTPNL[] }));
+
+    if (!success) {
+      if (ignoreError) {
+        return [];
       }
-      return nft;
+      throw new OneKeyInternalError('data load error');
+    }
+    return data;
+  }
+
+  @backgroundMethod()
+  async getMarketPlaces(params: { chain?: string }) {
+    const { chain } = params;
+    let url = `${this.baseUrl}/marketPlace/list`;
+    if (chain) {
+      url += `?chain=${chain}`;
+    }
+    const { data, success } = await this.client
+      .get<NFTServiceResp<MarketPlace[]>>(url)
+      .then((resp) => resp.data)
+      .catch(() => ({ success: false, data: [] as MarketPlace[] }));
+
+    if (!success) {
+      return [];
+    }
+    return data;
+  }
+
+  @backgroundMethod()
+  async fetchNFT({
+    accountId,
+    networkId,
+  }: {
+    accountId: string;
+    networkId: string;
+  }) {
+    const { serviceOverview } = this.backgroundApi;
+    await serviceOverview.fetchAccountOverview({
+      accountId,
+      networkId,
+      scanTypes: [EOverviewScanTaskType.nfts],
     });
   }
 
   @backgroundMethod()
-  public async getNFT(params: {
+  async getAsset(params: {
+    accountId?: string;
     networkId: string;
-    nftId: string;
-    collectionAddress: string;
-    accountAddress: string;
+    contractAddress?: string;
+    tokenId: string;
+    local: boolean;
   }) {
-    try {
-      return {
-        ...(await this._getNFTMemo(params)),
-      };
-    } catch (error) {
-      return Promise.resolve(undefined);
-    }
+    return nft.getAsset(params);
   }
 
-  _getNFTMemo = memoizee(
-    async ({
+  @backgroundMethod()
+  async getAssetFromLocal(params: {
+    accountId?: string;
+    networkId: string;
+    contractAddress?: string;
+    tokenId: string;
+  }) {
+    return nft.getAssetFromLocal(params);
+  }
+
+  @backgroundMethod()
+  async getAllAssetsFromLocal(params: {
+    accountId?: string;
+    networkId: string;
+  }) {
+    return nft.getAllAssetsFromLocal(params);
+  }
+
+  @backgroundMethod()
+  updatePriceType(priceType: 'floorPrice' | 'lastSalePrice') {
+    const { dispatch } = this.backgroundApi;
+    dispatch(setNFTPriceType(priceType));
+  }
+
+  @backgroundMethod()
+  async getNftListWithAssetType({
+    networkId,
+    accountId,
+  }: {
+    networkId: string;
+    accountId: string;
+  }): Promise<NFTAssetMeta[]> {
+    if (!networkId || !accountId) {
+      return [];
+    }
+    const nftPortfolio = await simpleDb.accountPortfolios.getPortfolio({
       networkId,
-      nftId,
-      collectionAddress,
-      accountAddress,
-    }: {
-      networkId: string;
-      nftId: string;
-      collectionAddress: string;
-      accountAddress: string;
-    }) => {
-      const nftDetails = await this.fetchNFTDetails({
-        networkId,
-        nfts: [{ collectionAddress, itemId: nftId }],
-        accountAddress,
-      });
-      return nftDetails[0];
-    },
-    {
-      promise: true,
-      primitive: true,
-      max: 10,
-      maxAge: timerUtils.getTimeDurationMs({ minute: 5 }),
-    },
-  );
+      accountId,
+    });
+
+    const nfts = nftPortfolio?.[EOverviewScanTaskType.nfts] ?? [];
+
+    const { engine } = this.backgroundApi;
+
+    const results = await Promise.all(
+      Object.entries(groupBy(nfts, 'networkId')).map(async ([key, list]) => {
+        const vault = await engine.getChainOnlyVault(key);
+        return vault.getUserNFTAssets({ serviceData: list as NFTListItems });
+      }),
+    );
+
+    return results.filter(Boolean);
+  }
+
+  @backgroundMethod()
+  async updateAsset({
+    accountId,
+    networkId,
+    asset,
+  }: {
+    accountId?: string;
+    networkId: string;
+    asset: NFTBTCAssetModel;
+  }) {
+    if (!accountId) return;
+    const res = await simpleDb.accountPortfolios.getData();
+    const key = `${networkId}___${accountId}`;
+
+    const portfolios = res.portfolios[key];
+
+    const nfts = portfolios?.[EOverviewScanTaskType.nfts] || [];
+
+    const type = NFTDataType(networkId);
+
+    if (type === 'btc') {
+      const index = (nfts as NFTBTCAssetModel[]).findIndex(
+        (item) => item.inscription_id === asset.inscription_id,
+      );
+      if (index !== -1) {
+        nfts[index] = asset;
+        simpleDb.accountPortfolios.setRawData({
+          ...res,
+          portfolios: {
+            ...(res.portfolios ?? {}),
+            [key]: {
+              ...res.portfolios?.[key],
+              [EOverviewScanTaskType.nfts]: nfts,
+            },
+          },
+        });
+      }
+    }
+  }
 }
 
 export default ServiceNFT;

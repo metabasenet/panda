@@ -1,1 +1,1 @@
-module.exports = 'mockFileContent';
+export default 'test-file-stub';
