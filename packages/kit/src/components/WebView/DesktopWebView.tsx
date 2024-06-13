@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/ban-ts-comment, @typescript-eslint/no-explicit-any, react/no-unknown-property */
 import type { ComponentProps, Ref } from 'react';
 import {
@@ -12,28 +13,36 @@ import {
 
 import { consts } from '@onekeyfe/cross-inpage-provider-core';
 import { JsBridgeDesktopHost } from '@onekeyfe/onekey-cross-webview';
-import { Freeze } from 'react-freeze';
 
+import { Stack } from '@onekeyhq/components';
+import backgroundApiProxy from '@onekeyhq/kit/src/background/instance/backgroundApiProxy';
 import { waitForDataLoaded } from '@onekeyhq/shared/src/background/backgroundUtils';
-import debugLogger from '@onekeyhq/shared/src/logger/debugLogger';
-
-import backgroundApiProxy from '../../background/instance/backgroundApiProxy';
-import { checkOneKeyCardGoogleOauthUrl } from '../../utils/uriUtils';
+import { checkOneKeyCardGoogleOauthUrl } from '@onekeyhq/shared/src/utils/uriUtils';
 
 import ErrorView from './ErrorView';
 
 import type {
   IElectronWebView,
-  InpageProviderWebViewProps,
-} from '@onekeyfe/cross-inpage-provider-types';
+  IElectronWebViewEvents,
+  IInpageProviderWebViewProps,
+} from './types';
 import type { IWebViewWrapperRef } from '@onekeyfe/onekey-cross-webview';
-import type { LoadURLOptions } from 'electron';
+import type {
+  DidFailLoadEvent,
+  DidStartNavigationEvent,
+  Event,
+  LoadURLOptions,
+  PageFaviconUpdatedEvent,
+  PageTitleUpdatedEvent,
+} from 'electron';
 
-interface IElectronWebViewExt extends IElectronWebView {
-  stop: () => void;
-  setUserAgent: (userAgent: string) => void;
-  getUserAgent: () => string;
-}
+export type {
+  DidFailLoadEvent,
+  DidStartNavigationEvent,
+  Event,
+  PageFaviconUpdatedEvent,
+  PageTitleUpdatedEvent,
+};
 
 const isDev = process.env.NODE_ENV !== 'production';
 
@@ -64,21 +73,35 @@ const DesktopWebView = forwardRef(
       src,
       style,
       receiveHandler,
+      allowpopups,
       onSrcChange,
+      onDidStartLoading,
+      onDidStartNavigation,
+      onDidFinishLoad,
+      onDidStopLoading,
+      onDidFailLoad,
+      onPageTitleUpdated,
+      onPageFaviconUpdated,
+      // @ts-expect-error
+      onNewWindow,
+      onDomReady,
       ...props
-    }: ComponentProps<typeof WEBVIEW_TAG> & InpageProviderWebViewProps,
+    }: ComponentProps<typeof WEBVIEW_TAG> &
+      IElectronWebViewEvents &
+      IInpageProviderWebViewProps,
     ref: any,
   ) => {
     const [isWebviewReady, setIsWebviewReady] = useState(false);
-    const webviewRef = useRef<IElectronWebViewExt | null>(null);
+    const webviewRef = useRef<IElectronWebView | null>(null);
     const [devToolsAtLeft, setDevToolsAtLeft] = useState(false);
 
     const [desktopLoadError, setDesktopLoadError] = useState(false);
 
+    // Register event listeners
     useEffect(() => {
-      const electronWebView = webviewRef.current;
+      const webview = webviewRef.current;
 
-      if (!electronWebView) {
+      if (!webview) {
         return;
       }
 
@@ -86,63 +109,85 @@ const DesktopWebView = forwardRef(
         const checkGoogleOauth = (checkUrl: string) => {
           try {
             if (checkOneKeyCardGoogleOauthUrl({ url: checkUrl })) {
-              const originUA = electronWebView.getUserAgent();
+              const originUA = webview.getUserAgent();
               const updatedUserAgent = originUA.replace(
                 / Electron\/[\d.]+/,
                 '',
               );
-              electronWebView.setUserAgent(updatedUserAgent);
+              webview.setUserAgent(updatedUserAgent);
             }
           } catch (e) {
-            debugLogger.webview.error('handleNavigation', e);
+            // debugLogger.webview.error('handleNavigation', e);
+            console.error(e);
           }
         };
 
-        const handleMessage = (event: any) => {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        const innerHandleDidFailLoad = (event: any) => {
           if (event.errorCode !== -3) {
             // TODO iframe error also show ErrorView
             //      testing www.163.com
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
             if (event.isMainFrame) {
               setDesktopLoadError(true);
             }
           }
+          onDidFailLoad?.(event);
         };
 
-        const handleNavigation = ({
-          isMainFrame,
-          url,
-        }: {
-          url: string;
-          isInPlace: boolean;
-          isMainFrame: boolean;
-        }) => {
+        const innerHandleDidStartNavigationNavigation = (
+          event: DidStartNavigationEvent,
+        ) => {
+          const { isMainFrame, url } = event ?? {};
           if (isMainFrame) {
             setDesktopLoadError(false);
           }
           checkGoogleOauth(url);
+          onDidStartNavigation?.(event);
         };
 
-        electronWebView.addEventListener('did-fail-load', handleMessage);
-
-        electronWebView.addEventListener(
+        webview.addEventListener('did-start-loading', onDidStartLoading);
+        webview.addEventListener(
           'did-start-navigation',
-          handleNavigation,
+          innerHandleDidStartNavigationNavigation,
         );
+        webview.addEventListener('did-finish-load', onDidFinishLoad);
+        webview.addEventListener('did-stop-loading', onDidStopLoading);
+        webview.addEventListener('did-fail-load', innerHandleDidFailLoad);
+        webview.addEventListener('page-title-updated', onPageTitleUpdated);
+        webview.addEventListener('page-favicon-updated', onPageFaviconUpdated);
+        webview.addEventListener('new-window', onNewWindow);
+        webview.addEventListener('dom-ready', onDomReady);
 
         return () => {
-          electronWebView.removeEventListener('did-fail-load', handleMessage);
-
-          electronWebView.removeEventListener(
+          webview.removeEventListener('did-start-loading', onDidStartLoading);
+          webview.removeEventListener(
             'did-start-navigation',
-            handleNavigation,
+            innerHandleDidStartNavigationNavigation,
           );
+          webview.removeEventListener('did-finish-load', onDidFinishLoad);
+          webview.removeEventListener('did-stop-loading', onDidStopLoading);
+          webview.removeEventListener('did-fail-load', innerHandleDidFailLoad);
+          webview.removeEventListener('page-title-updated', onPageTitleUpdated);
+          webview.removeEventListener(
+            'page-favicon-updated',
+            onPageFaviconUpdated,
+          );
+          webview.removeEventListener('new-window', onNewWindow);
+          webview.removeEventListener('dom-ready', onDomReady);
         };
       } catch (error) {
         console.error(error);
       }
-    }, []);
+    }, [
+      onDidFailLoad,
+      onDidFinishLoad,
+      onDidStartLoading,
+      onDidStopLoading,
+      onDomReady,
+      onNewWindow,
+      onPageFaviconUpdated,
+      onPageTitleUpdated,
+      onDidStartNavigation,
+    ]);
     if (isDev && props.preload) {
       console.warn(
         'DesktopWebView:  custom preload url may disable built-in injected function',
@@ -181,14 +226,12 @@ const DesktopWebView = forwardRef(
           }
         },
       };
-
       jsBridgeHost.webviewWrapper = wrapper;
-
       return wrapper;
     });
 
     const initWebviewByRef = useCallback(($ref: any) => {
-      webviewRef.current = $ref as IElectronWebViewExt;
+      webviewRef.current = $ref;
       setIsWebviewReady(true);
     }, []);
 
@@ -275,7 +318,7 @@ const DesktopWebView = forwardRef(
 
     return (
       <>
-        {isDev && (
+        {isDev ? (
           <button
             type="button"
             style={{
@@ -293,37 +336,35 @@ const DesktopWebView = forwardRef(
           >
             DevTools
           </button>
-        )}
-
-        <Freeze freeze={desktopLoadError}>
-          <webview
-            ref={initWebviewByRef}
-            preload={preloadJsUrl}
-            src={src}
-            partition="webview"
-            style={{
-              'width': '100%',
-              'height': '100%',
-              ...style,
-            }}
-            // @ts-ignore
-            allowpopups="true"
-            // @ts-ignore
-            nodeintegration="true"
-            nodeintegrationinsubframes="true"
-            webpreferences="contextIsolation=0, contextisolation=0, nativeWindowOpen=1"
-            // mobile user-agent
-            // useragent="Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1"
-            {...props}
-          />
-        </Freeze>
-        {desktopLoadError && (
-          <ErrorView
-            onRefresh={() => {
-              webviewRef.current?.reload();
-            }}
-          />
-        )}
+        ) : null}
+        <webview
+          ref={initWebviewByRef}
+          preload={preloadJsUrl}
+          src={src}
+          partition="webview"
+          style={{
+            'width': '100%',
+            'height': '100%',
+            ...style,
+          }}
+          allowpopups={allowpopups}
+          // @ts-expect-error
+          nodeintegration="true"
+          nodeintegrationinsubframes="true"
+          webpreferences="contextIsolation=0, contextisolation=0, nativeWindowOpen=1, sandbox=0"
+          // mobile user-agent
+          // useragent="Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1"
+          {...props}
+        />
+        {desktopLoadError ? (
+          <Stack position="absolute" top={0} bottom={0} left={0} right={0}>
+            <ErrorView
+              onRefresh={() => {
+                webviewRef.current?.reload();
+              }}
+            />
+          </Stack>
+        ) : null}
       </>
     );
   },

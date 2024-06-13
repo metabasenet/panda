@@ -2,7 +2,7 @@ import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import axios from 'axios';
 import RNCloudFs from 'react-native-cloud-fs';
 
-import debugLogger from '@onekeyhq/shared/src/logger/debugLogger';
+// import debugLogger from '@onekeyhq/shared/src/logger/debugLogger';
 
 import platformEnv from '../platformEnv';
 
@@ -19,16 +19,20 @@ export function backupPlatform() {
 }
 
 export async function isAvailable(): Promise<boolean> {
-  const hasPlayServices = await GoogleSignin.hasPlayServices({
-    showPlayServicesUpdateDialog: false,
-  });
-  return Promise.resolve(hasPlayServices);
+  try {
+    const hasPlayServices = await GoogleSignin.hasPlayServices({
+      showPlayServicesUpdateDialog: false,
+    });
+    return hasPlayServices;
+  } catch (e) {
+    return false;
+  }
 }
 
 async function checkInternet() {
   const result = await axios
     .head('https://www.googleapis.com/auth/drive.file', {
-      timeout: 100,
+      timeout: 1000,
     })
     .then(() => true)
     .catch(() => false);
@@ -42,23 +46,16 @@ export async function loginIfNeeded(
     try {
       return await RNCloudFs.loginIfNeeded();
     } catch (error) {
-      debugLogger.cloudBackup.error(error);
+      // debugLogger.cloudBackup.error(error);
       return Promise.resolve(false);
     }
   } else if (showSignInDialog) {
-    try {
-      if ((await checkInternet()) === false) {
-        throw new Error('NETWORK');
-      }
-      GoogleSignin.configure(GoogleSignInConfigure);
-      await GoogleSignin.signIn();
-      return await RNCloudFs.loginIfNeeded();
-    } catch (error) {
-      debugLogger.cloudBackup.error(error);
-
-      throw error;
-      // return Promise.resolve(false);
+    if ((await checkInternet()) === false) {
+      throw new Error('NETWORK');
     }
+    GoogleSignin.configure(GoogleSignInConfigure);
+    await GoogleSignin.signIn();
+    return RNCloudFs.loginIfNeeded();
   }
   return Promise.resolve(false);
 }
@@ -68,9 +65,9 @@ export async function logoutFromGoogleDrive(
 ): Promise<boolean> {
   if (platformEnv.isNativeAndroid) {
     if (revokeAccess) {
-      GoogleSignin.revokeAccess();
+      await GoogleSignin.revokeAccess();
     }
-    GoogleSignin.signOut();
+    await GoogleSignin.signOut();
     return RNCloudFs.logout();
   }
   return Promise.resolve(true);
@@ -81,9 +78,9 @@ export function sync(): Promise<boolean> {
 }
 
 export async function listFiles(target: string) {
-  if ((await checkInternet()) === false) {
-    return [];
-  }
+  // if ((await checkInternet()) === false) {
+  //   return [];
+  // }
   await loginIfNeeded(false);
   const { files }: { files: Array<{ isFile: boolean; name: string }> } =
     await RNCloudFs.listFiles({ scope: 'hidden', targetPath: target });
@@ -93,9 +90,9 @@ export async function listFiles(target: string) {
 async function getFileObject(
   target: string,
 ): Promise<{ id: string; name: string } | undefined> {
-  if ((await checkInternet()) === false) {
-    return undefined;
-  }
+  // if ((await checkInternet()) === false) {
+  //   return undefined;
+  // }
   const { files }: { files: Array<{ id: string; name: string }> } =
     await RNCloudFs.listFiles({
       scope: 'hidden',
@@ -118,9 +115,9 @@ export async function deleteFile(target: string): Promise<boolean> {
 }
 
 export async function downloadFromCloud(target: string): Promise<string> {
-  if ((await checkInternet()) === false) {
-    return Promise.resolve('');
-  }
+  // if ((await checkInternet()) === false) {
+  //   return Promise.resolve('');
+  // }
   await loginIfNeeded(false);
   const file = await getFileObject(target);
   if (file) {
@@ -133,6 +130,9 @@ export async function uploadToCloud(
   source: string,
   target: string,
 ): Promise<void> {
+  if ((await checkInternet()) === false) {
+    throw new Error('NETWORK');
+  }
   await loginIfNeeded(false);
   await RNCloudFs.copyToCloud({
     mimeType: null,

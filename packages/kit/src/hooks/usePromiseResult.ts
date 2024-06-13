@@ -2,102 +2,69 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useIsFocused } from '@react-navigation/core';
 import { debounce } from 'lodash';
-// import useSWR from 'swr';
 
-import { wait } from '../utils/helper';
+import timerUtils from '@onekeyhq/shared/src/utils/timerUtils';
 
 import { useIsMounted } from './useIsMounted';
 
-// import type { SWRConfiguration, SWRResponse } from 'swr';
+type IRunnerConfig = {
+  triggerByDeps?: boolean; // true when trigger by deps changed, do not set it when manually trigger
+  pollingNonce?: number;
+};
 
-// const [cache, mutate] = initCache({
-//   get(key: string) {
-//     debugger;
-//   },
-//   set(key: string, value: Data) {},
-//   delete(key: string): void {},
-//   keys() {},
-// });
-// const mockCache2 = initCache(new Map());
-
-// type SWROptionsType = typeof useSWR extends (
-//   key: infer Key,
-//   fn?: infer Fn,
-//   options?: infer Options,
-// ) => SWRResponse<infer Data, infer Error>
-//   ? Options
-//   : SWRConfiguration;
-
-// function useSWRPro<T extends (...args: any) => unknown>(
-//   params: Parameters<T>[0],
-//   fn: T,
-//   options?: SWROptionsType,
-// ) {
-//   const { data, error, isLoading } = useSWR(params, fn, options);
-//   console.log('useSWRFetch >>>>> ', isLoading, data, error);
-//   type UnwrapPromise<T1> = T1 extends Promise<infer U> ? U : T1;
-//   type DataType = UnwrapPromise<ReturnType<T>>;
-
-//   return {
-//     data: data as DataType,
-//     error,
-//     isLoading,
-//   };
-// }
-
-type IRunnerConfig = { triggerByDeps?: boolean };
-
-type IPromiseResultOptions<T> = {
+export type IPromiseResultOptions<T> = {
   initResult?: T; // TODO rename to initData
   watchLoading?: boolean; // make isLoading work, which cause more once render
   loadingDelay?: number;
   checkIsMounted?: boolean;
   checkIsFocused?: boolean;
+  overrideIsFocused?: (isFocused: boolean) => boolean; // override the value of useIsFocused
   debounced?: number;
+  undefinedResultIfError?: boolean;
+  pollingInterval?: number;
+  alwaysSetState?: boolean;
 };
 
-/*
-interface SWRResponse<Data = any, Error = any, Config = any> {
-    data: BlockingData<Data, Config> extends true ? Data : Data | undefined;
-    error: Error | undefined;
-    mutate: KeyedMutator<Data>;
-    isValidating: boolean;
-    isLoading: BlockingData<Data, Config> extends true ? false : boolean;
-}
-*/
+export type IUsePromiseResultReturn<T> = {
+  result: T | undefined;
+  isLoading: boolean | undefined;
+  run: (config?: IRunnerConfig) => Promise<void>;
+};
+
+export type IUsePromiseResultReturnWithInitValue<T> =
+  IUsePromiseResultReturn<T> & {
+    result: T;
+  };
+
 export function usePromiseResult<T>(
-  method: (...args: any[]) => Promise<T>,
+  method: () => Promise<T>,
   deps: any[],
   options: { initResult: T } & IPromiseResultOptions<T>,
-): { result: T; isLoading: boolean | undefined };
+): IUsePromiseResultReturnWithInitValue<T>;
 
 export function usePromiseResult<T>(
-  method: (...args: any[]) => Promise<T>,
+  method: () => Promise<T>,
   deps: any[],
   options?: IPromiseResultOptions<T>,
-): {
-  result: T | undefined;
-  isLoading: boolean | undefined;
-  run: (config?: IRunnerConfig) => Promise<void>;
-};
+): IUsePromiseResultReturn<T>;
 
 export function usePromiseResult<T>(
-  method: (...args: any[]) => Promise<T>,
+  method: () => Promise<T>,
   deps: any[] = [],
   options: IPromiseResultOptions<T> = {},
-): {
-  result: T | undefined;
-  isLoading: boolean | undefined;
-  run: (config?: IRunnerConfig) => Promise<void>;
-} {
+): IUsePromiseResultReturn<T> {
   const [result, setResult] = useState<T | undefined>(
     options.initResult as any,
   );
   const [isLoading, setIsLoading] = useState<boolean | undefined>();
   const isMountedRef = useIsMounted();
-  const isFocused = useIsFocused();
-  const isFocusedRef = useRef<boolean>(isFocused);
-  isFocusedRef.current = isFocused;
+  const _isFocused = useIsFocused();
+  const isFocusedRef = useRef<boolean>(_isFocused);
+  const pollingNonceRef = useRef<number>(0);
+  isFocusedRef.current = _isFocused;
+  if (options?.overrideIsFocused !== undefined) {
+    isFocusedRef.current = options?.overrideIsFocused?.(_isFocused);
+  }
   const methodRef = useRef<typeof method>(method);
   methodRef.current = method;
   const optionsRef = useRef(options);
@@ -106,14 +73,23 @@ export function usePromiseResult<T>(
     loadingDelay: 0,
     checkIsMounted: true,
     checkIsFocused: true,
+    alwaysSetState: false,
     ...options,
   };
   const isDepsChangedOnBlur = useRef(false);
+  const nonceRef = useRef(0);
 
   const run = useMemo(
     () => {
-      const { watchLoading, loadingDelay, checkIsMounted, checkIsFocused } =
-        optionsRef.current;
+      const {
+        watchLoading,
+        loadingDelay,
+        checkIsMounted,
+        checkIsFocused,
+        undefinedResultIfError,
+        pollingInterval,
+        alwaysSetState,
+      } = optionsRef.current;
 
       const setLoadingTrue = () => {
         if (watchLoading) setIsLoading(true);
@@ -129,7 +105,19 @@ export function usePromiseResult<T>(
         if (checkIsFocused && !isFocusedRef.current) {
           flag = false;
         }
+
+        if (alwaysSetState) {
+          flag = true;
+        }
         return flag;
+      };
+
+      const methodWithNonce = async ({ nonce }: { nonce: number }) => {
+        const r = await methodRef?.current?.();
+        return {
+          r,
+          nonce,
+        };
       };
 
       const runner = async (config?: IRunnerConfig) => {
@@ -139,35 +127,58 @@ export function usePromiseResult<T>(
         try {
           if (shouldSetState()) {
             setLoadingTrue();
-            const r = await methodRef?.current?.();
-            if (shouldSetState()) {
+            nonceRef.current += 1;
+            const requestNonce = nonceRef.current;
+            const { r, nonce } = await methodWithNonce({
+              nonce: requestNonce,
+            });
+            if (shouldSetState() && nonceRef.current === nonce) {
               setResult(r);
             }
           }
+        } catch (err) {
+          if (shouldSetState() && undefinedResultIfError) {
+            setResult(undefined);
+          } else {
+            throw err;
+          }
         } finally {
           if (loadingDelay && watchLoading) {
-            await wait(loadingDelay);
+            await timerUtils.wait(loadingDelay);
           }
           if (shouldSetState()) {
             setLoadingFalse();
+          }
+          if (
+            pollingInterval &&
+            pollingNonceRef.current === config?.pollingNonce
+          ) {
+            await timerUtils.wait(pollingInterval);
+
+            if (pollingNonceRef.current === config?.pollingNonce) {
+              if (shouldSetState()) {
+                void run({
+                  triggerByDeps: true,
+                  pollingNonce: config.pollingNonce,
+                });
+              } else {
+                isDepsChangedOnBlur.current = true;
+              }
+            }
           }
         }
       };
 
       if (optionsRef.current.debounced) {
-        const runnderDebounced = debounce(
-          runner,
-          optionsRef.current.debounced,
-          {
-            leading: false,
-            trailing: true,
-          },
-        );
+        const runnerDebounced = debounce(runner, optionsRef.current.debounced, {
+          leading: false,
+          trailing: true,
+        });
         return async (config?: IRunnerConfig) => {
           if (shouldSetState()) {
             setLoadingTrue();
           }
-          await runnderDebounced(config);
+          await runnerDebounced(config);
         };
       }
 
@@ -177,23 +188,30 @@ export function usePromiseResult<T>(
     [],
   );
 
+  const runRef = useRef(run);
+  runRef.current = run;
+
   useEffect(() => {
-    run({ triggerByDeps: true });
+    pollingNonceRef.current += 1;
+    void runRef.current({
+      triggerByDeps: true,
+      pollingNonce: pollingNonceRef.current,
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 
+  const isFocusedRefValue = isFocusedRef.current;
   useEffect(() => {
     if (
-      isFocused &&
+      isFocusedRefValue &&
       optionsRef.current.checkIsFocused &&
       isDepsChangedOnBlur.current
     ) {
       isDepsChangedOnBlur.current = false;
-      run();
+      void runRef.current({ pollingNonce: pollingNonceRef.current });
     }
-  }, [isFocused, run]);
+  }, [isFocusedRefValue]);
 
-  // TODO rename result to data
   return { result, isLoading, run };
 }
 

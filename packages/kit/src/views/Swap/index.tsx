@@ -1,22 +1,23 @@
-import type { ReactNode } from 'react';
+import { useDebugComponentRemountLog } from '@onekeyhq/shared/src/utils/debugUtils';
+import { EAccountSelectorSceneName } from '@onekeyhq/shared/types';
 
-import { Box, useIsVerticalLayout } from '@onekeyhq/components';
+import { AccountSelectorProviderMirror } from '../../components/AccountSelector';
 
-import { Desktop } from './Desktop';
-import { Mobile } from './Mobile';
+import SwapPageContainer from './pages/SwapPageContainer';
 
-const Swap = ({
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  hideBottomTabBar,
-}: { hideBottomTabBar?: boolean; children?: ReactNode } = {}) => {
-  // useHideTabNavigatorHeader();
-  const isSmall = useIsVerticalLayout();
-  return isSmall ? (
-    <Box flex={1}>
-      <Mobile />
-    </Box>
-  ) : (
-    <Desktop />
+const Swap = () => {
+  useDebugComponentRemountLog({ name: 'SwapRoutePage' });
+
+  return (
+    <AccountSelectorProviderMirror
+      config={{
+        sceneName: EAccountSelectorSceneName.swap,
+        sceneUrl: '',
+      }}
+      enabledNum={[0, 1]}
+    >
+      <SwapPageContainer />
+    </AccountSelectorProviderMirror>
   );
 };
 

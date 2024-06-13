@@ -1,170 +1,199 @@
 import { web3Errors } from '@onekeyfe/cross-inpage-provider-errors';
 import { IInjectedProviderNames } from '@onekeyfe/cross-inpage-provider-types';
+import { Semaphore } from 'async-mutex';
 
-import { ETHMessageTypes } from '@onekeyhq/engine/src/types/message';
-import { NetworkId } from '@onekeyhq/engine/src/vaults/impl/ada/types';
-import type AdaVault from '@onekeyhq/engine/src/vaults/impl/ada/Vault';
-import { getActiveWalletAccount } from '@onekeyhq/kit/src/hooks';
+import { EAdaNetworkId } from '@onekeyhq/core/src/chains/ada/types';
+import type IAdaVault from '@onekeyhq/kit-bg/src/vaults/impls/ada/Vault';
 import {
   backgroundClass,
   providerApiMethod,
 } from '@onekeyhq/shared/src/background/backgroundDecorators';
-import { IMPL_ADA } from '@onekeyhq/shared/src/engine/engineConsts';
-import debugLogger from '@onekeyhq/shared/src/logger/debugLogger';
+import {
+  NotImplemented,
+  OneKeyInternalError,
+} from '@onekeyhq/shared/src/errors';
+import { EMessageTypesEth } from '@onekeyhq/shared/types/message';
+
+import { vaultFactory } from '../vaults/factory';
 
 import ProviderApiBase from './ProviderApiBase';
 
 import type { IProviderBaseBackgroundNotifyInfo } from './ProviderApiBase';
-import type {
-  IJsBridgeMessagePayload,
-  IJsonRpcRequest,
-} from '@onekeyfe/cross-inpage-provider-types';
+import type { IJsBridgeMessagePayload } from '@onekeyfe/cross-inpage-provider-types';
 
 @backgroundClass()
 class ProviderApiCardano extends ProviderApiBase {
   public providerName = IInjectedProviderNames.cardano;
 
-  public notifyDappAccountsChanged(info: IProviderBaseBackgroundNotifyInfo) {
+  private semaphore = new Semaphore(1);
+
+  public override notifyDappAccountsChanged(
+    info: IProviderBaseBackgroundNotifyInfo,
+  ): void {
     const data = async ({ origin }: { origin: string }) => {
       const result = {
         method: 'wallet_events_accountChanged',
         params: {
-          accounts: await this.getConnectedAccount({ origin }),
+          accounts: await this.cardano_accounts({
+            origin,
+            scope: this.providerName,
+          }),
         },
       };
       return result;
     };
-
-    info.send(data);
+    info.send(data, info.targetOrigin);
   }
 
-  public notifyDappChainChanged(info: IProviderBaseBackgroundNotifyInfo) {
-    // TODO
-    debugLogger.providerApi.info(info);
+  public override notifyDappChainChanged(): void {
+    throw new NotImplemented();
   }
 
-  public async rpcCall(request: IJsonRpcRequest): Promise<any> {
-    const { networkId, networkImpl } = getActiveWalletAccount();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public async rpcCall(request: IJsBridgeMessagePayload): Promise<any> {
+    return Promise.resolve();
+  }
 
-    if (networkImpl !== IMPL_ADA) {
-      return;
+  @providerApiMethod()
+  async cardano_accounts(
+    request: IJsBridgeMessagePayload,
+  ): Promise<{ account: string } | null> {
+    const accountsInfo =
+      await this.backgroundApi.serviceDApp.dAppGetConnectedAccountsInfo(
+        request,
+      );
+    if (!accountsInfo) {
+      return null;
     }
-
-    debugLogger.providerApi.info('cardano rpcCall:', request, { networkId });
-    const result = await this.backgroundApi.engine.proxyJsonRPCCall(
-      networkId,
-      request,
-    );
-    debugLogger.providerApi.info('cardano rpcCall RESULT:', request, {
-      networkId,
-      result,
-    });
-    return result;
+    return { account: accountsInfo?.[0]?.account.address };
   }
 
-  private async getAdaVault() {
-    const { accountId, networkId } = getActiveWalletAccount();
-    const vault = (await this.backgroundApi.engine.getVault({
-      networkId,
-      accountId,
-    })) as AdaVault;
+  private async getAdaVault(request: IJsBridgeMessagePayload) {
+    const accountsInfo =
+      await this.backgroundApi.serviceDApp.dAppGetConnectedAccountsInfo(
+        request,
+      );
+    if (!accountsInfo) {
+      return null;
+    }
+    const { networkId, accountId } = accountsInfo[0].accountInfo ?? {};
+    const vault = (await vaultFactory.getVault({
+      networkId: networkId ?? '',
+      accountId: accountId ?? '',
+    })) as IAdaVault;
     return vault;
   }
 
-  private getConnectedAccount(request: IJsBridgeMessagePayload) {
-    const [account] = this.backgroundApi.serviceDapp.getActiveConnectedAccounts(
-      {
-        origin: request.origin as string,
-        impl: IMPL_ADA,
-      },
-    );
-
-    return Promise.resolve({ address: account?.address ?? null });
-  }
-
-  // ----------------------------------------------
+  // Provider API
   @providerApiMethod()
-  public async connect(request: IJsBridgeMessagePayload) {
-    await this.backgroundApi.serviceDapp.openConnectionModal(request);
-    const { address } = await this.getConnectedAccount(request);
-    return { account: address };
+  async connect(request: IJsBridgeMessagePayload) {
+    return this.semaphore.runExclusive(async () => {
+      const connectedAddress = await this.cardano_accounts(request);
+      if (connectedAddress) {
+        return connectedAddress;
+      }
+      await this.backgroundApi.serviceDApp.openConnectionModal(request);
+      return this.cardano_accounts(request);
+    });
   }
 
   @providerApiMethod()
-  public disconnect(request: IJsBridgeMessagePayload) {
+  async disconnect(request: IJsBridgeMessagePayload) {
     const { origin } = request;
     if (!origin) {
       return;
     }
-    this.backgroundApi.serviceDapp.removeConnectedAccounts({
+    await this.backgroundApi.serviceDApp.disconnectWebsite({
       origin,
-      networkImpl: IMPL_ADA,
-      addresses: this.backgroundApi.serviceDapp
-        .getActiveConnectedAccounts({ origin, impl: IMPL_ADA })
-        .map(({ address }) => address),
+      storageType: request.isWalletConnectRequest
+        ? 'walletConnect'
+        : 'injectedProvider',
     });
-    debugLogger.providerApi.info('cardano disconnect', origin);
   }
 
   @providerApiMethod()
   public async getNetworkId() {
-    return Promise.resolve(NetworkId.MAINNET);
+    return Promise.resolve(EAdaNetworkId.MAINNET);
   }
 
   @providerApiMethod()
   public async getUtxos(
-    _: IJsBridgeMessagePayload,
+    request: IJsBridgeMessagePayload,
     params: { amount?: string },
   ) {
-    const vault = await this.getAdaVault();
-    return vault.getUtxosForDapp(params.amount);
+    const vault = await this.getAdaVault(request);
+    if (!vault) {
+      throw new Error('Not connected to any account.');
+    }
+    const result = await vault.getUtxosForDapp(params.amount);
+    return result ?? [];
   }
 
   @providerApiMethod()
   public async getBalance(request: IJsBridgeMessagePayload) {
-    const { address } = await this.getConnectedAccount(request);
-    const vault = await this.getAdaVault();
-    return vault.getBalanceForDapp(address);
+    const vault = await this.getAdaVault(request);
+    if (!vault) {
+      throw new Error('Not connected to any account.');
+    }
+    return vault.getBalanceForDapp();
   }
 
   @providerApiMethod()
-  async getUsedAddresses() {
-    const vault = await this.getAdaVault();
+  async getUsedAddresses(request: IJsBridgeMessagePayload) {
+    const vault = await this.getAdaVault(request);
+    if (!vault) {
+      throw new Error('Not connected to any account.');
+    }
     return vault.getAccountAddressForDapp();
   }
 
   @providerApiMethod()
-  async getUnusedAddresses() {
-    const vault = await this.getAdaVault();
+  async getUnusedAddresses(request: IJsBridgeMessagePayload) {
+    const vault = await this.getAdaVault(request);
+    if (!vault) {
+      throw new Error('Not connected to any account.');
+    }
     return vault.getAccountAddressForDapp();
   }
 
   @providerApiMethod()
-  async getChangeAddress() {
-    const vault = await this.getAdaVault();
+  async getChangeAddress(request: IJsBridgeMessagePayload) {
+    const vault = await this.getAdaVault(request);
+    if (!vault) {
+      throw new Error('Not connected to any account.');
+    }
     const [address] = await vault.getAccountAddressForDapp();
     return address;
   }
 
   @providerApiMethod()
-  async getRewardAddresses() {
-    const vault = await this.getAdaVault();
+  async getRewardAddresses(request: IJsBridgeMessagePayload) {
+    const vault = await this.getAdaVault(request);
+    if (!vault) {
+      throw new Error('Not connected to any account.');
+    }
     return vault.getStakeAddressForDapp();
   }
 
   @providerApiMethod()
   async signTx(request: IJsBridgeMessagePayload, params: { tx: string }) {
-    const vault = await this.getAdaVault();
+    const vault = await this.getAdaVault(request);
+    if (!vault) {
+      throw new Error('Not connected to any account.');
+    }
+    const { accountInfo: { networkId, accountId } = {} } = (
+      await this.getAccountsInfo(request)
+    )[0];
     const encodedTx = await vault.buildTxCborToEncodeTx(params.tx);
-
-    const txWitnessSetHex =
-      (await this.backgroundApi.serviceDapp?.openSignAndSendModal(request, {
+    const result =
+      await this.backgroundApi.serviceDApp.openSignAndSendTransactionModal({
+        request,
         encodedTx,
+        accountId: accountId ?? '',
+        networkId: networkId ?? '',
         signOnly: true,
-      })) as string;
-
-    debugLogger.providerApi.debug('cardano signTx witness: ', txWitnessSetHex);
-    return txWitnessSetHex;
+      });
+    return result;
   }
 
   @providerApiMethod()
@@ -178,27 +207,42 @@ class ProviderApiCardano extends ProviderApiBase {
     if (typeof params.payload !== 'string') {
       throw web3Errors.rpc.invalidInput();
     }
+    const { accountInfo: { accountId, networkId } = {} } = (
+      await this.getAccountsInfo(request)
+    )[0];
 
-    const signature =
-      await this.backgroundApi.serviceDapp?.openSignAndSendModal(request, {
+    const signature = await this.backgroundApi.serviceDApp.openSignMessageModal(
+      {
+        request,
         unsignedMessage: {
           // Use ETH_SIGN to sign plain message
-          type: ETHMessageTypes.ETH_SIGN,
+          type: EMessageTypesEth.ETH_SIGN,
           message: Buffer.from(params.payload, 'hex').toString('utf8'),
           payload: params,
         },
-      });
+        networkId: networkId ?? '',
+        accountId: accountId ?? '',
+      },
+    );
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    return JSON.parse(signature as string);
+    return JSON.parse(signature as any);
   }
 
   @providerApiMethod()
-  async submitTx(_: IJsBridgeMessagePayload, params: string) {
-    const vault = await this.getAdaVault();
-    const client = await vault.getClient();
-    const txid = await client.submitTx(params);
-    return txid;
+  async submitTx(request: IJsBridgeMessagePayload, params: string) {
+    const { accountInfo: { networkId, address } = {} } = (
+      await this.getAccountsInfo(request)
+    )[0];
+    return this.backgroundApi.serviceSend.broadcastTransaction({
+      networkId: networkId ?? '',
+      signedTx: {
+        txid: '',
+        rawTx: params,
+        encodedTx: null,
+      },
+      accountAddress: address ?? '',
+    });
   }
 }
 

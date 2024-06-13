@@ -1,95 +1,92 @@
-import type { PropsWithChildren } from 'react';
-import { useCallback, useEffect, useState } from 'react';
+import { type PropsWithChildren, useCallback, useState } from 'react';
 
 import { useIntl } from 'react-intl';
 
-import { Center, Empty, Spinner, ToastManager } from '@onekeyhq/components';
-import debugLogger from '@onekeyhq/shared/src/logger/debugLogger';
+import { Empty, Spinner, Stack, Toast } from '@onekeyhq/components';
 
 import backgroundApiProxy from '../../../background/instance/backgroundApiProxy';
+import { usePromiseResult } from '../../../hooks/usePromiseResult';
 
 function LNHardwareWalletAuth({
   children,
-  networkId,
   accountId,
+  networkId,
 }: PropsWithChildren<{
-  walletId: string;
-  networkId: string;
   accountId: string;
+  networkId: string;
 }>) {
   const intl = useIntl();
   const [verifyAuth, setVerifyAuth] = useState(false);
-  const [shouldRefreshAuth, setShouldNeedRefreshAuth] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  useEffect(() => {
-    backgroundApiProxy.serviceLightningNetwork
-      .checkAuth({
-        networkId,
+  const { result, run } = usePromiseResult(async () => {
+    try {
+      await backgroundApiProxy.serviceLightning.checkAuth({
         accountId,
-      })
-      .then((shouldRefresh) => {
-        setShouldNeedRefreshAuth(shouldRefresh);
-        setVerifyAuth(true);
+        networkId,
       });
+      return true;
+    } catch {
+      return false;
+    } finally {
+      setVerifyAuth(true);
+    }
   }, [networkId, accountId]);
 
-  const refreshToken = useCallback(() => {
+  const refreshToken = useCallback(async () => {
     setIsLoading(true);
-    backgroundApiProxy.serviceLightningNetwork
-      .refreshToken({
+    try {
+      await backgroundApiProxy.serviceLightning.exchangeToken({
         networkId,
         accountId,
-        password: '',
-      })
-      .then(() => {
-        debugLogger.common.info('refresh lightning network token success');
-        setShouldNeedRefreshAuth(false);
-      })
-      .catch((e) => {
-        ToastManager.show(
-          {
-            title: intl.formatMessage({
-              id: 'msg__authentication_failed_verify_again',
-            }),
-          },
-          {
-            type: 'error',
-          },
-        );
-        debugLogger.common.info('refresh lightning network token failed: ', e);
-      })
-      .finally(() => {
-        setIsLoading(false);
       });
-  }, [networkId, accountId, intl]);
+      setTimeout(() => {
+        void run();
+      }, 200);
+    } catch (e) {
+      console.error('refresh lightning network token failed: ', e);
+      Toast.error({
+        title: intl.formatMessage({
+          id: 'msg__authentication_failed_verify_again',
+        }),
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [networkId, accountId, intl, run]);
 
   if (!verifyAuth) {
     return (
-      <Center w="full" h="full">
-        <Spinner size="lg" />
-      </Center>
+      <Stack w="full" h="full">
+        <Spinner size="large" />
+      </Stack>
     );
   }
 
-  if (!shouldRefreshAuth) {
+  if (result) {
     return <>{children}</>;
   }
 
   return (
-    <Center w="full" h="full">
+    <Stack
+      testID="LNHardware"
+      w="100%"
+      h="100%"
+      justifyContent="center"
+      alignItems="center"
+    >
       <Empty
-        emoji="📇"
-        title={intl.formatMessage({ id: 'title__authorize_access' })}
-        subTitle={intl.formatMessage({
-          id: 'content__connecting_your_hardware_wallet_to_access_the_lightning_account',
-        })}
-        actionTitle={intl.formatMessage({ id: 'action__connect' })}
-        handleAction={() => {
-          refreshToken();
+        icon="PasswordOutline"
+        title="Authorize Access"
+        description="Connecting your hardware wallet to access the Lightning account"
+        buttonProps={{
+          children: intl.formatMessage({ id: 'action__connect' }),
+          onPress: () => {
+            void refreshToken();
+          },
+          loading: isLoading,
         }}
-        isLoading={isLoading}
       />
-    </Center>
+    </Stack>
   );
 }
 

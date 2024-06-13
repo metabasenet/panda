@@ -1,27 +1,43 @@
-import { setBoardingCompleted } from '@onekeyhq/kit/src/store/reducers/status';
 import {
   backgroundClass,
   backgroundMethod,
 } from '@onekeyhq/shared/src/background/backgroundDecorators';
 
+import localDb from '../dbs/local/localDb';
+import { ELocalDBStoreNames } from '../dbs/local/localDBStoreNames';
+
 import ServiceBase from './ServiceBase';
 
 @backgroundClass()
-export default class ServiceOnboarding extends ServiceBase {
+class ServiceOnboarding extends ServiceBase {
+  constructor({ backgroundApi }: { backgroundApi: any }) {
+    super({ backgroundApi });
+  }
+
   @backgroundMethod()
-  async checkOnboardingStatus() {
-    const { engine, dispatch, appSelector } = this.backgroundApi;
-    const boardingCompleted = appSelector((s) => s.status.boardingCompleted);
-    if (boardingCompleted) {
-      return;
-    }
-    const wallets = await engine.getWallets();
-    for (let i = 0; i < wallets.length; i += 1) {
-      const wallet = wallets[i];
-      if (wallet.accounts.length > 0) {
-        dispatch(setBoardingCompleted());
-        break;
-      }
-    }
+  public async isOnboardingDone() {
+    const { count: accountsCount } = await localDb.getRecordsCount({
+      name: ELocalDBStoreNames.Account,
+    });
+    const { count: indexedAccountsCount } = await localDb.getRecordsCount({
+      name: ELocalDBStoreNames.IndexedAccount,
+    });
+    const { count: walletsCount } = await localDb.getRecordsCount({
+      name: ELocalDBStoreNames.Wallet,
+    });
+
+    return {
+      accountsCount,
+      indexedAccountsCount,
+      walletsCount,
+      isOnboardingDone:
+        accountsCount > 0 ||
+        indexedAccountsCount > 0 ||
+        // watching\imported\external 3 wallets created in default
+        // TODO lazy _addSingletonWalletRecord
+        walletsCount > 3,
+    };
   }
 }
+
+export default ServiceOnboarding;

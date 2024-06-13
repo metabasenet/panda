@@ -1,27 +1,20 @@
 import { web3Errors } from '@onekeyfe/cross-inpage-provider-errors';
 import { IInjectedProviderNames } from '@onekeyfe/cross-inpage-provider-types';
+import { Semaphore } from 'async-mutex';
 
-import { getNip19EncodedPubkey } from '@onekeyhq/engine/src/vaults/impl/nostr/helper/NostrSDK';
 import type {
+  INostrEvent,
   INostrRelays,
-  NostrEvent,
-} from '@onekeyhq/engine/src/vaults/impl/nostr/helper/types';
-import { getActiveWalletAccount } from '@onekeyhq/kit/src/hooks';
-import {
-  ModalRoutes,
-  NostrModalRoutes,
-} from '@onekeyhq/kit/src/routes/routesEnum';
-import { getTimeDurationMs } from '@onekeyhq/kit/src/utils/helper';
+} from '@onekeyhq/core/src/chains/nostr/types';
 import {
   backgroundClass,
   providerApiMethod,
 } from '@onekeyhq/shared/src/background/backgroundDecorators';
-import { IMPL_NOSTR } from '@onekeyhq/shared/src/engine/engineConsts';
 import {
-  isHardwareWallet,
-  isHdWallet,
-} from '@onekeyhq/shared/src/engine/engineUtils';
-import debugLogger from '@onekeyhq/shared/src/logger/debugLogger';
+  EDAppConnectionModal,
+  EModalRoutes,
+} from '@onekeyhq/shared/src/routes';
+import accountUtils from '@onekeyhq/shared/src/utils/accountUtils';
 
 import ProviderApiBase from './ProviderApiBase';
 
@@ -31,37 +24,15 @@ import type {
   IJsonRpcRequest,
 } from '@onekeyfe/cross-inpage-provider-types';
 
-interface HardwareDecryptionQueueItem {
-  request: IJsBridgeMessagePayload;
-  resolve: (value: string | PromiseLike<string>) => void;
-  reject: (reason?: any) => void;
-}
-
 @backgroundClass()
 class ProviderApiNostr extends ProviderApiBase {
   public providerName = IInjectedProviderNames.nostr;
 
-  /**
-   * Queue for hardware decryption.
-   */
-  private hardwareDecryptionQueue: HardwareDecryptionQueueItem[] = [];
+  private decryptMutex = new Semaphore(1);
 
-  /**
-   * Indicates whether decryption is currently being processed.
-   */
-  private decryptionProcessing = false;
-
-  /**
-   * The timestamp of the last decryption processing time.
-   */
-  private lastDecryptionProcessingTime = 0;
-
-  /**
-   * The duration in milliseconds for the decryption timeout.
-   */
-  private decryptionTimeout = getTimeDurationMs({ minute: 1 });
-
-  public notifyDappAccountsChanged(info: IProviderBaseBackgroundNotifyInfo) {
+  public override notifyDappAccountsChanged(
+    info: IProviderBaseBackgroundNotifyInfo,
+  ): void {
     const data = () => {
       const result = {
         method: 'wallet_events_accountChanged',
@@ -71,154 +42,139 @@ class ProviderApiNostr extends ProviderApiBase {
       };
       return result;
     };
-
-    info.send(data);
+    info.send(data, info.targetOrigin);
   }
 
-  public notifyDappChainChanged(info: IProviderBaseBackgroundNotifyInfo) {
-    // TODO
-    debugLogger.providerApi.info(info);
+  public override notifyDappChainChanged(): void {
+    // throw new NotImplemented();;
   }
 
-  public async rpcCall(request: IJsonRpcRequest): Promise<any> {
-    debugLogger.providerApi.info('nostr rpcCall: ', request);
+  public async rpcCall(): Promise<any> {
     return Promise.resolve();
   }
 
-  private checkWalletSupport(walletId: string) {
-    const isSupportedWallet =
-      isHdWallet({ walletId }) || isHardwareWallet({ walletId });
-    if (!isSupportedWallet) {
-      throw new Error(
-        'The current wallet does not support Nostr, switch to an app wallet',
+  _getAccountsInfo = async (request: IJsBridgeMessagePayload) => {
+    const accountsInfo =
+      await this.backgroundApi.serviceDApp.dAppGetConnectedAccountsInfo(
+        request,
       );
+    if (!accountsInfo) {
+      throw web3Errors.provider.unauthorized();
     }
+    return accountsInfo;
+  };
+
+  @providerApiMethod()
+  async nostr_account(
+    request: IJsBridgeMessagePayload,
+  ): Promise<{ npub: string; pubkey: string } | null> {
+    const accountsInfo =
+      await this.backgroundApi.serviceDApp.dAppGetConnectedAccountsInfo(
+        request,
+      );
+    if (accountsInfo && accountsInfo.length) {
+      return Promise.resolve({
+        npub: accountsInfo[0].account.address,
+        pubkey: accountsInfo[0].account.pub ?? '',
+      });
+    }
+    return Promise.resolve(null);
   }
 
   // Nostr API
   @providerApiMethod()
-  public async getPublicKey(request: IJsBridgeMessagePayload): Promise<string> {
-    const { walletId, networkId, accountId } = getActiveWalletAccount();
-    this.checkWalletSupport(walletId);
-    const existPubKey = await this.getNostrAccountPubKey(request);
-    if (existPubKey) {
-      return existPubKey;
+  async getPublicKey(request: IJsBridgeMessagePayload): Promise<string> {
+    const account = await this.nostr_account(request);
+    if (account) {
+      return account.pubkey;
     }
-    const pubkey = await this.backgroundApi.serviceDapp.openModal({
-      request,
-      screens: [ModalRoutes.Nostr, NostrModalRoutes.GetPublicKey],
-      params: { walletId, networkId, accountId },
-    });
-
-    if (request.origin) {
-      this.backgroundApi.serviceDapp.saveConnectedAccounts({
-        site: {
-          origin: request.origin,
-        },
-        address: getNip19EncodedPubkey(pubkey as string),
-        networkImpl: IMPL_NOSTR,
-      });
-    }
-
-    return Promise.resolve(pubkey as string);
-  }
-
-  async getNostrAccountPubKey(request: IJsBridgeMessagePayload) {
-    const { walletId, networkId, accountId } = getActiveWalletAccount();
-    const accounts = this.backgroundApi.serviceDapp?.getActiveConnectedAccounts(
-      {
-        origin: request.origin as string,
-        impl: IMPL_NOSTR,
-      },
-    );
-    if (!accounts) {
-      return null;
-    }
-    const accountNpubs = accounts.map((account) => account.address);
-    try {
-      const nostrAccount =
-        await this.backgroundApi.serviceNostr.getNostrAccount({
-          walletId,
-          currentNetworkId: networkId,
-          currentAccountId: accountId,
-        });
-      if (accountNpubs.includes(nostrAccount.address)) {
-        return nostrAccount.pubKey;
-      }
-      return null;
-    } catch {
-      return null;
-    }
+    await this.backgroundApi.serviceDApp.openConnectionModal(request);
+    const result = await this.nostr_account(request);
+    return result?.pubkey ?? '';
   }
 
   @providerApiMethod()
   public async getRelays(): Promise<INostrRelays> {
-    const result = await this.backgroundApi.serviceNostr.getRelays();
-    return result;
+    // TODO: move to backend
+    return {
+      'wss://relay.relayable.org': { read: true, write: true },
+      'wss://relay.nostrassets.com': { read: true, write: true },
+      'wss://relay.damus.io': { read: true, write: true },
+      'wss://nostr1.tunnelsats.com': { read: true, write: true },
+      'wss://nostr-pub.wellorder.net': { read: true, write: true },
+      'wss://relay.nostr.info': { read: true, write: true },
+      'wss://nostr-relay.wlvs.space': { read: true, write: true },
+      'wss://nostr.bitcoiner.social': { read: true, write: true },
+      'wss://nostr-01.bolt.observer': { read: true, write: true },
+      'wss://relayer.fiatjaf.com': { read: true, write: true },
+    };
   }
 
   @providerApiMethod()
   public async signEvent(
     request: IJsBridgeMessagePayload,
-  ): Promise<NostrEvent> {
-    const { walletId, networkId, accountId } = getActiveWalletAccount();
-    this.checkWalletSupport(walletId);
+  ): Promise<INostrEvent> {
     const params = (request.data as IJsonRpcRequest)?.params as {
-      event: NostrEvent;
+      event: INostrEvent;
     };
     if (!params.event) {
       throw web3Errors.rpc.invalidInput();
     }
 
-    // Auto sign logic
-    const passwordCache = await this.getPasswordCache();
-    if (passwordCache && !isHardwareWallet({ walletId }) && request.origin) {
-      const url = new URL(request.origin);
+    const { accountInfo: { accountId, networkId, walletId } = {} } = (
+      await this._getAccountsInfo(request)
+    )[0];
+
+    const cachedPassword =
+      await this.backgroundApi.servicePassword.getCachedPassword();
+    if (
+      cachedPassword &&
+      !accountUtils.isHwWallet({ walletId: walletId ?? '' })
+    ) {
       const shouldAutoSign =
         await this.backgroundApi.serviceNostr.getAutoSignStatus(
           accountId ?? '',
-          url.hostname,
+          new URL(request.origin ?? '').origin,
         );
       if (shouldAutoSign) {
         const result = await this.backgroundApi.serviceNostr.signEvent({
-          walletId,
           networkId: networkId ?? '',
           accountId: accountId ?? '',
-          password: typeof passwordCache === 'string' ? passwordCache : '',
+          walletId: walletId ?? '',
           event: params.event,
         });
-
-        return (result?.data ?? {}) as NostrEvent;
+        return (result?.data ?? {}) as INostrEvent;
       }
     }
 
     try {
-      const signedEvent = await this.backgroundApi.serviceDapp.openModal({
+      const signedEvent = await this.backgroundApi.serviceDApp.openModal({
         request,
-        screens: [ModalRoutes.Nostr, NostrModalRoutes.SignEvent],
-        params: { walletId, networkId, accountId, event: params.event },
+        screens: [
+          EModalRoutes.DAppConnectionModal,
+          EDAppConnectionModal.NostrSignEventModal,
+        ],
+        params: {
+          event: params.event,
+          walletId: walletId ?? '',
+          accountId: accountId ?? '',
+          networkId: networkId ?? '',
+        },
+        fullScreen: true,
       });
-      return signedEvent as NostrEvent;
+      return signedEvent as INostrEvent;
     } catch (e) {
-      debugLogger.providerApi.error(`nostr.signEvent data: `, params.event);
-      debugLogger.providerApi.error(`nostr.signEvent error: `, e);
+      console.error('====> signEvent error: ', e);
       throw e;
     }
   }
 
   @providerApiMethod()
-  private async getPasswordCache() {
-    const password = await this.backgroundApi.servicePassword.getPassword();
-    if (password && password.length > 0) {
-      return password;
-    }
-    return false;
-  }
-
-  @providerApiMethod()
   public async encrypt(request: IJsBridgeMessagePayload): Promise<string> {
-    const { walletId, networkId, accountId } = getActiveWalletAccount();
-    this.checkWalletSupport(walletId);
+    const { accountInfo: { accountId, networkId, walletId } = {} } = (
+      await this._getAccountsInfo(request)
+    )[0];
+
     const params = (request.data as IJsonRpcRequest)?.params as {
       pubkey: string;
       plaintext: string;
@@ -227,35 +183,40 @@ class ProviderApiNostr extends ProviderApiBase {
       throw web3Errors.rpc.invalidInput();
     }
 
-    try {
-      const passwordCache = await this.getPasswordCache();
-      if (passwordCache || isHardwareWallet({ walletId })) {
-        const encrypted = await this.backgroundApi.serviceNostr.encrypt({
-          walletId,
-          networkId,
-          accountId,
-          password: typeof passwordCache === 'string' ? passwordCache : '',
-          pubkey: params.pubkey,
-          plaintext: params.plaintext,
-        });
-        await this.backgroundApi.serviceNostr.saveEncryptedData({
-          pubkey: params.pubkey,
-          plaintext: params.plaintext,
-          encryptedData: encrypted.data,
-        });
-        return encrypted.data;
-      }
+    const cachedPassword =
+      await this.backgroundApi.servicePassword.getCachedPassword();
+    const isHwWallet = accountUtils.isHwWallet({ walletId: walletId ?? '' });
+    if (cachedPassword || isHwWallet) {
+      const encrypted = await this.backgroundApi.serviceNostr.encrypt({
+        walletId: walletId ?? '',
+        networkId: networkId ?? '',
+        accountId: accountId ?? '',
+        pubkey: params.pubkey,
+        plaintext: params.plaintext,
+      });
+      await this.backgroundApi.serviceNostr.saveEncryptedData({
+        pubkey: params.pubkey,
+        plaintext: params.plaintext,
+        encryptedData: encrypted.data,
+      });
+      return encrypted.data;
+    }
 
-      const encrypted = await this.backgroundApi.serviceDapp.openModal({
+    try {
+      const encrypted = await this.backgroundApi.serviceDApp.openModal({
         request,
-        screens: [ModalRoutes.Nostr, NostrModalRoutes.SignEvent],
+        screens: [
+          EModalRoutes.DAppConnectionModal,
+          EDAppConnectionModal.NostrSignEventModal,
+        ],
         params: {
-          walletId,
-          networkId,
-          accountId,
           pubkey: params.pubkey,
           plaintext: params.plaintext,
+          walletId: walletId ?? '',
+          accountId: accountId ?? '',
+          networkId: networkId ?? '',
         },
+        fullScreen: true,
       });
       await this.backgroundApi.serviceNostr.saveEncryptedData({
         pubkey: params.pubkey,
@@ -264,65 +225,26 @@ class ProviderApiNostr extends ProviderApiBase {
       });
       return encrypted as string;
     } catch (e) {
-      debugLogger.providerApi.error(`nostr.encrypt data: `, params);
-      debugLogger.providerApi.error(`nostr.encrypt error: `, e);
+      console.error('====> signEvent error: ', e);
       throw e;
     }
   }
 
   @providerApiMethod()
   public async decrypt(request: IJsBridgeMessagePayload): Promise<string> {
-    const { walletId } = getActiveWalletAccount();
-    this.checkWalletSupport(walletId);
-
-    // Directly decrypts the request
-    if (isHdWallet({ walletId })) {
-      return this.decryptRequest(request);
-    }
-
-    // If the active wallet is a hardware wallet, adds the request to the decryption queue and processes it asynchronously.
-    return new Promise((resolve, reject) => {
-      this.hardwareDecryptionQueue.push({ request, resolve, reject });
-      this.processDecryptQueue();
-    });
-  }
-
-  private async processDecryptQueue() {
-    const currentTime = Date.now();
-
-    if (
-      this.decryptionProcessing ||
-      this.hardwareDecryptionQueue.length === 0
-    ) {
-      if (
-        currentTime - this.lastDecryptionProcessingTime <
-        this.decryptionTimeout
-      ) {
-        return;
-      }
-      debugLogger.providerApi.debug('Decrypt timeout, processing again');
-    }
-
-    this.decryptionProcessing = true;
-
-    while (this.hardwareDecryptionQueue.length > 0) {
-      const { request, resolve, reject } =
-        this.hardwareDecryptionQueue.shift() ?? {};
-      try {
-        const result = await this.decryptRequest(request ?? {});
-        resolve?.(result);
-      } catch (error) {
-        reject?.(error);
-      }
-      this.lastDecryptionProcessingTime = Date.now();
-    }
-    this.decryptionProcessing = false;
+    const result = await this.decryptMutex.runExclusive(() =>
+      this.decryptRequest(request),
+    );
+    console.log('====>>>>>DECRYPT: ', result);
+    return result;
   }
 
   private async decryptRequest(
     request: IJsBridgeMessagePayload,
   ): Promise<string> {
-    const { walletId, networkId, accountId } = getActiveWalletAccount();
+    const { accountInfo: { accountId, networkId, walletId } = {} } = (
+      await this._getAccountsInfo(request)
+    )[0];
     const params = (request.data as IJsonRpcRequest)?.params as {
       pubkey: string;
       ciphertext: string;
@@ -331,54 +253,67 @@ class ProviderApiNostr extends ProviderApiBase {
       throw web3Errors.rpc.invalidInput();
     }
 
-    try {
-      const passwordCache = await this.getPasswordCache();
-      if (passwordCache || isHardwareWallet({ walletId })) {
-        const decrypted = await this.backgroundApi.serviceNostr.decrypt({
-          walletId,
-          networkId,
-          accountId,
-          password: typeof passwordCache === 'string' ? passwordCache : '',
-          pubkey: params.pubkey,
-          ciphertext: params.ciphertext,
-        });
+    const cachedPassword =
+      await this.backgroundApi.servicePassword.getCachedPassword();
+    const isHwWallet = accountUtils.isHwWallet({ walletId: walletId ?? '' });
+    if (cachedPassword || isHwWallet) {
+      const decrypted = await this.backgroundApi.serviceNostr.decrypt({
+        walletId: walletId ?? '',
+        networkId: networkId ?? '',
+        accountId: accountId ?? '',
+        pubkey: params.pubkey,
+        ciphertext: params.ciphertext,
+      });
+      return decrypted.data;
+    }
 
-        return decrypted.data;
-      }
-      const decrypted = await this.backgroundApi.serviceDapp.openModal({
+    try {
+      const decrypted = await this.backgroundApi.serviceDApp.openModal({
         request,
-        screens: [ModalRoutes.Nostr, NostrModalRoutes.SignEvent],
+        screens: [
+          EModalRoutes.DAppConnectionModal,
+          EDAppConnectionModal.NostrSignEventModal,
+        ],
         params: {
-          walletId,
-          networkId,
-          accountId,
           pubkey: params.pubkey,
           ciphertext: params.ciphertext,
+          walletId: walletId ?? '',
+          accountId: accountId ?? '',
+          networkId: networkId ?? '',
         },
+        fullScreen: true,
       });
       return decrypted as string;
     } catch (e) {
-      debugLogger.providerApi.error(`nostr.decrypt data: `, params);
-      debugLogger.providerApi.error(`nostr.decrypt error: `, e);
+      console.error('====> decrypted error: ', e);
       throw e;
     }
   }
 
   @providerApiMethod()
   public async signSchnorr(request: IJsBridgeMessagePayload): Promise<string> {
-    const { walletId, networkId, accountId } = getActiveWalletAccount();
-    this.checkWalletSupport(walletId);
+    const { accountInfo: { accountId, networkId, walletId } = {} } = (
+      await this._getAccountsInfo(request)
+    )[0];
     const params = (request.data as IJsonRpcRequest)?.params as string;
     try {
-      const signedHash = await this.backgroundApi.serviceDapp.openModal({
+      const signedHash = await this.backgroundApi.serviceDApp.openModal({
         request,
-        screens: [ModalRoutes.Nostr, NostrModalRoutes.SignEvent],
-        params: { walletId, networkId, accountId, sigHash: params },
+        screens: [
+          EModalRoutes.DAppConnectionModal,
+          EDAppConnectionModal.NostrSignEventModal,
+        ],
+        params: {
+          sigHash: params,
+          walletId: walletId ?? '',
+          accountId: accountId ?? '',
+          networkId: networkId ?? '',
+        },
+        fullScreen: true,
       });
       return signedHash as string;
     } catch (e) {
-      debugLogger.providerApi.error(`nostr.signSchnorr data: `, params);
-      debugLogger.providerApi.error(`nostr.signSchnorr error: `, e);
+      console.error('====> sign schnorr error: ', e);
       throw e;
     }
   }

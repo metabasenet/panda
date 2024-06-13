@@ -1,45 +1,37 @@
 import { web3Errors } from '@onekeyfe/cross-inpage-provider-errors';
 import { IInjectedProviderNames } from '@onekeyfe/cross-inpage-provider-types';
+import { Semaphore } from 'async-mutex';
 import BigNumber from 'bignumber.js';
 import { Psbt } from 'bitcoinjs-lib';
-import { isNil } from 'lodash';
+import { isEmpty, isNil } from 'lodash';
 
-import { getFiatEndpoint } from '@onekeyhq/engine/src/endpoint';
-import type { NFTBTCAssetModel } from '@onekeyhq/engine/src/types/nft';
-import type VaultBtcFork from '@onekeyhq/engine/src/vaults/utils/btcForkChain/VaultBtcFork';
-import { getActiveWalletAccount } from '@onekeyhq/kit/src/hooks';
+import { getInputsToSignFromPsbt } from '@onekeyhq/core/src/chains/btc/sdkBtc';
+import {
+  decodedPsbt as decodedPsbtFN,
+  formatPsbtHex,
+  toPsbtNetwork,
+} from '@onekeyhq/core/src/chains/btc/sdkBtc/providerUtils';
+import type { IEncodedTx } from '@onekeyhq/core/src/types';
 import {
   backgroundClass,
   providerApiMethod,
 } from '@onekeyhq/shared/src/background/backgroundDecorators';
-import { OnekeyNetwork } from '@onekeyhq/shared/src/config/networkIds';
-import {
-  IMPL_BTC,
-  IMPL_TBTC,
-  isBTCNetwork,
-} from '@onekeyhq/shared/src/engine/engineConsts';
-import debugLogger from '@onekeyhq/shared/src/logger/debugLogger';
+import { getNetworkIdsMap } from '@onekeyhq/shared/src/config/networkIds';
+import accountUtils from '@onekeyhq/shared/src/utils/accountUtils';
+import networkUtils from '@onekeyhq/shared/src/utils/networkUtils';
 import type {
-  DecodedPsbt,
-  InscribeTransferParams,
-  PushPsbtParams,
-  PushTxParams,
-  SendBitcoinParams,
-  SendInscriptionParams,
-  SignMessageParams,
-  SignPsbtParams,
-  SignPsbtsParams,
-  SwitchNetworkParams,
-} from '@onekeyhq/shared/src/providerApis/ProviderApiBtc/ProviderApiBtc.types';
-import {
-  formatPsbtHex,
-  getInputsToSignFromPsbt,
-  getNetworkName,
-  httpPost,
-  mapInscriptionToNFTBTCAssetModel,
-  toPsbtNetwork,
-} from '@onekeyhq/shared/src/providerApis/ProviderApiBtc/ProviderApiBtc.utils';
-import { RestfulRequest } from '@onekeyhq/shared/src/request/RestfulRequest';
+  ISendBitcoinParams,
+  ISignMessageParams,
+  ISwitchNetworkParams,
+} from '@onekeyhq/shared/types/ProviderApis/ProviderApiBtc.type';
+import type {
+  IPushPsbtParams,
+  IPushTxParams,
+  ISignPsbtParams,
+  ISignPsbtsParams,
+} from '@onekeyhq/shared/types/ProviderApis/ProviderApiSui.type';
+
+import { vaultFactory } from '../vaults/factory';
 
 import ProviderApiBase from './ProviderApiBase';
 
@@ -51,103 +43,135 @@ import type * as BitcoinJS from 'bitcoinjs-lib';
 class ProviderApiBtc extends ProviderApiBase {
   public providerName = IInjectedProviderNames.btc;
 
-  public notifyDappAccountsChanged(info: IProviderBaseBackgroundNotifyInfo) {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  private semaphore = new Semaphore(1);
+
+  public override notifyDappAccountsChanged(
+    info: IProviderBaseBackgroundNotifyInfo,
+  ): void {
     const data = async ({ origin }: { origin: string }) => {
-      const params = await this.getAccounts({ origin });
       const result = {
-        method: 'wallet_events_accountsChanged',
-        params,
+        method: 'wallet_events_accountChanged',
+        params: {
+          accounts: await this.getAccounts({
+            origin,
+            scope: this.providerName,
+          }),
+        },
       };
       return result;
     };
-    info.send(data);
+    info.send(data, info.targetOrigin);
   }
 
-  public notifyDappChainChanged(info: IProviderBaseBackgroundNotifyInfo) {
-    const data = async () => {
-      const params = await this.getNetwork();
+  public override notifyDappChainChanged(
+    info: IProviderBaseBackgroundNotifyInfo,
+  ): void {
+    const data = async ({ origin }: { origin: string }) => {
+      const params = await this.getNetwork({
+        origin,
+        scope: this.providerName,
+      });
       const result = {
         method: 'wallet_events_networkChanged',
         params,
       };
       return result;
     };
-    info.send(data);
+    info.send(data, info.targetOrigin);
   }
 
-  public rpcCall() {
+  public async rpcCall(): Promise<any> {
     throw web3Errors.rpc.methodNotSupported();
   }
 
   @providerApiMethod()
   public async getProviderState() {
-    const isUnlocked = await this.backgroundApi.serviceApp.isUnlock();
-    const accounts: string[] = [];
-    const { accountAddress, network } = getActiveWalletAccount();
-    if (isUnlocked) {
-      if (accountAddress) {
-        accounts.push(accountAddress);
-      }
-    }
     return {
-      network: network ? getNetworkName(network) : '',
-      isUnlocked,
-      accounts,
+      network: '',
+      isUnlocked: true,
+      accounts: [],
     };
   }
 
+  // Provider API
   @providerApiMethod()
   public async requestAccounts(request: IJsBridgeMessagePayload) {
-    debugLogger.providerApi.info('ProviderApiBtc.requestAccounts', request);
-
-    const accounts = await this.getAccounts(request);
-    if (accounts && accounts.length) {
-      return accounts;
-    }
-
-    await this.backgroundApi.serviceDapp.openConnectionModal(request);
-    return this.getAccounts(request);
+    return this.semaphore.runExclusive(async () => {
+      const accounts = await this.getAccounts(request);
+      if (accounts && accounts.length) {
+        return accounts;
+      }
+      await this.backgroundApi.serviceDApp.openConnectionModal(request);
+      return this.getAccounts(request);
+    });
   }
 
   @providerApiMethod()
-  public async getAccounts(request: IJsBridgeMessagePayload) {
-    const { network } = getActiveWalletAccount();
-    const accounts = this.backgroundApi.serviceDapp?.getActiveConnectedAccounts(
-      {
-        origin: request.origin as string,
-        impl: network?.isTestnet ? IMPL_TBTC : IMPL_BTC,
-      },
-    );
-    if (!accounts) {
+  async getAccounts(request: IJsBridgeMessagePayload) {
+    const accountsInfo =
+      await this.backgroundApi.serviceDApp.dAppGetConnectedAccountsInfo(
+        request,
+      );
+    if (!accountsInfo) {
       return Promise.resolve([]);
     }
-    const accountAddresses = accounts.map((account) => account.address);
-    return Promise.resolve(accountAddresses);
+    return Promise.resolve(accountsInfo.map((i) => i.account.address));
   }
 
   @providerApiMethod()
-  public async getNetwork() {
-    debugLogger.providerApi.info('ProviderApiBtc.getNetwork');
+  public async getPublicKey(request: IJsBridgeMessagePayload) {
+    const accountsInfo =
+      await this.backgroundApi.serviceDApp.dAppGetConnectedAccountsInfo(
+        request,
+      );
+    if (!accountsInfo) {
+      return Promise.resolve('');
+    }
+    return Promise.resolve(accountsInfo[0]?.account?.pub);
+  }
 
-    const { network } = getActiveWalletAccount();
-
-    return network ? getNetworkName(network) : '';
+  @providerApiMethod()
+  public async getNetwork(request: IJsBridgeMessagePayload) {
+    try {
+      const networks =
+        await this.backgroundApi.serviceDApp.getConnectedNetworks({
+          origin: request.origin ?? '',
+          scope: request.scope ?? this.providerName,
+        });
+      if (Array.isArray(networks) && networks.length) {
+        return await networkUtils.getBtcDappNetworkName(networks[0]);
+      }
+      return '';
+    } catch {
+      return '';
+    }
   }
 
   @providerApiMethod()
   public async switchNetwork(
     request: IJsBridgeMessagePayload,
-    params: SwitchNetworkParams,
+    params: ISwitchNetworkParams,
   ) {
-    debugLogger.providerApi.info('ProviderApiBtc.switchNetwork');
+    console.log('ProviderApiBtc.switchNetwork');
+    const accountsInfo =
+      await this.backgroundApi.serviceDApp.dAppGetConnectedAccountsInfo(
+        request,
+      );
+    if (!accountsInfo) {
+      return;
+    }
+    const { accountInfo: { networkId: oldNetworkId } = {} } = accountsInfo[0];
+
+    if (!oldNetworkId) {
+      return;
+    }
 
     const { network: networkName } = params;
     let networkId;
     if (networkName === 'livenet') {
-      networkId = OnekeyNetwork.btc;
+      networkId = getNetworkIdsMap().btc;
     } else if (networkName === 'testnet') {
-      networkId = OnekeyNetwork.tbtc;
+      networkId = getNetworkIdsMap().tbtc;
     }
     if (!networkId) {
       throw web3Errors.provider.custom({
@@ -155,92 +179,61 @@ class ProviderApiBtc extends ProviderApiBase {
         message: `Unrecognized network ${networkName}.`,
       });
     }
-
-    const { network } = getActiveWalletAccount();
-    if (networkId === network?.id) {
-      return;
-    }
-
-    await this.backgroundApi.serviceDapp?.openSwitchNetworkModal(request, {
-      networkId,
+    await this.backgroundApi.serviceDApp.switchConnectedNetwork({
+      origin: request.origin ?? '',
+      scope: request.scope ?? this.providerName,
+      oldNetworkId,
+      newNetworkId: networkId,
     });
+    const network = await this.getNetwork(request);
+    return network;
   }
 
   @providerApiMethod()
-  public async getPublicKey() {
-    debugLogger.providerApi.info('ProviderApiBtc.getPublicKey');
-    const { accountPubKey } = getActiveWalletAccount();
-
-    return Promise.resolve(accountPubKey);
-  }
-
-  @providerApiMethod()
-  public async getBalance() {
-    debugLogger.providerApi.info('ProviderApiBtc.getBalance');
-    const { accountId, network } = getActiveWalletAccount();
-    if (!accountId || !network) return null;
-    const balanceDetail =
-      await this.backgroundApi.serviceToken.fetchBalanceDetails({
-        networkId: network.id,
-        accountId,
+  public async getBalance(request: IJsBridgeMessagePayload) {
+    const { accountInfo: { networkId, accountId } = {} } = (
+      await this.getAccountsInfo(request)
+    )[0];
+    const accountAddress =
+      await this.backgroundApi.serviceAccount.getAccountAddressForApi({
+        networkId: networkId ?? '',
+        accountId: accountId ?? '',
       });
-    if (balanceDetail) {
-      return {
-        confirmed: new BigNumber(balanceDetail.total)
-          .minus(balanceDetail.unavailableOfUnconfirmed ?? '0')
-          .shiftedBy(network.decimals)
-          .toFixed(),
-        unconfirmed: new BigNumber(
-          balanceDetail.unavailableOfUnconfirmed ?? '0',
-        )
-          .shiftedBy(network.decimals)
-          .toFixed(),
-        total: new BigNumber(balanceDetail.total)
-          .shiftedBy(network.decimals)
-          .toFixed(),
-      };
-    }
-    return null;
+    const { balance } =
+      await this.backgroundApi.serviceAccountProfile.fetchAccountDetails({
+        networkId: networkId ?? '',
+        xpub: await this.backgroundApi.serviceAccount.getAccountXpub({
+          accountId: accountId ?? '',
+          networkId: networkId ?? '',
+        }),
+        accountAddress,
+      });
+    return {
+      confirmed: balance,
+      unconfirmed: 0,
+      total: balance,
+    };
   }
 
   @providerApiMethod()
   public async getInscriptions() {
-    debugLogger.providerApi.info('ProviderApiBtc.getBalance');
-    const { networkId, accountAddress } = getActiveWalletAccount();
-
-    const req = new RestfulRequest(getFiatEndpoint(), {}, 60 * 1000);
-
-    const query = {
-      chain: networkId,
-      address: accountAddress,
-    };
-
-    try {
-      const resp = (await req
-        .get('/NFT/v2/list', query)
-        .then((r) => r.json())) as { data: NFTBTCAssetModel[] };
-
-      return {
-        total: resp.data.length,
-        list: resp.data,
-      };
-    } catch {
-      return null;
-    }
+    throw web3Errors.rpc.methodNotSupported();
   }
 
   @providerApiMethod()
   public async sendBitcoin(
     request: IJsBridgeMessagePayload,
-    params: SendBitcoinParams,
+    params: ISendBitcoinParams,
   ) {
     const { toAddress, satoshis, feeRate } = params;
-    const { account, network } = getActiveWalletAccount();
+    const accountsInfo = await this.getAccountsInfo(request);
+    const { accountInfo: { accountId, networkId, address } = {} } =
+      accountsInfo[0];
 
-    if (!network || !account) {
+    if (!networkId || !accountId) {
       throw web3Errors.provider.custom({
         code: 4002,
-        message: `Can not get current account`,
+        message: `Can not get account`,
       });
     }
 
@@ -249,156 +242,107 @@ class ProviderApiBtc extends ProviderApiBase {
     if (amountBN.isNaN() || amountBN.isNegative()) {
       throw web3Errors.rpc.invalidParams('Invalid satoshis');
     }
-    const vault = (await this.backgroundApi.engine.getVault({
-      networkId: network.id,
-      accountId: account.id,
-    })) as VaultBtcFork;
 
-    const encodedTx = await vault.buildEncodedTxFromTransfer(
+    const vault = await vaultFactory.getVault({
+      networkId,
+      accountId,
+    });
+    const network = await this.backgroundApi.serviceNetwork.getNetwork({
+      networkId,
+    });
+
+    const transfersInfo = [
       {
-        from: account.address,
+        from: address ?? '',
         to: toAddress,
         amount: amountBN.shiftedBy(-network.decimals).toFixed(),
       },
-      isNil(feeRate)
+    ];
+    const encodedTx = await vault.buildEncodedTx({
+      transfersInfo,
+      specifiedFeeRate: isNil(feeRate)
         ? undefined
-        : new BigNumber(feeRate).shiftedBy(-network.feeDecimals).toFixed(),
-    );
+        : new BigNumber(feeRate).shiftedBy(-network.feeMeta.decimals).toFixed(),
+    });
 
-    const result = await this.backgroundApi.serviceDapp?.openSignAndSendModal(
-      request,
-      {
+    const result =
+      await this.backgroundApi.serviceDApp.openSignAndSendTransactionModal({
+        request,
         encodedTx,
-      },
-    );
-
-    return result;
-  }
-
-  @providerApiMethod()
-  public async sendInscription(
-    request: IJsBridgeMessagePayload,
-    params: SendInscriptionParams,
-  ) {
-    const { toAddress, inscriptionId, feeRate } = params;
-
-    const { account, accountAddress, network } = getActiveWalletAccount();
-
-    if (!network || !account) {
-      throw web3Errors.provider.custom({
-        code: 4002,
-        message: `Can not get current account`,
+        accountId: accountId ?? '',
+        networkId: networkId ?? '',
+        transfersInfo,
       });
-    }
-
-    const asset = (await this.backgroundApi.serviceNFT.getAsset({
-      networkId: network.id,
-      accountId: account.id,
-      tokenId: inscriptionId,
-      local: true,
-    })) as NFTBTCAssetModel;
-
-    if (!asset) {
-      throw web3Errors.provider.custom({
-        code: 4001,
-        message: `Can not get asset by inscriptionId ${inscriptionId}`,
-      });
-    }
-
-    const vault = (await this.backgroundApi.engine.getVault({
-      networkId: network.id,
-      accountId: account.id,
-    })) as VaultBtcFork;
-
-    const encodedTx = await vault.buildEncodedTxFromTransfer(
-      {
-        from: accountAddress,
-        to: toAddress,
-        amount: '0',
-        isNFT: true,
-        nftTokenId: asset.inscription_id,
-        nftInscription: {
-          address: asset.owner,
-          inscriptionId: asset.inscription_id,
-          output: asset.output,
-          location: asset.location,
-        },
-      },
-      isNil(feeRate)
-        ? undefined
-        : new BigNumber(feeRate)
-            .shiftedBy(-network.feeDecimals ?? '0')
-            .toFixed(),
-    );
-
-    const result = await this.backgroundApi.serviceDapp?.openSignAndSendModal(
-      request,
-      {
-        encodedTx,
-      },
-    );
-
     return result;
   }
 
   @providerApiMethod()
   public async signMessage(
     request: IJsBridgeMessagePayload,
-    params: SignMessageParams,
+    params: ISignMessageParams,
   ) {
     const { message, type } = params;
-
-    const { network, account, wallet } = getActiveWalletAccount();
-
-    if (wallet?.type === 'hw') {
-      throw web3Errors.provider.custom({
-        code: 4003,
-        message: 'Sign message is not supported on hardware.',
-      });
-    }
-
-    if (!network || !account) {
-      throw web3Errors.provider.custom({
-        code: 4002,
-        message: `Can not get current account`,
-      });
-    }
+    const accountsInfo = await this.getAccountsInfo(request);
+    const { accountInfo: { accountId, networkId } = {} } = accountsInfo[0];
 
     if (type !== 'bip322-simple' && type !== 'ecdsa') {
       throw web3Errors.rpc.invalidParams('Invalid type');
     }
 
-    const result = await this.backgroundApi.serviceDapp.openSignAndSendModal(
+    const result = await this.backgroundApi.serviceDApp.openSignMessageModal({
       request,
-      {
-        unsignedMessage: {
-          type,
-          message,
-          sigOptions: {
-            noScriptType: true,
-          },
-          payload: {
-            isFromDApp: true,
-          },
+      accountId: accountId ?? '',
+      networkId: networkId ?? '',
+      unsignedMessage: {
+        type,
+        message,
+        sigOptions: {
+          noScriptType: true,
         },
-        signOnly: true,
+        payload: {
+          isFromDApp: true,
+        },
       },
-    );
+    });
     return Buffer.from(result as string, 'hex').toString('base64');
   }
 
   @providerApiMethod()
-  public async pushTx(request: IJsBridgeMessagePayload, params: PushTxParams) {
+  public async sendInscription() {
+    throw web3Errors.rpc.methodNotSupported();
+  }
+
+  @providerApiMethod()
+  public async inscribeTransfer() {
+    throw web3Errors.rpc.methodNotSupported();
+  }
+
+  @providerApiMethod()
+  public async pushTx(request: IJsBridgeMessagePayload, params: IPushTxParams) {
     const { rawTx } = params;
-    const { networkId, accountId } = getActiveWalletAccount();
-    const vault = (await this.backgroundApi.engine.getVault({
+    const accountsInfo = await this.getAccountsInfo(request);
+    const { accountInfo: { accountId, networkId, address } = {} } =
+      accountsInfo[0];
+
+    if (!networkId || !accountId) {
+      throw web3Errors.provider.custom({
+        code: 4002,
+        message: `Can not get account`,
+      });
+    }
+
+    const vault = await vaultFactory.getVault({
       networkId,
       accountId,
-    })) as VaultBtcFork;
-
+    });
     const result = await vault.broadcastTransaction({
-      txid: '',
-      rawTx,
+      accountAddress: address ?? '',
+      networkId,
+      signedTx: {
+        txid: '',
+        rawTx,
+        encodedTx: null,
+      },
     });
 
     return result.txid;
@@ -407,24 +351,35 @@ class ProviderApiBtc extends ProviderApiBase {
   @providerApiMethod()
   public async signPsbt(
     request: IJsBridgeMessagePayload,
-    params: SignPsbtParams,
+    params: ISignPsbtParams,
   ) {
-    const { psbtHex, options } = params;
+    const accountsInfo = await this.getAccountsInfo(request);
+    const { accountInfo: { accountId, networkId } = {} } = accountsInfo[0];
 
-    const formatedPsbtHex = formatPsbtHex(psbtHex);
+    if (!networkId || !accountId) {
+      throw web3Errors.provider.custom({
+        code: 4002,
+        message: `Can not get account`,
+      });
+    }
 
-    const { network, wallet } = getActiveWalletAccount();
-
-    if (wallet?.type === 'hw') {
+    if (accountUtils.isHwAccount({ accountId })) {
       throw web3Errors.provider.custom({
         code: 4003,
         message:
           'Partially signed bitcoin transactions is not supported on hardware.',
       });
     }
+
+    const network = await this.backgroundApi.serviceNetwork.getNetwork({
+      networkId,
+    });
     if (!network) return null;
+
+    const { psbtHex, options } = params;
+    const formattedPsbtHex = formatPsbtHex(psbtHex);
     const psbtNetwork = toPsbtNetwork(network);
-    const psbt = Psbt.fromHex(formatedPsbtHex, { network: psbtNetwork });
+    const psbt = Psbt.fromHex(formattedPsbtHex, { network: psbtNetwork });
     const respPsbtHex = await this._signPsbt(request, {
       psbt,
       psbtNetwork,
@@ -437,12 +392,19 @@ class ProviderApiBtc extends ProviderApiBase {
   @providerApiMethod()
   public async signPsbts(
     request: IJsBridgeMessagePayload,
-    params: SignPsbtsParams,
+    params: ISignPsbtsParams,
   ) {
-    const { psbtHexs, options } = params;
+    const accountsInfo = await this.getAccountsInfo(request);
+    const { accountInfo: { accountId, networkId } = {} } = accountsInfo[0];
 
-    const { network, wallet } = getActiveWalletAccount();
-    if (wallet?.type === 'hw') {
+    if (!networkId || !accountId) {
+      throw web3Errors.provider.custom({
+        code: 4002,
+        message: `Can not get account`,
+      });
+    }
+
+    if (accountUtils.isHwAccount({ accountId })) {
       throw web3Errors.provider.custom({
         code: 4003,
         message:
@@ -450,14 +412,19 @@ class ProviderApiBtc extends ProviderApiBase {
       });
     }
 
+    const network = await this.backgroundApi.serviceNetwork.getNetwork({
+      networkId,
+    });
     if (!network) return null;
+
+    const { psbtHexs, options } = params;
 
     const psbtNetwork = toPsbtNetwork(network);
     const result: string[] = [];
 
     for (let i = 0; i < psbtHexs.length; i += 1) {
-      const formatedPsbtHex = formatPsbtHex(psbtHexs[i]);
-      const psbt = Psbt.fromHex(formatedPsbtHex, { network: psbtNetwork });
+      const formattedPsbtHex = formatPsbtHex(psbtHexs[i]);
+      const psbt = Psbt.fromHex(formattedPsbtHex, { network: psbtNetwork });
       const respPsbtHex = await this._signPsbt(request, {
         psbt,
         psbtNetwork,
@@ -469,81 +436,32 @@ class ProviderApiBtc extends ProviderApiBase {
     return result;
   }
 
-  @providerApiMethod()
-  public async pushPsbt(
-    request: IJsBridgeMessagePayload,
-    params: PushPsbtParams,
-  ) {
-    const { psbtHex } = params;
-
-    const formatedPsbtHex = formatPsbtHex(psbtHex);
-    const psbt = Psbt.fromHex(formatedPsbtHex);
-    const tx = psbt.extractTransaction();
-    const rawTx = tx.toHex();
-
-    const { networkId, accountId } = getActiveWalletAccount();
-    const vault = (await this.backgroundApi.engine.getVault({
-      networkId,
-      accountId,
-    })) as VaultBtcFork;
-
-    const result = await vault.broadcastTransaction({
-      txid: '',
-      rawTx,
-    });
-
-    return result.txid;
-  }
-
-  @providerApiMethod()
-  public async inscribeTransfer(
-    request: IJsBridgeMessagePayload,
-    params: InscribeTransferParams,
-  ) {
-    const { ticker, amount } = params;
-
-    const amountBN = new BigNumber(amount ?? 0);
-
-    if (amountBN.isNaN() || amountBN.isNegative()) {
-      throw web3Errors.rpc.invalidParams('Invalid amount.');
-    }
-
-    if (!ticker) {
-      throw web3Errors.rpc.invalidParams('Invalid ticker.');
-    }
-
-    return this.backgroundApi.serviceDapp.openInscribeTransferModal(request, {
-      ticker,
-      amount,
-    });
-  }
-
-  private async _signPsbt(
+  async _signPsbt(
     request: IJsBridgeMessagePayload,
     params: {
       psbt: Psbt;
       psbtNetwork: BitcoinJS.networks.Network;
-      options: SignPsbtParams['options'];
+      options: ISignPsbtParams['options'];
     },
   ) {
-    const { psbt, psbtNetwork, options } = params;
+    const accountsInfo = await this.getAccountsInfo(request);
+    const { accountInfo: { accountId, networkId } = {} } = accountsInfo[0];
 
-    const { account, network } = getActiveWalletAccount();
-
-    if (!account || !account.xpub || !network) {
+    if (!networkId || !accountId) {
       throw web3Errors.provider.custom({
         code: 4002,
-        message: `Can not get current account`,
+        message: `Can not get account`,
       });
     }
 
-    const decodedPsbt = (
-      await httpPost<DecodedPsbt>({
-        isTestnet: network.isTestnet,
-        route: '/tx/decode',
-        params: { psbtHex: psbt.toHex() },
-      })
-    ).data;
+    const { psbt, psbtNetwork, options } = params;
+
+    const decodedPsbt = decodedPsbtFN({ psbt, psbtNetwork });
+
+    const account = await this.backgroundApi.serviceAccount.getAccount({
+      accountId,
+      networkId,
+    });
 
     const inputsToSign = getInputsToSignFromPsbt({
       psbt,
@@ -552,45 +470,30 @@ class ProviderApiBtc extends ProviderApiBase {
       isBtcWalletProvider: options.isBtcWalletProvider,
     });
 
-    const resp = (await this.backgroundApi.serviceDapp.openSignAndSendModal(
-      request,
-      {
+    const resp =
+      (await this.backgroundApi.serviceDApp.openSignAndSendTransactionModal({
+        request,
+        accountId,
+        networkId,
         encodedTx: {
           inputs: (decodedPsbt.inputInfos ?? []).map((v) => ({
             ...v,
             path: '',
-            value: v.value.toString(),
-            inscriptions: v.inscriptions.map((i) =>
-              mapInscriptionToNFTBTCAssetModel(
-                decodedPsbt.inscriptions[i.inscriptionId],
-              ),
-            ),
+            value: new BigNumber(v.value).toFixed(),
           })),
           outputs: (decodedPsbt.outputInfos ?? []).map((v) => ({
             ...v,
-            value: v.value.toString(),
-            inscriptions: v.inscriptions.map((i) =>
-              mapInscriptionToNFTBTCAssetModel(
-                decodedPsbt.inscriptions[i.inscriptionId],
-              ),
-            ),
+            value: new BigNumber(v.value).toFixed(),
           })),
-          totalFee: decodedPsbt.fee,
-          totalFeeInNative: new BigNumber(decodedPsbt.fee)
-            .shiftedBy(-network.decimals)
-            .toFixed(),
-          transferInfo: {
-            from: '',
-            to: '',
-            amount: '0',
-            coinControlDisabled: true,
-          },
+          inputsForCoinSelect: [],
+          outputsForCoinSelect: [],
+          fee: new BigNumber(decodedPsbt.fee).toFixed(),
           inputsToSign,
           psbtHex: psbt.toHex(),
+          disabledCoinSelect: true,
         },
         signOnly: true,
-      },
-    )) as { psbtHex: string };
+      })) as { psbtHex: string };
 
     const respPsbt = Psbt.fromHex(resp.psbtHex, { network: psbtNetwork });
 
@@ -601,34 +504,90 @@ class ProviderApiBtc extends ProviderApiBase {
         respPsbt.finalizeInput(v.index);
       });
     }
-
-    if (options.isBtcWalletProvider) {
-      return respPsbt.extractTransaction().toHex();
-    }
     return respPsbt.toHex();
   }
 
   @providerApiMethod()
-  public async getNetworkFees() {
-    const { account, network } = getActiveWalletAccount();
-    if (!account || !network) return null;
-    const vault = (await this.backgroundApi.engine.getVault({
-      networkId: network.id,
-      accountId: account.id,
-    })) as VaultBtcFork;
+  public async pushPsbt(
+    request: IJsBridgeMessagePayload,
+    params: IPushPsbtParams,
+  ) {
+    const accountsInfo = await this.getAccountsInfo(request);
+    const { accountInfo: { accountId, networkId, address } = {} } =
+      accountsInfo[0];
 
-    const result = await vault.getFeeRate();
-    if (result.length !== 3) {
-      throw new Error('Invalid fee rate');
+    if (!networkId || !accountId) {
+      throw web3Errors.provider.custom({
+        code: 4002,
+        message: `Can not get account`,
+      });
     }
-    const [hourFee, halfHourFee, fastestFee] = result;
-    return {
-      fastestFee,
-      halfHourFee,
-      hourFee,
-      economyFee: hourFee,
-      minimumFee: hourFee,
-    };
+
+    const { psbtHex } = params;
+
+    const formattedPsbtHex = formatPsbtHex(psbtHex);
+    const psbt = Psbt.fromHex(formattedPsbtHex);
+    const tx = psbt.extractTransaction();
+    const rawTx = tx.toHex();
+
+    const vault = await vaultFactory.getVault({
+      networkId,
+      accountId,
+    });
+    const result = await vault.broadcastTransaction({
+      accountAddress: address ?? '',
+      networkId,
+      signedTx: {
+        txid: '',
+        rawTx,
+        encodedTx: null,
+      },
+    });
+
+    return result.txid;
+  }
+
+  @providerApiMethod()
+  public async getNetworkFees(request: IJsBridgeMessagePayload) {
+    const accountsInfo = await this.getAccountsInfo(request);
+    const { accountInfo: { networkId, accountId } = {} } = accountsInfo[0];
+
+    if (!networkId || !accountId) {
+      throw web3Errors.provider.custom({
+        code: 4002,
+        message: `Can not get account`,
+      });
+    }
+    const accountAddress =
+      await this.backgroundApi.serviceAccount.getAccountAddressForApi({
+        networkId,
+        accountId,
+      });
+    const result = await this.backgroundApi.serviceGas.estimateFee({
+      networkId,
+      encodedTx: await this.backgroundApi.serviceGas.buildEstimateFeeParams({
+        accountId,
+        networkId,
+        encodedTx: {} as IEncodedTx,
+      }),
+      accountAddress,
+    });
+    if (result.feeUTXO && result.feeUTXO.length === 3) {
+      const fastestFee = Number(result.feeUTXO[0].feeRate);
+      const halfHourFee = Number(result.feeUTXO[1].feeRate);
+      const hourFee = Number(result.feeUTXO[2].feeRate);
+      return {
+        fastestFee,
+        halfHourFee,
+        hourFee,
+        economyFee: hourFee,
+        minimumFee: hourFee,
+      };
+    }
+    throw web3Errors.provider.custom({
+      code: 4001,
+      message: 'Failed to get network fees',
+    });
   }
 
   @providerApiMethod()
@@ -639,15 +598,38 @@ class ProviderApiBtc extends ProviderApiBase {
       amount: number;
     },
   ) {
-    const { account, network } = getActiveWalletAccount();
-    if (!account || !network) return null;
-    const vault = (await this.backgroundApi.engine.getVault({
-      networkId: network.id,
-      accountId: account.id,
-    })) as VaultBtcFork;
-    const { utxos } = await vault.collectUTXOsInfo({
-      checkInscription: true,
+    const accountsInfo = await this.getAccountsInfo(request);
+    const { accountInfo: { networkId, accountId } = {} } = accountsInfo[0];
+
+    if (!networkId || !accountId) {
+      throw web3Errors.provider.custom({
+        code: 4002,
+        message: `Can not get account`,
+      });
+    }
+    const accountAddress =
+      await this.backgroundApi.serviceAccount.getAccountAddressForApi({
+        networkId,
+        accountId,
+      });
+    const xpub = await this.backgroundApi.serviceAccount.getAccountXpub({
+      accountId,
+      networkId,
     });
+    const { utxoList } =
+      await this.backgroundApi.serviceAccountProfile.fetchAccountDetails({
+        networkId,
+        accountAddress,
+        xpub,
+        withUTXOList: true,
+      });
+    if (!utxoList || isEmpty(utxoList)) {
+      throw web3Errors.provider.custom({
+        code: 4001,
+        message: 'Failed to get UTXO list',
+      });
+    }
+    const utxos = utxoList;
     const confirmedUtxos = utxos.filter(
       (v) => v.address === params.address && Number(v?.confirmations ?? 0) > 0,
     );
@@ -666,11 +648,8 @@ class ProviderApiBtc extends ProviderApiBase {
     const sliced = confirmedUtxos.slice(0, index);
     const result = [];
     for (const utxo of sliced) {
-      const txDetails =
-        await this.backgroundApi.serviceTransaction.getTransactionDetail({
-          txId: utxo.txid,
-          networkId: network.id,
-        });
+      // TODO: get scriptPubKey from txDetails by Api
+      const txDetails = {} as any;
       result.push({
         txid: utxo.txid,
         vout: utxo.vout,
@@ -684,15 +663,10 @@ class ProviderApiBtc extends ProviderApiBase {
   }
 
   @providerApiMethod()
-  public async getBTCTipHeight() {
-    const { networkId } = getActiveWalletAccount();
-    if (!isBTCNetwork(networkId)) {
-      throw new Error('Invalid network');
-    }
-    const status = await this.backgroundApi.serviceNetwork.measureRpcStatus(
-      networkId,
-    );
-    const blockHeight = new BigNumber(status?.latestBlock ?? '0').toNumber();
+  public async getBTCTipHeight(request: IJsBridgeMessagePayload) {
+    await this.getAccountsInfo(request);
+    // TODO: get tip height from btc node
+    const blockHeight = 100;
     return blockHeight;
   }
 }

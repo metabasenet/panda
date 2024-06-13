@@ -1,60 +1,87 @@
-import type { BRC20TextProps } from '@onekeyhq/engine/src/managers/nft';
-import {
-  BRC20TokenOperation,
-  BRCTokenType,
-} from '@onekeyhq/engine/src/types/token';
+import { SEARCH_KEY_MIN_LENGTH } from '../consts/walletConsts';
 
-export function isBRC20Token(tokenAddress?: string) {
-  return (
-    tokenAddress?.startsWith('brc20') || tokenAddress?.startsWith('brc-20')
-  );
-}
+import type { IAccountToken, ITokenData } from '../../types/token';
 
-export function parseTextProps(content: string) {
-  try {
-    const json = JSON.parse(content) as BRC20TextProps;
-    return json;
-  } catch (error) {
-    console.log('parse InscriptionText error = ', error);
-  }
-}
-
-export async function parseBRC20Content({
-  content,
-  contentType,
-  contentUrl,
+export function getMergedTokenData({
+  tokens,
+  smallBalanceTokens,
+  riskTokens,
 }: {
-  content: string | null;
-  contentType: string;
-  contentUrl?: string;
+  tokens: ITokenData;
+  smallBalanceTokens: ITokenData;
+  riskTokens: ITokenData;
 }) {
-  let brc20Content = content;
+  const mergedTokens = [
+    ...tokens.data,
+    ...smallBalanceTokens.data,
+    ...riskTokens.data,
+  ];
 
-  if (contentType === 'text/plain;charset=utf-8') {
-    if (!brc20Content && contentUrl) {
-      const response = await fetch(contentUrl);
-      brc20Content = await response.text();
-    }
+  const mergedKeys = `${tokens.keys}_${smallBalanceTokens.keys}_${riskTokens.keys}`;
 
-    const props = parseTextProps(brc20Content ?? '');
-    if (props?.p === 'brc-20') {
-      return {
-        isBRC20Content: true,
-        brc20Content: props,
-      };
-    }
-  }
+  const mergedTokenMap = {
+    ...tokens.map,
+    ...smallBalanceTokens.map,
+    ...riskTokens.map,
+  };
+
   return {
-    isBRC20Content: false,
-    brc20Content: null,
+    allTokens: {
+      data: mergedTokens,
+      keys: mergedKeys,
+      map: mergedTokenMap,
+    },
+    tokens,
+    riskTokens,
+    smallBalanceTokens,
   };
 }
 
-export function createBRC20TransferText(amount: string, tick: string) {
-  return JSON.stringify({
-    p: BRCTokenType.BRC20,
-    op: BRC20TokenOperation.Transfer,
-    tick,
-    amt: amount,
-  });
+export function getEmptyTokenData() {
+  return {
+    allTokens: {
+      data: [],
+      keys: '',
+      map: {},
+    },
+    tokens: {
+      data: [],
+      keys: '',
+      map: {},
+    },
+    riskTokens: {
+      data: [],
+      keys: '',
+      map: {},
+    },
+    smallBalanceTokens: {
+      data: [],
+      keys: '',
+      map: {},
+    },
+  };
+}
+
+export function getFilteredTokenBySearchKey({
+  tokens,
+  searchKey,
+}: {
+  tokens: IAccountToken[];
+  searchKey: string;
+}) {
+  if (!searchKey || searchKey.length < SEARCH_KEY_MIN_LENGTH) {
+    return tokens;
+  }
+
+  // eslint-disable-next-line no-param-reassign
+  searchKey = searchKey.trim().toLowerCase();
+
+  const filteredTokens = tokens.filter(
+    (token) =>
+      token.name?.toLowerCase().includes(searchKey) ||
+      token.symbol?.toLowerCase().includes(searchKey) ||
+      token.address?.toLowerCase() === searchKey,
+  );
+
+  return filteredTokens;
 }

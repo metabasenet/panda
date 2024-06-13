@@ -1,17 +1,26 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access,@typescript-eslint/restrict-template-expressions */
+import platformEnv from '@onekeyhq/shared/src/platformEnv';
+
+import errorUtils from '../errors/utils/errorUtils';
+
 import {
   throwCrossError,
   warningIfNotRunInBackground,
 } from './backgroundUtils';
 
+import type { OneKeyError } from '../errors';
+
 const INTERNAL_METHOD_PREFIX = 'INTERNAL_';
 const PROVIDER_API_METHOD_PREFIX = 'PROVIDER_API_';
 
 // Is a any record, but namely use `PropertyDescriptor['value']`
-export type UnknownTarget = Record<string, PropertyDescriptor['value']>;
-export type UnknownFunc = (...args: unknown[]) => unknown;
+export type IBackgroundUnknownTarget = Record<
+  string,
+  PropertyDescriptor['value']
+>;
+export type IBackgroundUnknownFunc = (...args: unknown[]) => unknown;
 
-const isFunction = (fn?: any): fn is UnknownFunc =>
+const isFunction = (fn?: any): fn is IBackgroundUnknownFunc =>
   !!fn && {}.toString.call(fn) === '[object Function]';
 
 function backgroundClass() {
@@ -35,9 +44,15 @@ function backgroundClass() {
   };
 }
 
-function createBackgroundMethodDecorator({ prefix }: { prefix: string }) {
+function createBackgroundMethodDecorator({
+  prefix,
+  devOnly = false,
+}: {
+  prefix: string;
+  devOnly?: boolean;
+}) {
   return function (
-    target: UnknownTarget,
+    target: IBackgroundUnknownTarget,
     methodName: string,
     descriptor: PropertyDescriptor,
   ) {
@@ -47,6 +62,14 @@ function createBackgroundMethodDecorator({ prefix }: { prefix: string }) {
         methodName,
       );
     }
+
+    if (devOnly && platformEnv.isProduction && !platformEnv.isE2E) {
+      throwCrossError(
+        '@backgroundMethodForDev() / providerApiMethod only available in development.',
+        methodName,
+      );
+    }
+
     target[`${prefix}${methodName}`] = descriptor.value;
     // return PropertyDescriptor
     // descriptor.value.$isBackgroundMethod = true;
@@ -60,6 +83,13 @@ function backgroundMethod() {
   });
 }
 
+function backgroundMethodForDev() {
+  return createBackgroundMethodDecorator({
+    prefix: INTERNAL_METHOD_PREFIX,
+    devOnly: true,
+  });
+}
+
 function providerApiMethod() {
   return createBackgroundMethodDecorator({
     prefix: PROVIDER_API_METHOD_PREFIX,
@@ -68,7 +98,7 @@ function providerApiMethod() {
 
 function permissionRequired() {
   return function (
-    _: UnknownTarget,
+    _: IBackgroundUnknownTarget,
     __: string,
     descriptor: PropertyDescriptor,
   ) {
@@ -121,12 +151,37 @@ function bindThis() {
   };
 }
 
+// TODO implement call toast from background methods:
+//    backgroundShowToast / backgroundToast / toastBackground / showToastFromBackground
+export function toastIfError() {
+  return (
+    target: Record<any, any>,
+    propertyKey: string,
+    descriptor: TypedPropertyDescriptor<any>,
+  ) => {
+    const originalMethod = descriptor.value as (...args: any[]) => Promise<any>;
+
+    descriptor.value = async function (...args: any[]) {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
+        return await originalMethod.apply(this, args);
+      } catch (error: unknown) {
+        errorUtils.toastIfError(error);
+        throw error;
+      }
+    };
+
+    return descriptor;
+  };
+}
+
 export {
-  bindThis,
-  backgroundClass,
-  permissionRequired,
-  backgroundMethod,
-  providerApiMethod,
   INTERNAL_METHOD_PREFIX,
   PROVIDER_API_METHOD_PREFIX,
+  backgroundClass,
+  backgroundMethod,
+  backgroundMethodForDev,
+  bindThis,
+  permissionRequired,
+  providerApiMethod,
 };

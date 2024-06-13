@@ -1,17 +1,24 @@
-import { NotAutoPrintError } from '../errors/common-errors';
-import { toPlainErrorObject } from '../utils/errorUtils';
+import { toPlainErrorObject } from '@onekeyhq/shared/src/errors/utils/errorUtils';
 
 let prevErrorStack: string | undefined;
 
+// used by 'babel-plugin-catch-logger'
+// add console.error() for every try catch block if error.$$autoPrintErrorIgnore is not true
 const autoLogger = {
   error: (error: Error, ...messages: unknown[]) => {
     if (process.env.NODE_ENV !== 'production') {
-      if (
-        error.stack !== prevErrorStack &&
-        !(error instanceof NotAutoPrintError)
-      ) {
+      if (error.stack !== prevErrorStack) {
         setTimeout(() => {
-          // @ts-ignore
+          /*
+          how to mute auto error log:
+              try {
+                ...
+              } catch (error) {
+                error.$$autoPrintErrorIgnore = true;
+                ...
+                throw error;
+              }
+          */
           if (error && error.$$autoPrintErrorIgnore) {
             return;
           }

@@ -1,12 +1,14 @@
 /* eslint-disable @typescript-eslint/require-await,@typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-return */
 
+import { web3Errors } from '@onekeyfe/cross-inpage-provider-errors';
+
 import {
   PROVIDER_API_METHOD_PREFIX,
   backgroundClass,
 } from '@onekeyhq/shared/src/background/backgroundDecorators';
 import { throwMethodNotFound } from '@onekeyhq/shared/src/background/backgroundUtils';
 
-import type { IBackgroundApi } from '../IBackgroundApi';
+import type { IBackgroundApi } from '../apis/IBackgroundApi';
 import type {
   IInjectedProviderNamesStrings,
   IJsBridgeMessagePayload,
@@ -14,7 +16,8 @@ import type {
 } from '@onekeyfe/cross-inpage-provider-types';
 
 export type IProviderBaseBackgroundNotifyInfo = {
-  send: (data: any) => void;
+  send: (data: any, targetOrigin: string) => void;
+  targetOrigin: string;
 };
 
 @backgroundClass()
@@ -35,7 +38,7 @@ abstract class ProviderApiBase {
     info: IProviderBaseBackgroundNotifyInfo,
   ): void;
 
-  public abstract rpcCall(request: IJsonRpcRequest): any;
+  public abstract rpcCall(request: IJsBridgeMessagePayload): any;
 
   async handleMethods(payload: IJsBridgeMessagePayload) {
     const { data } = payload;
@@ -54,16 +57,31 @@ abstract class ProviderApiBase {
         methodName,
       );
     }
+    if (!payload.origin) {
+      throw web3Errors.provider.unauthorized('origin is required');
+    }
+
     if (methodFunc) {
       return methodFunc.call(this, payload, ...paramsArr);
     }
-    return this.rpcCall(request);
+    return this.rpcCall(payload);
 
     // TODO
     //  exists methods
     //  RPC methods
     //  throwMethodNotFound
   }
+
+  getAccountsInfo = async (request: IJsBridgeMessagePayload) => {
+    const accountsInfo =
+      await this.backgroundApi.serviceDApp.dAppGetConnectedAccountsInfo(
+        request,
+      );
+    if (!accountsInfo) {
+      throw web3Errors.provider.unauthorized();
+    }
+    return accountsInfo;
+  };
 }
 
 export default ProviderApiBase;

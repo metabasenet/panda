@@ -1,44 +1,38 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-/* eslint-disable camelcase */
-import { bytesToHex, hexToBytes } from '@noble/hashes/utils';
 import { web3Errors } from '@onekeyfe/cross-inpage-provider-errors';
 import { IInjectedProviderNames } from '@onekeyfe/cross-inpage-provider-types';
-import { BCS, TxnBuilderTypes } from 'aptos';
+import { BCS, Network, NetworkToNodeAPI, TxnBuilderTypes } from 'aptos';
 import { isArray } from 'lodash';
 
-import { AptosMessageTypes } from '@onekeyhq/engine/src/types/message';
-import type {
-  IEncodedTxAptos,
-  SignMessagePayload,
-  SignMessageResponse,
-} from '@onekeyhq/engine/src/vaults/impl/apt/types';
+import {
+  type IEncodedTxAptos,
+  type ISignMessagePayload,
+  type ISignMessageResponse,
+} from '@onekeyhq/core/src/chains/aptos/types';
+import {
+  backgroundClass,
+  permissionRequired,
+  providerApiMethod,
+} from '@onekeyhq/shared/src/background/backgroundDecorators';
+import bufferUtils from '@onekeyhq/shared/src/utils/bufferUtils';
+import hexUtils from '@onekeyhq/shared/src/utils/hexUtils';
+import { EMessageTypesAptos } from '@onekeyhq/shared/types/message';
+
+import { vaultFactory } from '../vaults/factory';
 import {
   APTOS_SIGN_MESSAGE_PREFIX,
   formatSignMessageRequest,
   generateTransferCreateCollection,
   generateTransferCreateNft,
   transactionPayloadToTxPayload,
-} from '@onekeyhq/engine/src/vaults/impl/apt/utils';
-import type VaultAptos from '@onekeyhq/engine/src/vaults/impl/apt/Vault';
-import {
-  hexlify,
-  stripHexPrefix,
-} from '@onekeyhq/engine/src/vaults/utils/hexUtils';
-import { getActiveWalletAccount } from '@onekeyhq/kit/src/hooks';
-import {
-  backgroundClass,
-  permissionRequired,
-  providerApiMethod,
-} from '@onekeyhq/shared/src/background/backgroundDecorators';
-import { IMPL_APTOS } from '@onekeyhq/shared/src/engine/engineConsts';
-import debugLogger from '@onekeyhq/shared/src/logger/debugLogger';
+} from '../vaults/impls/aptos/utils';
 
 import ProviderApiBase from './ProviderApiBase';
 
 import type { IProviderBaseBackgroundNotifyInfo } from './ProviderApiBase';
+import type VaultAptos from '../vaults/impls/aptos/Vault';
 import type { IJsBridgeMessagePayload } from '@onekeyfe/cross-inpage-provider-types';
 
-type AccountInfo =
+type IAccountInfo =
   | {
       publicKey: string;
       address: string;
@@ -55,7 +49,7 @@ export function decodeBytesTransaction(txn: any) {
     if (txn.indexOf(',') !== -1) {
       bcsTxn = new Uint8Array(txn.split(',').map((item) => parseInt(item, 10)));
     } else {
-      bcsTxn = hexToBytes(txn);
+      bcsTxn = bufferUtils.hexToBytes(txn);
     }
   } else {
     throw new Error('invalidParams');
@@ -71,14 +65,14 @@ class ProviderApiAptos extends ProviderApiBase {
   public notifyDappAccountsChanged(info: IProviderBaseBackgroundNotifyInfo) {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const data = async ({ origin }: { origin: string }) => {
-      const params = await this.account({ origin });
+      const params = await this.account({ origin, scope: this.providerName });
       const result = {
         method: 'wallet_events_accountChanged',
         params,
       };
       return result;
     };
-    info.send(data);
+    info.send(data, info.targetOrigin);
   }
 
   public notifyDappChainChanged(info: IProviderBaseBackgroundNotifyInfo) {
@@ -91,7 +85,7 @@ class ProviderApiAptos extends ProviderApiBase {
       };
       return result;
     };
-    info.send(data);
+    info.send(data, info.targetOrigin);
   }
 
   public rpcCall() {
@@ -100,12 +94,10 @@ class ProviderApiAptos extends ProviderApiBase {
 
   @providerApiMethod()
   public async getNetworkURL() {
-    const { networkId } = getActiveWalletAccount();
-    const network = await this.backgroundApi.engine.getNetwork(networkId);
-    return network.rpcURL;
+    return NetworkToNodeAPI[Network.MAINNET];
   }
 
-  private wrapperConnectAccount(account: AccountInfo) {
+  private wrapperConnectAccount(account: IAccountInfo) {
     const status = account ? 200 : 4001;
     return {
       ...account,
@@ -116,32 +108,35 @@ class ProviderApiAptos extends ProviderApiBase {
 
   @providerApiMethod()
   public async connect(request: IJsBridgeMessagePayload) {
-    debugLogger.providerApi.info('aptos connect', request);
-    const account = await this.account(request);
+    const accountsInfo =
+      await this.backgroundApi.serviceDApp.dAppGetConnectedAccountsInfo(
+        request,
+      );
 
-    if (account) {
-      return this.wrapperConnectAccount(account);
+    if (accountsInfo) {
+      return this.wrapperConnectAccount({
+        publicKey: accountsInfo[0].account.pub ?? '',
+        address: accountsInfo[0].account.address,
+      });
     }
 
-    await this.backgroundApi.serviceDapp.openConnectionModal(request);
+    await this.backgroundApi.serviceDApp.openConnectionModal(request);
 
     return this.wrapperConnectAccount(await this.account(request));
   }
 
   @providerApiMethod()
-  public disconnect(request: IJsBridgeMessagePayload) {
+  public async disconnect(request: IJsBridgeMessagePayload) {
     const { origin } = request;
     if (!origin) {
       return;
     }
-    this.backgroundApi.serviceDapp.removeConnectedAccounts({
+    await this.backgroundApi.serviceDApp.disconnectWebsite({
       origin,
-      networkImpl: IMPL_APTOS,
-      addresses: this.backgroundApi.serviceDapp
-        .getActiveConnectedAccounts({ origin, impl: IMPL_APTOS })
-        .map(({ address }) => address),
+      storageType: request.isWalletConnectRequest
+        ? 'walletConnect'
+        : 'injectedProvider',
     });
-    debugLogger.providerApi.info('aptos disconnect', origin);
   }
 
   @providerApiMethod()
@@ -152,43 +147,21 @@ class ProviderApiAptos extends ProviderApiBase {
       }
     | undefined
   > {
-    debugLogger.providerApi.info('aptos account');
-    const { networkId, networkImpl, accountId } = getActiveWalletAccount();
-    if (networkImpl !== IMPL_APTOS) {
+    const accounts = await this.getAccountsInfo(request);
+    if (!accounts || accounts.length === 0) {
       return undefined;
     }
+    const { account } = accounts[0];
 
-    const connectedAccounts =
-      this.backgroundApi.serviceDapp?.getActiveConnectedAccounts({
-        origin: request.origin as string,
-        impl: IMPL_APTOS,
-      });
-    if (!connectedAccounts) {
-      return undefined;
-    }
-
-    const vault = (await this.backgroundApi.engine.getVault({
-      networkId,
-      accountId,
-    })) as VaultAptos;
-    const address = await vault.getAccountAddress();
-
-    const addresses = connectedAccounts.map((account) => account.address);
-    if (!addresses.includes(address)) {
-      return undefined;
-    }
-
-    const publicKey = await vault._getPublicKey();
-    return Promise.resolve({ publicKey, address });
+    return {
+      publicKey: account.pub ?? '',
+      address: account.address,
+    };
   }
 
   @providerApiMethod()
   public async network(): Promise<string> {
-    debugLogger.providerApi.info('aptos network');
-    const { networkId } = getActiveWalletAccount();
-    const network = await this.backgroundApi.engine.getNetwork(networkId);
-
-    return Promise.resolve(network.isTestnet ? 'Testnet' : 'Mainnet');
+    return Promise.resolve('Mainnet');
   }
 
   @permissionRequired()
@@ -197,31 +170,33 @@ class ProviderApiAptos extends ProviderApiBase {
     request: IJsBridgeMessagePayload,
     params: IEncodedTxAptos,
   ): Promise<string> {
-    debugLogger.providerApi.info('aptos signAndSubmitTransaction', params);
-    const { networkId, accountId } = getActiveWalletAccount();
-    const vault = (await this.backgroundApi.engine.getVault({
-      networkId,
-      accountId,
-    })) as VaultAptos;
-
     const encodeTx = params;
 
-    const result = (await this.backgroundApi.serviceDapp.openSignAndSendModal(
-      request,
-      { encodedTx: encodeTx },
-    )) as string;
+    const accounts = await this.getAccountsInfo(request);
+    if (!accounts || accounts.length === 0) {
+      throw new Error('No accounts');
+    }
 
-    const tx = await vault.getTransactionByHash(result);
+    const { account, accountInfo } = accounts[0];
+    const result =
+      (await this.backgroundApi.serviceDApp.openSignAndSendTransactionModal({
+        request,
+        encodedTx: encodeTx,
+        accountId: account.id,
+        networkId: accountInfo?.networkId ?? '',
+      })) as string;
+
+    const tx = await this.getTransaction(request, result);
 
     return Promise.resolve(JSON.stringify(tx));
   }
 
-  private _decodeTnxToRawTransaction(txn: string) {
+  private _decodeTxToRawTransaction(txn: string) {
     let bcsTxn: Uint8Array;
     if (txn.indexOf(',') !== -1) {
       bcsTxn = new Uint8Array(txn.split(',').map((item) => parseInt(item, 10)));
     } else {
-      bcsTxn = hexToBytes(txn);
+      bcsTxn = bufferUtils.hexToBytes(txn);
     }
 
     const deserializer = new BCS.Deserializer(bcsTxn);
@@ -229,7 +204,7 @@ class ProviderApiAptos extends ProviderApiBase {
 
     return {
       rawTxn,
-      hexBcsTxn: bytesToHex(bcsTxn),
+      hexBcsTxn: bufferUtils.bytesToHex(bcsTxn),
     };
   }
 
@@ -239,13 +214,13 @@ class ProviderApiAptos extends ProviderApiBase {
     vault: VaultAptos,
   ) {
     const payload = await transactionPayloadToTxPayload(
-      await vault.getClient(),
+      vault.client,
       // @ts-expect-error
       transaction.payload.value,
     );
 
     return {
-      sender: hexlify(transaction?.sender?.address),
+      sender: hexUtils.hexlify(transaction?.sender?.address),
       sequence_number: transaction?.sequence_number?.toString(),
       max_gas_amount: transaction?.max_gas_amount?.toString(),
       gas_unit_price: transaction?.gas_unit_price?.toString(),
@@ -260,35 +235,40 @@ class ProviderApiAptos extends ProviderApiBase {
     };
   }
 
+  private async _getAccount(request: IJsBridgeMessagePayload) {
+    const accounts = await this.getAccountsInfo(request);
+    if (!accounts || accounts.length === 0) {
+      throw new Error('No accounts');
+    }
+
+    return accounts[0];
+  }
+
   @permissionRequired()
   @providerApiMethod()
   public async martianSignAndSubmitTransaction(
     request: IJsBridgeMessagePayload,
     params: string,
   ): Promise<string> {
-    debugLogger.providerApi.info(
-      'aptos martianSignAndSubmitTransaction',
-      params,
-    );
-    const { networkId, accountId } = getActiveWalletAccount();
-    const vault = (await this.backgroundApi.engine.getVault({
-      networkId,
-      accountId,
-    })) as VaultAptos;
+    const { account, accountInfo } = await this._getAccount(request);
+    const vault = await this.getAptosVault(request);
 
-    const { rawTxn, hexBcsTxn } = this._decodeTnxToRawTransaction(params);
+    const { rawTxn, hexBcsTxn } = this._decodeTxToRawTransaction(params);
     const encodeTx = await this._convertRawTransactionToEncodeTx(
       rawTxn,
       hexBcsTxn,
       vault,
     );
 
-    const result = (await this.backgroundApi.serviceDapp.openSignAndSendModal(
-      request,
-      { encodedTx: encodeTx },
-    )) as string;
+    const result =
+      (await this.backgroundApi.serviceDApp.openSignAndSendTransactionModal({
+        request,
+        encodedTx: encodeTx,
+        accountId: account.id,
+        networkId: accountInfo?.networkId ?? '',
+      })) as string;
 
-    return Promise.resolve(result);
+    return result;
   }
 
   @permissionRequired()
@@ -297,26 +277,28 @@ class ProviderApiAptos extends ProviderApiBase {
     request: IJsBridgeMessagePayload,
     params: string,
   ) {
-    debugLogger.providerApi.info('aptos martianSignTransaction', params);
-    const { networkId, accountId } = getActiveWalletAccount();
-    const vault = (await this.backgroundApi.engine.getVault({
-      networkId,
-      accountId,
-    })) as VaultAptos;
+    const { account, accountInfo } = await this._getAccount(request);
+    const vault = await this.getAptosVault(request);
 
-    const { rawTxn, hexBcsTxn } = this._decodeTnxToRawTransaction(params);
+    const { rawTxn, hexBcsTxn } = this._decodeTxToRawTransaction(params);
     const encodeTx = await this._convertRawTransactionToEncodeTx(
       rawTxn,
       hexBcsTxn,
       vault,
     );
 
-    const result = (await this.backgroundApi.serviceDapp.openSignAndSendModal(
-      request,
-      { encodedTx: encodeTx, signOnly: true },
-    )) as string;
+    const result =
+      (await this.backgroundApi.serviceDApp.openSignAndSendTransactionModal({
+        request,
+        encodedTx: encodeTx,
+        signOnly: true,
+        accountId: account.id,
+        networkId: accountInfo?.networkId ?? '',
+      })) as string;
 
-    return Promise.resolve(hexToBytes(stripHexPrefix(result)).toString());
+    return Promise.resolve(
+      bufferUtils.hexToBytes(hexUtils.stripHexPrefix(result)).toString(),
+    );
   }
 
   @permissionRequired()
@@ -325,36 +307,31 @@ class ProviderApiAptos extends ProviderApiBase {
     request: IJsBridgeMessagePayload,
     params: IEncodedTxAptos,
   ) {
-    debugLogger.providerApi.info('aptos signTransaction', params);
+    const { account, accountInfo } = await this._getAccount(request);
+    const result =
+      (await this.backgroundApi.serviceDApp.openSignAndSendTransactionModal({
+        request,
+        encodedTx: params,
+        signOnly: true,
+        accountId: account.id,
+        networkId: accountInfo?.networkId ?? '',
+      })) as string;
 
-    const result = (await this.backgroundApi.serviceDapp.openSignAndSendModal(
-      request,
-      { encodedTx: params, signOnly: true },
-    )) as string;
-
-    return Promise.resolve(result);
+    return result;
   }
 
   @permissionRequired()
   @providerApiMethod()
   public async signMessage(
     request: IJsBridgeMessagePayload,
-    params: SignMessagePayload,
-  ): Promise<SignMessageResponse> {
-    debugLogger.providerApi.info('aptos signMessage', params);
-
+    params: ISignMessagePayload,
+  ): Promise<ISignMessageResponse> {
     // @ts-expect-error
     const isPetra = request.data?.aptosProviderType === 'petra';
 
-    const account = await this.account(request);
+    const { account, accountInfo } = await this._getAccount(request);
 
-    const { networkId, accountId } = getActiveWalletAccount();
-    const vault = (await this.backgroundApi.engine.getVault({
-      networkId,
-      accountId,
-    })) as VaultAptos;
-
-    const chainId = await (await vault.getClient()).getChainId();
+    const { chainId } = await this.getChainId(request);
 
     const format = formatSignMessageRequest(
       params,
@@ -363,20 +340,21 @@ class ProviderApiAptos extends ProviderApiBase {
       chainId,
     );
 
-    const result = (await this.backgroundApi.serviceDapp.openSignAndSendModal(
+    const result = (await this.backgroundApi.serviceDApp.openSignMessageModal({
       request,
-      {
-        unsignedMessage: {
-          type: AptosMessageTypes.SIGN_MESSAGE,
-          message: JSON.stringify(format),
-        },
+      unsignedMessage: {
+        type: EMessageTypesAptos.SIGN_MESSAGE,
+        message: format.fullMessage,
+        payload: format,
       },
-    )) as string;
+      accountId: account.id ?? '',
+      networkId: accountInfo?.networkId ?? '',
+    })) as string;
 
     return Promise.resolve({
       ...format,
       prefix: APTOS_SIGN_MESSAGE_PREFIX,
-      signature: isPetra ? stripHexPrefix(result) : result,
+      signature: isPetra ? hexUtils.stripHexPrefix(result) : result,
     });
   }
 
@@ -389,8 +367,6 @@ class ProviderApiAptos extends ProviderApiBase {
       type_args: any[];
     },
   ): Promise<string> {
-    debugLogger.providerApi.info('aptos signGenericTransaction', params);
-
     const encodeTx: IEncodedTxAptos = {
       type: 'entry_function_payload',
       function: params.func,
@@ -398,12 +374,16 @@ class ProviderApiAptos extends ProviderApiBase {
       type_arguments: params.type_args,
     };
 
-    const result = (await this.backgroundApi.serviceDapp.openSignAndSendModal(
-      request,
-      { encodedTx: encodeTx },
-    )) as string;
+    const { account, accountInfo } = await this._getAccount(request);
+    const result =
+      (await this.backgroundApi.serviceDApp.openSignAndSendTransactionModal({
+        request,
+        encodedTx: encodeTx,
+        accountId: account.id,
+        networkId: accountInfo?.networkId ?? '',
+      })) as string;
 
-    return Promise.resolve(result);
+    return result;
   }
 
   @providerApiMethod()
@@ -416,31 +396,23 @@ class ProviderApiAptos extends ProviderApiBase {
       maxAmount: string;
     },
   ) {
-    debugLogger.providerApi.info('aptos createCollection', params);
-
-    const { networkId, networkImpl, accountId } = getActiveWalletAccount();
-    if (networkImpl !== IMPL_APTOS) {
-      return undefined;
-    }
-    const vault = (await this.backgroundApi.engine.getVault({
-      networkId,
-      accountId,
-    })) as VaultAptos;
-    const address = await vault.getAccountAddress();
+    const { account, accountInfo } = await this._getAccount(request);
 
     const encodeTx = generateTransferCreateCollection(
-      address,
       params.name,
       params.description,
       params.uri,
     );
 
-    const result = (await this.backgroundApi.serviceDapp.openSignAndSendModal(
-      request,
-      { encodedTx: encodeTx },
-    )) as string;
+    const result =
+      (await this.backgroundApi.serviceDApp.openSignAndSendTransactionModal({
+        request,
+        encodedTx: encodeTx,
+        accountId: account.id,
+        networkId: accountInfo?.networkId ?? '',
+      })) as string;
 
-    return Promise.resolve(result);
+    return result;
   }
 
   @providerApiMethod()
@@ -461,20 +433,9 @@ class ProviderApiAptos extends ProviderApiBase {
       property_types?: Array<string>;
     },
   ) {
-    debugLogger.providerApi.info('aptos createToken', params);
-
-    const { networkId, networkImpl, accountId } = getActiveWalletAccount();
-    if (networkImpl !== IMPL_APTOS) {
-      return undefined;
-    }
-    const vault = (await this.backgroundApi.engine.getVault({
-      networkId,
-      accountId,
-    })) as VaultAptos;
-    const address = await vault.getAccountAddress();
-
+    const { account, accountInfo } = await this._getAccount(request);
     const encodeTx = generateTransferCreateNft(
-      address,
+      account.address,
       params.collectionName,
       params.name,
       params.description,
@@ -489,34 +450,34 @@ class ProviderApiAptos extends ProviderApiBase {
       params.property_types,
     );
 
-    const result = (await this.backgroundApi.serviceDapp.openSignAndSendModal(
-      request,
-      { encodedTx: encodeTx },
-    )) as string;
+    const result =
+      (await this.backgroundApi.serviceDApp.openSignAndSendTransactionModal({
+        request,
+        encodedTx: encodeTx,
+        accountId: account.id,
+        networkId: accountInfo?.networkId ?? '',
+      })) as string;
 
     return Promise.resolve(result);
   }
 
-  private async getAptosVault(): Promise<VaultAptos> {
-    const { networkId, networkImpl, accountId } = getActiveWalletAccount();
-    if (networkImpl !== IMPL_APTOS) {
-      throw web3Errors.provider.chainDisconnected();
-    }
-    const vault = (await this.backgroundApi.engine.getVault({
-      networkId,
-      accountId,
+  private async getAptosVault(
+    request: IJsBridgeMessagePayload,
+  ): Promise<VaultAptos> {
+    const { account, accountInfo } = await this._getAccount(request);
+    const vault = (await vaultFactory.getVault({
+      networkId: accountInfo?.networkId ?? '',
+      accountId: account.id,
     })) as VaultAptos;
 
     return vault;
   }
 
   @providerApiMethod()
-  public async getChainId() {
-    debugLogger.providerApi.info('aptos getChainId');
+  public async getChainId(request: IJsBridgeMessagePayload) {
+    const vault = await this.getAptosVault(request);
 
-    const vault = await this.getAptosVault();
-
-    const chainId = await (await vault.getClient()).getChainId();
+    const chainId = await vault.client.getChainId();
     return Promise.resolve({ chainId });
   }
 
@@ -540,11 +501,8 @@ class ProviderApiAptos extends ProviderApiBase {
       };
     },
   ) {
-    debugLogger.providerApi.info('aptos generateTransaction');
-
-    const vault = await this.getAptosVault();
-    const client = await vault.getClient();
-    const rawTx = await client.generateTransaction(
+    const vault = await this.getAptosVault(request);
+    const rawTx = await vault.client.generateTransaction(
       params.sender,
       params.payload,
       params.options,
@@ -559,13 +517,21 @@ class ProviderApiAptos extends ProviderApiBase {
     request: IJsBridgeMessagePayload,
     params: Uint8Array | string,
   ) {
-    debugLogger.providerApi.info('aptos generateTransaction');
-
+    const { account, accountInfo } = await this._getAccount(request);
     const bcsTxn: Uint8Array = decodeBytesTransaction(params);
-    const vault = await this.getAptosVault();
-    const client = await vault.getClient();
-    const res = await client.submitTransaction(bcsTxn);
-    return res.hash;
+    const encodedTx = {
+      bscTxn: bufferUtils.bytesToHex(bcsTxn),
+    } as IEncodedTxAptos;
+    const res = await this.backgroundApi.serviceSend.broadcastTransaction({
+      signedTx: {
+        encodedTx,
+        txid: '',
+        rawTx: bufferUtils.bytesToHex(bcsTxn),
+      },
+      accountAddress: account.address,
+      networkId: accountInfo?.networkId ?? '',
+    });
+    return res;
   }
 
   @providerApiMethod()
@@ -573,12 +539,9 @@ class ProviderApiAptos extends ProviderApiBase {
     request: IJsBridgeMessagePayload,
     params: { start?: string; limit?: number },
   ) {
-    debugLogger.providerApi.info('aptos getTransactions');
-
-    const vault = await this.getAptosVault();
-    const client = await vault.getClient();
+    const vault = await this.getAptosVault(request);
     const { start } = params ?? {};
-    return client.getTransactions({
+    return vault.client.getTransactions({
       start: start ? BigInt(start) : undefined,
       limit: params.limit,
     });
@@ -589,11 +552,8 @@ class ProviderApiAptos extends ProviderApiBase {
     request: IJsBridgeMessagePayload,
     params: string,
   ) {
-    debugLogger.providerApi.info('aptos getTransaction');
-
-    const vault = await this.getAptosVault();
-    const client = await vault.getClient();
-    return client.getTransactionByHash(params);
+    const vault = await this.getAptosVault(request);
+    return vault.client.getTransactionByHash(params);
   }
 
   @providerApiMethod()
@@ -604,12 +564,9 @@ class ProviderApiAptos extends ProviderApiBase {
       query?: { start?: string; limit?: number };
     },
   ) {
-    debugLogger.providerApi.info('aptos getAccountTransactions');
-
-    const vault = await this.getAptosVault();
-    const client = await vault.getClient();
+    const vault = await this.getAptosVault(request);
     const { start } = params.query ?? {};
-    return client.getAccountTransactions(params.accountAddress, {
+    return vault.client.getAccountTransactions(params.accountAddress, {
       start: start ? BigInt(start) : undefined,
       limit: params.query?.limit,
     });
@@ -623,34 +580,24 @@ class ProviderApiAptos extends ProviderApiBase {
       query?: { ledgerVersion?: string };
     },
   ) {
-    debugLogger.providerApi.info('aptos getAccountResources');
-
-    const vault = await this.getAptosVault();
-    const client = await vault.getClient();
-
+    const vault = await this.getAptosVault(request);
     const { ledgerVersion } = params.query ?? {};
 
-    return client.getAccountResources(params.accountAddress, {
+    return vault.client.getAccountResources(params.accountAddress, {
       ledgerVersion: ledgerVersion ? BigInt(ledgerVersion) : undefined,
     });
   }
 
   @providerApiMethod()
   public async getAccount(request: IJsBridgeMessagePayload, params: string) {
-    debugLogger.providerApi.info('aptos getAccount');
-
-    const vault = await this.getAptosVault();
-    const client = await vault.getClient();
-    return client.getAccount(params);
+    const vault = await this.getAptosVault(request);
+    return vault.client.getAccount(params);
   }
 
   @providerApiMethod()
-  public async getLedgerInfo() {
-    debugLogger.providerApi.info('aptos getLedgerInfo');
-
-    const vault = await this.getAptosVault();
-    const client = await vault.getClient();
-    return client.getLedgerInfo();
+  public async getLedgerInfo(request: IJsBridgeMessagePayload) {
+    const vault = await this.getAptosVault(request);
+    return vault.client.getLedgerInfo();
   }
 }
 

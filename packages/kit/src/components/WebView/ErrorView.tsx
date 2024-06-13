@@ -3,52 +3,45 @@ import { type FC, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { ERROR_CODE } from 'react-native-webview/lib/WebViewShared';
 
-import { Button, Center, Empty } from '@onekeyhq/components';
-import type EnLanguage from '@onekeyhq/components/src/locale/en-US.json';
+import { Empty, Stack } from '@onekeyhq/components';
+import { ETranslations } from '@onekeyhq/shared/src/locale';
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
-type LanguageId = keyof typeof EnLanguage;
-
-interface ErrorViewProps {
+interface IErrorViewProps {
   errorCode?: number;
   onRefresh: () => void;
 }
 
-const ErrorView: FC<ErrorViewProps> = ({ errorCode, onRefresh }) => {
+const ErrorView: FC<IErrorViewProps> = ({ errorCode, onRefresh }) => {
   const intl = useIntl();
   const messages: {
-    title: LanguageId;
-    subTitle: LanguageId;
+    title: ETranslations;
+    subTitle: ETranslations;
   } = useMemo(() => {
     if (errorCode === ERROR_CODE.CONNECTION_FAILED) {
       return {
-        title: 'title__connection_refused',
-        subTitle: 'title__connection_refused_desc',
+        title: ETranslations.global_connection_failed,
+        subTitle: ETranslations.global_connection_failed,
       };
     }
     return {
-      title: 'title__no_connection',
-      subTitle: 'title__no_connection_desc',
+      title: ETranslations.global_network_error,
+      subTitle: ETranslations.explore_network_issue_detected,
     };
   }, [errorCode]);
+
   return (
-    <Center w="full" h="full" bg="background-default">
+    <Stack flex={1} alignItems="center" justifyContent="center">
       <Empty
-        emoji="🌐"
+        icon="CloudOffOutline"
         title={intl.formatMessage({ id: messages.title })}
-        subTitle={intl.formatMessage({ id: messages.subTitle })}
-        mb={3}
+        description={intl.formatMessage({ id: messages.subTitle })}
+        buttonProps={{
+          children: intl.formatMessage({ id: ETranslations.global_refresh }),
+          onPress: () => onRefresh?.(),
+          testID: 'error-view-refresh',
+        }}
       />
-      <Button
-        mt={6}
-        size="lg"
-        type="primary"
-        leftIconName="ArrowPathOutline"
-        onPress={onRefresh}
-      >
-        {intl.formatMessage({ id: 'action__refresh' })}
-      </Button>
-    </Center>
+    </Stack>
   );
 };
 export default ErrorView;

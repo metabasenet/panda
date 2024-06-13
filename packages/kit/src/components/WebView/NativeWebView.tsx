@@ -1,27 +1,38 @@
 import {
+  createRef,
   forwardRef,
   useCallback,
   useImperativeHandle,
   useMemo,
   useRef,
+  useState,
 } from 'react';
 
 import { JsBridgeNativeHost } from '@onekeyfe/onekey-cross-webview';
+import { RefreshControl, StyleSheet } from 'react-native';
 import { WebView } from 'react-native-webview';
 
-import { useTheme } from '@onekeyhq/components';
-import debugLogger from '@onekeyhq/shared/src/logger/debugLogger';
+// import debugLogger from '@onekeyhq/shared/src/logger/debugLogger';
 
-import { openUrlExternal } from '../../utils/openUrl';
-import { checkOneKeyCardGoogleOauthUrl } from '../../utils/uriUtils';
+import { Stack } from '@onekeyhq/components';
+import platformEnv from '@onekeyhq/shared/src/platformEnv';
+import { openUrlExternal } from '@onekeyhq/shared/src/utils/openUrlUtils';
+import { checkOneKeyCardGoogleOauthUrl } from '@onekeyhq/shared/src/utils/uriUtils';
 
 import ErrorView from './ErrorView';
 
-import type { InpageProviderWebViewProps } from '@onekeyfe/cross-inpage-provider-types';
+import type { IInpageProviderWebViewProps } from './types';
 import type { IWebViewWrapperRef } from '@onekeyfe/onekey-cross-webview';
 import type { WebViewMessageEvent, WebViewProps } from 'react-native-webview';
 
-export type NativeWebViewProps = WebViewProps & InpageProviderWebViewProps;
+export type INativeWebViewProps = WebViewProps & IInpageProviderWebViewProps;
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: 'transparent',
+    flex: 1,
+  },
+});
 
 const NativeWebView = forwardRef(
   (
@@ -33,12 +44,21 @@ const NativeWebView = forwardRef(
       onLoadProgress,
       injectedJavaScriptBeforeContentLoaded,
       onMessage,
+      onLoadStart,
+      onLoad,
+      onLoadEnd,
+      onScroll,
+      pullToRefreshEnabled = true,
       ...props
-    }: NativeWebViewProps,
+    }: INativeWebViewProps,
     ref,
   ) => {
-    const { themeVariant } = useTheme();
     const webviewRef = useRef<WebView>();
+    const refreshControlRef = useMemo(() => createRef<RefreshControl>(), []);
+    const [isRefresh] = useState(false);
+    const onRefresh = useCallback(() => {
+      webviewRef.current?.reload();
+    }, []);
 
     const jsBridge = useMemo(
       () =>
@@ -55,11 +75,13 @@ const NativeWebView = forwardRef(
         try {
           const uri = new URL(event.nativeEvent.url);
           const origin = uri?.origin || '';
-          debugLogger.webview.info('onMessage', origin, data);
+          // debugLogger.webview.info('onMessage', origin, data);
+          // console.log('onMessage: ', origin, data);
           // - receive
           jsBridge.receive(data, { origin });
-          // eslint-disable-next-line no-empty
-        } catch {}
+        } catch {
+          // noop
+        }
         onMessage?.(event);
       },
       [jsBridge, onMessage],
@@ -70,10 +92,7 @@ const NativeWebView = forwardRef(
         innerRef: webviewRef.current,
         jsBridge,
         reload: () => webviewRef.current?.reload(),
-        loadURL: (url: string) =>
-          // @ts-ignore
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
-          webviewRef.current?.loadUrl(url),
+        loadURL: (url: string) => webviewRef.current?.loadUrl(url),
       };
 
       jsBridge.webviewWrapper = wrapper;
@@ -81,18 +100,24 @@ const NativeWebView = forwardRef(
       return wrapper;
     });
 
-    const webViewOnLoadStart = useCallback((syntheticEvent) => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, no-unsafe-optional-chaining
-      const { url } = syntheticEvent?.nativeEvent;
-      try {
-        if (checkOneKeyCardGoogleOauthUrl({ url })) {
-          openUrlExternal(url);
-          webviewRef.current?.stopLoading();
+    const webViewOnLoadStart = useCallback(
+      // @ts-expect-error
+      (syntheticEvent) => {
+        // eslint-disable-next-line no-unsafe-optional-chaining, @typescript-eslint/no-unsafe-member-access
+        const { url } = syntheticEvent?.nativeEvent;
+        try {
+          if (checkOneKeyCardGoogleOauthUrl({ url })) {
+            openUrlExternal(url);
+            webviewRef.current?.stopLoading();
+          }
+          onLoadStart?.(syntheticEvent);
+        } catch (error) {
+          // debugLogger.webview.error('onLoadStart', error);
+          console.log('onLoadStart: ', error);
         }
-      } catch (error) {
-        debugLogger.webview.error('onLoadStart', error);
-      }
-    }, []);
+      },
+      [onLoadStart],
+    );
 
     const renderError = useCallback(
       (
@@ -100,23 +125,25 @@ const NativeWebView = forwardRef(
         errorCode: number,
         errorDesc: string,
       ) => {
-        debugLogger.webview.error({ errorDomain, errorCode, errorDesc, src });
+        // debugLogger.webview.error({ errorDomain, errorCode, errorDesc, src });
+        console.log({ errorDomain, errorCode, errorDesc, src });
         return (
-          <ErrorView
-            errorCode={errorCode}
-            onRefresh={() => webviewRef.current?.reload()}
-          />
+          <Stack position="absolute" top={0} bottom={0} left={0} right={0}>
+            <ErrorView
+              errorCode={errorCode}
+              onRefresh={() => webviewRef.current?.reload()}
+            />
+          </Stack>
         );
       },
       [src],
     );
 
-    return (
+    const renderLoading = useCallback(() => <Stack />, []);
+
+    const renderWebView = (
       <WebView
-        style={{
-          flex: 1,
-          backgroundColor: themeVariant === 'light' ? undefined : 'transparent',
-        }}
+        style={styles.container}
         originWhitelist={['*']}
         allowFileAccess
         allowFileAccessFromFileURLs
@@ -125,7 +152,6 @@ const NativeWebView = forwardRef(
         fraudulentWebsiteWarningEnabled={false}
         onLoadProgress={onLoadProgress}
         ref={webviewRef}
-        // injectedJavaScript={injectedNative}
         injectedJavaScriptBeforeContentLoaded={
           injectedJavaScriptBeforeContentLoaded || ''
         }
@@ -136,9 +162,52 @@ const NativeWebView = forwardRef(
         source={{ uri: src }}
         onMessage={webviewOnMessage}
         onLoadStart={webViewOnLoadStart}
+        onLoad={onLoad}
+        onLoadEnd={onLoadEnd}
         renderError={renderError}
+        renderLoading={renderLoading}
+        pullToRefreshEnabled={pullToRefreshEnabled}
+        onScroll={(e) => {
+          if (platformEnv.isNativeAndroid && pullToRefreshEnabled) {
+            const {
+              contentOffset,
+              contentSize,
+              contentInset,
+              layoutMeasurement,
+            } = e.nativeEvent;
+            // @ts-expect-error
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+            refreshControlRef?.current?._nativeRef?.setNativeProps?.({
+              enabled:
+                contentOffset?.y === 0 &&
+                Math.round(contentSize.height) >
+                  Math.round(
+                    layoutMeasurement.height +
+                      contentInset.top +
+                      contentInset.bottom,
+                  ),
+            });
+          }
+          void onScroll?.(e);
+        }}
+        scrollEventThrottle={16}
+        webviewDebuggingEnabled={__DEV__}
         {...props}
       />
+    );
+
+    return platformEnv.isNativeAndroid && pullToRefreshEnabled ? (
+      <RefreshControl
+        ref={refreshControlRef}
+        style={{ flex: 1 }}
+        onRefresh={onRefresh}
+        refreshing={isRefresh}
+        enabled={false}
+      >
+        {renderWebView}
+      </RefreshControl>
+    ) : (
+      renderWebView
     );
   },
 );

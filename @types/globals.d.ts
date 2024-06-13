@@ -1,11 +1,18 @@
 /* eslint-disable no-var,vars-on-top */
-import type { LocaleIds } from '@onekeyhq/components/src/locale';
+
+import type { LocalDbBase } from '@onekeyhq/kit-bg/src/dbs/local/LocalDbBase';
 import type { IBackgroundApi } from '@onekeyhq/kit-bg/src/IBackgroundApi';
+import type { IOffscreenApi } from '@onekeyhq/kit-bg/src/offscreens/instance/IOffscreenApi';
+import type { JotaiBgSync } from '@onekeyhq/kit-bg/src/states/jotai/jotaiBgSync';
+import type { IWebembedApi } from '@onekeyhq/kit-bg/src/webembeds/instance/IWebembedApi';
+import type { ETranslations } from '@onekeyhq/shared/src/locale';
 
 import type { JsBridgeBase } from '@onekeyfe/cross-inpage-provider-core';
 import type { ProviderPrivate } from '@onekeyfe/onekey-private-provider';
+import type { NavigationContainerRef } from '@react-navigation/native';
 import type { EnhancedStore } from '@reduxjs/toolkit';
 import type WebView from 'react-native-webview';
+import type Realm from 'realm';
 
 declare const self: ServiceWorkerGlobalScope;
 
@@ -16,19 +23,30 @@ declare global {
   // eslint-disable-next-line
   // var onekey: WindowOneKey;
 
+  var $rootAppNavigation: IAppNavigation | undefined;
+  var $$scanNavigation: IAppNavigation | undefined;
   var $appIsReduxReady: boolean;
   var $onekey: IWindowOneKeyHub;
   var $backgroundApiProxy: IBackgroundApi;
-  var $backgroundApi: IBackgroundApi;
+  var $backgroundApi: IBackgroundApi; // not available for ext ui
+  var $jotaiBgSync: JotaiBgSync;
 
+  var $$Toast: any;
   var $$navigationShortcuts: any;
+  var $$jotaiContextStore: any;
+  var $$jotaiContextStorePrint: any;
   var $$simpleDb: any;
+  var $$simpleDbV4: any;
+  var $$localDb: LocalDbBase;
+  var $$localDbV4: any;
   var $$appEventBus: any;
   var $$appUIEventBus: any;
   var $$appStore: EnhancedStore;
   var $$appDispatch: any;
+  var $$realm: Realm;
   var $$appSelector: any;
   var $$appStorage: any;
+  var $$allAtoms: any; // jotai global atoms
   var $$platformEnv: any;
   var $$debugLogger: any;
   var $$localforage: any;
@@ -48,10 +66,15 @@ declare global {
         }>;
       }
     | undefined;
+  var $navigationRef: React.RefObject<NavigationContainerRef<any>>;
+
+  var $offscreenApiProxy: IOffscreenApi;
+  var $webembedApiProxy: IWebembedApi;
 
   var chrome: typeof chrome; // chrome api
   var browser: typeof chrome; // firefox api
 
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   interface Window {
     // All website
     ethereum: any;
@@ -69,12 +92,18 @@ declare global {
     extJsBridgeOffscreenToBg: JsBridgeBase;
     ONEKEY_DESKTOP_DEEP_LINKS: any[];
   }
+
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  interface Error extends Error {
+    $$autoPrintErrorIgnore?: boolean;
+  }
 }
 
 declare global {
   namespace FormatjsIntl {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     interface Message {
-      ids: LocaleIds;
+      ids: ETranslations;
     }
   }
 }

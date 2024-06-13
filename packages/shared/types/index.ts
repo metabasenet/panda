@@ -2,11 +2,6 @@ import type {
   IInjectedProviderNamesStrings,
   IJsonRpcRequest,
 } from '@onekeyfe/cross-inpage-provider-types';
-import type { Features, IDeviceType } from '@onekeyfe/hd-core';
-
-export type IOneKeyDeviceType = IDeviceType;
-
-export type IOneKeyDeviceFeatures = Features;
 
 export type IDappSourceInfo = {
   id: string | number; // ServicePromise callback id to reject/resolve
@@ -14,6 +9,7 @@ export type IDappSourceInfo = {
   hostname: string;
   scope: IInjectedProviderNamesStrings;
   data: IJsonRpcRequest;
+  isWalletConnectRequest: boolean;
 };
 
 export enum ENetworkStatus {
@@ -43,6 +39,7 @@ export interface INetworkExplorerConfig {
   address?: string;
   transaction?: string;
   block?: string;
+  token?: string;
 }
 
 export type IServerNetwork = {
@@ -58,18 +55,46 @@ export type IServerNetwork = {
   decimals: number;
   feeMeta: INetworkFeeInfo;
   defaultEnabled: boolean;
-  support: string[];
+  support?: string[];
   balance2FeeDecimals: number;
   status: ENetworkStatus;
   clientApi?: Record<string, string>;
   isTestnet: boolean;
-  rpcURLs: INetworkRpcURL[];
   priceConfigs: INetworkPriceConfig[];
   explorers: INetworkExplorerConfig[];
-  extensions: Record<string, unknown>;
+  extensions?: Record<string, unknown>;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export enum EOnekeyDomain {
   ONEKEY_SO = 'onekey.so',
-  ONEKEY_CN = 'onekeycn.com',
+}
+
+export enum EAccountSelectorSceneName {
+  home = 'home',
+  homeUrlAccount = 'homeUrlAccount',
+  swap = 'swap',
+  discover = 'discover',
+  settings = 'settings',
+  addressInput = 'addressInput', // test Gallery AddressInput test
+}
+
+export type INotPromise<T> = T extends Promise<any> ? never : T;
+
+export enum EHomeTab {
+  TOKENS = 'tokens',
+  NFT = 'nft',
+  HISTORY = 'history',
+  TOOLS = 'tools',
+}
+
+export enum EAssetType {
+  Token = 'Token',
+  NFT = 'NFT',
+}
+
+export enum ETxActionComponentType {
+  ListView = 'ListView',
+  DetailView = 'DetailView',
 }

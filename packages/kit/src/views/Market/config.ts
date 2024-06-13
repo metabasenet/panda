@@ -1,5 +1,3 @@
-import type { ListHeadTagType } from './types';
-
 export const SUBMIT_TOKEN_URL = 'https://gr4yl99ujhl.typeform.com/to/ZM0qyr9e';
 
 export const MARKET_LIST_COLUMN_SHOW_WIDTH_1 = 824;
@@ -20,7 +18,7 @@ export enum EMarketCellData {
   TokenCollectionStarAndMore = 'TokenCollectionStarAndMore',
 }
 
-export const ListHeadTagsForSearch: ListHeadTagType[] = [
+export const ListHeadTagsForSearch: any[] = [
   {
     id: EMarketCellData.CollectionStarOrSerialNumber,
     minW: '42px',
@@ -54,7 +52,7 @@ export const ListHeadTagsForSearch: ListHeadTagType[] = [
   },
 ];
 
-export const ListHeadTags: ListHeadTagType[] = [
+export const ListHeadTags: any[] = [
   {
     id: EMarketCellData.CollectionStarOrSerialNumber,
     minW: '32px',
@@ -87,7 +85,7 @@ export const ListHeadTags: ListHeadTagType[] = [
   {
     id: EMarketCellData.Token24hChange,
     title: 'form__24h%_uppercase',
-    minW: '96px',
+    minW: '70px',
     textAlign: 'right',
     showVerticalLayout: true,
   },
@@ -98,9 +96,8 @@ export const ListHeadTags: ListHeadTagType[] = [
     textAlign: 'right',
     showVerticalLayout: false,
     hide824Width: true,
-    hide924Width: true,
   },
-  /* {
+  {
     id: EMarketCellData.Token24hVolume,
     title: 'form__24h_volume_uppercase',
     minW: '120px',
@@ -108,8 +105,7 @@ export const ListHeadTags: ListHeadTagType[] = [
     showVerticalLayout: false,
     hide924Width: true,
     hide824Width: true,
-  }, */
-  // 不再显示24h volume
+  },
   {
     id: EMarketCellData.TokenSparklineChart,
     title: 'form__last_7_days_uppercase',

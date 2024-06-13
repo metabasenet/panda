@@ -1,7 +1,10 @@
-import type { IWalletConnectRequestOptions } from '@onekeyhq/kit/src/components/WalletConnect/types';
-
 import type ProviderApiWalletConnect from './ProviderApiWalletConnect';
 import type { IInjectedProviderNames } from '@onekeyfe/cross-inpage-provider-types';
+import type { Web3WalletTypes } from '@walletconnect/web3wallet';
+
+export type IWalletConnectRequestOptions = {
+  sessionRequest?: Web3WalletTypes.SessionRequest;
+};
 
 export abstract class WalletConnectRequestProxy {
   constructor({ client }: { client: ProviderApiWalletConnect }) {
@@ -28,19 +31,20 @@ export abstract class WalletConnectRequestProxy {
   ): Promise<T> {
     const resp = await this.client.backgroundApi.handleProviderMethods<T>({
       scope: this.providerName,
-      origin: this.client.getConnectorOrigin(options),
+      origin: this.client.getDAppOrigin(options),
       data,
+      isWalletConnectRequest: true,
     });
     return Promise.resolve(resp.result as T);
   }
 
-  abstract connect(options: IWalletConnectRequestOptions): Promise<string[]>;
+  // abstract connect(options: IWalletConnectRequestOptions): Promise<string[]>;
 
-  abstract getAccounts(
-    options: IWalletConnectRequestOptions,
-  ): Promise<string[]>;
+  // abstract getAccounts(
+  //   options: IWalletConnectRequestOptions,
+  // ): Promise<string[]>;
 
-  abstract getChainId(
-    options: IWalletConnectRequestOptions,
-  ): Promise<number | undefined>;
+  // abstract getChainId(
+  //   options: IWalletConnectRequestOptions,
+  // ): Promise<number | undefined>;
 }

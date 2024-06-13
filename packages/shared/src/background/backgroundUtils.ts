@@ -1,11 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { IInjectedProviderNames } from '@onekeyfe/cross-inpage-provider-types';
-import axios from 'axios';
 import {
   isArray,
   isBoolean,
   isEmpty,
-  isFunction,
   isNil,
   isNull,
   isNumber,
@@ -13,10 +11,8 @@ import {
   isString,
   isUndefined,
 } from 'lodash';
-import qs from 'qs';
-import { batch } from 'react-redux';
 
-import { getFiatEndpoint } from '@onekeyhq/engine/src/endpoint';
+// import { getFiatEndpoint } from '@onekeyhq/engine/src/endpoint';
 
 import {
   IMPL_ADA,
@@ -28,20 +24,23 @@ import {
   IMPL_DOT,
   IMPL_EVM,
   IMPL_LIGHTNING,
+  IMPL_LIGHTNING_TESTNET,
   IMPL_NEAR,
+  IMPL_NOSTR,
   IMPL_SOL,
   IMPL_STC,
   IMPL_SUI,
+  IMPL_TBTC,
   IMPL_TRON,
 } from '../engine/engineConsts';
-import { NotAutoPrintError } from '../errors/common-errors';
-import debugLogger from '../logger/debugLogger';
+import { NotAutoPrintError } from '../errors';
+// import debugLogger from '../logger/debugLogger';
+import errorUtils from '../errors/utils/errorUtils';
 import platformEnv from '../platformEnv';
 
+import type { OneKeyError } from '../errors';
 import type { IInjectedProviderNamesStrings } from '@onekeyfe/cross-inpage-provider-types';
-import type { PayloadAction } from '@reduxjs/toolkit';
 import type { Method } from 'axios';
-import type { AnyAction } from 'redux';
 
 export function throwCrossError(msg: string, ...args: any) {
   if (platformEnv.isNative) {
@@ -80,41 +79,6 @@ export function isSerializable(obj: any) {
   return true;
 }
 
-export function ensureSerializable(obj: any, stringify = false): any {
-  if (process.env.NODE_ENV !== 'production') {
-    if (!isSerializable(obj)) {
-      console.error('Object should be serializable >>>> ', obj);
-      if (stringify) {
-        return JSON.parse(JSON.stringify(obj));
-      }
-
-      throw new Error('Object should be serializable');
-    }
-  }
-  return obj;
-}
-
-export function ensurePromiseObject(
-  obj: any,
-  {
-    serviceName,
-    methodName,
-  }: {
-    serviceName: string;
-    methodName: string;
-  },
-) {
-  if (process.env.NODE_ENV !== 'production') {
-    if (obj !== undefined && !(obj instanceof Promise)) {
-      throwCrossError(
-        `${
-          serviceName ? `${serviceName}.` : ''
-        }${methodName}() should be async or Promise method.`,
-      );
-    }
-  }
-}
-
 export function throwMethodNotFound(...methods: string[]) {
   const msg = `DApp Provider or Background method not support (method=${methods.join(
     '.',
@@ -140,10 +104,16 @@ export function warningIfNotRunInBackground({
       // web-embed error.stack data is not reliable, missing background keywords
       return;
     }
+    if (platformEnv.isWebMobileIOS || platformEnv.isWebSafari) {
+      // iOS safari get wrong error.stack
+      return;
+    }
     try {
       throw new NotAutoPrintError();
     } catch (error) {
       const err = error as Error;
+      errorUtils.autoPrintErrorIgnore(err);
+
       if (
         err.stack &&
         !err.stack.includes('backgroundApiInit') &&
@@ -207,37 +177,48 @@ export function waitAsync(timeout: number) {
   });
 }
 
-export function makeTimeoutPromise<T>({
+export function makeTimeoutPromise<T, TParams = undefined>({
   asyncFunc,
-  timeout,
-  timeoutResult,
+  timeout, // ms
+  timeoutRejectError,
 }: {
-  asyncFunc: () => Promise<T>;
+  asyncFunc: (params: TParams) => Promise<T>;
   timeout: number;
-  timeoutResult: T;
+  timeoutRejectError: OneKeyError | Error;
 }) {
-  return new Promise<T>((resolve) => {
-    let isResolved = false;
-    const timer = setTimeout(() => {
-      if (isResolved) {
-        return;
-      }
-      isResolved = true;
-      resolve(timeoutResult);
-      // console.log('makeTimeoutPromise timeout result >>>>> ', timeoutResult);
-    }, timeout);
+  return (params: TParams) =>
+    new Promise<T>((resolve, reject) => {
+      let isCompleted = false;
+      const timer = setTimeout(() => {
+        if (isCompleted) {
+          return;
+        }
+        isCompleted = true;
+        clearTimeout(timer);
+        reject(timeoutRejectError);
+        // console.log('makeTimeoutPromise timeout result >>>>> ', timeoutResult);
+      }, timeout);
 
-    const p = asyncFunc();
-    p.then((result) => {
-      if (isResolved) {
-        return;
-      }
-      isResolved = true;
-      clearTimeout(timer);
-      resolve(result);
-      // console.log('makeTimeoutPromise correct result >>>>> ', result);
+      const p = asyncFunc(params);
+      void p
+        .then((result) => {
+          if (isCompleted) {
+            return;
+          }
+          resolve(result);
+          // console.log('makeTimeoutPromise correct result >>>>> ', result);
+        })
+        .catch((error) => {
+          if (isCompleted) {
+            return;
+          }
+          reject(error);
+        })
+        .finally(() => {
+          isCompleted = true;
+          clearTimeout(timer);
+        });
     });
-  });
 }
 
 export async function waitForDataLoaded({
@@ -300,28 +281,32 @@ export async function waitForDataLoaded({
 
 export const MAX_LOG_LENGTH = 1000;
 
-const scopeNetwork: Record<IInjectedProviderNamesStrings, string | undefined> =
-  {
-    'btc': IMPL_BTC,
-    'ethereum': IMPL_EVM,
-    'near': IMPL_NEAR,
-    'conflux': IMPL_CFX,
-    'solana': IMPL_SOL,
-    'sollet': IMPL_SOL,
-    'starcoin': IMPL_STC,
-    'aptos': IMPL_APTOS,
-    'martian': IMPL_APTOS,
-    'tron': IMPL_TRON,
-    'algo': IMPL_ALGO,
-    'sui': IMPL_SUI,
-    'cardano': IMPL_ADA,
-    'cosmos': IMPL_COSMOS,
-    'polkadot': IMPL_DOT,
-    'webln': IMPL_LIGHTNING,
-    'nostr': undefined,
-    '$hardware_sdk': undefined,
-    '$private': undefined,
-  };
+export const scopeNetworks: Record<
+  IInjectedProviderNamesStrings,
+  string[] | undefined
+> = {
+  'btc': [IMPL_BTC, IMPL_TBTC],
+  'ethereum': [IMPL_EVM],
+  'near': [IMPL_NEAR],
+  'conflux': [IMPL_CFX],
+  'solana': [IMPL_SOL],
+  'sollet': [IMPL_SOL],
+  'starcoin': [IMPL_STC],
+  'aptos': [IMPL_APTOS],
+  'martian': [IMPL_APTOS],
+  'tron': [IMPL_TRON],
+  'algo': [IMPL_ALGO],
+  'sui': [IMPL_SUI],
+  'cardano': [IMPL_ADA],
+  'cosmos': [IMPL_COSMOS],
+  'polkadot': [IMPL_DOT],
+  'webln': [IMPL_LIGHTNING, IMPL_LIGHTNING_TESTNET],
+  'nostr': [IMPL_NOSTR],
+  '$hardware_sdk': undefined,
+  '$private': undefined,
+  '$privateExternalAccount': [IMPL_BTC, IMPL_TBTC],
+  '$walletConnect': undefined,
+};
 
 export const ENABLED_DAPP_SCOPE: IInjectedProviderNamesStrings[] = [
   IInjectedProviderNames.btc,
@@ -340,85 +325,85 @@ export const ENABLED_DAPP_SCOPE: IInjectedProviderNamesStrings[] = [
   IInjectedProviderNames.webln,
 ];
 
-export function getNetworkImplFromDappScope(
+export function getNetworkImplsFromDappScope(
   scope: IInjectedProviderNamesStrings,
 ) {
-  return scopeNetwork[scope];
+  return scopeNetworks[scope];
 }
 
-export const isDappScopeMatchNetwork = (
-  scope?: IInjectedProviderNamesStrings,
-  impl?: string,
-) => {
-  if (scope && impl) {
-    return scopeNetwork[scope] === impl;
-  }
-  return true;
+export const GLOBAL_STATES_SYNC_BROADCAST_METHOD_NAME =
+  'globaStatesSyncBroadcast';
+export type IGlobalStatesSyncBroadcastParams = {
+  $$isFromBgStatesSyncBroadcast: true;
+  name: string;
+  payload: any;
 };
 
-export const DISPATCH_ACTION_BROADCAST_METHOD_NAME = 'dispatchActionBroadcast';
+export const GLOBAL_EVENT_BUS_SYNC_BROADCAST_METHOD_NAME =
+  'globaEventBusSyncBroadcast';
+export type IGlobalEventBusSyncBroadcastParams = {
+  $$isFromBgEventBusSyncBroadcast: true;
+  type: string;
+  payload: any;
+};
+
 export const REPLACE_WHOLE_STATE = 'REPLACE_WHOLE_STATE';
-export type IDispatchActionBroadcastParams = {
-  actions?: PayloadAction[];
-  $isDispatchFromBackground: boolean;
-};
-export function buildReduxBatchAction(...actions: AnyAction[]) {
-  if (!actions || !actions.length) {
-    return undefined;
-  }
-  if (actions && actions.length > 1) {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const batchAction = (dispatch: (p: any) => void, getState: any) => {
-      // should only result in one combined re-render, not two
-      batch(() => {
-        actions.forEach((action) => {
-          if (isFunction(action)) {
-            throw new Error(
-              'backgroundApi.dispatch ERROR:  async action is NOT allowed.',
-            );
-          }
-          if (action) {
-            action.$isDispatchFromBackground = true;
-          }
-
-          dispatch(action);
-          ensureSerializable(action);
-        });
-      });
-    };
-    return batchAction;
-  }
-
-  const singleAction: AnyAction | undefined = actions?.[0];
-  if (singleAction) {
-    singleAction.$isDispatchFromBackground = true;
-  }
-
-  return singleAction;
-}
 
 export async function fetchData<T>(
   path: string,
-  // eslint-disable-next-line default-param-last, @typescript-eslint/default-param-last
+  // eslint-disable-next-line default-param-last, @typescript-eslint/default-param-last, @typescript-eslint/no-unused-vars
   query: Record<string, unknown> = {},
   fallback: T,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   method: Method = 'GET',
 ): Promise<T> {
-  const endpoint = getFiatEndpoint();
-  const isPostBody = ['post', 'put'].includes(method.toLowerCase());
-  const apiUrl = `${endpoint}${path}${
-    !isPostBody ? `?${qs.stringify(query)}` : ''
-  }`;
-  try {
-    const postData = isPostBody ? query : undefined;
-    const requestConfig = { url: apiUrl, method, data: postData };
-    const { data } = await axios.request<T>(requestConfig);
-    return data;
-  } catch (e) {
-    debugLogger.http.error(
-      `backgroundApi.fetchData ERROR: request api ${apiUrl}`,
-      e,
-    );
-    return fallback;
+  throw new Error('fetchData not support yet');
+  // const endpoint = getFiatEndpoint();
+  // const isPostBody = ['post', 'put'].includes(method.toLowerCase());
+  // const apiUrl = `${endpoint}${path}${
+  //   !isPostBody ? `?${qs.stringify(query)}` : ''
+  // }`;
+  // try {
+  //   const postData = isPostBody ? query : undefined;
+  //   const requestConfig = { url: apiUrl, method, data: postData };
+  //   const { data } = await axios.request<T>(requestConfig);
+  //   return data;
+  // } catch (e) {
+  //   debugLogger.http.error(
+  //     `backgroundApi.fetchData ERROR: request api ${apiUrl}`,
+  //     e,
+  //   );
+  //   return fallback;
+  // }
+}
+
+export function getBackgroundServiceApi({
+  serviceName,
+  backgroundApi,
+}: {
+  serviceName: string;
+  backgroundApi: any;
+}) {
+  let serviceApi: {
+    [key: string]: (...args: any[]) => any;
+  } = backgroundApi;
+  if (serviceName) {
+    if (serviceName.includes('@')) {
+      const [nameSpace, name] = serviceName.split('@');
+      if (!nameSpace) {
+        throw new Error(`service nameSpace not found: ${nameSpace}`);
+      }
+      if (!backgroundApi[nameSpace]) {
+        throw new Error(`service nameSpace not found: ${nameSpace}`);
+      }
+      serviceApi = backgroundApi[nameSpace][name];
+    } else {
+      serviceApi = backgroundApi[serviceName];
+    }
+
+    if (!serviceApi) {
+      throw new Error(`serviceApi not found: ${serviceName}`);
+    }
   }
+  return serviceApi;
 }

@@ -1,178 +1,116 @@
 import { TransactionBlock } from '@mysten/sui.js';
-/* eslint-disable @typescript-eslint/naming-convention */
-/* eslint-disable camelcase */
 import { web3Errors } from '@onekeyfe/cross-inpage-provider-errors';
 import { IInjectedProviderNames } from '@onekeyfe/cross-inpage-provider-types';
-import { get } from 'lodash';
 
-import { parseNetworkId } from '@onekeyhq/engine/src/managers/network';
-import type { DBSimpleAccount } from '@onekeyhq/engine/src/types/account';
-import { CommonMessageTypes } from '@onekeyhq/engine/src/types/message';
-import type { IEncodedTxSUI } from '@onekeyhq/engine/src/vaults/impl/sui/types';
-import type VaultSUI from '@onekeyhq/engine/src/vaults/impl/sui/Vault';
-import type { ISignedTxPro } from '@onekeyhq/engine/src/vaults/types';
-import { getActiveWalletAccount } from '@onekeyhq/kit/src/hooks';
+import type { IEncodedTxSui } from '@onekeyhq/core/src/chains/sui/types';
+import type { ISignedTxPro } from '@onekeyhq/core/src/types';
+import type IVaultSui from '@onekeyhq/kit-bg/src/vaults/impls/sui/Vault';
 import {
   backgroundClass,
-  permissionRequired,
   providerApiMethod,
 } from '@onekeyhq/shared/src/background/backgroundDecorators';
-import { IMPL_SUI } from '@onekeyhq/shared/src/engine/engineConsts';
-import debugLogger from '@onekeyhq/shared/src/logger/debugLogger';
+import { EMessageTypesCommon } from '@onekeyhq/shared/types/message';
+import type {
+  ISignAndExecuteTransactionBlockInput,
+  ISignMessageInput,
+  ISignTransactionBlockInput,
+  ISignTransactionBlockOutput,
+} from '@onekeyhq/shared/types/ProviderApis/ProviderApiSui.type';
+
+import { vaultFactory } from '../vaults/factory';
 
 import ProviderApiBase from './ProviderApiBase';
 
 import type { IProviderBaseBackgroundNotifyInfo } from './ProviderApiBase';
 import type {
-  ExecuteTransactionRequestType,
   SignedMessage,
-  SignedTransaction,
   SuiTransactionBlockResponse,
-  SuiTransactionBlockResponseOptions,
 } from '@mysten/sui.js';
 import type { IJsBridgeMessagePayload } from '@onekeyfe/cross-inpage-provider-types';
-import type {
-  PermissionType,
-  SuiChainType,
-} from '@onekeyfe/onekey-sui-provider';
-
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface AccountInfo {
-  address: string;
-  publicKey: string;
-}
-
-type IdentifierString = `${string}:${string}`;
-type IdentifierArray = readonly IdentifierString[];
-type WalletIcon = `data:image/${
-  | 'svg+xml'
-  | 'webp'
-  | 'png'
-  | 'gif'};base64,${string}`;
-
-interface WalletAccount {
-  readonly address: string;
-  readonly publicKey: Uint8Array;
-  readonly chains: IdentifierArray;
-  readonly features: IdentifierArray;
-  readonly label?: string;
-  readonly icon?: WalletIcon;
-}
-
-type SignAndExecuteTransactionBlockInput = {
-  blockSerialize: string;
-  walletSerialize: string;
-  account: WalletAccount;
-  chain: IdentifierString;
-  requestType?: ExecuteTransactionRequestType;
-  options?: SuiTransactionBlockResponseOptions;
-};
-type SignAndExecuteTransactionBlockOutput = SuiTransactionBlockResponse;
-
-type SignTransactionBlockInput = {
-  blockSerialize: string;
-  walletSerialize: string;
-  account: WalletAccount;
-  chain: IdentifierString;
-};
-type SignTransactionBlockOutput = SignedTransaction;
-
-type SignMessageInput = {
-  messageSerialize: string;
-  walletSerialize: string;
-  account: WalletAccount;
-};
-type SignMessageOutput = SignedMessage;
 
 @backgroundClass()
 class ProviderApiSui extends ProviderApiBase {
-  public providerName = IInjectedProviderNames.sui;
+  public providerName = IInjectedProviderNames.ethereum;
 
-  public notifyDappAccountsChanged(info: IProviderBaseBackgroundNotifyInfo) {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public override notifyDappAccountsChanged(
+    info: IProviderBaseBackgroundNotifyInfo,
+  ): void {
     const data = async ({ origin }: { origin: string }) => {
-      const params = await this.account({ origin });
       const result = {
         method: 'wallet_events_accountChanged',
-        params,
+        params: await this.sui_accounts({ origin }),
       };
       return result;
     };
-    info.send(data);
+    info.send(data, info.targetOrigin);
   }
 
-  public notifyDappChainChanged(info: IProviderBaseBackgroundNotifyInfo) {
+  public override notifyDappChainChanged(
+    info: IProviderBaseBackgroundNotifyInfo,
+  ): void {
     const data = () => {
-      try {
-        const params = this.network();
-        const result = {
-          method: 'wallet_events_networkChange',
-          params,
-        };
-        return result;
-      } catch (error) {
-        return null;
-      }
+      const result = {
+        method: 'wallet_events_networkChange',
+        params: 'sui:mainnet',
+      };
+      return result;
     };
-    info.send(data);
+    info.send(data, info.targetOrigin);
   }
 
-  public rpcCall() {
+  public async rpcCall(): Promise<any> {
     throw web3Errors.rpc.methodNotSupported();
   }
 
   @providerApiMethod()
+  async sui_accounts(
+    request: IJsBridgeMessagePayload,
+  ): Promise<{ address: string; publicKey: string } | null> {
+    const accountsInfo =
+      await this.backgroundApi.serviceDApp.dAppGetConnectedAccountsInfo(
+        request,
+      );
+    if (!accountsInfo) {
+      return null;
+    }
+    const account = accountsInfo?.[0]?.account;
+    return {
+      address: account.address,
+      publicKey: account.pub ?? '',
+    };
+  }
+
+  // Provider API
+  @providerApiMethod()
   public async hasPermissions(
     request: IJsBridgeMessagePayload,
-    params: {
-      permissions: readonly PermissionType[];
-    },
   ): Promise<boolean> {
-    debugLogger.providerApi.info('SUI hasPermissions', request, params);
-    // const permissions =
-    //   params.permissions.length === 0
-    //     ? ALL_PERMISSION_TYPES
-    //     : params.permissions;
-
-    return !!(await this.account(request));
+    return !!(await this.sui_accounts(request));
   }
 
   @providerApiMethod()
-  public async requestPermissions(
-    request: IJsBridgeMessagePayload,
-    params: {
-      permissions: readonly PermissionType[];
-    },
-  ): Promise<boolean> {
-    debugLogger.providerApi.info('SUI requestPermissions', request, params);
-    // const permissions =
-    //   params.permissions.length === 0
-    //     ? ALL_PERMISSION_TYPES
-    //     : params.permissions;
-
-    const account = await this.account(request);
+  async requestPermissions(request: IJsBridgeMessagePayload): Promise<boolean> {
+    const account = await this.sui_accounts(request);
     if (account) {
       return true;
     }
-    await this.backgroundApi.serviceDapp.openConnectionModal(request);
-    return !!(await this.account(request));
+    await this.backgroundApi.serviceDApp.openConnectionModal(request);
+    return !!(await this.sui_accounts(request));
   }
 
-  @permissionRequired()
   @providerApiMethod()
   public async getAccounts(
     request: IJsBridgeMessagePayload,
-  ): Promise<AccountInfo[]> {
-    debugLogger.providerApi.info('SUI getAccounts', request);
-    let account = await this.account(request);
+  ): Promise<{ address: string; publicKey: string }[]> {
+    let account = await this.sui_accounts(request);
 
     if (account) {
       return [account];
     }
 
-    await this.backgroundApi.serviceDapp.openConnectionModal(request);
+    await this.backgroundApi.serviceDApp.openConnectionModal(request);
 
-    account = await this.account(request);
+    account = await this.sui_accounts(request);
 
     if (account) {
       return [account];
@@ -186,115 +124,43 @@ class ProviderApiSui extends ProviderApiBase {
     if (!origin) {
       return;
     }
-    this.backgroundApi.serviceDapp.removeConnectedAccounts({
+    void this.backgroundApi.serviceDApp.disconnectWebsite({
       origin,
-      networkImpl: IMPL_SUI,
-      addresses: this.backgroundApi.serviceDapp
-        .getActiveConnectedAccounts({ origin, impl: IMPL_SUI })
-        .map(({ address }) => address),
-    });
-    debugLogger.providerApi.info('SUI disconnect', origin);
-  }
-
-  private async account(
-    request: IJsBridgeMessagePayload,
-  ): Promise<AccountInfo | undefined> {
-    debugLogger.providerApi.info('SUI account');
-    const { networkId, networkImpl, accountId } = getActiveWalletAccount();
-    if (networkImpl !== IMPL_SUI) {
-      return undefined;
-    }
-
-    const connectedAccounts =
-      this.backgroundApi.serviceDapp?.getActiveConnectedAccounts({
-        origin: request.origin as string,
-        impl: IMPL_SUI,
-      });
-    if (!connectedAccounts) {
-      return undefined;
-    }
-
-    const vault = (await this.backgroundApi.engine.getVault({
-      networkId,
-      accountId,
-    })) as VaultSUI;
-    const address = await vault.getAccountAddress();
-    const account = (await vault.getDbAccount()) as DBSimpleAccount;
-
-    const addresses = connectedAccounts.map((a) => a.address);
-    if (!addresses.includes(address)) {
-      return undefined;
-    }
-
-    return Promise.resolve({
-      address,
-      publicKey: account.pub,
+      storageType: request.isWalletConnectRequest
+        ? 'walletConnect'
+        : 'injectedProvider',
     });
   }
 
-  @permissionRequired()
   @providerApiMethod()
-  public getActiveChain(
-    request: IJsBridgeMessagePayload,
-  ): Promise<IdentifierString | undefined> {
-    debugLogger.providerApi.info('SUI getActiveChain', request);
-
-    try {
-      return Promise.resolve(this.network());
-    } catch (e) {
-      return Promise.resolve(undefined);
-    }
+  public getActiveChain() {
+    return Promise.resolve('sui:mainnet');
   }
 
-  private network(): SuiChainType {
-    const { networkId } = getActiveWalletAccount();
-
-    const { impl, chainId } = parseNetworkId(networkId);
-
-    if (impl !== IMPL_SUI) {
-      throw web3Errors.rpc.invalidRequest();
-    }
-    if (chainId === 'mainnet') {
-      return 'sui:mainnet';
-    }
-    if (chainId === '8888883') {
-      return 'sui:testnet';
-    }
-    if (chainId === '8888884') {
-      return 'sui:devnet';
-    }
-
-    throw web3Errors.rpc.invalidRequest();
-  }
-
-  @permissionRequired()
   @providerApiMethod()
   public async signAndExecuteTransactionBlock(
     request: IJsBridgeMessagePayload,
-    params: SignAndExecuteTransactionBlockInput,
-  ): Promise<SignAndExecuteTransactionBlockOutput> {
-    debugLogger.providerApi.info('SUI signAndExecuteTransactionBlock', params);
-    const { networkId, accountId, accountAddress } = getActiveWalletAccount();
-
-    const address = get(JSON.parse(params.walletSerialize), 'address');
-    if (address && address !== accountAddress) {
-      throw web3Errors.provider.unauthorized();
-    }
-
-    const vault = (await this.backgroundApi.engine.getVault({
-      networkId,
-      accountId,
-    })) as VaultSUI;
-
-    const encodeTx: IEncodedTxSUI = {
+    params: ISignAndExecuteTransactionBlockInput,
+  ): Promise<SuiTransactionBlockResponse> {
+    const { accountInfo: { accountId, networkId, address } = {} } = (
+      await this.getAccountsInfo(request)
+    )[0];
+    const encodedTx: IEncodedTxSui = {
       rawTx: TransactionBlock.from(params.blockSerialize).serialize(),
+      sender: address ?? '',
     };
+    const result =
+      (await this.backgroundApi.serviceDApp.openSignAndSendTransactionModal({
+        request,
+        encodedTx,
+        accountId: accountId ?? '',
+        networkId: networkId ?? '',
+      })) as string;
 
-    const result = (await this.backgroundApi.serviceDapp.openSignAndSendModal(
-      request,
-      { encodedTx: encodeTx },
-    )) as string;
-
+    const vault = (await vaultFactory.getVault({
+      accountId: accountId ?? '',
+      networkId: networkId ?? '',
+    })) as IVaultSui;
     const tx = await vault.waitPendingTransaction(result, params.options);
 
     if (!tx) throw new Error('Transaction not found');
@@ -302,32 +168,27 @@ class ProviderApiSui extends ProviderApiBase {
     return Promise.resolve(tx);
   }
 
-  @permissionRequired()
   @providerApiMethod()
   public async signTransactionBlock(
     request: IJsBridgeMessagePayload,
-    params: SignTransactionBlockInput,
-  ): Promise<SignTransactionBlockOutput> {
-    debugLogger.providerApi.info('SUI signTransactionBlock', params);
-
-    const { accountAddress } = getActiveWalletAccount();
-
-    const address = get(JSON.parse(params.walletSerialize), 'address');
-    if (address && address !== accountAddress) {
-      throw web3Errors.provider.unauthorized();
-    }
-
-    const encodeTx: IEncodedTxSUI = {
+    params: ISignTransactionBlockInput,
+  ): Promise<ISignTransactionBlockOutput> {
+    const { accountInfo: { accountId, networkId, address } = {} } = (
+      await this.getAccountsInfo(request)
+    )[0];
+    const encodedTx: IEncodedTxSui = {
       rawTx: TransactionBlock.from(params.blockSerialize).serialize(),
+      sender: address ?? '',
     };
 
-    const result = (await this.backgroundApi.serviceDapp.openSignAndSendModal(
-      request,
-      {
-        encodedTx: encodeTx,
+    const result =
+      (await this.backgroundApi.serviceDApp.openSignAndSendTransactionModal({
+        request,
+        encodedTx,
+        accountId: accountId ?? '',
+        networkId: networkId ?? '',
         signOnly: true,
-      },
-    )) as ISignedTxPro;
+      })) as ISignedTxPro;
 
     if (!result.signature) throw web3Errors.provider.unauthorized();
 
@@ -337,31 +198,25 @@ class ProviderApiSui extends ProviderApiBase {
     });
   }
 
-  @permissionRequired()
   @providerApiMethod()
   public async signMessage(
     request: IJsBridgeMessagePayload,
-    params: SignMessageInput,
-  ): Promise<SignMessageOutput> {
-    debugLogger.providerApi.info('SUI signMessage', params);
+    params: ISignMessageInput,
+  ): Promise<SignedMessage> {
+    const { accountInfo: { accountId, networkId, address } = {} } = (
+      await this.getAccountsInfo(request)
+    )[0];
 
-    const { accountAddress } = getActiveWalletAccount();
-
-    const address = get(JSON.parse(params.walletSerialize), 'address');
-    if (address && address !== accountAddress) {
-      throw web3Errors.provider.unauthorized();
-    }
-
-    const result = (await this.backgroundApi.serviceDapp.openSignAndSendModal(
+    const result = (await this.backgroundApi.serviceDApp.openSignMessageModal({
       request,
-      {
-        unsignedMessage: {
-          type: CommonMessageTypes.SIGN_MESSAGE,
-          message: params.messageSerialize,
-          secure: false,
-        },
+      accountId: accountId ?? '',
+      networkId: networkId ?? '',
+      unsignedMessage: {
+        type: EMessageTypesCommon.SIGN_MESSAGE,
+        message: params.messageSerialize,
+        secure: false,
       },
-    )) as string;
+    })) as string;
 
     return {
       messageBytes: params.messageSerialize,

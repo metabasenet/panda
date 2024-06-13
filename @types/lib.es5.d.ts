@@ -13,8 +13,9 @@
  */
 
 /** See https://stackoverflow.com/a/51390763/1470607  */
-type Falsy = false | 0 | '' | null | undefined;
+type IFalsy = false | 0 | '' | null | undefined;
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 interface Array<T> {
   /**
    * Returns the elements of an array that meet the condition specified in a callback function.
@@ -24,5 +25,5 @@ interface Array<T> {
   filter<S extends T>(
     predicate: BooleanConstructor,
     thisArg?: any,
-  ): Exclude<S, Falsy>[];
+  ): Exclude<S, IFalsy>[];
 }

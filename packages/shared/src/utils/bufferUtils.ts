@@ -7,12 +7,18 @@ import {
 } from '@noble/hashes/utils';
 import { isString } from 'lodash';
 
+import hexUtils from './hexUtils';
+
 function toBuffer(
   data: Buffer | Uint8Array | string,
   // encoding of string data
   encoding: BufferEncoding = 'hex',
 ): Buffer {
   if (isString(data)) {
+    if (encoding === 'hex') {
+      // eslint-disable-next-line no-param-reassign
+      data = hexUtils.stripHexPrefix(data);
+    }
     // buffer from hex string in default
     return Buffer.from(data, encoding);
   }
@@ -35,19 +41,33 @@ function bytesToHex(bytes: Buffer | Uint8Array | string): string {
   if (isString(bytes)) {
     return bytes;
   }
-  return bytesToHex0(toBuffer(bytes));
+  const buff = toBuffer(bytes);
+  return bytesToHex0(buff);
 }
 
 function bytesToUtf8(bytes: Buffer | Uint8Array): string {
   return toBuffer(bytes).toString('utf8');
 }
 
-export default {
+function bytesToText(
+  bytes: Buffer | Uint8Array,
+  encoding: BufferEncoding = 'utf8',
+): string {
+  return toBuffer(bytes).toString(encoding || 'utf8');
+}
+
+const bufferUtils = {
   toBuffer,
   bytesToHex,
+  bytesToText,
   hexToBytes,
   textToHex,
   hexToText,
   utf8ToBytes,
   bytesToUtf8,
 };
+
+// @ts-ignore
+global.$$bufferUtils = bufferUtils;
+
+export default bufferUtils;

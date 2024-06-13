@@ -1,205 +1,333 @@
-/* eslint-disable @typescript-eslint/require-await  */
-
+import { flatten, groupBy, isFunction } from 'lodash';
 import semver from 'semver';
 
-import simpleDb from '@onekeyhq/engine/src/dbs/simple/simpleDb';
-import { getFiatEndpoint } from '@onekeyhq/engine/src/endpoint';
-import {
-  setEnableIOSDappSearch,
-  setShowBookmark,
-} from '@onekeyhq/kit/src/store/reducers/discover';
-import type { WalletSwitchItem } from '@onekeyhq/kit/src/store/reducers/settings';
-import {
-  disableExtSwitchTips,
-  setEnableETH2Unstake,
-  setWalletSwitch,
-  toggleDisableExt,
-  toggleWalletSwitch,
-} from '@onekeyhq/kit/src/store/reducers/settings';
-import {
-  setLimitOrderMaintain,
-  setSwapMaintain,
-} from '@onekeyhq/kit/src/store/reducers/swapTransactions';
-import extUtils from '@onekeyhq/kit/src/utils/extUtils';
-import {
-  MonopolizeNetwork,
-  getNetworkWithWalletId,
-} from '@onekeyhq/kit/src/views/Me/UtilSection/WalletSwitch/config';
+import { isTaprootPath } from '@onekeyhq/core/src/chains/btc/sdkBtc';
+import type { IAccountSelectorAvailableNetworksMap } from '@onekeyhq/kit/src/states/jotai/contexts/accountSelector';
+import type { ICurrencyItem } from '@onekeyhq/kit/src/views/Setting/pages/Currency';
 import {
   backgroundClass,
   backgroundMethod,
 } from '@onekeyhq/shared/src/background/backgroundDecorators';
+import { getNetworkIdsMap } from '@onekeyhq/shared/src/config/networkIds';
+import {
+  IMPL_BTC,
+  IMPL_EVM,
+  IMPL_LTC,
+} from '@onekeyhq/shared/src/engine/engineConsts';
+import type { ILocaleSymbol } from '@onekeyhq/shared/src/locale';
+import { LOCALES } from '@onekeyhq/shared/src/locale';
+import { appLocale } from '@onekeyhq/shared/src/locale/appLocale';
+import { getDefaultLocale } from '@onekeyhq/shared/src/locale/getDefaultLocale';
 import platformEnv from '@onekeyhq/shared/src/platformEnv';
+import { memoizee } from '@onekeyhq/shared/src/utils/cacheUtils';
+import networkUtils from '@onekeyhq/shared/src/utils/networkUtils';
+import timerUtils from '@onekeyhq/shared/src/utils/timerUtils';
+import type { IServerNetwork } from '@onekeyhq/shared/types';
+import { EServiceEndpointEnum } from '@onekeyhq/shared/types/endpoint';
+import type { IClearCacheOnAppState } from '@onekeyhq/shared/types/setting';
+
+import {
+  settingsLastActivityAtom,
+  settingsPersistAtom,
+} from '../states/jotai/atoms/settings';
 
 import ServiceBase from './ServiceBase';
 
-import type ProviderApiPrivate from '../providers/ProviderApiPrivate';
-
-type RemoteSetting = {
-  enableAppRatings: boolean;
-  swapMaintain: boolean;
-  limitOrderMaintain?: boolean;
-  enableETH2Unstake: boolean;
-  helloVersion: string;
-  bookmarkVersion: string;
-  iOSSupportSearchVersion?: string;
-  disabledRpcBatchHosts: string[];
+export type IAccountDerivationConfigItem = {
+  num: number;
+  title: string;
+  icon?: string;
+  networkIds: string[];
+  defaultNetworkId: string;
 };
 
 @backgroundClass()
-export default class ServiceSetting extends ServiceBase {
-  getFiatEndpoint() {
-    return getFiatEndpoint();
+class ServiceSetting extends ServiceBase {
+  constructor({ backgroundApi }: { backgroundApi: any }) {
+    super({ backgroundApi });
   }
 
-  @backgroundMethod()
-  async updateRemoteSetting() {
-    const baseUrl = this.getFiatEndpoint();
-    const url = `${baseUrl}/setting/list`;
-    const res = await this.client.get(url);
-    const data = res.data as RemoteSetting;
+  async refreshLocaleMessages() {
+    const { locale: rawLocale } = await settingsPersistAtom.get();
+    const locale: ILocaleSymbol =
+      rawLocale === 'system' ? getDefaultLocale() : rawLocale;
 
-    return this.updateRemoteSettingWithData(data);
-  }
-
-  @backgroundMethod()
-  async updateRemoteSettingWithData(data: RemoteSetting) {
-    const { appSelector, dispatch } = this.backgroundApi;
-    await simpleDb.setting.setEnableAppRatings(data.enableAppRatings);
-    await simpleDb.setting.setSwapMaintain(data.swapMaintain);
-    await simpleDb.setting.setRpcBatchFallbackWhitelistHosts(
-      data.disabledRpcBatchHosts.map((u) => ({
-        type: 'default',
-        url: u,
-      })),
-    );
-    const actions = [
-      setEnableETH2Unstake(data.enableETH2Unstake),
-      setSwapMaintain(data.swapMaintain),
-      setLimitOrderMaintain(!!data.limitOrderMaintain),
-    ] as any[];
-    let v = '';
-    if (platformEnv.isNativeIOS || platformEnv.isMas) {
-      if (platformEnv.isNativeIOS && data.helloVersion) {
-        v = data.helloVersion;
-      } else if (platformEnv.isMas && data.bookmarkVersion) {
-        v = data.bookmarkVersion;
-      }
-      if (v && semver.valid(v)) {
-        const version = appSelector((s) => s.settings.version);
-        if (semver.lte(version, v)) {
-          actions.push(setShowBookmark(true));
-        }
-      }
-      const v2 = data.iOSSupportSearchVersion;
-      if (v2 && semver.valid(v2)) {
-        const version = appSelector((s) => s.settings.version);
-        if (semver.lte(version, v2)) {
-          actions.push(setEnableIOSDappSearch(true));
-        }
-      }
+    const messagesBuilder = await (LOCALES[locale] as unknown as Promise<
+      (() => Promise<Record<string, string>>) | Promise<Record<string, string>>
+    >);
+    let messages: Record<string, string> = {};
+    if (isFunction(messagesBuilder)) {
+      messages = await messagesBuilder();
+    } else {
+      messages = messagesBuilder;
     }
-    dispatch(...actions);
+    appLocale.setLocale(locale, messages);
   }
 
   @backgroundMethod()
-  async getInstanceId() {
-    const { appSelector } = this.backgroundApi;
-    return appSelector((s) => s.settings.instanceId);
+  public async setTheme(theme: 'light' | 'dark' | 'system') {
+    await settingsPersistAtom.set((prev) => ({ ...prev, theme }));
   }
 
   @backgroundMethod()
-  async getWebAuthnCredentialID() {
-    return simpleDb.setting.getWebAuthnCredentialID();
+  public async setLocale(locale: ILocaleSymbol) {
+    await settingsPersistAtom.set((prev) => ({ ...prev, locale }));
+    await this.refreshLocaleMessages();
   }
 
   @backgroundMethod()
-  async setWebAuthnCredentialID(webAuthnCredentialID: string) {
-    return simpleDb.setting.setWebAuthnCredentialID(webAuthnCredentialID);
+  public async setProtectCreateTransaction(value: boolean) {
+    await settingsPersistAtom.set((prev) => ({
+      ...prev,
+      protectCreateTransaction: value,
+    }));
   }
 
   @backgroundMethod()
-  async setAppReviewsLastOpenedAt(value: number) {
-    return simpleDb.setting.setAppReviewsLastOpenedAt(value);
+  public async setProtectCreateOrRemoveWallet(value: boolean) {
+    await settingsPersistAtom.set((prev) => ({
+      ...prev,
+      protectCreateOrRemoveWallet: value,
+    }));
   }
 
   @backgroundMethod()
-  async getAppReviewsLastOpenedAt() {
-    return simpleDb.setting.getAppReviewsLastOpenedAt();
+  public async setSpendDustUTXO(value: boolean) {
+    await settingsPersistAtom.set((prev) => ({
+      ...prev,
+      spendDustUTXO: value,
+    }));
   }
 
   @backgroundMethod()
-  async getEnableAppRatings() {
-    return simpleDb.setting.getEnableAppRatings();
+  public async refreshLastActivity() {
+    await settingsLastActivityAtom.set((prev) => ({
+      ...prev,
+      time: Date.now(),
+    }));
   }
 
-  @backgroundMethod()
-  async checkBrowserActionIcon() {
-    const disableExt = this.backgroundApi.appSelector(
-      (s) => s.settings.disableExt,
-    );
-    extUtils.updatBrowserActionIcon(!disableExt);
-  }
-
-  @backgroundMethod()
-  async toggleDisableExt() {
-    this.backgroundApi.dispatch(toggleDisableExt());
-    const privateProvider = this.backgroundApi.providers
-      .$private as ProviderApiPrivate;
-    privateProvider.notifyExtSwitchChanged({
-      send: this.backgroundApi.sendForProvider('$private'),
-    });
-    this.checkBrowserActionIcon();
-  }
-
-  @backgroundMethod()
-  async disableExtSwitchTips() {
-    return this.backgroundApi.dispatch(disableExtSwitchTips());
-  }
-
-  @backgroundMethod()
-  async setWalletSwitchConfig(config: Record<string, WalletSwitchItem>) {
-    return this.backgroundApi.dispatch(setWalletSwitch(config));
-  }
-
-  @backgroundMethod()
-  async toggleWalletSwitchConfig(walletId: string, enable: boolean) {
-    const actions = [];
-
-    const networkId = getNetworkWithWalletId(walletId);
-    const walletSwitch =
-      this.backgroundApi.store.getState().settings.walletSwitchData || {};
-
-    // Monopolize the network's injection
-    if (MonopolizeNetwork.includes(networkId)) {
-      const relevantIds = Object.keys(walletSwitch).filter(
-        (id) => id !== walletId && id.startsWith(networkId),
+  _getCurrencyList = memoizee(
+    async () => {
+      const client = await this.getClient(EServiceEndpointEnum.Utility);
+      const res = await client.get<{ data: ICurrencyItem[] }>(
+        '/utility/v1/currency/exchange-rates',
       );
+      return res.data.data;
+    },
+    {
+      promise: true,
+      maxAge: timerUtils.getTimeDurationMs({ minute: 5 }),
+    },
+  );
 
-      let continueOneEnabled = false;
+  @backgroundMethod()
+  public async getCurrencyList(): Promise<ICurrencyItem[]> {
+    return this._getCurrencyList();
+  }
 
-      for (const relevantId of relevantIds) {
-        const currentEnabled = walletSwitch[relevantId].enable;
-        if (currentEnabled) {
-          if (!enable && !continueOneEnabled) {
-            // If the operation is closed, you need to leave one wallet open.
-            continueOneEnabled = true;
-          } else {
-            actions.push(
-              toggleWalletSwitch({ walletId: relevantId, enable: false }),
-            );
-          }
-        }
+  @backgroundMethod()
+  public async setCurrency(currencyInfo: { id: string; symbol: string }) {
+    await settingsPersistAtom.set((prev) => ({ ...prev, currencyInfo }));
+  }
+
+  @backgroundMethod()
+  public async clearCacheOnApp(values: IClearCacheOnAppState) {
+    if (values.tokenAndNFT) {
+      // clear token and nft
+    }
+    if (values.transactionHistory) {
+      // clear transaction history
+    }
+    if (values.swapHistory) {
+      // clear swap history
+      await this.backgroundApi.serviceSwap.cleanSwapHistoryItems();
+    }
+    if (values.browserCache) {
+      // clear browser cache
+    }
+    if (values.browserHistory) {
+      // clear Browser History, Bookmarks, Pins
+      await this.backgroundApi.simpleDb.browserTabs.clearRawData();
+      await this.backgroundApi.simpleDb.browserHistory.clearRawData();
+      await this.backgroundApi.simpleDb.browserBookmarks.clearRawData();
+      await this.backgroundApi.simpleDb.browserRiskWhiteList.clearRawData();
+      this.backgroundApi.serviceDiscovery._isUrlExistInRiskWhiteList.clear();
+    }
+    if (values.connectSites) {
+      // clear connect sites
+      await this.backgroundApi.simpleDb.dappConnection.clearRawData();
+    }
+    if (values.signatureRecord) {
+      // clear signature record
+      await this.backgroundApi.serviceSignature.deleteAllSignatureRecords();
+    }
+  }
+
+  @backgroundMethod()
+  public async clearPendingTransaction() {
+    // TODO: clear pending transaction
+  }
+
+  @backgroundMethod()
+  public async getAccountDerivationConfig() {
+    const { serviceNetwork } = this.backgroundApi;
+    const allNetworks =
+      await this.backgroundApi.serviceNetwork.getAllNetworks();
+    let { networks } = allNetworks;
+    const mainNetworks = networks.filter((o) => !o.isTestnet);
+
+    const networkGroup = groupBy(mainNetworks, (item) => item.impl);
+    networks = flatten(Object.values(networkGroup).map((o) => o[0]));
+
+    const networksVaultSettings = await Promise.all(
+      networks.map((o) => serviceNetwork.getVaultSettings({ networkId: o.id })),
+    );
+
+    if (networksVaultSettings.length !== networks.length) {
+      throw new Error('failed to get account derivation config');
+    }
+
+    networks = networks.filter((o, i) => {
+      const vaultSettings = networksVaultSettings[i];
+      return Object.values(vaultSettings.accountDeriveInfo).length > 1;
+    });
+
+    const toppedImpl = [IMPL_BTC, IMPL_EVM, IMPL_LTC].reduce(
+      (result, o, index) => {
+        result[o] = index;
+        return result;
+      },
+      {} as Record<string, number>,
+    );
+
+    const topped: IServerNetwork[] = [];
+    const bottomed: IServerNetwork[] = [];
+
+    for (let i = 0; i < networks.length; i += 1) {
+      const network = networks[i];
+      if (toppedImpl[network.impl] !== undefined) {
+        topped.push(network);
+      } else {
+        bottomed.push(network);
       }
     }
 
-    actions.push(toggleWalletSwitch({ walletId, enable }));
+    topped.sort((a, b) => toppedImpl[a.impl] ?? 0 - toppedImpl[b.impl] ?? 0);
 
-    this.backgroundApi.dispatch(...actions);
-    const privateProvider = this.backgroundApi.providers
-      .$private as ProviderApiPrivate;
-    privateProvider.notifyExtSwitchChanged({
-      send: this.backgroundApi.sendForProvider('$private'),
+    networks = [...topped, ...bottomed];
+    const networkIds = networks.map((n) => n.id);
+
+    const config: IAccountDerivationConfigItem[] = networks.map(
+      (network, i) => ({
+        num: i,
+        title: network.impl === IMPL_EVM ? 'EVM' : network.name,
+        icon: network?.logoURI,
+        networkIds,
+        defaultNetworkId: network.id,
+      }),
+    );
+
+    // const config: IAccountDerivationConfigItem[] = [];
+
+    const tbtc = allNetworks.networks.find(
+      (n) => n.id === getNetworkIdsMap().tbtc,
+    );
+
+    if (platformEnv.isDev && tbtc) {
+      config.push({
+        num: 10000,
+        title: 'Test Bitcoin',
+        icon: tbtc?.logoURI,
+        networkIds,
+        defaultNetworkId: getNetworkIdsMap().tbtc,
+      });
+    }
+    return {
+      enabledNum: config.map((o) => o.num),
+      availableNetworksMap: config.reduce((result, item) => {
+        result[item.num] = {
+          networkIds: item.networkIds,
+          defaultNetworkId: item.defaultNetworkId,
+        };
+        return result;
+      }, {} as IAccountSelectorAvailableNetworksMap),
+      items: config,
+    };
+  }
+
+  @backgroundMethod()
+  public async addConfirmedRiskTokens(tokens: string[]) {
+    await this.backgroundApi.simpleDb.riskyTokens.addConfirmedRiskTokens(
+      tokens,
+    );
+  }
+
+  @backgroundMethod()
+  public async checkConfirmedRiskToken(tokenId: string) {
+    const confirmedRiskTokens =
+      await this.backgroundApi.simpleDb.riskyTokens.getConfirmedRiskTokens();
+    return confirmedRiskTokens.includes(tokenId);
+  }
+
+  @backgroundMethod()
+  public async fetchReviewControl() {
+    const { reviewControl } = await settingsPersistAtom.get();
+    const isReviewControlEnv = platformEnv.isAppleStoreEnv || platformEnv.isMas;
+    if (!reviewControl && isReviewControlEnv) {
+      const client = await this.getClient(EServiceEndpointEnum.Utility);
+      const key = platformEnv.isAppleStoreEnv
+        ? 'Intelligent_Diligent_Resourceful_Capable'
+        : 'Mindful_Driven_Responsible_Curious';
+      const response = await client.get<{
+        data: { value: string; key: string }[];
+      }>('/utility/v1/setting', {
+        params: {
+          key,
+        },
+      });
+      const data = response.data.data;
+      if (data.length !== 1 && data[0].key !== key) {
+        return;
+      }
+      const reviewControlValue = data[0].value;
+      if (reviewControlValue && platformEnv.version) {
+        if (semver.lte(platformEnv.version, reviewControlValue)) {
+          await settingsPersistAtom.set((prev) => ({
+            ...prev,
+            reviewControl: true,
+          }));
+        }
+      }
+    }
+  }
+
+  @backgroundMethod()
+  public async getInscriptionProtection() {
+    const { inscriptionProtection } = await settingsPersistAtom.get();
+    return inscriptionProtection;
+  }
+
+  @backgroundMethod()
+  public async checkInscriptionProtectionEnabled({
+    networkId,
+    accountId,
+  }: {
+    networkId: string;
+    accountId: string;
+  }) {
+    if (!networkId || !accountId) {
+      return false;
+    }
+    if (!networkUtils.isBTCNetwork(networkId)) {
+      return false;
+    }
+    const account = await this.backgroundApi.serviceAccount.getAccount({
+      networkId,
+      accountId,
     });
+    return isTaprootPath(account.path);
   }
 }
+
+export default ServiceSetting;

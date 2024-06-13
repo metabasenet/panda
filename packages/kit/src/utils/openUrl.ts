@@ -1,60 +1,26 @@
-import { TabActions } from '@react-navigation/routers';
-import { openURL as LinkingOpenURL } from 'expo-linking';
-
 import platformEnv from '@onekeyhq/shared/src/platformEnv';
+import {
+  EModalRoutes,
+  EModalWebViewRoutes,
+  ERootRoutes,
+} from '@onekeyhq/shared/src/routes';
 
-import { getAppNavigation } from '../hooks/useAppNavigation';
-import { ModalRoutes, RootRoutes, TabRoutes } from '../routes/routesEnum';
-import { webTabsActions } from '../store/observable/webTabs';
-
-export const openUrlByWebview = (
-  url: string,
-  title?: string,
-  options?: {
-    modalMode?: boolean;
-  },
-) => {
-  const navigation = getAppNavigation();
-
-  navigation.navigate(RootRoutes.Modal, {
-    screen: ModalRoutes.Webview,
+export const openUrlByWebview = (url: string, title?: string) => {
+  global.$navigationRef.current?.navigate(ERootRoutes.Modal, {
+    screen: EModalRoutes.WebViewModal,
     params: {
-      url,
-      title,
-      modalMode: options?.modalMode ?? true,
+      screen: EModalWebViewRoutes.WebView,
+      params: {
+        url,
+        title,
+      },
     },
   });
 };
 
-export const openUrl = (
-  url: string,
-  title?: string,
-  options?: {
-    modalMode?: boolean;
-  },
-) => {
+export const openUrl = (url: string, title?: string) => {
   if (platformEnv.isNative) {
-    openUrlByWebview(url, title, options);
-  } else {
-    window.open(url, '_blank');
-  }
-};
-
-export const openDapp = (url: string) => {
-  if (platformEnv.isNative || platformEnv.isDesktop) {
-    const navigation = getAppNavigation();
-    webTabsActions.setIncomingUrl(url);
-
-    navigation?.dispatch(TabActions.jumpTo(TabRoutes.Discover, {}));
-  } else {
-    window.open(url, '_blank');
-  }
-};
-
-export const openUrlExternal = (url: string) => {
-  if (platformEnv.isNative) {
-    // open by OS default browser
-    LinkingOpenURL(url);
+    openUrlByWebview(url, title);
   } else {
     window.open(url, '_blank');
   }

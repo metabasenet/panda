@@ -3,21 +3,19 @@ import { web3Errors } from '@onekeyfe/cross-inpage-provider-errors';
 import { IInjectedProviderNames } from '@onekeyfe/cross-inpage-provider-types';
 import BigNumber from 'bignumber.js';
 
-import { ETHMessageTypes } from '@onekeyhq/engine/src/types/message';
-import type { EvmExtraInfo } from '@onekeyhq/engine/src/types/network';
-import { conflux } from '@onekeyhq/engine/src/vaults/impl/cfx/sdk';
-import type { IEncodedTxCfx } from '@onekeyhq/engine/src/vaults/impl/cfx/Vault';
-import type VaultConflux from '@onekeyhq/engine/src/vaults/impl/cfx/Vault';
-import { getActiveWalletAccount } from '@onekeyhq/kit/src/hooks';
+import { conflux } from '@onekeyhq/core/src/chains/cfx/sdkCfx';
+import type { IEncodedTxCfx } from '@onekeyhq/core/src/chains/cfx/types';
+import type ICfxVault from '@onekeyhq/kit-bg/src/vaults/impls/cfx/Vault';
 import {
   backgroundClass,
   permissionRequired,
   providerApiMethod,
 } from '@onekeyhq/shared/src/background/backgroundDecorators';
-import { IMPL_CFX } from '@onekeyhq/shared/src/engine/engineConsts';
-import debugLogger from '@onekeyhq/shared/src/logger/debugLogger';
 import { memoizee } from '@onekeyhq/shared/src/utils/cacheUtils';
 import { toBigIntHex } from '@onekeyhq/shared/src/utils/numberUtils';
+import { EMessageTypesEth } from '@onekeyhq/shared/types/message';
+
+import { vaultFactory } from '../vaults/factory';
 
 import ProviderApiBase from './ProviderApiBase';
 
@@ -27,53 +25,36 @@ import type {
   IJsonRpcRequest,
 } from '@onekeyfe/cross-inpage-provider-types';
 
-export type WatchAssetParameters = {
-  type: string;
-  options: {
-    address: string;
-    symbol?: string;
-    decimals?: number;
-    image?: string;
-  };
-};
-
-export type AddConfluxChainParameter = {
-  chainId: string;
-  blockExplorerUrls?: string[];
-  chainName?: string;
-  iconUrls?: string[];
-  nativeCurrency?: {
-    name: string;
-    symbol: string;
-    decimals: number;
-  };
-  rpcUrls?: string[];
-};
-
-export type SwitchConfluxChainParameter = {
-  chainId: string;
-};
-
 @backgroundClass()
 class ProviderApiConflux extends ProviderApiBase {
   public providerName = IInjectedProviderNames.conflux;
 
-  _getCurrentNetworkExtraInfoCache = memoizee(
-    async (accountId, networkId, networkImpl) => {
-      let networkInfo: EvmExtraInfo = {
+  async _getCfxVault(request: IJsBridgeMessagePayload) {
+    const accountsInfo =
+      await this.backgroundApi.serviceDApp.dAppGetConnectedAccountsInfo(
+        request,
+      );
+    if (!accountsInfo) {
+      return null;
+    }
+    const { networkId, accountId } = accountsInfo[0].accountInfo ?? {};
+    const vault = (await vaultFactory.getVault({
+      networkId: networkId ?? '',
+      accountId: accountId ?? '',
+    })) as ICfxVault;
+    return vault;
+  }
+
+  _getCurrentNetworkExtraInfo = memoizee(
+    async (request: IJsBridgeMessagePayload) => {
+      let networkInfo = {
         chainId: '0x405',
         networkVersion: '1029',
       };
-
-      if (networkImpl !== IMPL_CFX) {
+      const vault = await this._getCfxVault(request);
+      if (!vault) {
         return networkInfo;
       }
-
-      const vault = (await this.backgroundApi.engine.getVault({
-        networkId,
-        accountId,
-      })) as VaultConflux;
-
       const status = await (await vault.getClient()).getStatus();
       networkInfo = {
         chainId: toBigIntHex(new BigNumber(status.chainId)),
@@ -87,79 +68,74 @@ class ProviderApiConflux extends ProviderApiBase {
     },
   );
 
-  async _getCurrentNetworkExtraInfo(): Promise<EvmExtraInfo> {
-    const { accountId, networkId, networkImpl } = getActiveWalletAccount();
-    return this._getCurrentNetworkExtraInfoCache(
-      accountId,
-      networkId,
-      networkImpl,
-    );
-  }
-
   async _showSignMessageModal(
     request: IJsBridgeMessagePayload,
     unsignedMessage: any,
   ) {
-    const result = await this.backgroundApi.serviceDapp?.openSignAndSendModal(
+    const { accountInfo: { accountId, networkId } = {} } = (
+      await this.getAccountsInfo(request)
+    )[0];
+
+    return this.backgroundApi.serviceDApp.openSignMessageModal({
       request,
-      {
-        unsignedMessage,
-      },
-    );
-    return result;
+      unsignedMessage,
+      accountId: accountId ?? '',
+      networkId: networkId ?? '',
+    });
   }
 
   notifyDappAccountsChanged(info: IProviderBaseBackgroundNotifyInfo): void {
     const data = async ({ origin }: { origin: string }) => {
       const result = {
         method: 'wallet_events_accountsChanged',
-        params: await this.cfx_accounts({ origin }),
+        params: await this.cfx_accounts({ origin, scope: this.providerName }),
       };
       return result;
     };
-    info.send(data);
+    info.send(data, info.targetOrigin);
   }
 
   notifyDappChainChanged(info: IProviderBaseBackgroundNotifyInfo): void {
-    const data = async () => {
+    const data = async ({ origin }: { origin: string }) => {
       const result = {
         method: 'wallet_events_chainChanged',
         params: {
-          chainId: await this.cfx_chainId(),
-          networkId: await this.cfx_netVersion(),
+          chainId: await this.cfx_chainId({ origin, scope: this.providerName }),
+          networkId: await this.cfx_netVersion({
+            origin,
+            scope: this.providerName,
+          }),
         },
       };
       return result;
     };
-    info.send(data);
+    info.send(data, info.targetOrigin);
   }
 
-  public async rpcCall(request: IJsonRpcRequest): Promise<any> {
-    const { networkId, networkImpl } = getActiveWalletAccount();
+  public async rpcCall(request: IJsBridgeMessagePayload): Promise<any> {
+    const { data } = request;
+    const { accountInfo: { networkId } = {} } = (
+      await this.getAccountsInfo(request)
+    )[0];
+    const rpcRequest = data as IJsonRpcRequest;
 
-    if (networkImpl !== IMPL_CFX) {
-      return;
-    }
+    console.log(`${this.providerName} RpcCall=====>>>> : BgApi:`, request);
 
-    debugLogger.providerApi.info('conflux rpcCall:', request, { networkId });
-    const result = await this.backgroundApi.engine.proxyJsonRPCCall(
-      networkId,
-      request,
-    );
-    debugLogger.providerApi.info('conflux rpcCall RESULT:', request, {
-      networkId,
-      result,
+    const [result] = await this.backgroundApi.serviceDApp.proxyRPCCall({
+      networkId: networkId ?? '',
+      request: rpcRequest,
     });
+
     return result;
   }
 
   // ----------------------------------------------
 
   @providerApiMethod()
-  async cfx_getProviderState() {
+  async cfx_getProviderState(request: IJsBridgeMessagePayload) {
     const [chainId, networkId] = await Promise.all([
-      this.cfx_chainId(),
-      this.cfx_netVersion(),
+      this.cfx_chainId(request),
+      this.cfx_netVersion(request),
     ]);
     return {
       chainId,
@@ -169,22 +145,19 @@ class ProviderApiConflux extends ProviderApiBase {
 
   @providerApiMethod()
   async cfx_accounts(request: IJsBridgeMessagePayload) {
-    const accounts = this.backgroundApi.serviceDapp?.getActiveConnectedAccounts(
-      {
-        origin: request.origin as string,
-        impl: IMPL_CFX,
-      },
-    );
-    if (!accounts) {
+    const accountsInfo =
+      await this.backgroundApi.serviceDApp.dAppGetConnectedAccountsInfo(
+        request,
+      );
+    if (!accountsInfo) {
       return Promise.resolve([]);
     }
-    const accountAddresses = accounts.map((account) => account.address);
-    return Promise.resolve(accountAddresses);
+    return Promise.resolve(accountsInfo.map((i) => i.account?.address));
   }
 
   @providerApiMethod()
-  async cfx_chainId() {
-    const networkExtraInfo = await this._getCurrentNetworkExtraInfo();
+  async cfx_chainId(request: IJsBridgeMessagePayload) {
+    const networkExtraInfo = await this._getCurrentNetworkExtraInfo(request);
     return networkExtraInfo.chainId;
   }
 
@@ -200,30 +173,29 @@ class ProviderApiConflux extends ProviderApiBase {
     ...params: any[]
   ) {
     return this.rpcCall({
-      method: 'cfx_getNextNonce',
-      params,
+      ...request,
+      data: {
+        method: 'cfx_getNextNonce',
+        params,
+      },
     });
   }
 
   @providerApiMethod()
-  async cfx_netVersion() {
-    const networkExtraInfo = await this._getCurrentNetworkExtraInfo();
+  async cfx_netVersion(request: IJsBridgeMessagePayload) {
+    const networkExtraInfo = await this._getCurrentNetworkExtraInfo(request);
     return networkExtraInfo.networkVersion;
   }
 
   @providerApiMethod()
   async cfx_requestAccounts(request: IJsBridgeMessagePayload) {
-    debugLogger.providerApi.info(
-      'ProviderApiConflux.cfx_requestAccounts',
-      request,
-    );
+    console.log('ProviderApiConflux.cfx_requestAccounts', request);
 
     const accounts = await this.cfx_accounts(request);
     if (accounts && accounts.length) {
       return accounts;
     }
-
-    await this.backgroundApi.serviceDapp.openConnectionModal(request);
+    await this.backgroundApi.serviceDApp.openConnectionModal(request);
     return this.cfx_accounts(request);
   }
 
@@ -233,39 +205,43 @@ class ProviderApiConflux extends ProviderApiBase {
     request: IJsBridgeMessagePayload,
     transaction: IEncodedTxCfx,
   ) {
+    console.log('cfx_sendTransaction', request, transaction);
+
+    const { accountInfo: { accountId, networkId } = {} } = (
+      await this.getAccountsInfo(request)
+    )[0];
+
     const gasPrice = new BigNumber(transaction.gasPrice ?? 0);
 
     if (gasPrice.isLessThan(conflux.CONST.MIN_GAS_PRICE)) {
       delete transaction.gasPrice;
     }
 
-    debugLogger.providerApi.info('cfx_sendTransaction', request, transaction);
-    const result = await this.backgroundApi.serviceDapp?.openSignAndSendModal(
-      request,
-      {
+    const result =
+      await this.backgroundApi.serviceDApp.openSignAndSendTransactionModal({
+        request,
         encodedTx: transaction,
-      },
-    );
+        accountId: accountId ?? '',
+        networkId: networkId ?? '',
+      });
 
-    debugLogger.providerApi.info(
-      'cfx_sendTransaction DONE',
-      result,
-      request,
-      transaction,
-    );
+    console.log('cfx_sendTransaction DONE', result, request, transaction);
 
     return result;
   }
 
   @providerApiMethod()
-  cfx_signTypedData_v4() {
-    // Temporarily not supported
-    throw web3Errors.provider.unsupportedMethod();
+  cfx_signTypedData_v4(request: IJsBridgeMessagePayload, ...messages: any[]) {
+    return this._showSignMessageModal(request, {
+      type: EMessageTypesEth.TYPED_DATA_V4,
+      message: messages[1],
+      payload: messages,
+    });
   }
 
   @providerApiMethod()
-  async net_version() {
-    return this.cfx_netVersion();
+  async net_version(request: IJsBridgeMessagePayload) {
+    return this.cfx_netVersion(request);
   }
 
   @providerApiMethod()
@@ -273,16 +249,16 @@ class ProviderApiConflux extends ProviderApiBase {
     const message = messages[0];
 
     return this._showSignMessageModal(request, {
-      type: ETHMessageTypes.PERSONAL_SIGN,
+      type: EMessageTypesEth.PERSONAL_SIGN,
       message,
       payload: messages,
     });
   }
 
   @providerApiMethod()
-  cfx_sign(req: IJsBridgeMessagePayload, ...messages: any[]) {
-    return this._showSignMessageModal(req, {
-      type: ETHMessageTypes.ETH_SIGN,
+  cfx_sign(request: IJsBridgeMessagePayload, ...messages: any[]) {
+    return this._showSignMessageModal(request, {
+      type: EMessageTypesEth.ETH_SIGN,
       message: messages[1],
       payload: messages,
     });
@@ -290,15 +266,17 @@ class ProviderApiConflux extends ProviderApiBase {
 
   @providerApiMethod()
   wallet_addConfluxChain() {
-    // Temporarily not supported
     throw web3Errors.provider.unsupportedMethod();
   }
 
   @providerApiMethod()
-  wallet_getBalance(_: IJsBridgeMessagePayload, ...params: any[]) {
+  wallet_getBalance(request: IJsBridgeMessagePayload, ...params: any[]) {
     return this.rpcCall({
-      method: 'cfx_getBalance',
-      params,
+      ...request,
+      data: {
+        method: 'cfx_getBalance',
+        params,
+      },
     });
   }
 
@@ -327,7 +305,6 @@ class ProviderApiConflux extends ProviderApiBase {
 
   @providerApiMethod()
   wallet_switchConfluxChain() {
-    // Temporarily not supported
     throw web3Errors.provider.unsupportedMethod();
   }
 
@@ -348,19 +325,8 @@ class ProviderApiConflux extends ProviderApiBase {
 
   @permissionRequired()
   @providerApiMethod()
-  async wallet_watchAsset(
-    request: IJsBridgeMessagePayload,
-    params: WatchAssetParameters,
-  ) {
-    const type = params.type ?? '';
-    if (type !== 'ERC20' && type !== 'CRC20') {
-      throw new Error(`Asset of type '${type}' not supported`);
-    }
-    const result = await this.backgroundApi.serviceDapp?.openAddTokenModal(
-      request,
-      params,
-    );
-    return result;
+  async wallet_watchAsset() {
+    throw web3Errors.provider.unsupportedMethod();
   }
 }
 

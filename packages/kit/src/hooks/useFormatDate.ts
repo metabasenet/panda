@@ -9,19 +9,20 @@ import {
 } from 'date-fns';
 import { enUS, ja, ko, zhCN, zhHK } from 'date-fns/locale';
 
-import { useLocale } from '@onekeyhq/components';
-import type { LocaleSymbol } from '@onekeyhq/components/src/locale';
+import type { ILocaleSymbol } from '@onekeyhq/shared/src/locale';
+
+import { useLocaleVariant } from './useLocaleVariant';
 
 import type { Duration } from 'date-fns';
 
-const parseLocal = (localeSymbol: LocaleSymbol) => {
+const parseLocal = (localeSymbol: ILocaleSymbol) => {
   switch (localeSymbol) {
     case 'zh-CN':
       return zhCN;
     case 'en-US':
       return enUS;
-    case 'zh-HK':
-      return zhHK;
+    // case 'zh-HK':
+    //   return zhHK;
     case 'ja-JP':
       return ja;
     case 'ko-KR':
@@ -31,21 +32,22 @@ const parseLocal = (localeSymbol: LocaleSymbol) => {
   }
 };
 
-export type FormatDateOptions = {
+export type IFormatDateOptions = {
   hideTheYear?: boolean;
   hideTheMonth?: boolean;
   hideYear?: boolean;
   hideMonth?: boolean;
   hideTimeForever?: boolean;
+  onlyTime?: boolean;
 };
 
-export type FormatMonthOptions = {
+export type IFormatMonthOptions = {
   hideTheYear?: boolean;
   hideYear?: boolean;
 };
 
 export default function useFormatDate() {
-  const { locale } = useLocale();
+  const locale = useLocaleVariant();
 
   const format = useCallback(
     (date: Date | string, _format?: string) => {
@@ -68,7 +70,7 @@ export default function useFormatDate() {
   );
 
   const formatDate = useCallback(
-    (date: Date | string, options?: FormatDateOptions) => {
+    (date: Date | string, options?: IFormatDateOptions) => {
       let parsedDate: Date;
       if (typeof date === 'string') {
         parsedDate = parseISO(date);
@@ -95,6 +97,9 @@ export default function useFormatDate() {
       if (options?.hideTimeForever) {
         formatTemplate = formatTemplate.replace(', HH:mm', '');
       }
+      if (options?.onlyTime) {
+        formatTemplate = 'HH:mm';
+      }
 
       return format(parsedDate, formatTemplate) ?? '';
     },
@@ -102,7 +107,7 @@ export default function useFormatDate() {
   );
 
   const formatMonth = useCallback(
-    (date: Date | string, options?: FormatMonthOptions) => {
+    (date: Date | string, options?: IFormatMonthOptions) => {
       let parsedDate: Date;
       if (typeof date === 'string') {
         parsedDate = parseISO(date);
