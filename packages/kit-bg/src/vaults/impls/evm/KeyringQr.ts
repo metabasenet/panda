@@ -72,7 +72,7 @@ export class KeyringQr extends KeyringQrBase {
     };
   }
 
-  override generateSignRequest(
+  generateSignRequest(
     params: IAirGapGenerateSignRequestParamsEvm,
   ): Promise<AirGapUR> {
     if (!params.xfp) {
@@ -86,7 +86,7 @@ export class KeyringQr extends KeyringQrBase {
     return Promise.resolve(signRequestUr);
   }
 
-  override parseSignature(ur: AirGapUR): Promise<IAirGapSignature> {
+  parseSignature(ur: AirGapUR): Promise<IAirGapSignature> {
     const sdk = getAirGapSdk();
     const sig = sdk.eth.parseSignature(ur);
     return Promise.resolve(sig);
@@ -143,7 +143,10 @@ export class KeyringQr extends KeyringQrBase {
             });
             return signRequestUr;
           },
-          signedResultBuilder: async ({ signature }) => {
+          signedResultBuilder: async ({ signatureUr }) => {
+            const signature = await this.parseSignature(
+              checkIsDefined(signatureUr),
+            );
             const signatureHex = signature.signature;
             return hexUtils.addHexPrefix(signatureHex);
           },
@@ -183,15 +186,18 @@ export class KeyringQr extends KeyringQrBase {
         });
         return signRequestUr;
       },
-      signedResultBuilder: async ({ signature }) => {
+      signedResultBuilder: async ({ signatureUr }) => {
+        const signature = await this.parseSignature(
+          checkIsDefined(signatureUr),
+        );
         const signatureHex = signature.signature;
 
-        const verifyMessageFn = verifyMessage;
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const verifyResult = verifyMessageFn(
-          hexUtils.stripHexPrefix(serializedTxWithout0x),
-          hexUtils.addHexPrefix(signatureHex),
-        ); // verify signature
+        // const verifyMessageFn = verifyMessage;
+        // // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        // const verifyResult = verifyMessageFn(
+        //   hexUtils.stripHexPrefix(serializedTxWithout0x),
+        //   hexUtils.addHexPrefix(signatureHex),
+        // ); // verify signature
 
         const r = hexUtils.addHexPrefix(signatureHex.slice(0, 32 * 2));
         const s = hexUtils.addHexPrefix(signatureHex.slice(32 * 2, 64 * 2));
@@ -205,7 +211,11 @@ export class KeyringQr extends KeyringQrBase {
             v,
           },
         });
-        return { txid, rawTx, encodedTx: params.unsignedTx.encodedTx };
+        return Promise.resolve({
+          txid,
+          rawTx,
+          encodedTx: params.unsignedTx.encodedTx,
+        });
       },
     });
   }
@@ -236,7 +246,10 @@ export class KeyringQr extends KeyringQrBase {
           }
 
           const { fullPath, airGapAccount, childPathTemplate } =
-            await this.findQrWalletAirGapAccount(params, { index, wallet });
+            await this.findAirGapAccountInPrepareAccounts(params, {
+              index,
+              wallet,
+            });
 
           if (!airGapAccount) {
             throw new OneKeyErrorAirGapAccountNotFound();

@@ -1,15 +1,24 @@
 import { toast } from '@backpackapp-io/react-native-toast';
+import { Dimensions } from 'react-native';
 
 import { View, XStack } from '../../primitives';
 
 import type { IToastMessageOptions } from './type';
 
-export function showMessage({ title, duration }: IToastMessageOptions) {
+const GAP = 104;
+export function showMessage({ renderContent, duration }: IToastMessageOptions) {
+  const windowWidth = Dimensions.get('window').width;
   toast('', {
+    width: windowWidth - GAP * 2,
     duration,
     disableShadow: true,
     customToast: ({ width }) => (
-      <XStack alignItems="center" justifyContent="center" width={width}>
+      <XStack
+        alignItems="center"
+        justifyContent="center"
+        alignSelf="center"
+        width={width}
+      >
         <View
           bg="$bgApp"
           px="$4"
@@ -24,7 +33,7 @@ export function showMessage({ title, duration }: IToastMessageOptions) {
           shadowRadius={4.65}
           elevationAndroid={7}
         >
-          {title}
+          {renderContent({ width })}
         </View>
       </XStack>
     ),

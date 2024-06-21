@@ -2,7 +2,10 @@ import BigNumber from 'bignumber.js';
 import { isEmpty } from 'lodash';
 
 import { XRPL } from '@onekeyhq/core/src/chains/xrp/sdkXrp';
-import type { IEncodedTxXrp } from '@onekeyhq/core/src/chains/xrp/types';
+import type {
+  IDecodedTxExtraXrp,
+  IEncodedTxXrp,
+} from '@onekeyhq/core/src/chains/xrp/types';
 import {
   decodeSensitiveText,
   encodeSensitiveText,
@@ -10,10 +13,13 @@ import {
 import type { IUnsignedTxPro } from '@onekeyhq/core/src/types';
 import {
   InvalidAddress,
+  InvalidTransferValue,
   NotImplemented,
   OneKeyInternalError,
 } from '@onekeyhq/shared/src/errors';
+import { ETranslations } from '@onekeyhq/shared/src/locale';
 import bufferUtils from '@onekeyhq/shared/src/utils/bufferUtils';
+import { memoizee } from '@onekeyhq/shared/src/utils/cacheUtils';
 import type {
   IAddressValidation,
   IGeneralInputValidation,
@@ -22,8 +28,9 @@ import type {
   IXprvtValidation,
   IXpubValidation,
 } from '@onekeyhq/shared/types/address';
-import { EOnChainHistoryTxType } from '@onekeyhq/shared/types/history';
-import { EDecodedTxStatus, type IDecodedTx } from '@onekeyhq/shared/types/tx';
+import type { IOnChainHistoryTx } from '@onekeyhq/shared/types/history';
+import { EDecodedTxStatus } from '@onekeyhq/shared/types/tx';
+import type { IDecodedTx } from '@onekeyhq/shared/types/tx';
 
 import { VaultBase } from '../../base/VaultBase';
 
@@ -89,8 +96,8 @@ export default class Vault extends VaultBase {
     const { to, amount } = transferInfo;
     const dbAccount = await this.getAccount();
     let destination = to;
-    let destinationTag: number | undefined = transferInfo.destinationTag
-      ? Number(transferInfo.destinationTag)
+    let destinationTag: number | undefined = transferInfo.memo
+      ? Number(transferInfo.memo)
       : undefined;
     // Slice destination tag from swap address
     if (!XRPL.isValidAddress(to) && to.indexOf('#') > -1) {
@@ -192,9 +199,6 @@ export default class Vault extends VaultBase {
       networkId: this.networkId,
       accountId: this.accountId,
       extraInfo: null,
-      payload: {
-        type: EOnChainHistoryTxType.Send,
-      },
       encodedTx,
     };
 
@@ -218,6 +222,18 @@ export default class Vault extends VaultBase {
     params: IUpdateUnsignedTxParams,
   ): Promise<IUnsignedTxPro> {
     return Promise.resolve(params.unsignedTx);
+  }
+
+  override buildOnChainHistoryTxExtraInfo({
+    onChainHistoryTx,
+  }: {
+    onChainHistoryTx: IOnChainHistoryTx;
+  }): Promise<IDecodedTxExtraXrp> {
+    return Promise.resolve({
+      destinationTag: onChainHistoryTx.destinationTag,
+      ledgerIndex: onChainHistoryTx.ledgerIndex,
+      lastLedgerSequence: onChainHistoryTx.lastLedgerSequence,
+    });
   }
 
   override validateAddress(address: string): Promise<IAddressValidation> {
@@ -264,5 +280,76 @@ export default class Vault extends VaultBase {
   ): Promise<IGeneralInputValidation> {
     const { result } = await this.baseValidateGeneralInput(params);
     return result;
+  }
+
+  private _getAccountInfo = memoizee(
+    async (address: string) => {
+      const [accountInfo] =
+        await this.backgroundApi.serviceAccountProfile.sendProxyRequest<{
+          success: boolean;
+          error: string;
+        }>({
+          networkId: this.networkId,
+          body: [
+            {
+              route: 'rpc',
+              params: {
+                method: 'request',
+                params: [
+                  {
+                    'command': 'account_info',
+                    'account': address,
+                    'ledger_index': 'validated',
+                  },
+                ],
+              },
+            },
+          ],
+          returnRawData: true,
+        });
+      if (accountInfo.success === false) {
+        throw new Error(accountInfo.error);
+      }
+      return accountInfo;
+    },
+    {
+      promise: true,
+      max: 1,
+      maxAge: 1000 * 30,
+    },
+  );
+
+  override async validateSendAmount({
+    amount,
+    to,
+  }: {
+    amount: string;
+    tokenBalance: string;
+    to: string;
+  }): Promise<boolean> {
+    if (!to) return true;
+
+    const amountBN = new BigNumber(amount);
+    try {
+      await this._getAccountInfo(to);
+    } catch (e) {
+      const error = (e as Error).message ?? '';
+      if (error.includes('Account not found')) {
+        if (amountBN.lt(10)) {
+          throw new InvalidTransferValue({
+            key: ETranslations.form_amount_recipient_activate,
+            info: {
+              amount: '10',
+              unit: 'XRP',
+            },
+          });
+        } else {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    return true;
   }
 }

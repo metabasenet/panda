@@ -5,6 +5,11 @@ import type { IStakingInfo } from './staking';
 import type { IToken } from './token';
 import type { IDecodedTx, IReplacedTxType } from './tx';
 
+export enum EHistoryTxDetailsBlock {
+  Flow = 'Flow',
+  Attributes = 'Attributes',
+}
+
 export enum EOnChainHistoryTransferType {
   Transfer,
   Approve,
@@ -80,12 +85,25 @@ export type IOnChainHistoryTx = {
   value: string;
   label: string;
   confirmations?: number;
+  block?: number;
   inputs?: IOnChainHistoryTxUTXOInput[];
   outputs?: IOnChainHistoryTxUTXOOutput[];
 
   tokenApprove?: IOnChainHistoryTxApprove;
   // TODO: on chain swap info
   swapInfo?: any;
+
+  // Lightning network attributes
+  description?: string;
+  preimage?: string;
+
+  // Ripple
+  destinationTag?: number;
+  ledgerIndex?: number;
+  lastLedgerSequence?: number;
+
+  // Dynex
+  paymentId?: string;
 };
 
 export type IAccountHistoryTx = {
@@ -114,6 +132,7 @@ export type IFetchAccountHistoryParams = {
   xpub?: string;
   tokenIdOnNetwork?: string;
   onChainHistoryDisabled?: boolean;
+  saveConfirmedTxsEnabled?: boolean;
 };
 
 export type IOnChainHistoryTxToken = {
@@ -130,9 +149,11 @@ export type IFetchAccountHistoryResp = {
 };
 
 export type IFetchHistoryTxDetailsParams = {
+  accountId: string;
   networkId: string;
   txid: string;
-  accountAddress: string;
+  accountAddress?: string;
+  xpub?: string;
 };
 
 export type IFetchTxDetailsParams = {
@@ -145,4 +166,18 @@ export type IFetchHistoryTxDetailsResp = {
   data: IOnChainHistoryTx;
   tokens: Record<string, IOnChainHistoryTxToken>; // <tokenAddress, token>
   nfts: Record<string, IOnChainHistoryTxNFT>; // <nftAddress, nft>
+};
+
+export type IHistoryTxMetaProps = {
+  decodedTx: IDecodedTx;
+  txDetails?: IOnChainHistoryTx;
+};
+
+export type IHistoryTxMetaComponents = {
+  [EHistoryTxDetailsBlock.Flow]?: (
+    props: IHistoryTxMetaProps,
+  ) => JSX.Element | null;
+  [EHistoryTxDetailsBlock.Attributes]?: (
+    props: IHistoryTxMetaProps,
+  ) => JSX.Element | null;
 };

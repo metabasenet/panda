@@ -52,8 +52,8 @@ export type IFetchAccountDetailsResp = {
   };
   frozenBalance?: string;
   frozenBalanceParsed?: string;
-  availableBalance?: string;
-  availableBalanceParsed?: string;
+  totalBalance?: string;
+  totalBalanceParsed?: string;
 };
 
 export type IValidateAddressResp = {
@@ -112,4 +112,5 @@ export type IQueryCheckAddressArgs = {
   enableWalletName?: boolean;
   enableAddressInteractionStatus?: boolean;
   enableVerifySendFundToSelf?: boolean;
+  skipValidateAddress?: boolean;
 };

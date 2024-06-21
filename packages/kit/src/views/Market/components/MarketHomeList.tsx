@@ -23,7 +23,6 @@ import {
   Button,
   Icon,
   IconButton,
-  Image,
   ListView,
   NumberSizeableText,
   Select,
@@ -57,6 +56,7 @@ import useAppNavigation from '../../../hooks/useAppNavigation';
 
 import { MarketMore } from './MarketMore';
 import { MarketStar } from './MarketStar';
+import { MarketTokenIcon } from './MarketTokenIcon';
 import { PriceChangePercentage } from './PriceChangePercentage';
 import SparklineChart from './SparklineChart';
 import { ToggleButton } from './ToggleButton';
@@ -145,7 +145,7 @@ type ITableColumnConfig = Record<
   (item: IMarketToken) => ReactElement | string
 >;
 
-const useBuildTableRowConfig = (showMoreAction = false) => {
+const useBuildTableRowConfig = (showMoreAction = false, tabIndex = 0) => {
   // const navigation = useAppNavigation();
   const colors = useThemeValue(
     ['textSuccess', 'textCritical'],
@@ -161,11 +161,7 @@ const useBuildTableRowConfig = (showMoreAction = false) => {
       ),
       'name': (item) => (
         <XStack space="$3" ai="center">
-          <Image
-            src={decodeURIComponent(item.image)}
-            size="$8"
-            borderRadius="$full"
-          />
+          <MarketTokenIcon uri={item.image} size="$8" />
           <YStack width="$20">
             <SizableText size="$bodyLgMedium">
               {item.symbol.toUpperCase()}
@@ -271,7 +267,12 @@ const useBuildTableRowConfig = (showMoreAction = false) => {
       ),
       'actions': (item) => (
         <XStack>
-          <MarketStar coingeckoId={item.coingeckoId} width={44} mx={0} />
+          <MarketStar
+            coingeckoId={item.coingeckoId}
+            width={44}
+            mx={0}
+            tabIndex={tabIndex}
+          />
           {showMoreAction ? (
             <MarketMore coingeckoId={item.coingeckoId} width={44} />
           ) : null}
@@ -279,7 +280,7 @@ const useBuildTableRowConfig = (showMoreAction = false) => {
       ),
     };
     return tableRowConfig;
-  }, [colors, showMoreAction]);
+  }, [colors, showMoreAction, tabIndex]);
 };
 
 function TableRow({
@@ -646,35 +647,41 @@ function BasicMarketHomeList({
   category,
   tabIndex = 0,
   showMoreAction = false,
+  ordered,
 }: {
   tabIndex?: number;
   category: IMarketCategory;
   showMoreAction?: boolean;
+  ordered?: boolean;
 }) {
   const intl = useIntl();
   const navigation = useAppNavigation();
 
-  const { result: listData } = usePromiseResult(
-    async () =>
-      backgroundApiProxy.serviceMarket.fetchCategory(
+  const updateAtRef = useRef(0);
+
+  const [listData, setListData] = useState<IMarketToken[]>([]);
+  const fetchCategory = useCallback(async () => {
+    const now = Date.now();
+    if (now - updateAtRef.current > 45 * 1000) {
+      const response = await backgroundApiProxy.serviceMarket.fetchCategory(
         category.categoryId,
         category.coingeckoIds,
         true,
-      ),
-    [category.categoryId, category.coingeckoIds],
-    {
-      checkIsFocused: false,
-      overrideIsFocused: () => false,
-    },
-  );
+      );
+      setListData(response);
+    }
+  }, [category.categoryId, category.coingeckoIds]);
 
-  const tableRowConfig = useBuildTableRowConfig(showMoreAction);
+  useEffect(() => {
+    void fetchCategory();
+  }, [fetchCategory]);
+
+  const tableRowConfig = useBuildTableRowConfig(showMoreAction, tabIndex);
 
   const toDetailPage = useCallback(
     (item: IMarketToken) => {
       navigation.push(ETabMarketRoutes.MarketDetail, {
         coinGeckoId: item.coingeckoId,
-        icon: item.image,
         symbol: item.symbol,
       });
     },
@@ -708,15 +715,25 @@ function BasicMarketHomeList({
     [intl],
   );
 
-  const filterCoingeckoIdsListData = useMemo(
-    () =>
-      category.coingeckoIds?.length
-        ? listData?.filter((item) =>
-            category.coingeckoIds.includes(item.coingeckoId),
-          )
-        : listData,
-    [listData, category.coingeckoIds],
-  );
+  const filterCoingeckoIdsListData = useMemo(() => {
+    const filterListData = category.coingeckoIds?.length
+      ? listData?.filter((item) =>
+          category.coingeckoIds.includes(item.coingeckoId),
+        )
+      : listData;
+    if (ordered) {
+      return category.coingeckoIds.reduce((prev, coingeckoId) => {
+        const item = filterListData?.find(
+          (i) => i?.coingeckoId === coingeckoId,
+        );
+        if (item) {
+          prev.push(item);
+        }
+        return prev;
+      }, [] as IMarketToken[]);
+    }
+    return filterListData;
+  }, [category.coingeckoIds, listData, ordered]);
   const { sortedListData, handleSortTypeChange, sortByType, setSortByType } =
     useSortType(filterCoingeckoIdsListData as Record<string, any>[]);
 
@@ -831,11 +848,7 @@ function BasicMarketHomeList({
             {...(platformEnv.isNative ? pressEvents : undefined)}
           >
             <XStack space="$3" ai="center">
-              <Image
-                src={decodeURIComponent(item.image)}
-                size="$10"
-                borderRadius="$full"
-              />
+              <MarketTokenIcon uri={item.image} size="$10" />
               <YStack>
                 <SizableText size="$bodyLgMedium">
                   {item.symbol.toUpperCase()}
@@ -880,6 +893,7 @@ function BasicMarketHomeList({
                     size="$bodyMdMedium"
                     color="white"
                     formatter="priceChange"
+                    formatterOptions={{ showPlusMinusSigns: true }}
                   >
                     {item[mdColumnKeys[1]] as string}
                   </NumberSizeableText>
@@ -985,26 +999,30 @@ function BasicMarketHomeList({
 
   const onSwitchMarketHomeTabCallback = useCallback(
     ({ tabIndex: currentTabIndex }: { tabIndex: number }) => {
-      if (currentTabIndex !== tabIndex) {
-        handleMdSortByTypeChange('Default');
-      }
+      setTimeout(() => {
+        if (currentTabIndex !== tabIndex) {
+          if (md) {
+            handleMdSortByTypeChange('Default');
+          }
+        } else {
+          void fetchCategory();
+        }
+      }, 10);
     },
-    [handleMdSortByTypeChange, tabIndex],
+    [fetchCategory, handleMdSortByTypeChange, md, tabIndex],
   );
 
   useEffect(() => {
-    if (md) {
-      appEventBus.on(
+    appEventBus.on(
+      EAppEventBusNames.SwitchMarketHomeTab,
+      onSwitchMarketHomeTabCallback,
+    );
+    return () => {
+      appEventBus.off(
         EAppEventBusNames.SwitchMarketHomeTab,
         onSwitchMarketHomeTabCallback,
       );
-      return () => {
-        appEventBus.off(
-          EAppEventBusNames.SwitchMarketHomeTab,
-          onSwitchMarketHomeTabCallback,
-        );
-      };
-    }
+    };
   }, [md, onSwitchMarketHomeTabCallback, tabIndex]);
 
   if (platformEnv.isNativeAndroid && !sortedListData?.length) {

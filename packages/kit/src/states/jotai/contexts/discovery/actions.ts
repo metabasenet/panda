@@ -23,6 +23,7 @@ import {
   injectToResumeWebsocket,
   webviewRefs,
 } from '@onekeyhq/kit/src/views/Discovery/utils/explorerUtils';
+import { ETranslations } from '@onekeyhq/shared/src/locale';
 import { appLocale } from '@onekeyhq/shared/src/locale/appLocale';
 import platformEnv from '@onekeyhq/shared/src/platformEnv';
 import { ETabRoutes } from '@onekeyhq/shared/src/routes';
@@ -66,6 +67,7 @@ function buildWebTabData(tabs: IWebTab[]) {
   };
 }
 
+const ABOUT_PROTOCOL = 'about:';
 const BLANK_PAGE_URL = 'about:blank';
 export const homeTab: IWebTab = {
   id: 'home',
@@ -282,9 +284,8 @@ class ContextJotaiActionsDiscovery extends ContextJotaiActionsBase {
         throw new Error('buildBookmarkData: payload must be an array');
       }
       // set(browserBookmarkAtom(), payload);
-      void backgroundApiProxy.simpleDb.browserBookmarks.setRawData({
-        data: payload,
-      });
+
+      void backgroundApiProxy.serviceDiscovery.setBrowserBookmarks(payload);
     },
   );
 
@@ -533,8 +534,8 @@ class ContextJotaiActionsDiscovery extends ContextJotaiActionsBase {
         if (disabledAddedNewTab) {
           Toast.message({
             title: appLocale.intl.formatMessage(
-              { id: 'msg__tab_has_reached_the_maximum_limit_of_str' },
-              { 0: '20' },
+              { id: ETranslations.explore_toast_tab_limit_reached },
+              { number: '20' },
             ),
           });
           return;
@@ -705,7 +706,7 @@ class ContextJotaiActionsDiscovery extends ContextJotaiActionsBase {
 
   validateWebviewSrc = contextAtomMethod((get, _, url: string) => {
     if (!url) return EValidateUrlEnum.InvalidUrl;
-    if (url === BLANK_PAGE_URL) return EValidateUrlEnum.Valid;
+    if (new URL(url).protocol === ABOUT_PROTOCOL) return EValidateUrlEnum.Valid;
     const cache = get(phishingLruCacheAtom());
     const { action } = uriUtils.parseDappRedirect(
       url,

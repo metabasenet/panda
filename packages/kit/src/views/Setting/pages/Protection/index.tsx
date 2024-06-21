@@ -11,7 +11,6 @@ import backgroundApiProxy from '@onekeyhq/kit/src/background/instance/background
 import { ListItem } from '@onekeyhq/kit/src/components/ListItem';
 import { useSettingsPersistAtom } from '@onekeyhq/kit-bg/src/states/jotai/atoms/settings';
 import { ETranslations } from '@onekeyhq/shared/src/locale';
-import { EReasonForNeedPassword } from '@onekeyhq/shared/types/setting';
 
 const SettingProtectionModal = () => {
   const intl = useIntl();
@@ -40,7 +39,7 @@ const SettingProtectionModal = () => {
               }}
             />
           </ListItem>
-          <SizableText pl="$5" size="$bodySm" color="$textSubdued">
+          <SizableText px="$5" size="$bodySm" color="$textSubdued">
             {intl.formatMessage({
               id: ETranslations.settings_token_risk_reminder_desc,
             })}
@@ -55,22 +54,12 @@ const SettingProtectionModal = () => {
             title={intl.formatMessage({
               id: ETranslations.settings_create_transactions,
             })}
-            subtitle={intl.formatMessage({
-              id: ETranslations.settings_create_transactions_desc,
-            })}
           >
             <Switch
-              value={settings.protectCreateTransaction}
+              value={!settings.protectCreateTransaction}
               onChange={async (value) => {
-                if (!value) {
-                  await backgroundApiProxy.servicePassword.promptPasswordVerify(
-                    {
-                      reason: EReasonForNeedPassword.Security,
-                    },
-                  );
-                }
                 await backgroundApiProxy.serviceSetting.setProtectCreateTransaction(
-                  value,
+                  !value,
                 );
               }}
             />
@@ -79,22 +68,12 @@ const SettingProtectionModal = () => {
             title={intl.formatMessage({
               id: ETranslations.settings_create_remove_wallets,
             })}
-            subtitle={intl.formatMessage({
-              id: ETranslations.settings_create_remove_wallets_desc,
-            })}
           >
             <Switch
-              value={settings.protectCreateOrRemoveWallet}
+              value={!settings.protectCreateOrRemoveWallet}
               onChange={async (value) => {
-                if (!value) {
-                  await backgroundApiProxy.servicePassword.promptPasswordVerify(
-                    {
-                      reason: EReasonForNeedPassword.Security,
-                    },
-                  );
-                }
                 await backgroundApiProxy.serviceSetting.setProtectCreateOrRemoveWallet(
-                  value,
+                  !value,
                 );
               }}
             />

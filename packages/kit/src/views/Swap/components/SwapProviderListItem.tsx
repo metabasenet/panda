@@ -116,6 +116,16 @@ const SwapProviderListItem = ({
 
   const leftMainLabel = useMemo(() => {
     if (disabled) {
+      if (providerResult?.errorMessage === 'Token not supported') {
+        return intl.formatMessage({
+          id: ETranslations.provider_token_not_supported,
+        });
+      }
+      if (providerResult?.errorMessage === 'Insufficient input amount') {
+        return intl.formatMessage({
+          id: ETranslations.provider_amount_required,
+        });
+      }
       return (
         providerResult?.errorMessage ||
         intl.formatMessage({
@@ -142,11 +152,15 @@ const SwapProviderListItem = ({
       if (providerResult.limit.max) {
         const maxBN = new BigNumber(providerResult.limit.max);
         if (fromTokenAmountBN.gt(maxBN)) {
-          return `Max swap amount requires ${
-            numberFormat(providerResult.limit.max, {
-              formatter: 'balance',
-            }) as string
-          } ${fromToken?.symbol ?? 'unknown'}`;
+          return intl.formatMessage(
+            { id: ETranslations.provider_max_amount_required },
+            {
+              amount: numberFormat(providerResult.limit.max, {
+                formatter: 'balance',
+              }) as string,
+              token: fromToken?.symbol ?? 'unknown',
+            },
+          );
         }
       }
     }

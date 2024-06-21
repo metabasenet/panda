@@ -1,7 +1,10 @@
 import BigNumber from 'bignumber.js';
 import { isNil } from 'lodash';
 
-import type { IUnsignedMessage } from '@onekeyhq/core/src/types';
+import type {
+  IUnsignedMessage,
+  IUnsignedTxPro,
+} from '@onekeyhq/core/src/types';
 import {
   backgroundClass,
   backgroundMethod,
@@ -182,9 +185,14 @@ class ServiceSend extends ServiceBase {
 
     const devSetting =
       await this.backgroundApi.serviceDevSetting.getDevSetting();
+    const vaultSettings =
+      await this.backgroundApi.serviceNetwork.getVaultSettings({ networkId });
+    const alwaysSignOnlySendTxInDev =
+      devSetting?.settings?.alwaysSignOnlySendTx;
+
     // skip external account send, as rawTx is empty
     if (
-      !devSetting?.settings?.alwaysSignOnlySendTx &&
+      !alwaysSignOnlySendTxInDev &&
       !signOnly &&
       !accountUtils.isExternalAccount({
         accountId,
@@ -200,6 +208,9 @@ class ServiceSend extends ServiceBase {
         signedTx,
       });
       if (!txid) {
+        if (vaultSettings.withoutBroadcastTxId) {
+          return signedTx;
+        }
         throw new Error('Broadcast transaction failed.');
       }
       return { ...signedTx, txid };
@@ -310,12 +321,12 @@ class ServiceSend extends ServiceBase {
 
     const maxPendingNonce =
       await this.backgroundApi.simpleDb.localHistory.getMaxPendingNonce({
-        accountId,
+        accountAddress,
         networkId,
       });
     const pendingNonceList =
       await this.backgroundApi.simpleDb.localHistory.getPendingNonceList({
-        accountId,
+        accountAddress,
         networkId,
       });
     let nextNonce = Math.max(
@@ -499,6 +510,24 @@ class ServiceSend extends ServiceBase {
       return tokenDetails.info.isNative;
     }
     return vaultSettings.hasFrozenBalance;
+  }
+
+  @backgroundMethod()
+  @toastIfError()
+  async precheckUnsignedTxs(params: {
+    networkId: string;
+    accountId: string;
+    unsignedTxs: IUnsignedTxPro[];
+  }) {
+    const vault = await vaultFactory.getVault({
+      networkId: params.networkId,
+      accountId: params.accountId,
+    });
+    for (const unsignedTx of params.unsignedTxs) {
+      await vault.precheckUnsignedTx({
+        unsignedTx,
+      });
+    }
   }
 }
 

@@ -86,7 +86,7 @@ class ServiceMarket extends ServiceBase {
   }
 
   @backgroundMethod()
-  async fetchTokenDetail(coingeckoId: string, explorerPlatforms = true) {
+  async fetchMarketTokenDetail(coingeckoId: string, explorerPlatforms = true) {
     const client = await this.getClient(EServiceEndpointEnum.Utility);
     const response = await client.get<{
       data: IMarketTokenDetail;
@@ -97,14 +97,6 @@ class ServiceMarket extends ServiceBase {
       },
     });
     const { data } = response.data;
-    const newDetailPlatforms: IMarketDetailPlatform = {};
-    Object.keys(data.detailPlatforms).forEach((key) => {
-      const item = data.detailPlatforms[key];
-      if (!item?.hideContractAddress) {
-        newDetailPlatforms[key] = item;
-      }
-    });
-    data.detailPlatforms = newDetailPlatforms;
     return data;
   }
 

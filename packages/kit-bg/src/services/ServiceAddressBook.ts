@@ -124,15 +124,18 @@ class ServiceAddressBook extends ServiceBase {
       );
     }
     const promises = rawItems.map(async (item) => {
-      const network = await this.backgroundApi.serviceNetwork.getNetwork({
+      const network = await this.backgroundApi.serviceNetwork.getNetworkSafe({
         networkId: item.networkId,
       });
+      if (!network) {
+        return undefined;
+      }
       return {
         ...item,
         network,
       };
     });
-    const items = await Promise.all(promises);
+    const items = (await Promise.all(promises)).filter(Boolean);
     return { isSafe, items };
   }
 
@@ -303,6 +306,19 @@ class ServiceAddressBook extends ServiceBase {
       ...prev,
       hideDialogInfo: true,
     }));
+  }
+
+  // for Migration
+  @backgroundMethod()
+  async bulkSetItemsWithUniq(items: IAddressItem[], password: string) {
+    const currentItems = await this.getItems();
+    const currentNames = new Set(currentItems.map((i) => i.name));
+    const currentAddresses = new Set(currentItems.map((i) => i.address));
+    const itemsUniq = items.filter(
+      (i) => !currentNames.has(i.name) && !currentAddresses.has(i.address),
+    );
+    const itemsToAdd = currentItems.concat(itemsUniq);
+    await this.setItems(itemsToAdd, password);
   }
 }
 

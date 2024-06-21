@@ -1,59 +1,68 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import { StackActions } from '@react-navigation/native';
 import { useIntl } from 'react-intl';
 
-import type { IPageScreenProps } from '@onekeyhq/components';
 import {
+  Alert,
   Page,
   Progress,
   SizableText,
   Stack,
   usePreventRemove,
 } from '@onekeyhq/components';
+import type { IPageScreenProps } from '@onekeyhq/components';
 import backgroundApiProxy from '@onekeyhq/kit/src/background/instance/backgroundApiProxy';
 import useAppNavigation from '@onekeyhq/kit/src/hooks/useAppNavigation';
 import { useV4migrationAtom } from '@onekeyhq/kit-bg/src/states/jotai/atoms/v4migration';
+import { ETranslations } from '@onekeyhq/shared/src/locale';
 import type { IOnboardingParamList } from '@onekeyhq/shared/src/routes';
 import { EOnboardingPages } from '@onekeyhq/shared/src/routes';
 import timerUtils from '@onekeyhq/shared/src/utils/timerUtils';
 
-import { V4MigrationWarningMessage } from './V4MigrationWarningMessage';
+import { V4MigrationLogCopyHeaderRight } from './components/V4MigrationLogCopy';
+import { V4MigrationModalPage } from './components/V4MigrationModalPage';
+import { EModalExitPreventMode } from './hooks/useV4MigrationExitPrevent';
 
 function V4MigrationProgressBar() {
-  const [val] = useV4migrationAtom();
-
   const intl = useIntl();
+  const [val] = useV4migrationAtom();
   const progress = val?.progress ?? 0;
-  const desc = useMemo(() => {
-    const t = `${progress}% complete`;
-    return t;
-  }, [progress]);
+
   return (
-    <Stack py="$6">
-      <Stack mt="$12" mb="$3">
-        <Progress size="medium" value={progress} />
-      </Stack>
-      <Stack alignItems="center" justifyContent="center">
-        <SizableText size="$bodyLg" color="$textSubdued">
-          {desc}
-        </SizableText>
-      </Stack>
+    <Stack
+      flex={1}
+      alignItems="center"
+      justifyContent="center"
+      alignSelf="center"
+      w="100%"
+      maxWidth="$80"
+    >
+      <Progress w="100%" size="medium" value={progress} />
+      <SizableText mt="$5" size="$bodyLg" textAlign="center">
+        {intl.formatMessage(
+          { id: ETranslations.global_pct_complete },
+          {
+            ptc: progress,
+          },
+        )}
+      </SizableText>
     </Stack>
   );
 }
 
 export function V4MigrationProcess({
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   route,
-}: IPageScreenProps<IOnboardingParamList, EOnboardingPages.GetStarted>) {
+}: IPageScreenProps<
+  IOnboardingParamList,
+  EOnboardingPages.V4MigrationProcess
+>) {
   const navigation = useAppNavigation();
   const intl = useIntl();
   const [migrateLoading, setMigrateLoading] = useState(false);
   const { serviceV4Migration } = backgroundApiProxy;
   const [preventClose, setPreventClose] = useState(true);
-
-  // TODO prevent back, prevent gesture back
-  usePreventRemove(preventClose, () => null);
 
   const handleMigrateFromV4 = useCallback(async () => {
     if (migrateLoading) {
@@ -89,23 +98,45 @@ export function V4MigrationProcess({
   }, [migrateLoading, navigation, serviceV4Migration]);
 
   return (
-    <Page onMounted={handleMigrateFromV4}>
+    <V4MigrationModalPage
+      scrollEnabled={false}
+      exitPreventMode={
+        preventClose
+          ? EModalExitPreventMode.always
+          : EModalExitPreventMode.disabled
+      }
+      onMounted={handleMigrateFromV4}
+    >
       <Page.Header
         headerBackTitle={undefined}
         headerBackVisible={false}
-        headerRight={() => null}
-        headerTitle="Update in progress"
+        headerRight={V4MigrationLogCopyHeaderRight}
+        headerTitle={intl.formatMessage({
+          id: ETranslations.v4_migration_update_in_progress,
+        })}
+        disableClose
       />
-      <Page.Body>
-        <V4MigrationWarningMessage
-          title="Don't close your app during update"
-          description="Migration for users with many accounts can take up to several minutes."
+      <Page.Body
+        py="$2.5"
+        px="$5"
+        space="$5"
+        flex={1}
+        alignItems="center"
+        justifyContent="center"
+      >
+        <Alert
+          alignSelf="stretch"
+          type="warning"
+          title={intl.formatMessage({
+            id: ETranslations.v4_migration_update_in_progress_alert_title,
+          })}
+          description={intl.formatMessage({
+            id: ETranslations.v4_migration_update_in_progress_alert_description,
+          })}
         />
-        <Stack alignItems="center" justifyContent="center">
-          <V4MigrationProgressBar />
-        </Stack>
+        <V4MigrationProgressBar />
       </Page.Body>
-    </Page>
+    </V4MigrationModalPage>
   );
 }
 

@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useRoute } from '@react-navigation/core';
 import BigNumber from 'bignumber.js';
@@ -83,26 +83,34 @@ const SwapTokenSelectPage = () => {
   const syncDefaultNetworkSelect = useCallback(() => {
     if (type === ESwapDirectionType.FROM) {
       if (fromToken?.networkId) {
-        return swapNetworks.find(
-          (item: ISwapNetwork) => item.networkId === fromToken.networkId,
+        return (
+          swapNetworks.find(
+            (item: ISwapNetwork) => item.networkId === fromToken.networkId,
+          ) ?? swapNetworks?.[0]
         );
       }
       if (swapFromAddressInfo.networkId) {
-        return swapNetworks.find(
-          (item: ISwapNetwork) =>
-            item.networkId === swapToAddressInfo.networkId,
+        return (
+          swapNetworks.find(
+            (item: ISwapNetwork) =>
+              item.networkId === swapToAddressInfo.networkId,
+          ) ?? swapNetworks?.[0]
         );
       }
     } else {
       if (toToken?.networkId) {
-        return swapNetworks.find(
-          (item: ISwapNetwork) => item.networkId === toToken.networkId,
+        return (
+          swapNetworks.find(
+            (item: ISwapNetwork) => item.networkId === toToken.networkId,
+          ) ?? swapNetworks?.[0]
         );
       }
       if (swapToAddressInfo.networkId) {
-        return swapNetworks.find(
-          (item: ISwapNetwork) =>
-            item.networkId === swapToAddressInfo.networkId,
+        return (
+          swapNetworks.find(
+            (item: ISwapNetwork) =>
+              item.networkId === swapToAddressInfo.networkId,
+          ) ?? swapNetworks?.[0]
         );
       }
 
@@ -119,6 +127,24 @@ const SwapTokenSelectPage = () => {
   const [currentSelectNetwork, setCurrentSelectNetwork] = useState<
     ISwapNetwork | undefined
   >(syncDefaultNetworkSelect);
+
+  useEffect(() => {
+    const accountNet =
+      type === ESwapDirectionType.FROM
+        ? swapFromAddressInfo.networkId
+        : swapToAddressInfo.networkId;
+    if (
+      currentSelectNetwork?.networkId &&
+      currentSelectNetwork?.networkId !== accountNet
+    ) {
+      void updateSelectedAccountNetwork({
+        num: type === ESwapDirectionType.FROM ? 0 : 1,
+        networkId: currentSelectNetwork?.networkId,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const { fetchLoading, currentTokens } = useSwapTokenList(
     type,
     currentSelectNetwork?.networkId,
@@ -411,7 +437,9 @@ const SwapTokenSelectPage = () => {
                   title={intl.formatMessage({
                     id: ETranslations.global_no_results,
                   })}
-                  description="The token you searched for was not found"
+                  description={intl.formatMessage({
+                    id: ETranslations.token_no_search_results_desc,
+                  })}
                 />
               }
             />

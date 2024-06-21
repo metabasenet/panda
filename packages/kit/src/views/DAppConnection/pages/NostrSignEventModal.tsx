@@ -96,7 +96,10 @@ function NostrSignEventModal() {
       return sigHash;
     }
     return (
-      event?.content ?? `(${intl.formatMessage({ id: 'msg__no_content' })})`
+      event?.content ??
+      `(${intl.formatMessage({
+        id: ETranslations.dapp_connect_msg_no_content,
+      })})`
     );
   }, [signType, event, plaintext, ciphertext, sigHash, intl]);
 
@@ -106,35 +109,64 @@ function NostrSignEventModal() {
     }
     if (i18nSupportEventKinds.includes(Number(event?.kind))) {
       return intl.formatMessage({
-        id: `msg__nostr_event_kind_${event?.kind ?? 'unknown'}`,
-      } as any);
+        id: ETranslations[
+          `dapp_connect_nostr_event_kind_${event?.kind ?? 'unknown'}`
+        ],
+      });
     }
     return intl.formatMessage(
-      { id: 'msg__nostr_event_kind_unknown' },
+      { id: ETranslations.dapp_connect_nostr_event_kind_unknown },
       { kind: event?.kind },
     );
   }, [intl, signType, event]);
 
-  const subtitle = useMemo(() => {
+  const title = useMemo(() => {
     if (signType === ENostrSignType.encrypt) {
       return intl.formatMessage({
-        id: 'msg__nostr_allow_website_to_encrypt_data',
+        id: ETranslations.dapp_connect_encrypted_request,
       });
     }
     if (signType === ENostrSignType.decrypt) {
       return intl.formatMessage({
-        id: 'msg__nostr_allow_website_to_decrypt_data',
+        id: ETranslations.dapp_connect_decrypted_request,
       });
+    }
+    return intl.formatMessage({
+      id: ETranslations.dapp_connect_signature_request,
+    });
+  }, [intl, signType]);
+
+  const subtitle = useMemo(() => {
+    if (signType === ENostrSignType.encrypt) {
+      return intl.formatMessage(
+        {
+          id: ETranslations.dapp_connect_allow_to_access_your_chain_encrypted_message,
+        },
+        {
+          chain: 'Nostr',
+        },
+      );
+    }
+    if (signType === ENostrSignType.decrypt) {
+      return intl.formatMessage(
+        {
+          id: ETranslations.dapp_connect_allow_to_access_your_chain_decrypted_message,
+        },
+        {
+          chain: 'Nostr',
+        },
+      );
     }
     return intl.formatMessage(
       {
-        id: 'msg__allow_sign_event',
+        id: ETranslations.dapp_connect_allow_to_access_your_chain_message_signature,
       },
       {
-        kind: eventKindText,
+        chain:
+          signType === ENostrSignType.signSchnorr ? 'Nostr Schnorr' : 'Nostr',
       },
     );
-  }, [intl, signType, eventKindText]);
+  }, [intl, signType]);
 
   const onSubmit = useCallback(
     async (close: () => void) => {
@@ -216,7 +248,7 @@ function NostrSignEventModal() {
   const renderEventDetails = useCallback(() => {
     if (!event) return null;
     return (
-      <>
+      <YStack space="$2">
         <Button
           variant="secondary"
           onPress={() => setDisplayDetails(!displayDetails)}
@@ -230,11 +262,11 @@ function NostrSignEventModal() {
               })}
         </Button>
         {displayDetails ? (
-          <TextArea my="$2" disabled editable={false} numberOfLines={14}>
+          <TextArea editable={false} numberOfLines={11}>
             {JSON.stringify(event, null, 2)}
           </TextArea>
         ) : null}
-      </>
+      </YStack>
     );
   }, [intl, event, displayDetails]);
 
@@ -264,9 +296,12 @@ function NostrSignEventModal() {
       return (
         <YStack space="$2">
           <SizableText>
-            {intl.formatMessage({ id: 'form__nostr_plaintext' })}:
+            {intl.formatMessage({
+              id: ETranslations.dapp_connect_nostr_plaintext,
+            })}
+            :
           </SizableText>
-          <TextArea disabled editable={false} numberOfLines={2}>
+          <TextArea editable={false} numberOfLines={5}>
             {savedPlaintext}
           </TextArea>
         </YStack>
@@ -281,9 +316,7 @@ function NostrSignEventModal() {
         <Page.Header headerShown={false} />
         <Page.Body>
           <DAppRequestLayout
-            title={intl.formatMessage({
-              id: ETranslations.dapp_connect_initiate_message_signature_request,
-            })}
+            title={title}
             subtitle={subtitle}
             origin={$sourceInfo?.origin ?? ''}
             urlSecurityInfo={urlSecurityInfo}
@@ -292,7 +325,7 @@ function NostrSignEventModal() {
             {/* Content Start */}
             <YStack space="$2">
               <SizableText>{eventKindText}</SizableText>
-              <TextArea disabled editable={false} numberOfLines={2}>
+              <TextArea editable={false} numberOfLines={5}>
                 {content}
               </TextArea>
               {renderEncryptSignEventPlaintext()}
@@ -300,7 +333,9 @@ function NostrSignEventModal() {
             </YStack>
             {signType === ENostrSignType.signEvent ? (
               <Checkbox
-                label="记住我的选择，不再提示"
+                label={intl.formatMessage({
+                  id: ETranslations.dapp_connect_do_not_ask_again,
+                })}
                 value={autoSign}
                 onChange={(checked) => setAutoSign(!!checked)}
               />

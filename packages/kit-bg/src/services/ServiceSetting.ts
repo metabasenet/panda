@@ -1,4 +1,4 @@
-import { flatten, groupBy, isFunction } from 'lodash';
+import { flatten, groupBy } from 'lodash';
 import semver from 'semver';
 
 import { isTaprootPath } from '@onekeyhq/core/src/chains/btc/sdkBtc';
@@ -15,16 +15,21 @@ import {
   IMPL_LTC,
 } from '@onekeyhq/shared/src/engine/engineConsts';
 import type { ILocaleSymbol } from '@onekeyhq/shared/src/locale';
-import { LOCALES } from '@onekeyhq/shared/src/locale';
 import { appLocale } from '@onekeyhq/shared/src/locale/appLocale';
-import { getDefaultLocale } from '@onekeyhq/shared/src/locale/getDefaultLocale';
+import {
+  getDefaultLocale,
+  getLocaleMessages,
+} from '@onekeyhq/shared/src/locale/getDefaultLocale';
 import platformEnv from '@onekeyhq/shared/src/platformEnv';
 import { memoizee } from '@onekeyhq/shared/src/utils/cacheUtils';
 import networkUtils from '@onekeyhq/shared/src/utils/networkUtils';
 import timerUtils from '@onekeyhq/shared/src/utils/timerUtils';
 import type { IServerNetwork } from '@onekeyhq/shared/types';
 import { EServiceEndpointEnum } from '@onekeyhq/shared/types/endpoint';
-import type { IClearCacheOnAppState } from '@onekeyhq/shared/types/setting';
+import {
+  EReasonForNeedPassword,
+  type IClearCacheOnAppState,
+} from '@onekeyhq/shared/types/setting';
 
 import {
   settingsLastActivityAtom,
@@ -47,20 +52,11 @@ class ServiceSetting extends ServiceBase {
     super({ backgroundApi });
   }
 
+  @backgroundMethod()
   async refreshLocaleMessages() {
     const { locale: rawLocale } = await settingsPersistAtom.get();
-    const locale: ILocaleSymbol =
-      rawLocale === 'system' ? getDefaultLocale() : rawLocale;
-
-    const messagesBuilder = await (LOCALES[locale] as unknown as Promise<
-      (() => Promise<Record<string, string>>) | Promise<Record<string, string>>
-    >);
-    let messages: Record<string, string> = {};
-    if (isFunction(messagesBuilder)) {
-      messages = await messagesBuilder();
-    } else {
-      messages = messagesBuilder;
-    }
+    const locale = rawLocale === 'system' ? getDefaultLocale() : rawLocale;
+    const messages = await getLocaleMessages(locale);
     appLocale.setLocale(locale, messages);
   }
 
@@ -77,6 +73,9 @@ class ServiceSetting extends ServiceBase {
 
   @backgroundMethod()
   public async setProtectCreateTransaction(value: boolean) {
+    await this.backgroundApi.servicePassword.promptPasswordVerify({
+      reason: EReasonForNeedPassword.Security,
+    });
     await settingsPersistAtom.set((prev) => ({
       ...prev,
       protectCreateTransaction: value,
@@ -85,6 +84,9 @@ class ServiceSetting extends ServiceBase {
 
   @backgroundMethod()
   public async setProtectCreateOrRemoveWallet(value: boolean) {
+    await this.backgroundApi.servicePassword.promptPasswordVerify({
+      reason: EReasonForNeedPassword.Security,
+    });
     await settingsPersistAtom.set((prev) => ({
       ...prev,
       protectCreateOrRemoveWallet: value,
@@ -135,16 +137,18 @@ class ServiceSetting extends ServiceBase {
   public async clearCacheOnApp(values: IClearCacheOnAppState) {
     if (values.tokenAndNFT) {
       // clear token and nft
+      await this.backgroundApi.simpleDb.localTokens.clearRawData();
     }
     if (values.transactionHistory) {
       // clear transaction history
+      await this.backgroundApi.simpleDb.localHistory.clearRawData();
     }
     if (values.swapHistory) {
       // clear swap history
       await this.backgroundApi.serviceSwap.cleanSwapHistoryItems();
     }
     if (values.browserCache) {
-      // clear browser cache
+      await this.backgroundApi.serviceDiscovery.clearCache();
     }
     if (values.browserHistory) {
       // clear Browser History, Bookmarks, Pins
@@ -166,7 +170,7 @@ class ServiceSetting extends ServiceBase {
 
   @backgroundMethod()
   public async clearPendingTransaction() {
-    // TODO: clear pending transaction
+    await this.backgroundApi.serviceHistory.clearLocalHistoryPendingTxs();
   }
 
   @backgroundMethod()
@@ -243,7 +247,7 @@ class ServiceSetting extends ServiceBase {
         defaultNetworkId: getNetworkIdsMap().tbtc,
       });
     }
-    return {
+    const data = {
       enabledNum: config.map((o) => o.num),
       availableNetworksMap: config.reduce((result, item) => {
         result[item.num] = {
@@ -254,6 +258,7 @@ class ServiceSetting extends ServiceBase {
       }, {} as IAccountSelectorAvailableNetworksMap),
       items: config,
     };
+    return data;
   }
 
   @backgroundMethod()

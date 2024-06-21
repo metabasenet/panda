@@ -61,7 +61,7 @@ const SwapQuoteResult = ({
 
   const slippageHandleClick = useCallback(() => {
     dialogRef.current = Dialog.show({
-      title: 'Slippage tolerance',
+      title: intl.formatMessage({ id: ETranslations.slippage_tolerance_title }),
       renderContent: (
         <SwapSlippageContentContainer
           swapSlippage={slippageItem}
@@ -76,7 +76,13 @@ const SwapQuoteResult = ({
         setSwapSlippageDialogOpening(false);
       },
     });
-  }, [slippageItem, autoValue, slippageOnSave, setSwapSlippageDialogOpening]);
+  }, [
+    intl,
+    slippageItem,
+    autoValue,
+    slippageOnSave,
+    setSwapSlippageDialogOpening,
+  ]);
 
   return (
     <YStack space="$4">
@@ -94,7 +100,7 @@ const SwapQuoteResult = ({
           rate={quoteResult.instantRate}
           fromToken={fromToken}
           toToken={toToken}
-          showBest={quoteResult.isBest}
+          // showBest={quoteResult.isBest}
           showLock={!!quoteResult.allowanceResult}
           onPress={() => {
             onOpenProviderList?.();

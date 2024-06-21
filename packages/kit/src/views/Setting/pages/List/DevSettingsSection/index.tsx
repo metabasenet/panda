@@ -40,6 +40,10 @@ export const DevSettingsSection = () => {
     });
   }, []);
 
+  const handleOpenDevTools = useCallback(() => {
+    window?.desktopApi.openDevTools();
+  }, []);
+
   if (!settings.enabled) {
     return null;
   }
@@ -53,6 +57,13 @@ export const DevSettingsSection = () => {
         title="关闭开发者模式"
         onPress={handleDevModeOnChange}
       />
+      {platformEnv.isDesktop ? (
+        <SectionPressItem
+          title="Open Chrome DevTools in Desktop"
+          subtitle="重启后会在导航栏的菜单栏中出现相关按钮"
+          onPress={handleOpenDevTools}
+        />
+      ) : null}
       {platformEnv.githubSHA ? (
         <SectionPressItem
           copyable
@@ -67,15 +78,16 @@ export const DevSettingsSection = () => {
             ? ONEKEY_TEST_API_HOST
             : ONEKEY_API_HOST
         }
-        onValueChange={
-          platformEnv.isDesktop
-            ? (enabled: boolean) => {
-                window.desktopApi?.setAutoUpdateSettings?.({
-                  useTestFeedUrl: enabled,
-                });
-              }
-            : undefined
-        }
+        onValueChange={(enabled: boolean) => {
+          if (platformEnv.isDesktop) {
+            window.desktopApi?.setAutoUpdateSettings?.({
+              useTestFeedUrl: enabled,
+            });
+          }
+          setTimeout(() => {
+            backgroundApiProxy.serviceApp.restartApp();
+          }, 300);
+        }}
       >
         <Switch size={ESwitchSize.small} />
       </SectionFieldItem>
@@ -94,6 +106,14 @@ export const DevSettingsSection = () => {
       >
         <Switch size={ESwitchSize.small} />
       </SectionFieldItem>
+      <SectionFieldItem
+        name="showDevExportPrivateKey"
+        title="首页导出私钥临时入口"
+        subtitle=""
+        testID="show-dev-overlay"
+      >
+        <Switch size={ESwitchSize.small} />
+      </SectionFieldItem>
       <SectionPressItem
         title="FirmwareUpdateDevSettings"
         testID="firmware-update-dev-settings-menu"
@@ -106,47 +126,82 @@ export const DevSettingsSection = () => {
         }}
       />
       <SectionPressItem
+        title="V4MigrationDevSettings"
+        testID="v4-migration-dev-settings-menu"
+        onPress={() => {
+          Dialog.show({
+            title: '!!!!  Danger Zone: Clear all your data',
+            description:
+              'This is a feature specific to development environments. Function used to erase all data in the app.',
+            confirmButtonProps: {
+              variant: 'destructive',
+            },
+            onConfirm: () => {
+              navigation.push(EModalSettingRoutes.SettingDevV4MigrationModal);
+            },
+          });
+        }}
+      />
+      <SectionPressItem
         title="Clear App Data"
         testID="clear-data-menu"
         onPress={() => {
-          const dialog = Dialog.cancel({
-            title: 'Clear App Data',
-            renderContent: (
-              <YStack>
-                <SectionPressItem
-                  title="Clear Dapp Data"
-                  testID="clear-dapp-data"
-                  onPress={async () => {
-                    await backgroundApiProxy.serviceE2E.clearDiscoveryPageData();
-                    await dialog.close();
-                  }}
-                />
-                <SectionPressItem
-                  title="Clear Contacts Data"
-                  testID="clear-contacts-data"
-                  onPress={async () => {
-                    await backgroundApiProxy.serviceE2E.dangerClearDataForE2E();
-                    await dialog.close();
-                  }}
-                />
-                <SectionPressItem
-                  title="Clear Wallets Data"
-                  testID="clear-wallets-data"
-                  onPress={async () => {
-                    await backgroundApiProxy.serviceE2E.clearWalletsAndAccounts();
-                    await dialog.close();
-                  }}
-                />
-                <SectionPressItem
-                  title="Clear Password"
-                  testID="clear-password"
-                  onPress={() => {
-                    void backgroundApiProxy.serviceE2E.resetPasswordSetStatus();
-                    void dialog.close();
-                  }}
-                />
-              </YStack>
-            ),
+          Dialog.show({
+            title: '!!!!  Danger Zone: Clear all your data',
+            description:
+              'This is a feature specific to development environments. Function used to erase all data in the app.',
+            confirmButtonProps: {
+              variant: 'destructive',
+            },
+            onConfirm: () => {
+              const dialog = Dialog.cancel({
+                title: 'Clear App Data',
+                renderContent: (
+                  <YStack>
+                    <SectionPressItem
+                      title="Clear Dapp Data"
+                      testID="clear-dapp-data"
+                      onPress={async () => {
+                        await backgroundApiProxy.serviceE2E.clearDiscoveryPageData();
+                        await dialog.close();
+                      }}
+                    />
+                    <SectionPressItem
+                      title="Clear Contacts Data"
+                      testID="clear-contacts-data"
+                      onPress={async () => {
+                        await backgroundApiProxy.serviceE2E.dangerClearDataForE2E();
+                        await dialog.close();
+                      }}
+                    />
+                    <SectionPressItem
+                      title="Clear Wallets & Accounts Data"
+                      testID="clear-wallets-data"
+                      onPress={async () => {
+                        await backgroundApiProxy.serviceE2E.clearWalletsAndAccounts();
+                        await dialog.close();
+                      }}
+                    />
+                    <SectionPressItem
+                      title="Clear Password"
+                      testID="clear-password"
+                      onPress={() => {
+                        void backgroundApiProxy.serviceE2E.resetPasswordSetStatus();
+                        void dialog.close();
+                      }}
+                    />
+                    <SectionPressItem
+                      title="Wallet Connect Session"
+                      testID="wallet-connect-session"
+                      onPress={() => {
+                        void backgroundApiProxy.serviceWalletConnect.disconnectAllSessions();
+                        void dialog.close();
+                      }}
+                    />
+                  </YStack>
+                ),
+              });
+            },
           });
         }}
       />

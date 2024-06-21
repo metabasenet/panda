@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 import { useIntl } from 'react-intl';
 
@@ -42,11 +42,15 @@ type IAmountInputFormItemProps = IFormFieldProps<
       onPress?: () => void;
       loading?: boolean;
     };
+    balanceHelperProps?: {
+      onPress?: () => void;
+    };
     tokenSelectorTriggerProps?: {
       selectedTokenImageUri?: string;
       selectedNetworkImageUri?: string;
       selectedTokenSymbol?: string;
       loading?: boolean;
+      disabled?: boolean;
     } & IXStackProps;
     reversible?: boolean;
   } & IStackProps
@@ -63,6 +67,7 @@ export function AmountInput({
   hasError,
   valueProps,
   balanceProps,
+  balanceHelperProps,
   ...rest
 }: IAmountInputFormItemProps) {
   const intl = useIntl();
@@ -70,6 +75,7 @@ export function AmountInput({
   const sharedStyles = getSharedInputStyles({
     error: hasError,
   });
+  const [selection, setSelection] = useState({ start: 0, end: 0 });
 
   const InputElement = useMemo(() => {
     if (inputProps?.loading)
@@ -93,10 +99,17 @@ export function AmountInput({
         }}
         value={value}
         onChangeText={onChange}
+        // maybe should replace with ref.current.setNativeProps({ selection })
+        {...(platformEnv.isNativeAndroid && {
+          selection,
+          onSelectionChange: ({ nativeEvent }) =>
+            setSelection(nativeEvent.selection),
+          onBlur: () => setSelection({ start: 0, end: 0 }),
+        })}
         {...inputProps}
       />
     );
-  }, [inputProps, onChange, value]);
+  }, [inputProps, onChange, value, selection]);
 
   const AmountElement = useMemo(() => {
     if (!valueProps) {
@@ -158,9 +171,10 @@ export function AmountInput({
             bg: '$bgActive',
           },
         })}
+        disabled={tokenSelectorTriggerProps?.disabled}
         onPress={tokenSelectorTriggerProps?.onPress}
       >
-        <Stack>
+        <Stack mr="$2">
           <Image height="$7" width="$7" borderRadius="$full">
             <Image.Source
               source={{
@@ -170,10 +184,10 @@ export function AmountInput({
             <Image.Fallback
               alignItems="center"
               justifyContent="center"
-              bg="$bgStrong"
+              bg="$gray5"
               delayMs={1000}
             >
-              <Icon size="$6" name="CoinOutline" color="$iconDisabled" />
+              <Icon size="$6" name="CryptoCoinOutline" color="$iconSubdued" />
             </Image.Fallback>
           </Image>
           <Stack
@@ -182,6 +196,7 @@ export function AmountInput({
             bottom="$-1"
             p="$0.5"
             borderRadius="$full"
+            flexShrink={1}
             bg="$bgApp"
           >
             {tokenSelectorTriggerProps?.selectedNetworkImageUri ? (
@@ -191,18 +206,23 @@ export function AmountInput({
                     uri: tokenSelectorTriggerProps?.selectedNetworkImageUri,
                   }}
                 />
-                <Image.Fallback bg="$bgStrong" delayMs={1000}>
-                  <Icon size="$3" name="QuestionmarkSolid" />
+                <Image.Fallback bg="$gray5" delayMs={1000}>
+                  <Icon
+                    size="$3"
+                    name="QuestionmarkSolid"
+                    color="$iconSubdued"
+                  />
                 </Image.Fallback>
               </Image>
             ) : null}
           </Stack>
         </Stack>
-        <SizableText size="$headingXl" pl="$2" numberOfLines={1}>
+        <SizableText size="$headingXl" numberOfLines={1} flexShrink={1}>
           {tokenSelectorTriggerProps?.selectedTokenSymbol ||
             intl.formatMessage({ id: ETranslations.token_selector_title })}
         </SizableText>
-        {tokenSelectorTriggerProps?.onPress ? (
+        {tokenSelectorTriggerProps?.onPress &&
+        !tokenSelectorTriggerProps.disabled ? (
           <Icon
             flexShrink={0}
             name="ChevronDownSmallOutline"
@@ -215,6 +235,7 @@ export function AmountInput({
     );
   }, [
     intl,
+    tokenSelectorTriggerProps?.disabled,
     tokenSelectorTriggerProps?.loading,
     tokenSelectorTriggerProps?.onPress,
     tokenSelectorTriggerProps?.selectedNetworkImageUri,
@@ -232,6 +253,7 @@ export function AmountInput({
       </Stack>
     ) : (
       <XStack
+        alignItems="center"
         px="$3.5"
         pb="$2"
         onPress={balanceProps.onPress}
@@ -244,17 +266,18 @@ export function AmountInput({
             bg: '$bgActive',
           },
         })}
+        {...(balanceHelperProps && {
+          pr: '$0',
+        })}
       >
+        <Icon name="WalletOutline" size="$5" color="$iconSubdued" mr="$1" />
         <SizableText size="$bodyMd" color="$textSubdued">
           <NumberSizeableText
             size="$bodyMd"
             color="$textSubdued"
             formatter="balance"
           >
-            {intl.formatMessage(
-              { id: ETranslations.send_balance },
-              { number: balanceProps.value ?? 0 },
-            )}
+            {balanceProps.value ?? 0}
           </NumberSizeableText>
         </SizableText>
         {enableMaxAmount ? (
@@ -264,7 +287,33 @@ export function AmountInput({
         ) : null}
       </XStack>
     );
-  }, [balanceProps, enableMaxAmount, intl]);
+  }, [balanceHelperProps, balanceProps, enableMaxAmount, intl]);
+
+  const balanceHelper = useMemo(() => {
+    if (!balanceHelperProps) {
+      return null;
+    }
+
+    return (
+      <Stack
+        pl="$2"
+        pr="$3"
+        pb="$2"
+        {...(balanceHelperProps?.onPress && {
+          hoverStyle: {
+            bg: '$bgHover',
+          },
+          pressStyle: {
+            bg: '$bgActive',
+          },
+        })}
+        onPress={balanceHelperProps?.onPress}
+      >
+        <Icon name="InfoCircleOutline" color="$iconSubdued" size="$5" />
+      </Stack>
+    );
+  }, [balanceHelperProps]);
+
   return (
     <Stack
       borderRadius="$3"
@@ -279,11 +328,13 @@ export function AmountInput({
         {InputElement}
         {TokenSelectorTrigger}
       </XStack>
-      <XStack justifyContent="space-between">
+      <XStack>
         <XStack
+          flex={1}
           alignItems="center"
           px="$3.5"
           pb="$2"
+          disabled={balanceProps?.loading}
           onPress={valueProps?.onPress}
           {...(reversible && {
             userSelect: 'none',
@@ -298,6 +349,7 @@ export function AmountInput({
           {AmountElement}
         </XStack>
         {BalanceElement}
+        {balanceHelper}
       </XStack>
     </Stack>
   );

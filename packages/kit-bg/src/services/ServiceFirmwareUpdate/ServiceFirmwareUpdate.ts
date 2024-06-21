@@ -612,10 +612,17 @@ class ServiceFirmwareUpdate extends ServiceBase {
       await this.backgroundApi.serviceDevSetting.getFirmwareUpdateDevSettings(
         'forceUpdateBle',
       );
+    const mockUpdateBootloader =
+      await this.backgroundApi.serviceDevSetting.getFirmwareUpdateDevSettings(
+        'forceUpdateBootloader',
+      );
     if (firmwareType === 'firmware' && mockUpdateFirmware) {
       hasUpgrade = true;
     }
     if (firmwareType === 'ble' && mockUpdateBle) {
+      hasUpgrade = true;
+    }
+    if (firmwareType === 'bootloader' && mockUpdateBootloader) {
       hasUpgrade = true;
     }
 
@@ -1116,6 +1123,10 @@ class ServiceFirmwareUpdate extends ServiceBase {
     }
     await this.backgroundApi.serviceHardwareUI.withHardwareProcessing(
       async () => {
+        appEventBus.emit(EAppEventBusNames.BeginFirmwareUpdate, undefined);
+        // await other hardware task stop processing
+        await timerUtils.wait(3000);
+
         // TODO verify current device is matched with params.connectId\params.updateFirmware\params.updateBle
         // pre checking
         await this.validateMnemonicBackuped(params);
@@ -1248,8 +1259,12 @@ class ServiceFirmwareUpdate extends ServiceBase {
     //   release.shouldUpdate = true;
     // }
 
+    const mockUpdateBootloader =
+      await this.backgroundApi.serviceDevSetting.getFirmwareUpdateDevSettings(
+        'forceUpdateBootloader',
+      );
     // TODO check update version gt current version
-    if (updateInfo?.hasUpgrade) {
+    if (updateInfo?.hasUpgrade || mockUpdateBootloader) {
       return this.createRunTaskWithRetry({
         fn: async () => this.updatingBootloader(params, updateInfo),
       });
@@ -1501,6 +1516,11 @@ class ServiceFirmwareUpdate extends ServiceBase {
   }
 
   async validateDeviceBattery(params: IUpdateFirmwareWorkflowParams) {
+    // USB connected, skip battery check
+    if (!platformEnv.isNative) {
+      return;
+    }
+
     const { features: deviceFeatures } = params.releaseResult;
 
     let batteryLevel: number | undefined = deviceFeatures?.battery_level;

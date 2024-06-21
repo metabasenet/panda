@@ -5,15 +5,18 @@ import { isEmpty, isNil } from 'lodash';
 import { useIntl } from 'react-intl';
 
 import {
+  Dialog,
+  Divider,
+  Image,
   NumberSizeableText,
   Popover,
   SizableText,
   Skeleton,
-  YStack,
+  Stack,
+  XStack,
 } from '@onekeyhq/components';
 import type { IEncodedTxEvm } from '@onekeyhq/core/src/chains/evm/types';
 import backgroundApiProxy from '@onekeyhq/kit/src/background/instance/backgroundApiProxy';
-import { Container } from '@onekeyhq/kit/src/components/Container';
 import { usePromiseResult } from '@onekeyhq/kit/src/hooks/usePromiseResult';
 import {
   useCustomFeeAtom,
@@ -27,16 +30,23 @@ import {
 } from '@onekeyhq/kit/src/states/jotai/contexts/sendConfirm';
 import {
   calculateFeeForSend,
+  getFeeIcon,
   getFeeLabel,
 } from '@onekeyhq/kit/src/utils/gasFee';
 import { useSettingsPersistAtom } from '@onekeyhq/kit-bg/src/states/jotai/atoms';
 import type { IOneKeyRpcError } from '@onekeyhq/shared/src/errors/types/errorTypes';
+import { ETranslations } from '@onekeyhq/shared/src/locale';
+import chainValueUtils from '@onekeyhq/shared/src/utils/chainValueUtils';
 import { EFeeType, ESendFeeStatus } from '@onekeyhq/shared/types/fee';
 import type {
   IFeeInfoUnit,
   IFeeSelectorItem,
 } from '@onekeyhq/shared/types/fee';
 
+import {
+  InfoItem,
+  InfoItemGroup,
+} from '../../../AssetDetails/pages/HistoryDetails/components/TxDetailsInfoItem';
 import { FeeEditor, FeeSelectorTrigger } from '../../components/SendFee';
 
 type IProps = {
@@ -51,12 +61,10 @@ function TxFeeContainer(props: IProps) {
   const intl = useIntl();
   const txFeeInit = useRef(false);
   const feeInTxUpdated = useRef(false);
-  const [isEditFeeActive, setIsEditFeeActive] = useState(false);
   const [sendSelectedFee] = useSendSelectedFeeAtom();
   const [customFee] = useCustomFeeAtom();
   const [settings] = useSettingsPersistAtom();
   const [sendFeeStatus] = useSendFeeStatusAtom();
-  const [sendAlertStatus] = useSendTxStatusAtom();
   const [nativeTokenInfo] = useNativeTokenInfoAtom();
   const [unsignedTxs] = useUnsignedTxsAtom();
   const [nativeTokenTransferAmountToUpdate] =
@@ -84,7 +92,7 @@ function TxFeeContainer(props: IProps) {
       ]);
     }, [accountId, networkId]);
 
-  const { result: txFee } = usePromiseResult(
+  const { result, isLoading } = usePromiseResult(
     async () => {
       try {
         updateSendFeeStatus({
@@ -95,15 +103,17 @@ function TxFeeContainer(props: IProps) {
             networkId,
             accountId,
           });
+
+        const { encodedTx, estimateFeeParams: e } =
+          await backgroundApiProxy.serviceGas.buildEstimateFeeParams({
+            accountId,
+            networkId,
+            encodedTx: unsignedTxs[0].encodedTx,
+          });
+
         const r = await backgroundApiProxy.serviceGas.estimateFee({
           networkId,
-          encodedTx: await backgroundApiProxy.serviceGas.buildEstimateFeeParams(
-            {
-              accountId,
-              networkId,
-              encodedTx: unsignedTxs[0].encodedTx,
-            },
-          ),
+          encodedTx,
           accountAddress,
         });
         // if gasEIP1559 returns 5 gas level, then pick the 1st, 3rd and 5th as default gas level
@@ -119,7 +129,10 @@ function TxFeeContainer(props: IProps) {
           errMessage: '',
         });
         txFeeInit.current = true;
-        return r;
+        return {
+          r,
+          e,
+        };
       } catch (e) {
         updateSendFeeStatus({
           status: ESendFeeStatus.Error,
@@ -133,11 +146,14 @@ function TxFeeContainer(props: IProps) {
     },
     [accountId, networkId, unsignedTxs, updateSendFeeStatus],
     {
+      watchLoading: true,
       pollingInterval: 6000,
       overrideIsFocused: (isPageFocused) =>
         isPageFocused && sendSelectedFee.feeType !== EFeeType.Custom,
     },
   );
+
+  const { r: txFee, e: estimateFeeParams } = result ?? {};
 
   const openFeeEditorEnabled =
     !!vaultSettings?.editFeeEnabled || !!vaultSettings?.checkFeeDetailEnabled;
@@ -151,6 +167,7 @@ function TxFeeContainer(props: IProps) {
         txFee.feeUTXO?.length ||
         txFee.feeTron?.length ||
         txFee.gasFil?.length ||
+        txFee.feeSol?.length ||
         0;
 
       for (let i = 0; i < feeLength; i += 1) {
@@ -161,12 +178,14 @@ function TxFeeContainer(props: IProps) {
           feeUTXO: txFee.feeUTXO?.[i],
           feeTron: txFee.feeTron?.[i],
           gasFil: txFee.gasFil?.[i],
+          feeSol: txFee.feeSol?.[i],
         };
 
         items.push({
           label: intl.formatMessage({
             id: getFeeLabel({ feeType: EFeeType.Standard, presetIndex: i }),
           }),
+          icon: getFeeIcon({ feeType: EFeeType.Standard, presetIndex: i }),
           value: i,
           feeInfo,
           type: EFeeType.Standard,
@@ -179,6 +198,7 @@ function TxFeeContainer(props: IProps) {
           label: intl.formatMessage({
             id: getFeeLabel({ feeType: EFeeType.Standard, presetIndex: 0 }),
           }),
+          icon: getFeeIcon({ feeType: EFeeType.Standard, presetIndex: 0 }),
           value: 1,
           feeInfo: {
             common: txFee.common,
@@ -213,7 +233,14 @@ function TxFeeContainer(props: IProps) {
           };
         }
 
-        if (useFeeInTx) {
+        if (txFee.feeSol) {
+          customFeeInfo.feeSol = {
+            ...txFee.feeSol[sendSelectedFee.presetIndex],
+            ...(customFee?.feeSol ?? {}),
+          };
+        }
+
+        if (useFeeInTx && network && !feeInTxUpdated.current) {
           const {
             gas,
             gasLimit,
@@ -229,8 +256,14 @@ function TxFeeContainer(props: IProps) {
           ) {
             customFeeInfo.gasEIP1559 = {
               ...customFeeInfo.gasEIP1559,
-              maxFeePerGas,
-              maxPriorityFeePerGas,
+              maxFeePerGas: chainValueUtils.convertChainValueToGwei({
+                value: maxFeePerGas,
+                network,
+              }),
+              maxPriorityFeePerGas: chainValueUtils.convertChainValueToGwei({
+                value: maxPriorityFeePerGas,
+                network,
+              }),
               gasLimit: limit ?? customFeeInfo.gasEIP1559?.gasLimit,
               gasLimitForDisplay:
                 limit ?? customFeeInfo.gasEIP1559?.gasLimitForDisplay,
@@ -238,7 +271,10 @@ function TxFeeContainer(props: IProps) {
           } else if (gasPrice && customFeeInfo.gas) {
             customFeeInfo.gas = {
               ...customFeeInfo.gas,
-              gasPrice,
+              gasPrice: chainValueUtils.convertChainValueToGwei({
+                value: gasPrice,
+                network,
+              }),
               gasLimit: limit ?? customFeeInfo.gas?.gasLimit,
               gasLimitForDisplay:
                 limit ?? customFeeInfo.gas?.gasLimitForDisplay,
@@ -260,12 +296,10 @@ function TxFeeContainer(props: IProps) {
             }
           }
 
-          if (!feeInTxUpdated.current) {
-            updateSendSelectedFee({
-              feeType: EFeeType.Custom,
-              presetIndex: 0,
-            });
-          }
+          updateSendSelectedFee({
+            feeType: EFeeType.Custom,
+            presetIndex: 0,
+          });
 
           feeInTxUpdated.current = true;
         }
@@ -274,6 +308,7 @@ function TxFeeContainer(props: IProps) {
           label: intl.formatMessage({
             id: getFeeLabel({ feeType: EFeeType.Custom }),
           }),
+          icon: getFeeIcon({ feeType: EFeeType.Custom }),
           value: items.length,
           feeInfo: customFeeInfo,
           type: EFeeType.Custom,
@@ -288,11 +323,13 @@ function TxFeeContainer(props: IProps) {
     txFee,
     vaultSettings?.editFeeEnabled,
     intl,
+    useFeeInTx,
+    network,
+    sendSelectedFee.presetIndex,
     customFee?.gas,
     customFee?.gasEIP1559,
     customFee?.feeUTXO,
-    useFeeInTx,
-    sendSelectedFee.presetIndex,
+    customFee?.feeSol,
     unsignedTxs,
     updateSendSelectedFee,
   ]);
@@ -323,6 +360,7 @@ function TxFeeContainer(props: IProps) {
       feeInfo: selectedFeeInfo,
       nativeTokenPrice: txFee?.common.nativeTokenPrice ?? 0,
       txSize: unsignedTxs[0]?.txSize,
+      estimateFeeParams,
     });
 
     return {
@@ -336,6 +374,7 @@ function TxFeeContainer(props: IProps) {
       },
     };
   }, [
+    estimateFeeParams,
     feeSelectorItems,
     sendSelectedFee.feeType,
     sendSelectedFee.presetIndex,
@@ -413,9 +452,44 @@ function TxFeeContainer(props: IProps) {
     updateSendTxStatus,
   ]);
 
+  const handlePress = useCallback(() => {
+    Dialog.show({
+      title: intl.formatMessage({
+        id: ETranslations.swap_history_detail_network_fee,
+      }),
+      showFooter: false,
+      renderContent: (
+        <FeeEditor
+          networkId={networkId}
+          feeSelectorItems={feeSelectorItems}
+          selectedFee={selectedFee}
+          sendSelectedFee={sendSelectedFee}
+          unsignedTxs={unsignedTxs}
+          originalCustomFee={customFee}
+          onApplyFeeInfo={handleApplyFeeInfo}
+          estimateFeeParams={estimateFeeParams}
+        />
+      ),
+    });
+  }, [
+    customFee,
+    estimateFeeParams,
+    feeSelectorItems,
+    handleApplyFeeInfo,
+    intl,
+    networkId,
+    selectedFee,
+    sendSelectedFee,
+    unsignedTxs,
+  ]);
+
   const renderFeeEditor = useCallback(() => {
     if (!txFeeInit.current || !feeSelectorItems.length) {
-      return <Skeleton height="$5" width="$12" />;
+      return (
+        <Stack py="$1">
+          <Skeleton height="$3" width="$12" />
+        </Stack>
+      );
     }
 
     if (!openFeeEditorEnabled) {
@@ -432,109 +506,161 @@ function TxFeeContainer(props: IProps) {
     }
 
     return (
-      <Popover
-        title={intl.formatMessage({ id: 'title__edit_fee' })}
-        open={isEditFeeActive}
-        onOpenChange={setIsEditFeeActive}
-        allowFlip={false}
-        renderContent={
-          <FeeEditor
-            networkId={networkId}
-            feeSelectorItems={feeSelectorItems}
-            setIsEditFeeActive={setIsEditFeeActive}
-            selectedFee={selectedFee}
-            sendSelectedFee={sendSelectedFee}
-            unsignedTxs={unsignedTxs}
-            originalCustomFee={customFee}
-            onApplyFeeInfo={handleApplyFeeInfo}
-          />
-        }
-        renderTrigger={
-          <FeeSelectorTrigger
-            onPress={() => setIsEditFeeActive(true)}
-            disabled={
-              sendFeeStatus.status === ESendFeeStatus.Error ||
-              !txFeeInit.current
-            }
-          />
+      <FeeSelectorTrigger
+        onPress={handlePress}
+        disabled={
+          sendFeeStatus.status === ESendFeeStatus.Error || !txFeeInit.current
         }
       />
     );
+    // return (
+    //   <Popover
+    //     title={intl.formatMessage({ id: ETranslations.title__edit_fee })}
+    //     open={isEditFeeActive}
+    //     onOpenChange={setIsEditFeeActive}
+    //     allowFlip={false}
+
+    //     renderTrigger={
+    //       <FeeSelectorTrigger
+    //         onPress={() => setIsEditFeeActive(true)}
+    //         disabled={
+    //           sendFeeStatus.status === ESendFeeStatus.Error ||
+    //           !txFeeInit.current
+    //         }
+    //       />
+    //     }
+    //   />
+    // );
   }, [
-    customFee,
-    feeSelectorItems,
-    handleApplyFeeInfo,
+    feeSelectorItems.length,
+    handlePress,
     intl,
-    isEditFeeActive,
-    networkId,
     openFeeEditorEnabled,
-    selectedFee,
     sendFeeStatus.status,
-    sendSelectedFee,
-    unsignedTxs,
+    sendSelectedFee.feeType,
+    sendSelectedFee.presetIndex,
   ]);
 
   return (
-    <Container.Box>
-      <Container.Item
-        title="Fee Estimate"
-        content={
-          txFeeInit.current ? (
-            <NumberSizeableText
-              formatter="balance"
-              formatterOptions={{
-                tokenSymbol: txFee?.common.nativeSymbol,
-              }}
-              size="$bodyMdMedium"
-              color="$text"
-            >
-              {selectedFee?.totalNativeForDisplay ?? '0.00'}
-            </NumberSizeableText>
-          ) : (
-            <Skeleton height="$5" width="$40" />
-          )
-        }
-        subContent={
-          txFeeInit.current ? (
-            <NumberSizeableText
-              size="$bodyMdMedium"
-              color="$textSubdued"
-              formatter="value"
-              formatterOptions={{ currency: settings.currencyInfo.symbol }}
-            >
-              {selectedFee?.totalFiatForDisplay ?? '0.00'}
-            </NumberSizeableText>
-          ) : (
-            ''
-          )
-        }
-        contentAdd={renderFeeEditor()}
-        description={{
-          content: (
-            <YStack flex={1}>
-              {sendFeeStatus.errMessage ? (
-                <SizableText size="$bodyMd" color="$textCritical">
-                  {sendFeeStatus.errMessage}
-                </SizableText>
-              ) : null}
-              {sendAlertStatus.isInsufficientNativeBalance ? (
-                <SizableText size="$bodyMd" color="$textCritical">
-                  {intl.formatMessage(
-                    {
-                      id: 'msg__str_is_required_for_network_fees_top_up_str_to_make_tx',
-                    },
-                    {
-                      0: network?.symbol ?? '',
-                      1: network?.name ?? '',
-                    },
+    <>
+      <Divider mx="$5" />
+      <InfoItemGroup
+        animation="repeat"
+        opacity={isLoading && txFeeInit.current ? 0.5 : 1}
+      >
+        <InfoItem
+          label={intl.formatMessage({
+            id: ETranslations.global_est_network_fee,
+          })}
+          renderContent={
+            <>
+              <XStack space="$1">
+                <XStack space="$1">
+                  {txFeeInit.current ? (
+                    <NumberSizeableText
+                      formatter="balance"
+                      formatterOptions={{
+                        tokenSymbol: txFee?.common.nativeSymbol,
+                      }}
+                      size="$bodyMd"
+                      color="$textSubdued"
+                    >
+                      {selectedFee?.totalNativeForDisplay ?? '0.00'}
+                    </NumberSizeableText>
+                  ) : (
+                    <Stack py="$1">
+                      <Skeleton height="$3" width="$24" />
+                    </Stack>
                   )}
+                  {txFeeInit.current ? (
+                    <SizableText size="$bodyMd" color="$textSubdued">
+                      (
+                      <NumberSizeableText
+                        size="$bodyMd"
+                        color="$textSubdued"
+                        formatter="value"
+                        formatterOptions={{
+                          currency: settings.currencyInfo.symbol,
+                        }}
+                      >
+                        {selectedFee?.totalFiatForDisplay ?? '0.00'}
+                      </NumberSizeableText>
+                      )
+                    </SizableText>
+                  ) : (
+                    ''
+                  )}
+                </XStack>
+                <SizableText size="$bodyMd" color="$textSubdued">
+                  •
                 </SizableText>
-              ) : null}
-            </YStack>
-          ),
-        }}
-      />
-    </Container.Box>
+                {renderFeeEditor()}
+              </XStack>
+            </>
+          }
+        />
+      </InfoItemGroup>
+      {/* <Container.Box>
+        <Container.Item
+          title="Fee Estimate"
+          content={
+            txFeeInit.current ? (
+              <NumberSizeableText
+                formatter="balance"
+                formatterOptions={{
+                  tokenSymbol: txFee?.common.nativeSymbol,
+                }}
+                size="$bodyMdMedium"
+                color="$text"
+              >
+                {selectedFee?.totalNativeForDisplay ?? '0.00'}
+              </NumberSizeableText>
+            ) : (
+              <Skeleton height="$5" width="$40" />
+            )
+          }
+          subContent={
+            txFeeInit.current ? (
+              <NumberSizeableText
+                size="$bodyMdMedium"
+                color="$textSubdued"
+                formatter="value"
+                formatterOptions={{ currency: settings.currencyInfo.symbol }}
+              >
+                {selectedFee?.totalFiatForDisplay ?? '0.00'}
+              </NumberSizeableText>
+            ) : (
+              ''
+            )
+          }
+          contentAdd={renderFeeEditor()}
+          description={{
+            content: (
+              <YStack flex={1}>
+                {sendFeeStatus.errMessage ? (
+                  <SizableText size="$bodyMd" color="$textCritical">
+                    {sendFeeStatus.errMessage}
+                  </SizableText>
+                ) : null}
+                {sendAlertStatus.isInsufficientNativeBalance ? (
+                  <SizableText size="$bodyMd" color="$textCritical">
+                    {intl.formatMessage(
+                      {
+                        id: 'msg__str_is_required_for_network_fees_top_up_str_to_make_tx',
+                      },
+                      {
+                        0: network?.symbol ?? '',
+                        1: network?.name ?? '',
+                      },
+                    )}
+                  </SizableText>
+                ) : null}
+              </YStack>
+            ),
+          }}
+        />
+      </Container.Box> */}
+    </>
   );
 }
 export default memo(TxFeeContainer);

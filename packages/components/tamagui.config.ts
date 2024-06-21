@@ -21,6 +21,8 @@ import {
   blackA as primitiveBlackA,
   dark as primitiveDark,
   whiteA as primitiveWhiteA,
+  purple,
+  purpleDark,
   success,
   successDark,
 } from './colors';
@@ -139,6 +141,11 @@ const animations = createAnimations({
     type: 'timing',
     duration: 100,
   },
+  repeat: {
+    type: 'timing',
+    duration: 300,
+    repeat: 4,
+  },
   quick: {
     type: 'spring',
     damping: 20,
@@ -176,6 +183,7 @@ const lightColors = {
   ...caution,
   ...info,
   ...critical,
+  ...purple,
   bgApp: '#FFFFFF',
   bg: '#FFFFFF',
   bgReverse: '#1b1b1b',
@@ -269,6 +277,7 @@ const darkColors: typeof lightColors = {
   ...cautionDark,
   ...infoDark,
   ...criticalDark,
+  ...purpleDark,
   bgApp: '#0f0f0f',
   bg: '#1b1b1b',
   bgReverse: '#ffffff',

@@ -11,7 +11,7 @@ import {
   revealableSeedFromMnemonic,
   validateMnemonic,
 } from '@onekeyhq/core/src/secret';
-import type { ECoreApiExportedSecretKeyType } from '@onekeyhq/core/src/types';
+import { ECoreApiExportedSecretKeyType } from '@onekeyhq/core/src/types';
 import {
   backgroundClass,
   backgroundMethod,
@@ -52,6 +52,8 @@ import localDb from '../../dbs/local/localDb';
 import { vaultFactory } from '../../vaults/factory';
 import ServiceBase from '../ServiceBase';
 
+import { buildDefaultAddAccountNetworks } from './defaultNetworkAccountsConfig';
+
 import type {
   IDBAccount,
   IDBCreateHWWalletParams,
@@ -64,6 +66,7 @@ import type {
   IDBRemoveWalletParams,
   IDBSetAccountNameParams,
   IDBSetWalletNameAndAvatarParams,
+  IDBUtxoAccount,
   IDBVariantAccount,
   IDBWallet,
   IDBWalletId,
@@ -253,11 +256,13 @@ class ServiceAccount extends ServiceBase {
     indexedAccountId,
     skipDeviceCancel,
     hideCheckingDeviceLoading,
+    customNetworks,
   }: {
     walletId: string | undefined;
     indexedAccountId: string | undefined;
     skipDeviceCancel?: boolean;
     hideCheckingDeviceLoading?: boolean;
+    customNetworks?: { networkId: string; deriveType: IAccountDeriveTypes }[];
   }) {
     if (!walletId) {
       return;
@@ -277,12 +282,14 @@ class ServiceAccount extends ServiceBase {
         networkId: string;
         deriveType: IAccountDeriveTypes;
       }> = [];
-      // TODO use consts
-      const networks = ['btc--0', 'evm--1'];
-      for (const networkId of networks) {
+
+      const networks = [
+        ...buildDefaultAddAccountNetworks(),
+        ...(customNetworks || []),
+      ];
+      for (const { networkId, deriveType } of networks) {
         try {
           // TODO get global deriveType
-          const deriveType: IAccountDeriveTypes = 'default';
           await this.addHDOrHWAccounts({
             walletId,
             networkId,
@@ -506,6 +513,12 @@ class ServiceAccount extends ServiceBase {
         ),
         skipIfExists: true,
       });
+      for (const account of accounts) {
+        await this.setAccountName({
+          name: account.name,
+          indexedAccountId: account.indexedAccountId,
+        });
+      }
     }
   }
 
@@ -527,7 +540,7 @@ class ServiceAccount extends ServiceBase {
 
   @backgroundMethod()
   @toastIfError()
-  async exportAccountSecretKeys({
+  async exportAccountSecretKey({
     accountId,
     networkId,
     keyType,
@@ -535,7 +548,7 @@ class ServiceAccount extends ServiceBase {
     accountId: string;
     networkId: string;
     keyType: ECoreApiExportedSecretKeyType;
-  }) {
+  }): Promise<string> {
     const vault = await vaultFactory.getVault({ networkId, accountId });
     const { password } =
       await this.backgroundApi.servicePassword.promptPasswordVerifyByAccount({
@@ -546,6 +559,27 @@ class ServiceAccount extends ServiceBase {
       password,
       keyType,
     });
+  }
+
+  @backgroundMethod()
+  @toastIfError()
+  async exportAccountPublicKey({
+    accountId,
+    networkId,
+    keyType,
+  }: {
+    accountId: string;
+    networkId: string;
+    keyType: ECoreApiExportedSecretKeyType;
+  }): Promise<string | undefined> {
+    const account = await this.getAccount({ accountId, networkId });
+    if (keyType === ECoreApiExportedSecretKeyType.publicKey) {
+      return account.pub;
+    }
+    if (keyType === ECoreApiExportedSecretKeyType.xpub) {
+      return (account as IDBUtxoAccount | undefined)?.xpub;
+    }
+    return undefined;
   }
 
   @backgroundMethod()
@@ -770,7 +804,7 @@ class ServiceAccount extends ServiceBase {
     input: string;
     networkId: string;
     name?: string;
-    deriveType: IAccountDeriveTypes | undefined;
+    deriveType?: IAccountDeriveTypes;
     isUrlAccount?: boolean;
     skipAddIfNotEqualToAddress?: string;
   }): Promise<{
@@ -1424,6 +1458,17 @@ class ServiceAccount extends ServiceBase {
   }
 
   @backgroundMethod()
+  async canAutoCreateAddressInSilentMode({ walletId }: { walletId: string }) {
+    if (accountUtils.isHdWallet({ walletId })) {
+      const pwd = await this.backgroundApi.servicePassword.getCachedPassword();
+      if (pwd) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @backgroundMethod()
   async verifyHWAccountAddresses(params: {
     walletId: string;
     networkId: string;
@@ -1431,7 +1476,7 @@ class ServiceAccount extends ServiceBase {
     indexedAccountId: string | undefined;
     deriveType: IAccountDeriveTypes;
     confirmOnDevice?: EConfirmOnDeviceType;
-  }) {
+  }): Promise<string[]> {
     const { prepareParams, deviceParams, networkId, walletId } =
       await this.getPrepareHDOrHWAccountsParams(params);
 
@@ -1472,6 +1517,8 @@ class ServiceAccount extends ServiceBase {
             results.push(account.address);
           }
         }
+
+        return results;
       },
       {
         deviceParams,

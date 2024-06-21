@@ -1,12 +1,10 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { CommonActions } from '@react-navigation/native';
-import * as ExpoSharing from 'expo-sharing';
+import { CommonActions, StackActions } from '@react-navigation/native';
 import { useIntl } from 'react-intl';
 
 import {
   HeaderIconButton,
-  Image,
   NavBackButton,
   NumberSizeableText,
   Page,
@@ -16,8 +14,8 @@ import {
   View,
   XStack,
   YStack,
-  useClipboard,
   useMedia,
+  useShare,
 } from '@onekeyhq/components';
 import type { IPageScreenProps } from '@onekeyhq/components';
 import { EJotaiContextStoreNames } from '@onekeyhq/kit-bg/src/states/jotai/atoms';
@@ -32,10 +30,12 @@ import type { IMarketTokenDetail } from '@onekeyhq/shared/types/market';
 import backgroundApiProxy from '../../background/instance/backgroundApiProxy';
 import { OpenInAppButton } from '../../components/OpenInAppButton';
 import useAppNavigation from '../../hooks/useAppNavigation';
+import { useDeferredPromise } from '../../hooks/useDeferredPromise';
 
 import { MarketDetailOverview } from './components/MarketDetailOverview';
 import { MarketHomeHeaderSearchBar } from './components/MarketHomeHeaderSearchBar';
 import { MarketStar } from './components/MarketStar';
+import { MarketTokenIcon } from './components/MarketTokenIcon';
 import { PriceChangePercentage } from './components/PriceChangePercentage';
 import { TextCell } from './components/TextCell';
 import { TokenDetailTabs } from './components/TokenDetailTabs';
@@ -45,12 +45,13 @@ import { MarketWatchListProviderMirror } from './MarketWatchListProviderMirror';
 
 function TokenDetailHeader({
   coinGeckoId,
-  token,
+  token: responseToken,
 }: {
   coinGeckoId: string;
   token: IMarketTokenDetail;
 }) {
   const intl = useIntl();
+  const [token, setToken] = useState(responseToken);
   const {
     name,
     stats: {
@@ -63,6 +64,18 @@ function TokenDetailHeader({
     },
   } = token;
   const { gtMd } = useMedia();
+  useEffect(() => {
+    const timerId = setInterval(async () => {
+      const response =
+        await backgroundApiProxy.serviceMarket.fetchMarketTokenDetail(
+          coinGeckoId,
+        );
+      setToken(response);
+    }, 45 * 1000);
+    return () => {
+      clearInterval(timerId);
+    };
+  }, [coinGeckoId]);
   return (
     <YStack px="$5" $md={{ minHeight: 150 }}>
       <YStack flex={1}>
@@ -86,7 +99,7 @@ function TokenDetailHeader({
       {gtMd ? (
         <MarketDetailOverview token={token} onContentSizeChange={() => {}} />
       ) : (
-        <XStack pt="$6" flex={1} ai="center" jc="center" space="$2">
+        <XStack pt="$3" flex={1} ai="center" space="$2" flexWrap="wrap">
           <TextCell
             title={intl.formatMessage({ id: ETranslations.market_24h_vol_usd })}
           >
@@ -133,36 +146,45 @@ function SkeletonHeaderOverItemItem() {
 function MarketDetail({
   route,
 }: IPageScreenProps<ITabMarketParamList, ETabMarketRoutes.MarketDetail>) {
-  const { icon, coinGeckoId, symbol } = route.params;
+  const { coinGeckoId, symbol } = route.params;
   const { gtMd } = useMedia();
+
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const [tokenDetail, setTokenDetail] = useState<
     IMarketTokenDetail | undefined
   >(undefined);
 
-  useEffect(() => {
-    void backgroundApiProxy.serviceMarket
-      .fetchTokenDetail(coinGeckoId)
-      .then(setTokenDetail);
+  const fetchMarketTokenDetail = useCallback(async () => {
+    const response =
+      await backgroundApiProxy.serviceMarket.fetchMarketTokenDetail(
+        coinGeckoId,
+      );
+    setTokenDetail(response);
   }, [coinGeckoId]);
+
+  const onRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+    await fetchMarketTokenDetail();
+    setIsRefreshing(false);
+  }, [fetchMarketTokenDetail]);
+
+  useEffect(() => {
+    void fetchMarketTokenDetail();
+  }, [fetchMarketTokenDetail]);
 
   const renderHeaderTitle = useCallback(
     () => (
       <XStack space="$2">
-        <Image
-          width="$6"
-          height="$6"
-          borderRadius="$full"
-          src={decodeURIComponent(tokenDetail?.image || icon || '')}
-        />
+        <MarketTokenIcon uri={tokenDetail?.image || ''} size="$6" />
         <SizableText>
           {(tokenDetail?.symbol || symbol)?.toUpperCase()}
         </SizableText>
       </XStack>
     ),
-    [icon, symbol, tokenDetail?.image, tokenDetail?.symbol],
+    [symbol, tokenDetail?.image, tokenDetail?.symbol],
   );
-  const { copyText } = useClipboard();
+  const { shareText } = useShare();
 
   const buildDeepLinkUrl = useCallback(
     () =>
@@ -193,18 +215,13 @@ function MarketDetail({
           icon="ShareOutline"
           onPress={async () => {
             const url = buildMarketFullUrl({ coinGeckoId });
-            if (await ExpoSharing.isAvailableAsync()) {
-              // https://docs.expo.dev/versions/latest/sdk/sharing/
-              await ExpoSharing.shareAsync(url);
-            } else {
-              copyText(url);
-            }
+            await shareText(url);
           }}
         />
         {gtMd ? <MarketHomeHeaderSearchBar /> : null}
       </XStack>
     ),
-    [buildDeepLinkUrl, buildFullUrl, coinGeckoId, copyText, gtMd],
+    [buildDeepLinkUrl, buildFullUrl, coinGeckoId, gtMd, shareText],
   );
 
   const navigation = useAppNavigation();
@@ -213,7 +230,7 @@ function MarketDetail({
     navigation.dispatch((state) => {
       console.log(state);
       if (state.routes.length > 1) {
-        return CommonActions.goBack();
+        return StackActions.pop(state.routes.length);
       }
       return CommonActions.reset({
         index: 0,
@@ -280,9 +297,16 @@ function MarketDetail({
     );
   }, [coinGeckoId, gtMd, tokenDetail]);
 
+  const defer = useDeferredPromise();
+  const onDataLoaded = useCallback(() => {
+    if (defer) {
+      defer.resolve(null);
+    }
+  }, [defer]);
+
   const tokenPriceChart = useMemo(
-    () => <TokenPriceChart coinGeckoId={coinGeckoId} />,
-    [coinGeckoId],
+    () => <TokenPriceChart coinGeckoId={coinGeckoId} defer={defer} />,
+    [coinGeckoId, defer],
   );
 
   return (
@@ -301,6 +325,7 @@ function MarketDetail({
               </ScrollView>
               <YStack flex={1}>
                 <TokenDetailTabs
+                  onDataLoaded={onDataLoaded}
                   token={tokenDetail}
                   listHeaderComponent={tokenPriceChart}
                 />
@@ -309,11 +334,14 @@ function MarketDetail({
           </YStack>
         ) : (
           <TokenDetailTabs
+            isRefreshing={isRefreshing}
+            onRefresh={onRefresh}
             token={tokenDetail}
+            onDataLoaded={onDataLoaded}
             listHeaderComponent={
               <YStack>
                 {tokenDetailHeader}
-                {tokenPriceChart}
+                {tokenDetail ? tokenPriceChart : null}
               </YStack>
             }
           />

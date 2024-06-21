@@ -21,6 +21,7 @@ import type {
   IQueryCheckAddressArgs,
 } from '@onekeyhq/shared/types/address';
 import { EServiceEndpointEnum } from '@onekeyhq/shared/types/endpoint';
+import type { IResolveNameResp } from '@onekeyhq/shared/types/name';
 import type {
   IProxyRequest,
   IProxyRequestItem,
@@ -51,6 +52,7 @@ class ServiceAccountProfile extends ServiceBase {
     const resp = await client.get<{
       data: IFetchAccountDetailsResp;
     }>(`/wallet/v1/account/get-account?${qs.stringify(omitBy(params, isNil))}`);
+
     return resp.data.data;
   }
 
@@ -183,21 +185,28 @@ class ServiceAccountProfile extends ServiceBase {
     enableWalletName,
     enableAddressInteractionStatus,
     enableVerifySendFundToSelf,
+    skipValidateAddress,
   }: IQueryCheckAddressArgs) {
     const result: IAddressQueryResult = { input: address };
     if (!networkId) {
       return result;
     }
-    result.validStatus = await this.validateAddress({
-      networkId,
-      address,
-    });
 
-    const isDomain = addressIsEnsFormat(address);
-    if (isDomain && enableNameResolve) {
-      await this.handleNameSolve(networkId, address, result);
+    if (!skipValidateAddress) {
+      result.validStatus = await this.validateAddress({
+        networkId,
+        address,
+      });
     }
-    if (result.validStatus !== 'valid') {
+
+    if (enableNameResolve) {
+      const vault = await vaultFactory.getChainOnlyVault({ networkId });
+      const isDomain = await vault.checkIsDomainName({ name: address });
+      if (isDomain) {
+        await this.handleNameSolve(networkId, address, result);
+      }
+    }
+    if (!skipValidateAddress && result.validStatus !== 'valid') {
       return result;
     }
     const resolveAddress = result.resolveAddress ?? result.input;
@@ -231,7 +240,23 @@ class ServiceAccountProfile extends ServiceBase {
         });
 
       if (walletAccountItems.length > 0) {
-        const item = walletAccountItems[0];
+        let item = walletAccountItems[0];
+        if (accountId) {
+          const account = await this.backgroundApi.serviceAccount.getAccount({
+            accountId,
+            networkId,
+          });
+          const accountItem = walletAccountItems.find(
+            (a) =>
+              account.indexedAccountId === a.accountId ||
+              account.id === a.accountId,
+          );
+
+          if (accountItem) {
+            item = accountItem;
+          }
+        }
+
         result.walletAccountName = `${item.walletName} / ${item.accountName}`;
       }
     }
@@ -251,11 +276,19 @@ class ServiceAccountProfile extends ServiceBase {
     address: string,
     result: IAddressQueryResult,
   ) {
-    const resolveNames =
-      await this.backgroundApi.serviceNameResolver.resolveName({
+    const vault = await vaultFactory.getChainOnlyVault({ networkId });
+    let resolveNames: IResolveNameResp | null | undefined =
+      await vault.resolveDomainName({
+        name: address,
+      });
+
+    if (!resolveNames) {
+      resolveNames = await this.backgroundApi.serviceNameResolver.resolveName({
         name: address,
         networkId,
       });
+    }
+
     if (resolveNames && resolveNames.names?.length) {
       result.resolveAddress = resolveNames.names?.[0].value;
       result.resolveOptions = resolveNames.names?.map((o) => o.value);
@@ -273,9 +306,11 @@ class ServiceAccountProfile extends ServiceBase {
   async sendProxyRequest<T>({
     networkId,
     body,
+    returnRawData,
   }: {
     networkId: string;
     body: IProxyRequestItem[];
+    returnRawData?: boolean;
   }): Promise<T[]> {
     const client = await this.getClient(EServiceEndpointEnum.Wallet);
     const request: IProxyRequest = { networkId, body };
@@ -285,6 +320,10 @@ class ServiceAccountProfile extends ServiceBase {
     );
     const data = resp.data.data.data;
     if (data.some((item) => !item.success)) {
+      if (returnRawData) {
+        // @ts-expect-error
+        return data;
+      }
       throw new Error('Failed to send proxy request');
     }
     return data.map((item) => item.data);

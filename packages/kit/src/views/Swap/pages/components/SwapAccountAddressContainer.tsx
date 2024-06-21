@@ -100,6 +100,11 @@ const SwapAccountAddressContainer = ({
 }: ISwapAccountAddressContainerProps) => {
   const intl = useIntl();
   const swapAddressInfo = useSwapAddressInfo(type);
+  const swapAnotherAddressInfo = useSwapAddressInfo(
+    type === ESwapDirectionType.FROM
+      ? ESwapDirectionType.TO
+      : ESwapDirectionType.FROM,
+  );
   const [fromToken] = useSwapSelectFromTokenAtom();
   const [toToken] = useSwapSelectToTokenAtom();
   const [quoteResult] = useSwapQuoteCurrentSelectAtom();
@@ -167,6 +172,24 @@ const SwapAccountAddressContainer = ({
     ) {
       return null;
     }
+    // address same need hidden
+    if (
+      ((fromToken && type === ESwapDirectionType.FROM) ||
+        (toToken && type === ESwapDirectionType.TO)) &&
+      swapAddressInfo.address &&
+      swapAnotherAddressInfo.address &&
+      swapAddressInfo.address === swapAnotherAddressInfo.address
+    ) {
+      return null;
+    }
+    if (
+      fromToken &&
+      !toToken &&
+      type === ESwapDirectionType.FROM &&
+      swapAddressInfo.address
+    ) {
+      return null;
+    }
     if (
       !swapAddressInfo.address &&
       (accountUtils.isHdWallet({
@@ -190,6 +213,7 @@ const SwapAccountAddressContainer = ({
         <AddressButton
           address={accountUtils.shortenAddress({
             address: swapAddressInfo.address ?? '',
+            leadingLength: 8,
           })}
         />
       );
@@ -200,16 +224,15 @@ const SwapAccountAddressContainer = ({
         onPress={onToAnotherAddressModal}
         address={
           swapToAnotherAccountSwitchOn
-            ? intl.formatMessage(
-                { id: ETranslations.swap_account_to_address_edit },
-                {
-                  address: accountUtils.shortenAddress({
-                    address: swapAddressInfo.address ?? '',
-                  }),
-                },
-              )
+            ? `${accountUtils.shortenAddress({
+                address: swapAddressInfo.address ?? '',
+                leadingLength: 8,
+              })} ${intl.formatMessage({
+                id: ETranslations.swap_account_to_address_edit,
+              })}`
             : accountUtils.shortenAddress({
                 address: swapAddressInfo.address ?? '',
+                leadingLength: 8,
               })
         }
       />
@@ -218,9 +241,8 @@ const SwapAccountAddressContainer = ({
     fromToken,
     type,
     toToken,
-    swapAddressInfo.accountInfo?.wallet,
-    swapAddressInfo.accountInfo?.indexedAccount,
-    swapAddressInfo.address,
+    swapAddressInfo,
+    swapAnotherAddressInfo.address,
     swapSupportReceiveAddress,
     quoteResult,
     onToAnotherAddressModal,

@@ -12,6 +12,7 @@ import {
   Skeleton,
   Stack,
   XStack,
+  useMedia,
 } from '@onekeyhq/components';
 import { ETranslations } from '@onekeyhq/shared/src/locale';
 import type { ISwapToken } from '@onekeyhq/shared/types/swap/types';
@@ -37,24 +38,36 @@ const SwapProviderInfoItem = ({
   isLoading,
 }: ISwapProviderInfoItemProps) => {
   const intl = useIntl();
+  const { md } = useMedia();
   const rateIsExit = useMemo(() => {
     const rateBN = new BigNumber(rate ?? 0);
     return !rateBN.isZero();
   }, [rate]);
   const rateContent = useMemo(() => {
     if (!rateIsExit || !fromToken || !toToken)
-      return <SizableText>Insufficient liquidity</SizableText>;
+      return (
+        <SizableText>
+          {intl.formatMessage({
+            id: ETranslations.swap_page_provider_provider_insufficient_liquidity,
+          })}
+        </SizableText>
+      );
     const rateBN = new BigNumber(rate ?? 0);
     return (
-      <SizableText size="$bodyMdMedium" pl="$1" maxWidth={177}>
-        {`1 ${fromToken.symbol.toUpperCase()} =`}
-        <NumberSizeableText formatter="balance">
+      <SizableText
+        size="$bodyMdMedium"
+        pl="$1"
+        maxWidth={md ? 240 : 360}
+        textAlign="right"
+      >
+        {`1 ${fromToken.symbol.toUpperCase()} = `}
+        <NumberSizeableText size="$bodyMdMedium" formatter="balance">
           {rateBN.toFixed()}
-        </NumberSizeableText>
-        <SizableText>{toToken.symbol}</SizableText>
+        </NumberSizeableText>{' '}
+        <SizableText size="$bodyMdMedium">{toToken.symbol}</SizableText>
       </SizableText>
     );
-  }, [fromToken, rate, rateIsExit, toToken]);
+  }, [fromToken, intl, md, rate, rateIsExit, toToken]);
   return (
     <XStack justifyContent="space-between" alignItems="center">
       <SizableText size="$bodyMd" color="$textSubdued">

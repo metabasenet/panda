@@ -24,15 +24,20 @@ export const swapSlippageWillAheadMinValue = 10;
 
 export const swapSlippage = 50;
 
+export const swapSlippageDecimal = 2;
+
 export const networkTransactionExplorerReplaceStr = '{transaction}';
 
 export const swapTokenCatchMapMaxCount = 30;
 
 export const swapApproveResetValue = '0';
 
+export const swapQuoteIntervalMaxCount = 10;
+
 export const swapQuoteFetchInterval = timerUtils.getTimeDurationMs({
   seconds: 10,
 });
+
 export const swapApprovingStateFetchInterval = timerUtils.getTimeDurationMs({
   seconds: 1,
 });

@@ -273,7 +273,7 @@ class ProviderApiBtc extends ProviderApiBase {
         networkId: networkId ?? '',
         transfersInfo,
       });
-    return result;
+    return result.txid;
   }
 
   @providerApiMethod()
@@ -471,7 +471,7 @@ class ProviderApiBtc extends ProviderApiBase {
     });
 
     const resp =
-      (await this.backgroundApi.serviceDApp.openSignAndSendTransactionModal({
+      await this.backgroundApi.serviceDApp.openSignAndSendTransactionModal({
         request,
         accountId,
         networkId,
@@ -493,8 +493,14 @@ class ProviderApiBtc extends ProviderApiBase {
           disabledCoinSelect: true,
         },
         signOnly: true,
-      })) as { psbtHex: string };
+      });
 
+    if (!resp.psbtHex) {
+      throw web3Errors.provider.custom({
+        code: 4001,
+        message: 'Failed to sign psbt',
+      });
+    }
     const respPsbt = Psbt.fromHex(resp.psbtHex, { network: psbtNetwork });
 
     if (options && options.autoFinalized === false) {
@@ -563,13 +569,17 @@ class ProviderApiBtc extends ProviderApiBase {
         networkId,
         accountId,
       });
-    const result = await this.backgroundApi.serviceGas.estimateFee({
-      networkId,
-      encodedTx: await this.backgroundApi.serviceGas.buildEstimateFeeParams({
+
+    const { encodedTx } =
+      await this.backgroundApi.serviceGas.buildEstimateFeeParams({
         accountId,
         networkId,
         encodedTx: {} as IEncodedTx,
-      }),
+      });
+
+    const result = await this.backgroundApi.serviceGas.estimateFee({
+      networkId,
+      encodedTx,
       accountAddress,
     });
     if (result.feeUTXO && result.feeUTXO.length === 3) {

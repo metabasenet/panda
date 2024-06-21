@@ -9,7 +9,7 @@ import {
 import { toXOnly } from 'bitcoinjs-lib/src/psbt/bip371';
 import bs58check from 'bs58check';
 import { ECPairFactory } from 'ecpair';
-import { isNil, omit } from 'lodash';
+import { cloneDeep, isNil, omit } from 'lodash';
 
 import { OneKeyInternalError } from '@onekeyhq/shared/src/errors';
 import errorUtils from '@onekeyhq/shared/src/errors/utils/errorUtils';
@@ -142,6 +142,7 @@ export function scriptPkToAddress(
 ) {
   initBitcoinEcc();
   try {
+    // 0/0
     const address = BitcoinJsAddress.fromOutputScript(
       typeof scriptPk === 'string' ? Buffer.from(scriptPk, 'hex') : scriptPk,
       psbtNetwork,
@@ -188,7 +189,9 @@ export function getInputsToSignFromPsbt({
           address,
           sighashTypes: v.sighashType ? [v.sighashType] : undefined,
         });
+        // P2TR taproot
         if (account.template?.startsWith(`m/86'/`) && !v.tapInternalKey) {
+          // slice pub length from 33 to 32
           v.tapInternalKey = toXOnly(
             Buffer.from(checkIsDefined(account.pub), 'hex'),
           );
@@ -486,12 +489,52 @@ export function buildBtcXpubSegwit({
   return xpubSegwit;
 }
 
+export function getBip32FromBase58({
+  network,
+  key,
+}: {
+  network: IBtcForkNetwork;
+  key: string;
+}) {
+  // if (impl === IMPL_BTC) {
+  //   network = getBtcForkNetwork('btc');
+  // }
+  // if (impl === IMPL_TBTC) {
+  //   network = getBtcForkNetwork('tbtc');
+  // }
+  // if (!network) {
+  //   throw new Error(`network not support: ${impl}`);
+  // }
+
+  // const accountNameInfoMap = getAccountNameInfoByImpl(IMPL_BTC);
+  // const accountNameInfo = Object.values(accountNameInfoMap);
+
+  const buffer = Buffer.from(bs58check.decode(key));
+  const version = buffer.readUInt32BE(0);
+
+  const versionByteOptions = [
+    network.bip32,
+    ...Object.values(network.segwitVersionBytes || {}),
+  ];
+  let bip32Info = cloneDeep(network.bip32);
+  for (const versionByte of versionByteOptions) {
+    if (versionByte.private === version || versionByte.public === version) {
+      bip32Info = cloneDeep(versionByte);
+      break;
+    }
+  }
+  const newNetwork = cloneDeep(network);
+  newNetwork.bip32 = bip32Info;
+  const bip32Api = getBitcoinBip32().fromBase58(key, newNetwork);
+  return bip32Api;
+}
+
 export function pubkeyToPayment({
   pubkey,
   encoding,
   network,
 }: {
-  pubkey: Buffer;
+  pubkey: Buffer | undefined;
   encoding: EAddressEncodings;
   network: IBtcForkNetwork;
 }): Payment {
@@ -518,7 +561,9 @@ export function pubkeyToPayment({
       break;
     case EAddressEncodings.P2TR:
       payment = payments.p2tr({
-        internalPubkey: pubkey.slice(1, 33),
+        // this input may not belongs to self, can not get pubkey
+        internalPubkey: pubkey ? toXOnly(pubkey) : undefined,
+        //    internalPubkey: pubkey ? pubkey.slice(1, 33) : undefined,
         network,
       });
       break;
@@ -617,6 +662,24 @@ export function getAddressFromXpub({
     }
   }
   return Promise.resolve({ addresses: ret, publicKeys, xpubSegwit });
+}
+
+export function getPublicKeyFromXpub({
+  xpub,
+  network,
+  relPath = '0/0',
+}: {
+  xpub: string;
+  network: IBtcForkNetwork;
+  relPath: string;
+}) {
+  const node = getBip32FromBase58({
+    network,
+    key: xpub,
+  }).derivePath(relPath);
+
+  const pub = node.publicKey.toString('hex');
+  return pub;
 }
 
 /*

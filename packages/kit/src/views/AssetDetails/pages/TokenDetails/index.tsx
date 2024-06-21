@@ -1,12 +1,15 @@
 import { useCallback, useState } from 'react';
 
 import { useRoute } from '@react-navigation/core';
+import { isEmpty } from 'lodash';
+import { useIntl } from 'react-intl';
 
 import type { IActionListSection } from '@onekeyhq/components';
 import {
   ActionList,
   Alert,
   Divider,
+  Heading,
   NumberSizeableText,
   Page,
   Skeleton,
@@ -27,6 +30,7 @@ import { openUrl } from '@onekeyhq/kit/src/utils/openUrl';
 import { RawActions } from '@onekeyhq/kit/src/views/Home/components/WalletActions/RawActions';
 import { StakingApr } from '@onekeyhq/kit/src/views/Staking/components/StakingApr';
 import { useSettingsPersistAtom } from '@onekeyhq/kit-bg/src/states/jotai/atoms';
+import { ETranslations } from '@onekeyhq/shared/src/locale';
 import {
   EModalReceiveRoutes,
   EModalRoutes,
@@ -44,6 +48,7 @@ import ActionSell from './ActionSell';
 import type { RouteProp } from '@react-navigation/core';
 
 export function TokenDetails() {
+  const intl = useIntl();
   const navigation = useAppNavigation();
 
   const route =
@@ -107,6 +112,7 @@ export function TokenDetails() {
           networkId,
           tokenIdOnNetwork: tokenInfo.address,
           onChainHistoryDisabled: vaultSettings.onChainHistoryDisabled,
+          saveConfirmedTxsEnabled: vaultSettings.saveConfirmedTxsEnabled,
         }),
         backgroundApiProxy.serviceToken.fetchTokensDetails({
           networkId,
@@ -169,14 +175,25 @@ export function TokenDetails() {
   }, [accountId, deriveInfo, deriveType, navigation, networkId, walletId]);
 
   const handleHistoryItemPress = useCallback(
-    (tx: IAccountHistoryTx) => {
+    async (tx: IAccountHistoryTx) => {
+      if (!account || !network) return;
+
       navigation.push(EModalAssetDetailRoutes.HistoryDetails, {
+        accountId,
         networkId,
-        accountAddress: account?.address,
+        accountAddress:
+          await backgroundApiProxy.serviceAccount.getAccountAddressForApi({
+            accountId: account.id,
+            networkId: network.id,
+          }),
+        xpub: await backgroundApiProxy.serviceAccount.getAccountXpub({
+          accountId: account.id,
+          networkId: network.id,
+        }),
         historyTx: tx,
       });
     },
-    [account?.address, navigation, networkId],
+    [account, accountId, navigation, network, networkId],
   );
 
   const handleSendPress = useCallback(() => {
@@ -207,23 +224,29 @@ export function TokenDetails() {
   }, [isBlocked, networkId, tokenInfo.address]);
 
   const headerRight = useCallback(() => {
-    const sections: IActionListSection[] = [
-      {
+    const sections: IActionListSection[] = [];
+
+    if (!tokenInfo.isNative) {
+      sections.push({
         items: [
           {
-            label: isBlocked ? 'Unhide' : 'Hide',
+            label: isBlocked
+              ? intl.formatMessage({ id: ETranslations.global_unhide })
+              : intl.formatMessage({ id: ETranslations.global_hide }),
             icon: isBlocked ? 'EyeOutline' : 'EyeOffOutline',
             onPress: handleToggleBlockedToken,
           },
         ],
-      },
-    ];
+      });
+    }
 
     if (tokenInfo.address !== '') {
       sections.unshift({
         items: [
           {
-            label: 'Copy Token Contract',
+            label: intl.formatMessage({
+              id: ETranslations.global_copy_token_contract,
+            }),
             icon: 'Copy1Outline',
             onPress: () => copyText(tokenInfo.address),
           },
@@ -237,15 +260,17 @@ export function TokenDetails() {
 
       if (tokenDetailsUrl !== '') {
         sections[0].items.push({
-          label: 'View in explorer',
+          label: intl.formatMessage({
+            id: ETranslations.global_view_in_blockchain_explorer,
+          }),
           icon: 'ShareOutline',
           onPress: () => openUrl(tokenDetailsUrl),
         });
       }
     }
-    return (
+    return isEmpty(sections) ? null : (
       <ActionList
-        title="Actions"
+        title={intl.formatMessage({ id: ETranslations.global_more })}
         renderTrigger={<HeaderIconButton icon="DotHorOutline" />}
         sections={sections}
       />
@@ -253,9 +278,11 @@ export function TokenDetails() {
   }, [
     copyText,
     handleToggleBlockedToken,
+    intl,
     isBlocked,
     network,
     tokenInfo.address,
+    tokenInfo.isNative,
   ]);
 
   // const renderTokenAddress = useCallback(() => {
@@ -335,12 +362,18 @@ export function TokenDetails() {
   //   );
   // }, [media.gtMd, network?.logoURI, tokenInfo.address]);
 
+  const customHeaderTitle = useCallback(
+    () => (
+      <Heading size="$headingLg" numberOfLines={1}>
+        {tokenInfo.name ?? tokenDetails?.info.name}
+      </Heading>
+    ),
+    [tokenDetails?.info.name, tokenInfo.name],
+  );
+
   return (
     <Page>
-      <Page.Header
-        headerTitle={tokenInfo.name ?? tokenDetails?.info.name}
-        headerRight={headerRight}
-      />
+      <Page.Header headerTitle={customHeaderTitle} headerRight={headerRight} />
       <Page.Body>
         <ProviderJotaiContextHistoryList>
           <TxHistoryListView
@@ -355,9 +388,13 @@ export function TokenDetails() {
                     icon="EyeOffOutline"
                     fullBleed
                     type="warning"
-                    title="This token is currently hidden and won't appear in the list"
+                    title={intl.formatMessage({
+                      id: ETranslations.token_hidden_message,
+                    })}
                     action={{
-                      primary: 'Unhide',
+                      primary: intl.formatMessage({
+                        id: ETranslations.global_unhide,
+                      }),
                       onPrimaryPress: handleToggleBlockedToken,
                     }}
                     mb="$5"
@@ -390,7 +427,6 @@ export function TokenDetails() {
                             size="$heading3xl"
                             formatter="balance"
                             formatterOptions={{ tokenSymbol: tokenInfo.symbol }}
-                            numberOfLines={1}
                           >
                             {tokenDetails?.balanceParsed ?? '0'}
                           </NumberSizeableText>

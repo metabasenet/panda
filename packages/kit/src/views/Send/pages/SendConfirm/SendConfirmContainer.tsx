@@ -3,16 +3,18 @@ import { memo, useCallback, useEffect } from 'react';
 import { useRoute } from '@react-navigation/core';
 import { useIntl } from 'react-intl';
 
-import { Page, XStack, YStack } from '@onekeyhq/components';
+import { Alert, Page, SizableText, Stack } from '@onekeyhq/components';
 import backgroundApiProxy from '@onekeyhq/kit/src/background/instance/backgroundApiProxy';
-import { Container } from '@onekeyhq/kit/src/components/Container';
 import useDappApproveAction from '@onekeyhq/kit/src/hooks/useDappApproveAction';
 import { usePromiseResult } from '@onekeyhq/kit/src/hooks/usePromiseResult';
 import {
   useSendConfirmActions,
+  useSendFeeStatusAtom,
+  useSendTxStatusAtom,
   withSendConfirmProvider,
 } from '@onekeyhq/kit/src/states/jotai/contexts/sendConfirm';
 import { useSettingsPersistAtom } from '@onekeyhq/kit-bg/src/states/jotai/atoms';
+import { ETranslations } from '@onekeyhq/shared/src/locale';
 import type {
   EModalSendRoutes,
   IModalSendParamList,
@@ -29,12 +31,13 @@ import type { RouteProp } from '@react-navigation/core';
 
 function SendConfirmContainer() {
   const intl = useIntl();
-  const tableLayout = false;
   const route =
     useRoute<RouteProp<IModalSendParamList, EModalSendRoutes.SendConfirm>>();
   const { updateUnsignedTxs, updateNativeTokenInfo, updateSendFeeStatus } =
     useSendConfirmActions().current;
   const [settings] = useSettingsPersistAtom();
+  const [sendFeeStatus] = useSendFeeStatusAtom();
+  const [sendAlertStatus] = useSendTxStatusAtom();
   const {
     accountId,
     networkId,
@@ -45,56 +48,64 @@ function SendConfirmContainer() {
     sourceInfo,
     signOnly,
     useFeeInTx,
+    transferPayload,
   } = route.params;
   const dappApprove = useDappApproveAction({
     id: sourceInfo?.id ?? '',
     closeWindowAfterResolved: true,
   });
-  usePromiseResult(async () => {
-    updateUnsignedTxs(unsignedTxs);
-    updateNativeTokenInfo({
-      isLoading: true,
-      balance: '0',
-      logoURI: '',
-    });
-    const [accountAddress, xpub, nativeTokenAddress] = await Promise.all([
-      backgroundApiProxy.serviceAccount.getAccountAddressForApi({
+  const { network } =
+    usePromiseResult(async () => {
+      updateUnsignedTxs(unsignedTxs);
+      updateNativeTokenInfo({
+        isLoading: true,
+        balance: '0',
+        logoURI: '',
+      });
+      const [n, accountAddress, xpub, nativeTokenAddress] = await Promise.all([
+        backgroundApiProxy.serviceNetwork.getNetwork({ networkId }),
+        backgroundApiProxy.serviceAccount.getAccountAddressForApi({
+          networkId,
+          accountId,
+        }),
+        backgroundApiProxy.serviceAccount.getAccountXpub({
+          accountId,
+          networkId,
+        }),
+        backgroundApiProxy.serviceToken.getNativeTokenAddress({ networkId }),
+      ]);
+      const checkInscriptionProtectionEnabled =
+        await backgroundApiProxy.serviceSetting.checkInscriptionProtectionEnabled(
+          {
+            networkId,
+            accountId,
+          },
+        );
+      const withCheckInscription =
+        checkInscriptionProtectionEnabled && settings.inscriptionProtection;
+      const r = await backgroundApiProxy.serviceToken.fetchTokensDetails({
         networkId,
-        accountId,
-      }),
-      backgroundApiProxy.serviceAccount.getAccountXpub({
-        accountId,
-        networkId,
-      }),
-      backgroundApiProxy.serviceToken.getNativeTokenAddress({ networkId }),
-    ]);
-    const vs = await backgroundApiProxy.serviceNetwork.getVaultSettings({
+        accountAddress,
+        contractList: [nativeTokenAddress],
+        xpub,
+        withFrozenBalance: true,
+        withCheckInscription,
+      });
+      const balance = r[0].balanceParsed;
+      updateNativeTokenInfo({
+        isLoading: false,
+        balance,
+        logoURI: r[0].info.logoURI ?? '',
+      });
+      return { network: n };
+    }, [
+      accountId,
       networkId,
-    });
-    const r = await backgroundApiProxy.serviceToken.fetchTokensDetails({
-      networkId,
-      accountAddress,
-      contractList: [nativeTokenAddress],
-      xpub,
-      withFrozenBalance: true,
-      withCheckInscription: settings.inscriptionProtection,
-    });
-    const balance = vs.hasFrozenBalance
-      ? r[0].availableBalanceParsed ?? '0'
-      : r[0].balanceParsed;
-    updateNativeTokenInfo({
-      isLoading: false,
-      balance,
-      logoURI: r[0].info.logoURI ?? '',
-    });
-  }, [
-    accountId,
-    networkId,
-    unsignedTxs,
-    updateNativeTokenInfo,
-    updateUnsignedTxs,
-    settings.inscriptionProtection,
-  ]);
+      unsignedTxs,
+      updateNativeTokenInfo,
+      updateUnsignedTxs,
+      settings.inscriptionProtection,
+    ]).result ?? {};
 
   useEffect(
     () => () =>
@@ -102,61 +113,47 @@ function SendConfirmContainer() {
     [updateSendFeeStatus],
   );
 
-  const renderSendConfirmView = useCallback(() => {
-    if (tableLayout) {
-      return (
-        <Page.Body>
-          <XStack h="100%" px="$5">
-            <Container.Box
-              blockProps={{ width: '236px', pb: '$5' }}
-              contentProps={{
-                height: '100%',
-                flexDirection: 'column-reverse',
-                justifyContent: 'space-between',
-              }}
-            >
-              <TxSimulationContainer tableLayout={tableLayout} />
-            </Container.Box>
-            <YStack flex={1} justifyContent="space-between" mr="$-5">
-              <TxActionsContainer
-                accountId={accountId}
-                networkId={networkId}
-                tableLayout={tableLayout}
-              />
-              <YStack>
-                <TxFeeContainer
-                  accountId={accountId}
-                  networkId={networkId}
-                  tableLayout={tableLayout}
-                  useFeeInTx={useFeeInTx}
-                />
-                <SendConfirmActionsContainer
-                  sourceInfo={sourceInfo}
-                  signOnly={signOnly}
-                  accountId={accountId}
-                  networkId={networkId}
-                  onSuccess={onSuccess}
-                  onFail={onFail}
-                  onCancel={onCancel}
-                  tableLayout={tableLayout}
-                />
-              </YStack>
-            </YStack>
-          </XStack>
-        </Page.Body>
-      );
-    }
-
-    return (
+  const renderSendConfirmView = useCallback(
+    () => (
       <>
-        <Page.Body px="$5" space="$4">
+        <Page.Body testID="tx-confirmation-body">
+          <Stack>
+            {sendFeeStatus.errMessage ? (
+              <Alert
+                fullBleed
+                icon="ErrorOutline"
+                type="critical"
+                title={sendFeeStatus.errMessage}
+              />
+            ) : null}
+            {sendAlertStatus.isInsufficientNativeBalance ? (
+              <Alert
+                fullBleed
+                icon="ErrorOutline"
+                type="critical"
+                title={intl.formatMessage(
+                  {
+                    id: ETranslations.msg__str_is_required_for_network_fees_top_up_str_to_make_tx,
+                  },
+                  {
+                    crypto: network?.symbol ?? '',
+                  },
+                )}
+              />
+            ) : null}
+          </Stack>
           <TxSourceInfoContainer sourceInfo={sourceInfo} />
-          <TxActionsContainer accountId={accountId} networkId={networkId} />
+          <TxActionsContainer
+            accountId={accountId}
+            networkId={networkId}
+            transferPayload={transferPayload}
+          />
           <TxFeeContainer
             accountId={accountId}
             networkId={networkId}
             useFeeInTx={useFeeInTx}
           />
+          {/* TODO: Swap tx details */}
           <TxSimulationContainer />
         </Page.Body>
         <SendConfirmActionsContainer
@@ -169,22 +166,27 @@ function SendConfirmContainer() {
           onCancel={onCancel}
         />
       </>
-    );
-  }, [
-    tableLayout,
-    sourceInfo,
-    accountId,
-    networkId,
-    useFeeInTx,
-    signOnly,
-    onSuccess,
-    onFail,
-    onCancel,
-  ]);
+    ),
+    [
+      sendFeeStatus.errMessage,
+      sendAlertStatus.isInsufficientNativeBalance,
+      intl,
+      network?.symbol,
+      sourceInfo,
+      accountId,
+      networkId,
+      transferPayload,
+      useFeeInTx,
+      signOnly,
+      onSuccess,
+      onFail,
+      onCancel,
+    ],
+  );
 
   return (
     <Page
-      scrollEnabled={!tableLayout}
+      scrollEnabled
       onClose={(confirmed) => {
         if (!confirmed) {
           dappApprove.reject();
@@ -192,7 +194,9 @@ function SendConfirmContainer() {
       }}
     >
       <Page.Header
-        title={intl.formatMessage({ id: 'transaction__transaction_confirm' })}
+        title={intl.formatMessage({
+          id: ETranslations.transaction__transaction_confirm,
+        })}
       />
       {renderSendConfirmView()}
     </Page>

@@ -9,7 +9,6 @@ import {
   Icon,
   IconButton,
   SectionList,
-  SizableText,
   Stack,
   useSafeAreaInsets,
   useSafelyScrollToLocation,
@@ -296,6 +295,16 @@ export function WalletDetails({ num }: IWalletDetailsProps) {
     return true;
   }, [sectionData, isEditableRouteParams]);
 
+  const title = useMemo(() => {
+    if (isOthers) {
+      return 'Others';
+    }
+    return focusedWalletInfo?.wallet?.name
+      ? intl.formatMessage({
+          id: focusedWalletInfo?.wallet?.name as ETranslations,
+        })
+      : '';
+  }, [focusedWalletInfo, intl, isOthers]);
   return (
     <Stack flex={1} pb={bottom} testID="account-selector-accountList">
       <WalletDetailsHeader
@@ -310,7 +319,7 @@ export function WalletDetails({ num }: IWalletDetailsProps) {
           setEditMode((v) => !v);
         }}
         {...(!editMode && {
-          title: isOthers ? 'Others' : focusedWalletInfo?.wallet?.name,
+          title,
         })}
       />
 
@@ -483,6 +492,9 @@ export function WalletDetails({ num }: IWalletDetailsProps) {
                 : account.createAtNetwork,
             });
           }
+          if (!avatarNetworkId && indexedAccount && linkNetwork) {
+            avatarNetworkId = selectedAccount?.networkId;
+          }
 
           return (
             <ListItem
@@ -563,7 +575,6 @@ export function WalletDetails({ num }: IWalletDetailsProps) {
                   }
                   return;
                 }
-                console.log(section);
                 if (!focusedWalletInfo) {
                   return;
                 }

@@ -17,6 +17,7 @@ import backgroundApiProxy from '@onekeyhq/kit/src/background/instance/background
 import type { IListItemProps } from '@onekeyhq/kit/src/components/ListItem';
 import { ListItem } from '@onekeyhq/kit/src/components/ListItem';
 import useAppNavigation from '@onekeyhq/kit/src/hooks/useAppNavigation';
+import { usePromiseResult } from '@onekeyhq/kit/src/hooks/usePromiseResult';
 import { useBackupEntryStatus } from '@onekeyhq/kit/src/views/CloudBackup/components/useBackupEntryStatus';
 import useLiteCard from '@onekeyhq/kit/src/views/LiteCard/hooks/useLiteCard';
 import { ETranslations } from '@onekeyhq/shared/src/locale';
@@ -24,7 +25,7 @@ import platformEnv from '@onekeyhq/shared/src/platformEnv';
 import { EOnboardingPages } from '@onekeyhq/shared/src/routes';
 import timerUtils from '@onekeyhq/shared/src/utils/timerUtils';
 
-import { useV4MigrationActions } from '../../hooks/useV4MigrationActions';
+import { useV4MigrationActions } from '../V4Migration/hooks/useV4MigrationActions';
 
 type IOptionItem = IPropsWithTestId<{
   title?: string;
@@ -70,6 +71,11 @@ export function ImportWalletOptions() {
   const navigation = useAppNavigation();
   const liteCard = useLiteCard();
   const backupEntryStatus = useBackupEntryStatus();
+
+  const { result: isV4DbExist = false } = usePromiseResult(
+    () => backgroundApiProxy.serviceV4Migration.checkIfV4DbExist(),
+    [],
+  );
 
   const v4MigrationActions = useV4MigrationActions();
 
@@ -198,34 +204,38 @@ export function ImportWalletOptions() {
                 icon: 'CloudOutline',
                 title: intl.formatMessage({
                   id: platformEnv.isNativeAndroid
-                    ? ETranslations.settings_google_drive_backup
-                    : ETranslations.settings_icloud_backup,
+                    ? ETranslations.global_google_drive
+                    : ETranslations.global_icloud,
                 }),
                 onPress: handleImportFromCloud,
               } as IOptionItem,
             ]
           : []),
-        {
-          title: intl.formatMessage({
-            id: ETranslations.onboarding_migrate_from_v4,
-          }),
-          icon: 'StorageOutline',
-          // onPress: handleMigrateFromV4,
-          onPress: async () => {
-            navigation.popStack();
-            await timerUtils.wait(100);
-            v4MigrationActions.navigateToV4MigrationPage();
-          },
-          testID: 'connect-hardware-wallet',
-        },
-      ],
+        isV4DbExist
+          ? {
+              title: intl.formatMessage({
+                id: ETranslations.onboarding_migrate_from_v4,
+              }),
+              icon: 'StorageOutline',
+              // onPress: handleMigrateFromV4,
+              onPress: async () => {
+                navigation.popStack();
+                await timerUtils.wait(100);
+                await v4MigrationActions.navigateToV4MigrationPage();
+              },
+              testID: 'connect-hardware-wallet',
+            }
+          : null,
+      ].filter(Boolean),
     },
   ];
 
   return (
     <Page scrollEnabled>
       <Page.Header
-        title={intl.formatMessage({ id: ETranslations.global_import_wallet })}
+        title={intl.formatMessage({
+          id: ETranslations.onboarding_choose_import_method,
+        })}
       />
       <Page.Body>
         {options.map(({ sectionTitle, data }, index) => (

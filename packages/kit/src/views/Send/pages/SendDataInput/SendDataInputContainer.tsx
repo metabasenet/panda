@@ -12,6 +12,7 @@ import {
   Input,
   Page,
   SizableText,
+  TextArea,
   XStack,
   useForm,
 } from '@onekeyhq/components';
@@ -45,6 +46,7 @@ import {
   EAssetSelectorRoutes,
   EModalRoutes,
 } from '@onekeyhq/shared/src/routes';
+import hexUtils from '@onekeyhq/shared/src/utils/hexUtils';
 import { EAccountSelectorSceneName } from '@onekeyhq/shared/types';
 import type { IAccountNFT } from '@onekeyhq/shared/types/nft';
 import { ENFTType } from '@onekeyhq/shared/types/nft';
@@ -85,8 +87,27 @@ function SendDataInputContainer() {
   const { account, network } = useAccountData({ accountId, networkId });
   const sendConfirm = useSendConfirm({ accountId, networkId });
 
+  const isSelectTokenDisabled = allTokens.tokens.length <= 1;
+
+  const tokenMinAmount = useMemo(() => {
+    if (!tokenInfo || isNaN(tokenInfo.decimals)) {
+      return 0;
+    }
+
+    return new BigNumber(1).shiftedBy(-tokenInfo.decimals).toFixed();
+  }, [tokenInfo]);
+
   const {
-    result: [tokenDetails, nftDetails, vaultSettings, hasFrozenBalance] = [],
+    result: [
+      tokenDetails,
+      nftDetails,
+      vaultSettings,
+      hasFrozenBalance,
+      displayMemoForm,
+      displayPaymentIdForm,
+      memoMaxLength,
+      numericOnlyMemo,
+    ] = [],
     isLoading: isLoadingAssets,
   } = usePromiseResult(
     async () => {
@@ -151,7 +172,16 @@ function SendDataInputContainer() {
           tokenDetails: tokenResp?.[0],
         });
 
-      return [tokenResp?.[0], nftResp?.[0], vs, frozenBalanceSettings];
+      return [
+        tokenResp?.[0],
+        nftResp?.[0],
+        vs,
+        frozenBalanceSettings,
+        vs.withMemo,
+        vs.withPaymentId,
+        vs.memoMaxLength,
+        vs.numericOnlyMemo,
+      ];
     },
     [
       account,
@@ -182,6 +212,8 @@ function SendDataInputContainer() {
       to: { raw: address } as IAddressInputValue,
       amount: sendAmount,
       nftAmount: sendAmount || '1',
+      memo: '',
+      paymentId: '',
     },
     mode: 'onChange',
     reValidateMode: 'onBlur',
@@ -194,7 +226,8 @@ function SendDataInputContainer() {
   const nftAmount = form.watch('nftAmount');
 
   const linkedAmount = useMemo(() => {
-    const amountBN = new BigNumber(amount ?? 0);
+    let amountBN = new BigNumber(amount ?? 0);
+    amountBN = amountBN.isNaN() ? new BigNumber(0) : amountBN;
 
     const tokenPrice = tokenDetails?.price;
 
@@ -251,25 +284,32 @@ function SendDataInputContainer() {
 
     form.setValue('amount', linkedAmount.originalAmount);
   }, [form, linkedAmount]);
-  const handleOnSelectToken = useCallback(
-    () =>
-      navigation.pushModal(EModalRoutes.AssetSelectorModal, {
-        screen: EAssetSelectorRoutes.TokenSelector,
-        params: {
-          networkId,
-          accountId,
-          tokens: {
-            data: allTokens.tokens,
-            keys: allTokens.keys,
-            map,
-          },
-          onSelect: (data: IToken) => {
-            setTokenInfo(data);
-          },
+  const handleOnSelectToken = useCallback(() => {
+    if (isSelectTokenDisabled) return;
+    navigation.pushModal(EModalRoutes.AssetSelectorModal, {
+      screen: EAssetSelectorRoutes.TokenSelector,
+      params: {
+        networkId,
+        accountId,
+        tokens: {
+          data: allTokens.tokens,
+          keys: allTokens.keys,
+          map,
         },
-      }),
-    [accountId, allTokens.keys, allTokens.tokens, map, navigation, networkId],
-  );
+        onSelect: (data: IToken) => {
+          setTokenInfo(data);
+        },
+      },
+    });
+  }, [
+    accountId,
+    allTokens.keys,
+    allTokens.tokens,
+    isSelectTokenDisabled,
+    map,
+    navigation,
+    networkId,
+  ]);
   const handleOnConfirm = useCallback(async () => {
     try {
       if (!account) return;
@@ -295,6 +335,8 @@ function SendDataInputContainer() {
         }
       }
 
+      const memoValue = form.getValues('memo');
+      const paymentIdValue = form.getValues('paymentId');
       const transfersInfo: ITransferInfo[] = [
         {
           from: account.address,
@@ -309,11 +351,16 @@ function SendDataInputContainer() {
                 }
               : undefined,
           tokenInfo: !isNFT && tokenDetails ? tokenDetails.info : undefined,
+          memo: memoValue,
+          paymentId: paymentIdValue,
         },
       ];
       await sendConfirm.navigationToSendConfirm({
         transfersInfo,
         sameModal: true,
+        transferPayload: {
+          amountToSend: realAmount,
+        },
       });
       setIsSubmitting(false);
     } catch (e: any) {
@@ -337,7 +384,7 @@ function SendDataInputContainer() {
     tokenDetails,
   ]);
   const handleValidateTokenAmount = useCallback(
-    (value: string) => {
+    async (value: string) => {
       const amountBN = new BigNumber(value ?? 0);
       let isInsufficientBalance = false;
       let isLessThanMinTransferAmount = false;
@@ -380,21 +427,42 @@ function SendDataInputContainer() {
             id: ETranslations.send_error_minimum_amount,
           },
           {
-            amount: vaultSettings?.minTransferAmount ?? '0',
+            amount: BigNumber.max(
+              tokenMinAmount,
+              vaultSettings?.minTransferAmount ?? '0',
+            ).toFixed(),
             token: tokenSymbol,
           },
         );
 
+      try {
+        const toRaw = form.getValues('to').raw;
+        await backgroundApiProxy.serviceValidator.validateSendAmount({
+          accountId,
+          networkId,
+          amount: amountBN.toString(),
+          tokenBalance: tokenDetails?.balanceParsed ?? '0',
+          to: toRaw ?? '',
+        });
+      } catch (e) {
+        console.log('error: ', e);
+        return (e as Error).message;
+      }
+
       return true;
     },
     [
-      intl,
       isUseFiat,
-      tokenDetails?.balanceParsed,
+      intl,
+      tokenSymbol,
+      tokenMinAmount,
+      vaultSettings?.minTransferAmount,
       tokenDetails?.fiatValue,
       tokenDetails?.price,
-      tokenSymbol,
-      vaultSettings?.minTransferAmount,
+      tokenDetails?.balanceParsed,
+      form,
+      accountId,
+      networkId,
     ],
   );
 
@@ -426,23 +494,10 @@ function SendDataInputContainer() {
 
   const maxAmount = useMemo(() => {
     if (isUseFiat) {
-      if (hasFrozenBalance) {
-        return tokenDetails?.availableBalanceFiatValue ?? '0';
-      }
       return tokenDetails?.fiatValue ?? '0';
     }
-    if (hasFrozenBalance) {
-      return tokenDetails?.availableBalanceParsed ?? '0';
-    }
     return tokenDetails?.balanceParsed ?? '0';
-  }, [
-    isUseFiat,
-    tokenDetails?.balanceParsed,
-    tokenDetails?.availableBalanceParsed,
-    tokenDetails?.fiatValue,
-    tokenDetails?.availableBalanceFiatValue,
-    hasFrozenBalance,
-  ]);
+  }, [isUseFiat, tokenDetails?.balanceParsed, tokenDetails?.fiatValue]);
 
   const renderTokenDataInputForm = useCallback(
     () => (
@@ -490,6 +545,9 @@ function SendDataInputContainer() {
               : `${currencySymbol}${linkedAmount.amount}`,
             onPress: handleOnChangeAmountMode,
           }}
+          inputProps={{
+            placeholder: '0',
+          }}
           tokenSelectorTriggerProps={{
             selectedTokenImageUri: isNFT
               ? nft?.metadata?.image
@@ -499,23 +557,38 @@ function SendDataInputContainer() {
               ? nft?.metadata?.name
               : tokenInfo?.symbol,
             onPress: isNFT ? undefined : handleOnSelectToken,
+            disabled: isSelectTokenDisabled,
           }}
+          {...(hasFrozenBalance && {
+            balanceHelperProps: {
+              onPress: () => {
+                showBalanceDetailsDialog({
+                  accountId,
+                  networkId,
+                });
+              },
+            },
+          })}
         />
       </Form.Field>
     ),
     [
+      accountId,
       currencySymbol,
       form,
       handleOnChangeAmountMode,
       handleOnSelectToken,
       handleValidateTokenAmount,
+      hasFrozenBalance,
       intl,
       isLoadingAssets,
       isNFT,
+      isSelectTokenDisabled,
       isUseFiat,
       linkedAmount.amount,
       maxAmount,
       network?.logoURI,
+      networkId,
       nft?.metadata?.image,
       nft?.metadata?.name,
       tokenDetails?.info.decimals,
@@ -540,11 +613,15 @@ function SendDataInputContainer() {
               right="$0"
               top="$0"
             >
-              Available: {nftDetails?.amount ?? 1}
+              {intl.formatMessage({ id: ETranslations.global_available })}:{' '}
+              {nftDetails?.amount ?? 1}
             </SizableText>
           )}
           <Input
             size="large"
+            $gtMd={{
+              size: 'medium',
+            }}
             addOns={[
               {
                 loading: isLoadingAssets,
@@ -562,30 +639,93 @@ function SendDataInputContainer() {
     return null;
   }, [form, intl, isLoadingAssets, nft?.collectionType, nftDetails?.amount]);
 
-  const renderFrozenBalance = useCallback(() => {
-    if (!hasFrozenBalance) {
-      return false;
-    }
+  const renderMemoForm = useCallback(() => {
+    if (!displayMemoForm) return null;
+    const maxLength = memoMaxLength || 256;
+    const validateErrMsg = numericOnlyMemo
+      ? intl.formatMessage({
+          id: ETranslations.send_field_only_integer,
+        })
+      : undefined;
+    const memoRegExp = numericOnlyMemo ? /^[0-9]+$/ : undefined;
+
     return (
-      <XStack py="$2" flex={1}>
-        <Alert
-          flex={1}
-          icon="CoinOutline"
-          title={intl.formatMessage({
-            id: ETranslations.send_description_frozen_funds_info,
-          })}
-          action={{
-            primary: 'View',
-            onPrimaryPress: () =>
-              showBalanceDetailsDialog({
-                accountId,
-                networkId,
-              }),
+      <>
+        <XStack pt="$5" />
+        <Form.Field
+          label={intl.formatMessage({ id: ETranslations.send_tag })}
+          labelAddon={
+            <SizableText size="$bodyMdMedium" color="$textSubdued">
+              {intl.formatMessage({
+                id: ETranslations.form_optional_indicator,
+              })}
+            </SizableText>
+          }
+          name="memo"
+          rules={{
+            maxLength: {
+              value: maxLength,
+              message: intl.formatMessage(
+                {
+                  id: ETranslations.dapp_connect_msg_description_can_be_up_to_int_characters,
+                },
+                {
+                  number: maxLength,
+                },
+              ),
+            },
+            validate: (value) => {
+              if (!value || !memoRegExp) return undefined;
+              const result = !memoRegExp.test(value);
+              return result ? validateErrMsg : undefined;
+            },
           }}
-        />
-      </XStack>
+        >
+          <TextArea
+            numberOfLines={2}
+            size="large"
+            placeholder={intl.formatMessage({
+              id: ETranslations.send_tag_placeholder,
+            })}
+          />
+        </Form.Field>
+      </>
     );
-  }, [intl, hasFrozenBalance, accountId, networkId]);
+  }, [displayMemoForm, intl, memoMaxLength, numericOnlyMemo]);
+
+  const renderPaymentIdForm = useCallback(() => {
+    if (!displayPaymentIdForm) return null;
+
+    return (
+      <>
+        <XStack pt="$5" />
+        <Form.Field
+          label="Payment ID"
+          labelAddon={
+            <SizableText size="$bodyMdMedium" color="$textSubdued">
+              {intl.formatMessage({
+                id: ETranslations.form_optional_indicator,
+              })}
+            </SizableText>
+          }
+          name="paymentId"
+          rules={{
+            validate: (value) => {
+              if (!value) return undefined;
+              if (
+                !hexUtils.isHexString(hexUtils.addHexPrefix(value)) ||
+                hexUtils.stripHexPrefix(value).length !== 64
+              ) {
+                return 'Payment ID must be a 64 char hex string';
+              }
+            },
+          }}
+        >
+          <TextArea numberOfLines={2} size="large" placeholder="Payment ID" />
+        </Form.Field>
+      </>
+    );
+  }, [displayPaymentIdForm, intl]);
 
   const renderDataInput = useCallback(() => {
     if (isNFT) {
@@ -595,17 +735,19 @@ function SendDataInputContainer() {
       return (
         <>
           {renderTokenDataInputForm()}
-          {renderFrozenBalance()}
+          {renderMemoForm()}
+          {renderPaymentIdForm()}
         </>
       );
     }
     return null;
   }, [
-    displayAmountFormItem,
     isNFT,
+    displayAmountFormItem,
     renderNFTDataInputForm,
     renderTokenDataInputForm,
-    renderFrozenBalance,
+    renderMemoForm,
+    renderPaymentIdForm,
   ]);
 
   return (
@@ -613,7 +755,7 @@ function SendDataInputContainer() {
       <Page.Header
         title={intl.formatMessage({ id: ETranslations.send_title })}
       />
-      <Page.Body px="$5">
+      <Page.Body px="$5" testID="send-recipient-amount-form">
         <AccountSelectorProviderMirror
           config={{
             sceneName: EAccountSelectorSceneName.addressInput, // can replace with other sceneName
@@ -657,7 +799,7 @@ function SendDataInputContainer() {
               </Form.Field>
             ) : null}
             <Form.Field
-              label={intl.formatMessage({ id: ETranslations.send_to })}
+              label={intl.formatMessage({ id: ETranslations.global_recipient })}
               name="to"
               rules={{
                 required: true,

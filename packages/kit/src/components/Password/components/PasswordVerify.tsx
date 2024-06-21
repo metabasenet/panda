@@ -75,7 +75,7 @@ const PasswordVerify = ({
       });
     } else {
       actions.push({
-        iconName: secureEntry ? 'EyeOutline' : 'EyeOffOutline',
+        iconName: secureEntry ? 'EyeOffOutline' : 'EyeOutline',
         onPress: () => {
           setSecureEntry(!secureEntry);
         },
@@ -157,7 +157,7 @@ const PasswordVerify = ({
           autoFocus
           selectTextOnFocus
           size="large"
-          disabled={status.value === EPasswordVerifyStatus.VERIFYING}
+          editable={status.value !== EPasswordVerifyStatus.VERIFYING}
           placeholder={intl.formatMessage({
             id: ETranslations.auth_enter_your_password,
           })}
@@ -165,6 +165,9 @@ const PasswordVerify = ({
           onChangeText={(text) => text.replace(PasswordRegex, '')}
           keyboardType={getPasswordKeyboardType(!secureEntry)}
           secureTextEntry={secureEntry}
+          // fix Keyboard Flickering on TextInput with secureTextEntry #39411
+          // https://github.com/facebook/react-native/issues/39411
+          textContentType="oneTimeCode"
           onSubmitEditing={form.handleSubmit(onInputPasswordAuth)}
           addOns={rightActions}
           testID="enter-password"

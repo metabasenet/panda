@@ -35,7 +35,7 @@ const settings: IVaultSettings = {
   isUtxo: false,
   isSingleToken: false,
   NFTEnabled: false,
-  nonceRequired: true,
+  nonceRequired: false,
   feeUTXORequired: false,
   editFeeEnabled: true,
   replaceTxEnabled: false,
@@ -48,7 +48,6 @@ const settings: IVaultSettings = {
       nativeTokenAddress: SUI_TYPE_ARG,
     },
   },
-  signOnlyFullTxRequired: true,
 };
 
 export default Object.freeze(settings);

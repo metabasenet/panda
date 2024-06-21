@@ -30,6 +30,7 @@ export enum ETokenRiskLevel {
   WARNING = 2,
   SPAM = 1000,
   MALICIOUS = 1001,
+  SCAM = 1002,
 }
 
 export interface ISwapInitParams {
@@ -95,7 +96,28 @@ export interface IFetchTokensParams {
   limit?: number;
   accountAddress?: string;
   accountNetworkId?: string;
+  accountId?: string;
+}
+
+export interface IFetchTokenListParams {
+  protocol: string;
+  networkId?: string;
+  accountAddress?: string;
+  accountNetworkId?: string;
   accountXpub?: string;
+  withCheckInscription?: boolean;
+  limit?: number;
+  keywords?: string;
+}
+
+export interface IFetchTokenDetailParams {
+  protocol: string;
+  networkId: string;
+  accountAddress?: string;
+  contractAddress: string;
+  accountNetworkId?: string;
+  xpub?: string;
+  withCheckInscription?: boolean;
 }
 
 // quote
@@ -115,6 +137,7 @@ export interface ISwapApproveTransaction {
   spenderAddress: string;
   amount: string;
   status: ESwapApproveTransactionStatus;
+  isResetApprove?: boolean;
   txId?: string;
   blockNumber?: number;
 }
@@ -221,11 +244,11 @@ export interface ISwapState {
   isCrossChain: boolean;
   shoutResetApprove?: boolean;
   approveUnLimit?: boolean;
+  isRefreshQuote?: boolean;
 }
 
 export interface ISwapCheckWarningDef {
   swapFromAddressInfo: ReturnType<typeof useSwapAddressInfo>;
-  swapToAddressInfo: ReturnType<typeof useSwapAddressInfo>;
 }
 
 export enum ESwapAlertLevel {

@@ -32,6 +32,7 @@ const accountDeriveInfo: IAccountDeriveInfoMapSol = {
     coinType: COINTYPE_SOL,
     label: 'Ledger Live',
     desc: 'Ledger Live, Solflare, m/44’/501’/*’',
+    disableWalletTypes: ['hw'],
   },
 };
 
@@ -52,7 +53,7 @@ const settings: IVaultSettings = {
   NFTEnabled: true,
   nonceRequired: false,
   feeUTXORequired: false,
-  editFeeEnabled: false,
+  editFeeEnabled: true,
   replaceTxEnabled: false,
 
   accountDeriveInfo,

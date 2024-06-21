@@ -16,6 +16,7 @@ import {
   useSendTxStatusAtom,
   useUnsignedTxsAtom,
 } from '@onekeyhq/kit/src/states/jotai/contexts/sendConfirm';
+import { ETranslations } from '@onekeyhq/shared/src/locale';
 import type { IModalSendParamList } from '@onekeyhq/shared/src/routes';
 import type { IDappSourceInfo } from '@onekeyhq/shared/types';
 import type { ISendTxOnSuccessData } from '@onekeyhq/shared/types/tx';
@@ -26,7 +27,6 @@ type IProps = {
   onSuccess?: (data: ISendTxOnSuccessData[]) => void;
   onFail?: (error: Error) => void;
   onCancel?: () => void;
-  tableLayout?: boolean;
   sourceInfo?: IDappSourceInfo;
   signOnly?: boolean;
 };
@@ -38,7 +38,6 @@ function SendConfirmActionsContainer(props: IProps) {
     onSuccess,
     onFail,
     onCancel,
-    tableLayout,
     sourceInfo,
     signOnly,
   } = props;
@@ -60,13 +59,24 @@ function SendConfirmActionsContainer(props: IProps) {
     closeWindowAfterResolved: true,
   });
 
-  const vaultSettings = usePromiseResult(
-    () => backgroundApiProxy.serviceNetwork.getVaultSettings({ networkId }),
-    [networkId],
-  ).result;
   const handleOnConfirm = useCallback(async () => {
+    const { serviceSend } = backgroundApiProxy;
     setIsSubmitting(true);
     isSubmitted.current = true;
+    // Pre-check before submit
+    try {
+      await serviceSend.precheckUnsignedTxs({
+        networkId,
+        accountId,
+        unsignedTxs,
+      });
+    } catch (e: any) {
+      setIsSubmitting(false);
+      onFail?.(e as Error);
+      isSubmitted.current = false;
+      void dappApprove.reject(e);
+      throw e;
+    }
     try {
       const result =
         await backgroundApiProxy.serviceSend.batchSignAndSendTransaction({
@@ -85,20 +95,14 @@ function SendConfirmActionsContainer(props: IProps) {
       onSuccess?.(result);
       setIsSubmitting(false);
       Toast.success({
-        title: intl.formatMessage({ id: 'msg__transaction_submitted' }),
+        title: intl.formatMessage({
+          id: ETranslations.feedback_transaction_submitted,
+        }),
       });
 
       const signedTx = result[0].signedTx;
 
-      if (signOnly) {
-        if (vaultSettings?.signOnlyFullTxRequired) {
-          void dappApprove.resolve({ result: signedTx });
-        } else {
-          void dappApprove.resolve({ result: signedTx.rawTx });
-        }
-      } else {
-        void dappApprove.resolve({ result: signedTx.txid });
-      }
+      void dappApprove.resolve({ result: signedTx });
 
       navigation.popStack();
     } catch (e: any) {
@@ -126,7 +130,6 @@ function SendConfirmActionsContainer(props: IProps) {
     signOnly,
     unsignedTxs,
     sourceInfo,
-    vaultSettings?.signOnlyFullTxRequired,
   ]);
 
   const handleOnCancel = useCallback(
@@ -162,27 +165,6 @@ function SendConfirmActionsContainer(props: IProps) {
     }
   });
 
-  if (tableLayout) {
-    return (
-      <Page.FooterActions
-        confirmButtonProps={{
-          size: 'medium',
-          flex: 0,
-          disabled: isSubmitDisabled,
-          loading: isSubmitting,
-        }}
-        cancelButtonProps={{
-          size: 'medium',
-          flex: 0,
-          disabled: isSubmitting,
-        }}
-        onConfirmText={signOnly ? 'Sign' : 'Sign and Broadcast'}
-        onConfirm={handleOnConfirm}
-        onCancel={handleOnCancel}
-      />
-    );
-  }
-
   return (
     <Page.Footer
       confirmButtonProps={{
@@ -192,7 +174,11 @@ function SendConfirmActionsContainer(props: IProps) {
       cancelButtonProps={{
         disabled: isSubmitting,
       }}
-      onConfirmText={signOnly ? 'Sign' : 'Sign and Broadcast'}
+      onConfirmText={
+        signOnly
+          ? 'Sign'
+          : intl.formatMessage({ id: ETranslations.global_confirm })
+      }
       onConfirm={handleOnConfirm}
       onCancel={handleOnCancel}
     />

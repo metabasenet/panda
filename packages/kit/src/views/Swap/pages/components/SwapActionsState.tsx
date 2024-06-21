@@ -1,4 +1,4 @@
-import { memo, useCallback } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 
 import { useIntl } from 'react-intl';
 
@@ -21,8 +21,13 @@ import {
   useSwapSelectFromTokenAtom,
 } from '@onekeyhq/kit/src/states/jotai/contexts/swap';
 import { ETranslations } from '@onekeyhq/shared/src/locale';
+import { ESwapDirectionType } from '@onekeyhq/shared/types/swap/types';
 
-import { useSwapActionState } from '../../hooks/useSwapState';
+import { useSwapAddressInfo } from '../../hooks/useSwapAccount';
+import {
+  useSwapActionState,
+  useSwapQuoteLoading,
+} from '../../hooks/useSwapState';
 
 interface ISwapActionsStateProps {
   onBuildTx: () => void;
@@ -42,13 +47,16 @@ const SwapActionsState = ({
   const intl = useIntl();
   const [fromToken] = useSwapSelectFromTokenAtom();
   const [fromAmount] = useSwapFromTokenAmountAtom();
-  const { cleanQuoteInterval } = useSwapActions().current;
+  const swapFromAddressInfo = useSwapAddressInfo(ESwapDirectionType.FROM);
+  const { cleanQuoteInterval, quoteAction } = useSwapActions().current;
   const swapActionState = useSwapActionState();
-
+  const quoteLoading = useSwapQuoteLoading();
   const handleApprove = useCallback(() => {
     if (swapActionState.shoutResetApprove) {
       Dialog.confirm({
-        onConfirmText: 'Continue',
+        onConfirmText: intl.formatMessage({
+          id: ETranslations.global_continue,
+        }),
         onConfirm: () => {
           onApprove(fromAmount, swapActionState.approveUnLimit, true);
         },
@@ -59,7 +67,7 @@ const SwapActionsState = ({
         description: intl.formatMessage({
           id: ETranslations.swap_page_provider_approve_usdt_dialog_content,
         }),
-        icon: 'TxStatusWarningCircleIllus',
+        icon: 'ErrorOutline',
       });
     } else {
       onApprove(fromAmount, swapActionState.approveUnLimit);
@@ -75,29 +83,36 @@ const SwapActionsState = ({
   const { md } = useMedia();
 
   const onActionHandler = useCallback(() => {
-    cleanQuoteInterval();
-    if (swapActionState.isApprove) {
-      handleApprove();
-      return;
-    }
+    if (swapActionState.isRefreshQuote) {
+      void quoteAction(swapFromAddressInfo.address);
+    } else {
+      cleanQuoteInterval();
+      if (swapActionState.isApprove) {
+        handleApprove();
+        return;
+      }
 
-    if (swapActionState.isWrapped) {
-      onWrapped();
-      return;
+      if (swapActionState.isWrapped) {
+        onWrapped();
+        return;
+      }
+      onBuildTx();
     }
-    onBuildTx();
   }, [
     cleanQuoteInterval,
     handleApprove,
     onBuildTx,
     onWrapped,
+    quoteAction,
     swapActionState.isApprove,
+    swapActionState.isRefreshQuote,
     swapActionState.isWrapped,
+    swapFromAddressInfo.address,
   ]);
 
-  return (
-    <YStack p="$5">
-      {swapActionState.isApprove && !swapActionState.isLoading ? (
+  const approveStepComponent = useMemo(
+    () =>
+      swapActionState.isApprove && !quoteLoading ? (
         <XStack pb="$5" space="$1">
           <Popover
             title="Approve"
@@ -143,29 +158,42 @@ const SwapActionsState = ({
             })}
           </SizableText>
         </XStack>
-      ) : null}
+      ) : null,
+    [fromToken?.symbol, intl, quoteLoading, swapActionState.isApprove],
+  );
 
-      {pageType !== EPageType.modal && !md ? (
+  const actionComponent = useMemo(
+    () => (
+      <YStack {...(pageType === EPageType.modal && !md ? {} : { flex: 1 })}>
+        {approveStepComponent}
         <Button
           onPress={onActionHandler}
-          size="large"
+          size={pageType === EPageType.modal && !md ? 'medium' : 'large'}
           variant="primary"
           disabled={swapActionState.disabled || swapActionState.isLoading}
           loading={swapActionState.isLoading}
         >
           {swapActionState.label}
         </Button>
+      </YStack>
+    ),
+    [
+      approveStepComponent,
+      md,
+      onActionHandler,
+      pageType,
+      swapActionState.disabled,
+      swapActionState.isLoading,
+      swapActionState.label,
+    ],
+  );
+
+  return (
+    <YStack p="$5">
+      {pageType !== EPageType.modal && !md ? (
+        actionComponent
       ) : (
-        <Page.Footer
-          onConfirmText={swapActionState.label}
-          confirmButtonProps={{
-            variant: 'primary',
-            size: 'large',
-            loading: swapActionState.isLoading,
-            disabled: swapActionState.disabled || swapActionState.isLoading,
-            onPress: onActionHandler,
-          }}
-        />
+        <Page.Footer confirmButton={actionComponent} />
       )}
     </YStack>
   );

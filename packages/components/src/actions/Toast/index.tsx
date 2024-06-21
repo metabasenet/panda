@@ -98,10 +98,12 @@ function Title({
   title,
   message,
   icon,
+  maxWidth,
   actionsProps,
 }: {
   title: string;
   message?: string;
+  maxWidth?: number;
   icon?: JSX.Element;
   actionsProps?: IToastProps['actionsProps'];
 }) {
@@ -109,11 +111,14 @@ function Title({
   return (
     <YStack
       flex={1}
+      maxWidth={maxWidth}
       maxHeight={height - 100}
       $platform-native={{
         maxHeight: height - 200,
       }}
-      overflow="hidden"
+      $platform-web={{
+        overflow: 'hidden',
+      }}
     >
       <YStack>
         <RenderLines size="$headingSm" icon={icon} hasMessage={!!message}>
@@ -135,9 +140,10 @@ function toastMessage({
   actionsProps,
 }: IToastBaseProps) {
   showMessage({
-    title: (
+    renderContent: (props) => (
       <Title
         title={title}
+        maxWidth={props?.width}
         message={message}
         icon={iconMap[haptic as keyof typeof iconMap]}
         actionsProps={actionsProps}

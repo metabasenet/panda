@@ -24,12 +24,18 @@ import { useAppChangeLog } from '../../../components/UpdateReminder/hooks';
 import { UpdatePreviewActionButton } from '../components/UpdatePreviewActionButton';
 import { ViewUpdateHistory } from '../components/ViewUpdateHistory';
 
-const ExtPluginText = platformEnv.isExtension ? (
-  <SizableText size="$bodyMd" color="$textSubdued">
-    To ensure you get the best experience, we recommend that you regularly check
-    for and manually update the plugin.
-  </SizableText>
-) : null;
+const ExtPluginText = platformEnv.isExtension
+  ? () => {
+      const intl = useIntl();
+      return (
+        <SizableText size="$bodyMd" color="$textSubdued">
+          {intl.formatMessage({
+            id: ETranslations.update_recommend_regular_check_and_update_plugin,
+          })}
+        </SizableText>
+      );
+    }
+  : () => null;
 
 function UpdatePreview({
   route,
@@ -44,13 +50,15 @@ function UpdatePreview({
   const changeLog = useAppChangeLog(latestVersion);
   return (
     <Page>
-      <Page.Header title="App Update" />
+      <Page.Header
+        title={intl.formatMessage({ id: ETranslations.update_app_update })}
+      />
       <Page.Body m="$5">
         <YStack space="$3">
           <Heading size="$heading2xl">
             {intl.formatMessage({ id: ETranslations.update_new_app_version })}
           </Heading>
-          {ExtPluginText}
+          <ExtPluginText />
           <XStack space="$2.5" alignItems="center">
             <Badge badgeType="default" badgeSize="lg">
               {platformEnv.version}

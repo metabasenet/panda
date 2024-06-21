@@ -144,6 +144,9 @@ export default class VaultCosmos extends VaultBase {
     feeInfo?: IFeeInfoUnit;
   }): Promise<IEncodedTx> {
     const { transfersInfo, feeInfo } = params;
+    if (transfersInfo.length !== 1) {
+      throw new OneKeyInternalError('Only support one transfer');
+    }
     const network = await this.getNetwork();
     const networkInfo = await this.getNetworkInfo();
     const mainCoinDenom = networkInfo.nativeTokenAddress ?? '';
@@ -210,7 +213,7 @@ export default class VaultCosmos extends VaultBase {
     const feeAmount = '1';
 
     const tx = txBuilder.makeTxWrapper(msgs, {
-      memo: '',
+      memo: transfersInfo[0].memo || '',
       gasLimit,
       feeAmount,
       pubkey,
@@ -468,15 +471,15 @@ export default class VaultCosmos extends VaultBase {
   override async buildEstimateFeeParams({
     encodedTx,
   }: {
-    encodedTx: IEncodedTx | undefined;
-  }): Promise<IEncodedTx | undefined> {
+    encodedTx: IEncodedTxCosmos | undefined;
+  }) {
+    if (!encodedTx) {
+      return { encodedTx };
+    }
+
     const account = await this.getAccount();
-    const encodedTxCosmos = encodedTx as IEncodedTxCosmos;
     const rawTx = serializeSignedTx({
-      txWrapper: new TransactionWrapper(
-        encodedTxCosmos?.signDoc,
-        encodedTxCosmos?.msg,
-      ),
+      txWrapper: new TransactionWrapper(encodedTx?.signDoc, encodedTx?.msg),
       signature: {
         signatures: [Buffer.alloc(64, 0)],
       },
@@ -484,6 +487,8 @@ export default class VaultCosmos extends VaultBase {
         pubKey: account.pub ?? '',
       },
     });
-    return bufferUtils.bytesToHex(rawTx) as unknown as IEncodedTx;
+    return {
+      encodedTx: bufferUtils.bytesToHex(rawTx) as unknown as IEncodedTx,
+    };
   }
 }

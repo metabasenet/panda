@@ -65278,6 +65278,11 @@ var info = generateSemanticColorsWithDefaultCount(
   "info",
   "light"
 );
+var purple2 = generateSemanticColorsWithDefaultCount(
+  "purpleA",
+  "purple",
+  "light"
+);
 var brandDark2 = generateSemanticColorsWithDefaultCount(
   "brandDarkA",
   "brand",
@@ -65311,6 +65316,11 @@ var infoDark = generateSemanticColorsWithDefaultCount(
 var criticalDark = generateSemanticColorsWithDefaultCount(
   "redDarkA",
   "critical",
+  "dark"
+);
+var purpleDark2 = generateSemanticColorsWithDefaultCount(
+  "purpleDarkA",
+  "purple",
   "dark"
 );
 
@@ -65423,6 +65433,11 @@ var animations = (0, import_animations_moti.createAnimations)({
     type: "timing",
     duration: 100
   },
+  repeat: {
+    type: "timing",
+    duration: 300,
+    repeat: 4
+  },
   quick: {
     type: "spring",
     damping: 20,
@@ -65458,6 +65473,7 @@ var lightColors = {
   ...caution,
   ...info,
   ...critical,
+  ...purple2,
   bgApp: "#FFFFFF",
   bg: "#FFFFFF",
   bgReverse: "#1b1b1b",
@@ -65550,6 +65566,7 @@ var darkColors = {
   ...cautionDark,
   ...infoDark,
   ...criticalDark,
+  ...purpleDark2,
   bgApp: "#0f0f0f",
   bg: "#1b1b1b",
   bgReverse: "#ffffff",

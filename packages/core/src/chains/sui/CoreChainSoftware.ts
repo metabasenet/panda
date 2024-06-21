@@ -1,6 +1,7 @@
 import {
   Ed25519PublicKey,
   IntentScope,
+  bcs,
   messageWithIntent,
   toB64,
   toSerializedSignature,
@@ -122,7 +123,9 @@ export default class CoreChainSoftware extends CoreChainApiBase {
     });
     const messageScope = messageWithIntent(
       IntentScope.PersonalMessage,
-      bufferUtils.hexToBytes(unsignedMsg.message),
+      bcs
+        .ser(['vector', 'u8'], bufferUtils.hexToBytes(unsignedMsg.message))
+        .toBytes(),
     );
     const digest = blake2b(messageScope, { dkLen: 32 });
     const [signature] = await signer.sign(Buffer.from(digest));

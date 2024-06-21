@@ -28,6 +28,9 @@ const settings: IVaultSettings = {
   externalAccountEnabled: false,
   watchingAccountEnabled: false,
 
+  disabledSendAction: true,
+  disabledSwapAction: true,
+
   defaultFeePresetIndex: 0,
 
   isUtxo: false,
@@ -45,6 +48,8 @@ const settings: IVaultSettings = {
       addressPrefix: '',
     },
   },
+
+  hideBlockExplorer: true,
 };
 
 export default Object.freeze(settings);

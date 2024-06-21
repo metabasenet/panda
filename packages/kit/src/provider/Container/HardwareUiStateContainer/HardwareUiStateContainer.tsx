@@ -18,11 +18,13 @@ import {
   SizableText,
   Toast,
 } from '@onekeyhq/components';
+import type { IHardwareUiState } from '@onekeyhq/kit-bg/src/states/jotai/atoms';
 import {
   EHardwareUiStateAction,
   useHardwareUiStateAtom,
 } from '@onekeyhq/kit-bg/src/states/jotai/atoms';
 import { ETranslations } from '@onekeyhq/shared/src/locale';
+import platformEnv from '@onekeyhq/shared/src/platformEnv';
 import timerUtils from '@onekeyhq/shared/src/utils/timerUtils';
 import { EFirmwareUpdateTipMessages } from '@onekeyhq/shared/types/device';
 
@@ -35,13 +37,12 @@ import {
   EnterPin,
   EnterPinOnDevice,
 } from '../../../components/Hardware/Hardware';
-import { useThemeVariant } from '../../../hooks/useThemeVariant';
 
 function HardwareSingletonDialogCmp(
   props: any,
   ref: ForwardedRef<IDialogInstance>,
 ) {
-  const [state] = useHardwareUiStateAtom();
+  const { state }: { state: IHardwareUiState | undefined } = props;
   const action = state?.action;
   const connectId = state?.connectId || '';
   // state?.payload?.deviceType
@@ -54,17 +55,21 @@ function HardwareSingletonDialogCmp(
   const title = useRef('Loading');
   const content = useRef(
     <CommonDeviceLoading>
-      <SizableText size="$bodySmMedium">{action}</SizableText>
+      {platformEnv.isDev ? (
+        <SizableText size="$bodySmMedium">{action}</SizableText>
+      ) : null}
     </CommonDeviceLoading>,
   );
 
   if (action === EHardwareUiStateAction.DeviceChecking) {
-    title.current = 'Checking Device';
+    title.current = intl.formatMessage({
+      id: ETranslations.global_checking_device,
+    });
     content.current = <CommonDeviceLoading />;
   }
 
   if (action === EHardwareUiStateAction.ProcessLoading) {
-    title.current = 'Processing';
+    title.current = intl.formatMessage({ id: ETranslations.global_processing });
     content.current = <CommonDeviceLoading />;
   }
 
@@ -73,7 +78,9 @@ function HardwareSingletonDialogCmp(
     title.current = intl.formatMessage({
       id: ETranslations.enter_pin_enter_on_device,
     });
-    content.current = <EnterPinOnDevice />;
+    content.current = (
+      <EnterPinOnDevice deviceType={state?.payload?.deviceType} />
+    );
   }
 
   // EnterPin on App
@@ -94,6 +101,7 @@ function HardwareSingletonDialogCmp(
         switchOnDevice={async () => {
           await serviceHardwareUI.showEnterPinOnDeviceDialog({
             connectId,
+            payload: state?.payload,
           });
         }}
       />
@@ -125,8 +133,12 @@ function HardwareSingletonDialogCmp(
 
   // EnterPassphraseOnDevice
   if (action === EHardwareUiStateAction.REQUEST_PASSPHRASE_ON_DEVICE) {
-    title.current = 'Enter Passphrase on Device';
-    content.current = <EnterPassphraseOnDevice />;
+    title.current = intl.formatMessage({
+      id: ETranslations.hardware_enter_passphrase_on_device,
+    });
+    content.current = (
+      <EnterPassphraseOnDevice deviceType={state?.payload?.deviceType} />
+    );
   }
 
   const shouldEnterPinOnDevice =
@@ -137,9 +149,16 @@ function HardwareSingletonDialogCmp(
     if (shouldEnterPinOnDevice) {
       void serviceHardwareUI.showEnterPinOnDeviceDialog({
         connectId,
+        payload: state?.payload,
       });
     }
-  }, [connectId, serviceHardware, serviceHardwareUI, shouldEnterPinOnDevice]);
+  }, [
+    connectId,
+    serviceHardware,
+    serviceHardwareUI,
+    shouldEnterPinOnDevice,
+    state?.payload,
+  ]);
 
   return (
     <DialogContainer
@@ -153,6 +172,9 @@ function HardwareSingletonDialogCmp(
 
 const HardwareSingletonDialog = forwardRef(HardwareSingletonDialogCmp);
 
+let dialogInstances: IDialogInstance[] = [];
+let toastInstances: IToastShowResult[] = [];
+
 function HardwareUiStateContainerCmp() {
   const [state] = useHardwareUiStateAtom();
   const { serviceHardware, serviceHardwareUI } = backgroundApiProxy;
@@ -161,8 +183,12 @@ function HardwareUiStateContainerCmp() {
   const connectId = state?.connectId; // connectId maybe undefined usb-sdk
   const deviceType = state?.payload?.deviceType || 'unknown';
 
-  const dialogRef = useRef<IDialogInstance | undefined>();
-  const toastRef = useRef<IToastShowResult | undefined>();
+  const stateRef = useRef(state);
+  stateRef.current = state;
+
+  // const dialogRef = useRef<IDialogInstance | undefined>();
+  // const toastRef = useRef<IToastShowResult | undefined>();
+
   const shouldShowAction = Boolean(state);
 
   const isToastAction = useMemo(() => {
@@ -225,9 +251,9 @@ function HardwareUiStateContainerCmp() {
 
   const HardwareSingletonDialogRender = useCallback(
     ({ ref }: { ref: any }) => (
-      <HardwareSingletonDialog hello="world-338" ref={ref} />
+      <HardwareSingletonDialog hello="world-338" ref={ref} state={state} />
     ),
-    [],
+    [state],
   );
 
   console.log(
@@ -251,21 +277,42 @@ function HardwareUiStateContainerCmp() {
   // TODO support multiple connectId dialog show
   useEffect(() => {
     void showOrHideMutex.current.runExclusive(async () => {
+      const ts = Date.now();
+      const log = (...args: any[]) =>
+        console.log(`${ts}## HardwareUiStateContainerUiLog`, ...args);
+      const stateData = stateRef.current;
+      log(`start ui  ========= `, stateData);
       // TODO do not cancel device here
       const closePrevActions = async () => {
-        await dialogRef.current?.close({ flag: autoClosedFlag });
-        await toastRef.current?.close({ flag: autoClosedFlag });
+        for (const dialog of dialogInstances) {
+          await dialog?.close?.({ flag: autoClosedFlag });
+        }
+        for (const toast of toastInstances) {
+          await toast?.close?.({ flag: autoClosedFlag });
+        }
+        dialogInstances = [];
+        toastInstances = [];
+        // await dialogRef.current?.close({ flag: autoClosedFlag });
+        // await toastRef.current?.close({ flag: autoClosedFlag });
+        log(`close prev toast or dialog`);
       };
       await closePrevActions();
-      await timerUtils.wait(300);
+
+      // for DEBUG test
+      if (stateData?.action === 'ui-request_passphrase') {
+        // log(`skip action: 'ui-request_passphrase'`);
+        // return;
+      }
+
       if (shouldShowAction) {
         if (isToastAction) {
-          toastRef.current = Toast.show({
+          // hardware ui state toast
+          const instance = Toast.show({
             children: <ConfirmOnDeviceToastContent deviceType={deviceType} />,
             dismissOnOverlayPress: false,
             disableSwipeGesture: false,
             onClose: async (params) => {
-              console.log('close ConfirmOnDeviceToastContent');
+              log('close toast');
               if (params?.flag !== autoClosedFlag) {
                 await serviceHardwareUI.closeHardwareUiStateDialog({
                   connectId,
@@ -274,13 +321,15 @@ function HardwareUiStateContainerCmp() {
               }
             },
           });
+          toastInstances.push(instance);
         } else if (isDialogAction) {
-          dialogRef.current = Dialog.show({
+          // hardware ui action dialog
+          const instance = Dialog.show({
             dismissOnOverlayPress: false,
             showFooter: false,
             dialogContainer: HardwareSingletonDialogRender,
             async onClose(params) {
-              console.log('HardwareUiStateContainer onDismiss');
+              log('close dialog');
               if (params?.flag !== autoClosedFlag) {
                 await serviceHardwareUI.closeHardwareUiStateDialog({
                   connectId,
@@ -290,10 +339,15 @@ function HardwareUiStateContainerCmp() {
               }
             },
           });
+          dialogInstances.push(instance);
         }
       } else {
         await closePrevActions();
       }
+
+      // If the interval between toast open and close (prev opened toast) is less than 300ms, the toast cannot be closed, so a delay must be added here.
+      await timerUtils.wait(300);
+      log(`end ui ^^^^^^^^^^^^^^^^^^^^^^^^^^^`);
     });
 
     return () => {};

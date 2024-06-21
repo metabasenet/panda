@@ -5,6 +5,7 @@ import { ETranslations } from '@onekeyhq/shared/src/locale';
 import accountUtils from '@onekeyhq/shared/src/utils/accountUtils';
 
 import { useFeeInfoInDecodedTx } from '../../hooks/useTxFeeInfo';
+import { AddressInfo } from '../AddressInfo';
 
 import {
   TxActionCommonDetailView,
@@ -76,7 +77,9 @@ function TxActionTokenApproveListView(props: ITxActionProps) {
       numberOfLines={1}
     >
       {approveIsMax
-        ? intl.formatMessage({ id: 'form__unlimited_allowance' })
+        ? intl.formatMessage({
+            id: ETranslations.swap_page_provider_approve_amount_un_limit,
+          })
         : approveAmount}
     </NumberSizeableText>
   );
@@ -116,37 +119,41 @@ function TxActionTokenApproveDetailView(props: ITxActionProps) {
   const content =
     approveLabel ||
     intl.formatMessage(
+      { id: ETranslations.form__approve_str },
       {
-        id: 'form__approve_str',
-      },
-      {
-        0: `${
-          approveIsMax
-            ? intl.formatMessage({ id: 'form__unlimited_allowance' })
-            : approveAmount
-        } ${approveSymbol}`,
+        amount: approveIsMax
+          ? intl.formatMessage({
+              id: ETranslations.swap_page_provider_approve_amount_un_limit,
+            })
+          : approveAmount,
+        symbol: approveSymbol,
       },
     );
 
   return (
     <TxActionCommonDetailView
       overview={{
-        title: intl.formatMessage({ id: 'content__amount' }),
+        title: intl.formatMessage({ id: ETranslations.content__amount }),
         content,
         avatar: {
           src: approveIcon,
         },
       }}
       target={{
-        content: approveSpender,
-        description: decodedTx.toAddressLabel
-          ? {
-              icon: 'NoteSolid',
-              content: decodedTx.toAddressLabel,
-            }
-          : undefined,
+        content: decodedTx.to ?? approveSpender,
       }}
-      source={{ content: approveOwner }}
+      source={{
+        content: approveOwner,
+        description: {
+          content: (
+            <AddressInfo
+              address={approveOwner}
+              networkId={decodedTx.networkId}
+              accountId={decodedTx.accountId}
+            />
+          ),
+        },
+      }}
     />
   );
 }

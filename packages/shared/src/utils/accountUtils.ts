@@ -28,6 +28,7 @@ import {
 import { CoreSDKLoader } from '../hardware/instance';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { generateUUID } from './miscUtils';
 import networkUtils from './networkUtils';
 
 import type { IOneKeyDeviceFeatures } from '../../types/device';
@@ -59,11 +60,13 @@ function shortenAddress({
   minLength = 14,
   leadingLength = 8,
   trailingLength = 6,
+  showDot = true,
 }: {
   address: string | undefined;
   leadingLength?: number;
   trailingLength?: number;
   minLength?: number;
+  showDot?: boolean;
 }) {
   if (!address) {
     return '';
@@ -71,9 +74,9 @@ function shortenAddress({
   if (address.length <= minLength) {
     return address;
   }
-  return `${address.slice(0, leadingLength)}...${address.slice(
-    -trailingLength,
-  )}`;
+  return `${address.slice(0, leadingLength)}${
+    showDot ? '...' : ''
+  }${address.slice(-trailingLength)}`;
 }
 
 function isHdWallet({ walletId }: { walletId: string | undefined }) {
@@ -207,6 +210,11 @@ function isExternalAccount({ accountId }: { accountId: string }) {
   return isExternalWallet({ walletId });
 }
 
+function isWatchingAccount({ accountId }: { accountId: string }) {
+  const walletId = getWalletIdFromAccountId({ accountId });
+  return isWatchingWallet({ walletId });
+}
+
 function buildPathFromTemplate({
   template,
   index,
@@ -337,11 +345,12 @@ function buildLocalTokenId({
 
 function buildLocalHistoryId(params: {
   networkId: string;
+  accountAddress: string;
   txid: string;
-  accountId: string;
+  xpub?: string;
 }) {
-  const { networkId, txid, accountId } = params;
-  const historyId = `${networkId}_${txid}_${accountId}`;
+  const { networkId, txid, accountAddress, xpub } = params;
+  const historyId = `${networkId}_${txid}_${xpub ?? accountAddress}`;
   return historyId;
 }
 
@@ -610,6 +619,10 @@ function formatUtxoPath(path: string): string {
   return newPath;
 }
 
+function buildDeviceDbId() {
+  return generateUUID();
+}
+
 async function buildDeviceName({
   device,
   features,
@@ -672,6 +685,7 @@ export default {
   isHwAccount,
   isQrAccount,
   isExternalAccount,
+  isWatchingAccount,
   parseAccountId,
   parseIndexedAccountId,
   shortenAddress,
@@ -686,6 +700,7 @@ export default {
   buildLnToBtcPath,
   buildLightningAccountId,
   buildDeviceName,
+  buildDeviceDbId,
   getWalletConnectMergedNetwork,
   formatUtxoPath,
   buildPathFromTemplate,
