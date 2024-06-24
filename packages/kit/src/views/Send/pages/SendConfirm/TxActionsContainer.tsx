@@ -2,7 +2,7 @@ import { memo, useCallback, useEffect, useState } from 'react';
 
 import BigNumber from 'bignumber.js';
 
-import { Skeleton, Stack, XStack, YStack } from '@onekeyhq/components';
+import { Skeleton, Stack, XStack } from '@onekeyhq/components';
 import backgroundApiProxy from '@onekeyhq/kit/src/background/instance/backgroundApiProxy';
 import { TxActionsListView } from '@onekeyhq/kit/src/components/TxActionListView';
 import { useAccountData } from '@onekeyhq/kit/src/hooks/useAccountData';
@@ -14,6 +14,7 @@ import {
   useSendSelectedFeeInfoAtom,
   useUnsignedTxsAtom,
 } from '@onekeyhq/kit/src/states/jotai/contexts/sendConfirm';
+import { getMaxSendFeeUpwardAdjustmentFactor } from '@onekeyhq/kit/src/utils/gasFee';
 import type { ITransferPayload } from '@onekeyhq/kit-bg/src/vaults/types';
 import {
   calculateNativeAmountInActions,
@@ -74,10 +75,7 @@ function TxActionsContainer(props: IProps) {
 
     if (
       !vaultSettings?.ignoreUpdateNativeAmount &&
-      !nativeTokenInfo.isLoading &&
-      decodedTxs.length === 1 &&
-      decodedTxs[0].actions.length === 1 &&
-      isSendNativeTokenAction(decodedTxs[0].actions[0])
+      !nativeTokenInfo.isLoading
     ) {
       setIsSendNativeToken(true);
       nativeTokenTransferBN = new BigNumber(
@@ -86,12 +84,17 @@ function TxActionsContainer(props: IProps) {
       const nativeTokenBalanceBN = new BigNumber(nativeTokenInfo.balance);
       const feeBN = new BigNumber(sendSelectedFeeInfo?.totalNative ?? 0);
 
-      if (nativeTokenTransferBN.plus(feeBN).gte(nativeTokenBalanceBN)) {
+      if (
+        transferPayload?.isMaxSend &&
+        nativeTokenTransferBN.plus(feeBN).gte(nativeTokenBalanceBN)
+      ) {
         const transferAmountBN = BigNumber.min(
           nativeTokenBalanceBN,
           nativeTokenTransferBN,
         );
-        const amountToUpdate = transferAmountBN.minus(feeBN);
+        const amountToUpdate = transferAmountBN.minus(
+          feeBN.times(getMaxSendFeeUpwardAdjustmentFactor({ networkId })),
+        );
         if (amountToUpdate.gte(0)) {
           updateNativeTokenTransferAmountToUpdate({
             isMaxSend: true,
@@ -120,6 +123,7 @@ function TxActionsContainer(props: IProps) {
   }, [
     nativeTokenInfo.balance,
     nativeTokenInfo.isLoading,
+    networkId,
     r.result,
     sendSelectedFeeInfo,
     sendSelectedFeeInfo?.totalNative,

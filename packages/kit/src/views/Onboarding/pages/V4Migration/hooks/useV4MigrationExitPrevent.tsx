@@ -12,9 +12,9 @@ import {
   Stack,
   usePreventRemove,
 } from '@onekeyhq/components';
-import useAppNavigation from '@onekeyhq/kit/src/hooks/useAppNavigation';
 import { useV4migrationPersistAtom } from '@onekeyhq/kit-bg/src/states/jotai/atoms';
-import { ETranslations } from '@onekeyhq/shared/src/locale';
+import useAppNavigation from '@onekeyhq/kit/src/hooks/useAppNavigation';
+import { ETranslations, ETranslationsMock } from '@onekeyhq/shared/src/locale';
 import platformEnv from '@onekeyhq/shared/src/platformEnv';
 
 import { useV4MigrationActions } from './useV4MigrationActions';
@@ -49,6 +49,8 @@ function ModalExitPreventDialogContent({
   preventRemoveData: INavigationPreventRemoveData;
   isAutoStartOnMount?: boolean;
 }) {
+  const intl = useIntl();
+
   const navigation = useAppNavigation();
   const [v4MigrationPersistData, setV4MigrationPersistData] =
     useV4migrationPersistAtom();
@@ -63,7 +65,9 @@ function ModalExitPreventDialogContent({
           <Checkbox
             value={dontShowAgain}
             onChange={() => setDontShowAgain(!dontShowAgain)}
-            label="Never show this migration on App start"
+            label={intl.formatMessage({
+              id: ETranslationsMock.v4_migration_exit_dialog_never_show_again,
+            })}
           />
         </Stack>
       ) : null}
@@ -213,10 +217,15 @@ export function useV4MigrationExitPrevent({
   exitPreventMode: EModalExitPreventMode;
   isAutoStartOnMount?: boolean;
 }) {
-  const title = 'Confirm Exit';
-  const message = 'Confirm Exit Migration from V4?';
-  const onConfirmText = 'Exit';
-  const onCancelText = 'Cancel';
+  const intl = useIntl();
+  const title = intl.formatMessage({
+    id: ETranslations.confirm_exit_dialog_title,
+  });
+  const message = intl.formatMessage({
+    id: ETranslations.confirm_exit_dialog_desc,
+  });
+  const onConfirmText = intl.formatMessage({ id: ETranslations.global_exit });
+  const onCancelText = intl.formatMessage({ id: ETranslations.global_cancel });
   const [v4migrationPersistData] = useV4migrationPersistAtom();
 
   // Prevents screen locking
