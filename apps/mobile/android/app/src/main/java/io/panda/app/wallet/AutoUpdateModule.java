@@ -1,4 +1,4 @@
-package so.onekey.app.wallet;
+package io.panda.app.wallet;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -248,7 +248,7 @@ public class AutoUpdateModule extends ReactContextBaseJavaModule {
 
 
                 boolean isValidAPK = checkFilePackage(downloadedFile, sha256, promise);
-                Uri apkUri = OnekeyFileProvider.getUriForFile(rContext, downloadedFile);
+                Uri apkUri = PandaFileProvider.getUriForFile(rContext, downloadedFile);
                 installIntent.setDataAndType(apkUri, "application/vnd.android.package-archive");
                 installIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 installIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
@@ -293,7 +293,7 @@ public class AutoUpdateModule extends ReactContextBaseJavaModule {
         try {
             Intent intent = new Intent(Intent.ACTION_VIEW);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                Uri apkUri = OnekeyFileProvider.getUriForFile(rContext, file);
+                Uri apkUri = PandaFileProvider.getUriForFile(rContext, file);
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 intent.setDataAndType(apkUri, "application/vnd.android.package-archive");
             } else {

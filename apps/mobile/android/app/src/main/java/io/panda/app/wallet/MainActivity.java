@@ -1,4 +1,4 @@
-package so.onekey.app.wallet;
+package io.panda.app.wallet;
 
 import android.os.Build;
 import android.os.Bundle;

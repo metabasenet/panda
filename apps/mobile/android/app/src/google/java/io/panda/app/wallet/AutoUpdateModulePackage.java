@@ -1,4 +1,4 @@
-package so.onekey.app.wallet;
+package io.panda.app.wallet;
 
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
