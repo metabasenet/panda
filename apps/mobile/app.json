@@ -1,9 +1,9 @@
 {
   "expo": {
-    "scheme": "onekey-wallet",
-    "name": "OneKey Wallet",
-    "slug": "OneKey-Wallet",
-    "owner": "onekeyhq",
+    "scheme": "panda-wallet",
+    "name": "Panda Wallet",
+    "slug": "Panda-Wallet",
+    "owner": "panda",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -20,9 +20,9 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "so.onekey.wallet",
+      "bundleIdentifier": "io.panda.wallet",
       "associatedDomains": [
-        "applinks:app.onekey.so"
+        "applinks:app.panda.io"
       ]
     },
     "extra": {
