@@ -42,10 +42,6 @@ export const getPresetNetworks = memoFn((): IServerNetwork[] => {
     'decimals': 18,
     'extensions': {
       'defaultStableTokens': [
-        '0xdac17f958d2ee523a2206206994597c13d831ec7',
-        '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
-        '0x4fabb145d64652a948d72533023f6e7a623c7c53',
-        '0x6b175474e89094c44da98b954eedeac495271d0f',
       ],
       'position': 1,
       'providerOptions': {
@@ -80,23 +76,11 @@ export const getPresetNetworks = memoFn((): IServerNetwork[] => {
     ],
     'explorers': [
       {
-        'address': 'https://cn.etherscan.com/address/{address}',
-        'block': 'https://cn.etherscan.com/block/{block}',
-        'name': 'https://cn.etherscan.com/',
-        'transaction': 'https://cn.etherscan.com/tx/{transaction}',
-      },
-      {
-        'address': 'https://etherscan.io/address/{address}',
-        'block': 'https://etherscan.io/block/{block}',
-        'name': 'https://etherscan.io/',
-        'transaction': 'https://etherscan.io/tx/{transaction}',
-      },
-      {
-        'address': 'https://www.oklink.com/eth/address/{address}',
-        'block': 'https://www.oklink.com/eth/block/{block}',
-        'name': 'https://www.oklink.com/eth/',
-        'transaction': 'https://www.oklink.com/eth/tx/{transaction}',
-      },
+        'address': 'https://main.metabasenet.site/main-api/transaction/getByAddress?address={address}',
+        'block': 'https://main.metabasenet.site/main-api/block/getByNumber?blockNumber={block}',
+        'name': 'https://main.metabasenet.site/',
+        'transaction': 'https://main.metabasenet.site/main-api/transaction/getByHash?hash={transaction}',
+      }
     ],
     'status': ENetworkStatus.LISTED,
     'createdAt': '2023-05-31T00:29:24.951Z',
