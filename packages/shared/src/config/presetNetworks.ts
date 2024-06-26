@@ -34,6 +34,75 @@ export const dangerAllNetworkRepresent: IServerNetwork = {
 };
 
 export const getPresetNetworks = memoFn((): IServerNetwork[] => {
+	// mnt
+  const mnt: IServerNetwork = {
+    'balance2FeeDecimals': 9,
+    'chainId': '46655',
+    'code': 'mnt',
+    'decimals': 18,
+    'extensions': {
+      'defaultStableTokens': [
+        '0xdac17f958d2ee523a2206206994597c13d831ec7',
+        '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+        '0x4fabb145d64652a948d72533023f6e7a623c7c53',
+        '0x6b175474e89094c44da98b954eedeac495271d0f',
+      ],
+      'position': 1,
+      'providerOptions': {
+        'EIP1559Enabled': true,
+        'preferMetamask': true,
+      },
+    },
+    'id': 'evm--1',
+    'impl': 'evm',
+    'isTestnet': false,
+    'logoURI': 'https://uni.onekey-asset.com/static/chain/eth.png',
+    'name': 'MNT',
+    'shortcode': 'mnt',
+    'shortname': 'MNT',
+    'symbol': 'MNT',
+    'feeMeta': {
+      'code': 'mnt',
+      'decimals': 9,
+      'symbol': 'Gwei',
+    },
+    'defaultEnabled': true,
+    'priceConfigs': [
+      {
+        'channel': 'coingecko',
+        'native': 'ethereum',
+        'platform': 'ethereum',
+      },
+      {
+        'channel': 'yahoo',
+        'native': 'MNT',
+      },
+    ],
+    'explorers': [
+      {
+        'address': 'https://cn.etherscan.com/address/{address}',
+        'block': 'https://cn.etherscan.com/block/{block}',
+        'name': 'https://cn.etherscan.com/',
+        'transaction': 'https://cn.etherscan.com/tx/{transaction}',
+      },
+      {
+        'address': 'https://etherscan.io/address/{address}',
+        'block': 'https://etherscan.io/block/{block}',
+        'name': 'https://etherscan.io/',
+        'transaction': 'https://etherscan.io/tx/{transaction}',
+      },
+      {
+        'address': 'https://www.oklink.com/eth/address/{address}',
+        'block': 'https://www.oklink.com/eth/block/{block}',
+        'name': 'https://www.oklink.com/eth/',
+        'transaction': 'https://www.oklink.com/eth/tx/{transaction}',
+      },
+    ],
+    'status': ENetworkStatus.LISTED,
+    'createdAt': '2023-05-31T00:29:24.951Z',
+    'updatedAt': '2023-05-31T00:29:24.951Z',
+  };
+
   // shortcode
   const eth: IServerNetwork = {
     'balance2FeeDecimals': 9,
@@ -1764,43 +1833,43 @@ export const getPresetNetworks = memoFn((): IServerNetwork[] => {
     'updatedAt': '2023-08-10T00:29:24.951Z',
   };
 
-  const mnt: IServerNetwork = {
-    'chainId': '5000',
-    'code': 'mantle',
-    'id': 'evm--5000',
-    'logoURI': 'https://uni.onekey-asset.com/static/chain/mantle.png',
-    'name': 'Mantle',
-    'shortcode': 'mantle',
-    'shortname': 'Mantle',
-    'feeMeta': {
-      'code': 'mantle',
-      'decimals': 9,
-      'symbol': 'Gwei',
-    },
-    'symbol': 'MNT',
-    'priceConfigs': [
-      {
-        'channel': 'coingecko',
-        'native': 'mantle',
-      },
-    ],
-    'explorers': [
-      {
-        'address': 'https://explorer.mantle.xyz/address/{address}',
-        'block': 'https://explorer.mantle.xyz/block/{block}',
-        'name': 'https://explorer.mantle.xyz/',
-        'transaction': 'https://explorer.mantle.xyz/tx/{transaction}',
-      },
-    ],
-    'decimals': 18,
-    'balance2FeeDecimals': 9,
-    'impl': 'evm',
-    'isTestnet': false,
-    'defaultEnabled': true,
-    'status': ENetworkStatus.LISTED,
-    'createdAt': '2023-08-10T00:29:24.951Z',
-    'updatedAt': '2023-08-10T00:29:24.951Z',
-  };
+  //const mnt: IServerNetwork = {
+  //  'chainId': '5000',
+  //  'code': 'mantle',
+  //  'id': 'evm--5000',
+  //  'logoURI': 'https://uni.onekey-asset.com/static/chain/mantle.png',
+  //  'name': 'Mantle',
+  //  'shortcode': 'mantle',
+  //  'shortname': 'Mantle',
+  //  'feeMeta': {
+  //    'code': 'mantle',
+  //    'decimals': 9,
+  //    'symbol': 'Gwei',
+  //  },
+  //  'symbol': 'MNT',
+  //  'priceConfigs': [
+  //    {
+  //      'channel': 'coingecko',
+  //      'native': 'mantle',
+  //    },
+  //  ],
+  //  'explorers': [
+  //    {
+  //      'address': 'https://explorer.mantle.xyz/address/{address}',
+  //      'block': 'https://explorer.mantle.xyz/block/{block}',
+  //      'name': 'https://explorer.mantle.xyz/',
+  //      'transaction': 'https://explorer.mantle.xyz/tx/{transaction}',
+  //    },
+  //  ],
+  //  'decimals': 18,
+  //  'balance2FeeDecimals': 9,
+  //  'impl': 'evm',
+  //  'isTestnet': false,
+  //  'defaultEnabled': true,
+  //  'status': ENetworkStatus.LISTED,
+  //  'createdAt': '2023-08-10T00:29:24.951Z',
+  //  'updatedAt': '2023-08-10T00:29:24.951Z',
+  //};
 
   const mvm: IServerNetwork = {
     'balance2FeeDecimals': 9,
@@ -3029,6 +3098,7 @@ export const getPresetNetworks = memoFn((): IServerNetwork[] => {
     tbtc,
     sbtc,
     // evm
+	mnt,
     eth,
     sepolia,
     op,
@@ -3053,7 +3123,7 @@ export const getPresetNetworks = memoFn((): IServerNetwork[] => {
     mvm,
     linea,
     base,
-    mnt,
+    //mnt,
     iotex,
     mantapacific,
     blast,
