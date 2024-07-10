@@ -16,6 +16,7 @@ import type {
   IUnsignedMessageEth,
   IUnsignedTxPro,
 } from '@onekeyhq/core/src/types';
+import { NotImplemented } from '@onekeyhq/shared/src/errors';
 import {
   convertDeviceError,
   convertDeviceResponse,
@@ -74,9 +75,14 @@ async function hardwareEvmSignTransaction({
     prefix0x: true,
   });
 
+  const value = encodedTx.value ?? '0x0';
+  const data = encodedTx.data ?? '0x';
+
   if (isEip1559) {
     const txToSignEIP1559: EVMTransactionEIP1559 = {
       ...omit(encodedTx, 'from'),
+      value,
+      data,
       chainId,
       nonce,
       gasPrice: undefined,
@@ -88,6 +94,8 @@ async function hardwareEvmSignTransaction({
   } else {
     const txToSignNormal: EVMTransaction = {
       ...omit(encodedTx, 'from'),
+      value,
+      data,
       chainId,
       nonce,
       gasPrice: checkIsDefined(encodedTx.gasPrice),
@@ -100,11 +108,11 @@ async function hardwareEvmSignTransaction({
 
   const tx: UnsignedTransaction = {
     to: txToSign.to,
-    value: txToSign.value,
     gasPrice: txToSign.gasPrice,
     gasLimit: txToSign.gasLimit,
     nonce: parseInt(txToSign.nonce, 16),
     data: txToSign.data,
+    value: txToSign.value,
     chainId: txToSign.chainId,
   };
 
@@ -174,16 +182,14 @@ export class KeyringHardware extends KeyringHardwareBase {
 
     const chainId = Number(await this.getNetworkChainId());
 
-    if (message.type === EMessageTypesEth.TYPED_DATA_V1) {
-      throw web3Errors.provider.unsupportedMethod(
-        `Sign message method=${message.type} not supported for this device`,
-      );
+    if (
+      message.type === EMessageTypesEth.TYPED_DATA_V1 ||
+      message.type === EMessageTypesEth.ETH_SIGN
+    ) {
+      throw new NotImplemented();
     }
 
-    if (
-      message.type === EMessageTypesEth.ETH_SIGN ||
-      message.type === EMessageTypesEth.PERSONAL_SIGN
-    ) {
+    if (message.type === EMessageTypesEth.PERSONAL_SIGN) {
       let messageBuffer: Buffer;
       try {
         if (!hexUtils.isHexString(message.message))

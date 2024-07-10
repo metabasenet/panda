@@ -24,4 +24,6 @@ export enum EAtomNames {
   inAppNotificationAtom = 'inAppNotificationAtom',
   v4migrationAtom = 'v4migrationAtom',
   v4migrationPersistAtom = 'v4migrationPersistAtom',
+  accountIsAutoCreatingAtom = 'accountIsAutoCreatingAtom',
+  accountManualCreatingAtom = 'accountManualCreatingAtom',
 }

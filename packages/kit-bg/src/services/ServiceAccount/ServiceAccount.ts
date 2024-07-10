@@ -1,3 +1,4 @@
+import { HardwareErrorCode } from '@onekeyfe/hd-shared';
 import { isEmpty } from 'lodash';
 
 import type { IBip39RevealableSeedEncryptHex } from '@onekeyhq/core/src/secret';
@@ -11,6 +12,7 @@ import {
   revealableSeedFromMnemonic,
   validateMnemonic,
 } from '@onekeyhq/core/src/secret';
+import type { EAddressEncodings } from '@onekeyhq/core/src/types';
 import { ECoreApiExportedSecretKeyType } from '@onekeyhq/core/src/types';
 import {
   backgroundClass,
@@ -28,9 +30,14 @@ import {
 } from '@onekeyhq/shared/src/errors';
 import { DeviceNotOpenedPassphrase } from '@onekeyhq/shared/src/errors/errors/hardwareErrors';
 import {
+  isHardwareErrorByCode,
+  isHardwareInterruptErrorByCode,
+} from '@onekeyhq/shared/src/errors/utils/deviceErrorUtils';
+import {
   EAppEventBusNames,
   appEventBus,
 } from '@onekeyhq/shared/src/eventBus/appEventBus';
+import platformEnv from '@onekeyhq/shared/src/platformEnv';
 import accountUtils from '@onekeyhq/shared/src/utils/accountUtils';
 import { checkIsDefined } from '@onekeyhq/shared/src/utils/assertUtils';
 import { memoizee } from '@onekeyhq/shared/src/utils/cacheUtils';
@@ -56,8 +63,8 @@ import { buildDefaultAddAccountNetworks } from './defaultNetworkAccountsConfig';
 
 import type {
   IDBAccount,
-  IDBCreateHWWalletParams,
-  IDBCreateHWWalletParamsBase,
+  IDBCreateHwWalletParams,
+  IDBCreateHwWalletParamsBase,
   IDBCreateQRWalletParams,
   IDBDevice,
   IDBExternalAccount,
@@ -85,11 +92,11 @@ export type IAddHDOrHWAccountsParams = {
   walletId: string | undefined;
   networkId: string | undefined;
   indexes?: Array<number>; // multiple add by indexes
+  names?: Array<string>;
   indexedAccountId: string | undefined; // single add by indexedAccountId
   deriveType: IAccountDeriveTypes;
   skipDeviceCancel?: boolean;
   hideCheckingDeviceLoading?: boolean;
-  // names?: Array<string>;
   // purpose?: number;
   // skipRepeat?: boolean;
   // callback?: (_account: Account) => Promise<boolean>;
@@ -156,11 +163,6 @@ class ServiceAccount extends ServiceBase {
   @backgroundMethod()
   async getDevice({ dbDeviceId }: { dbDeviceId: string }) {
     return localDb.getDevice(dbDeviceId);
-  }
-
-  @backgroundMethod()
-  async getAllDevices() {
-    return localDb.getAllDevices();
   }
 
   @backgroundMethod()
@@ -299,8 +301,22 @@ class ServiceAccount extends ServiceBase {
             hideCheckingDeviceLoading,
           });
           addedAccounts.push({ networkId, deriveType });
-        } catch (error) {
-          //
+        } catch (error: any) {
+          // Some high priority errors need to interrupt the process
+          if (accountUtils.isHwWallet({ walletId })) {
+            if (isHardwareInterruptErrorByCode({ error })) {
+              throw error;
+            }
+            // Unplug device?
+            if (
+              isHardwareErrorByCode({
+                error,
+                code: HardwareErrorCode.DeviceNotFound,
+              })
+            ) {
+              throw error;
+            }
+          }
         }
       }
       return { addedAccounts };
@@ -311,6 +327,7 @@ class ServiceAccount extends ServiceBase {
     walletId,
     networkId,
     indexes,
+    names,
     indexedAccountId,
     deriveType,
     confirmOnDevice,
@@ -318,6 +335,7 @@ class ServiceAccount extends ServiceBase {
     walletId: string | undefined;
     networkId: string | undefined;
     indexes?: Array<number>;
+    names?: Array<string>; // custom names
     indexedAccountId: string | undefined;
     deriveType: IAccountDeriveTypes;
     confirmOnDevice?: EConfirmOnDeviceType;
@@ -378,6 +396,7 @@ class ServiceAccount extends ServiceBase {
         },
 
         indexes: usedIndexes,
+        names,
         deriveInfo,
       };
       prepareParams = hwParams;
@@ -387,6 +406,7 @@ class ServiceAccount extends ServiceBase {
         password,
 
         indexes: usedIndexes,
+        names,
         deriveInfo,
         // purpose: usedPurpose,
         // deriveInfo, // TODO pass deriveInfo to generate id and name
@@ -429,6 +449,7 @@ class ServiceAccount extends ServiceBase {
         // addHDOrHWAccounts
         const accounts = await vault.keyring.prepareAccounts(prepareParams);
         await localDb.addAccountsToWallet({
+          allAccountsBelongToNetworkId: networkId,
           walletId,
           accounts,
         });
@@ -447,6 +468,7 @@ class ServiceAccount extends ServiceBase {
         deviceParams,
         skipDeviceCancel,
         hideCheckingDeviceLoading,
+        debugMethodName: 'keyring.prepareAccounts',
       },
     );
   }
@@ -626,6 +648,11 @@ class ServiceAccount extends ServiceBase {
     walletId: string;
     accounts: IDBAccount[];
   }> {
+    if (platformEnv.isWebDappMode) {
+      throw new Error(
+        'addImportedAccountWithCredential ERROR: Not supported in Dapp mode',
+      );
+    }
     const walletId = WALLET_TYPE_IMPORTED;
     const vault = await vaultFactory.getWalletOnlyVault({
       networkId,
@@ -650,6 +677,7 @@ class ServiceAccount extends ServiceBase {
       password,
       name: name || '',
       importedCredential: credentialEncrypt,
+      networks: [networkId],
       createAtNetwork: networkId,
     };
     if (deriveType) {
@@ -678,6 +706,7 @@ class ServiceAccount extends ServiceBase {
     }
 
     await localDb.addAccountsToWallet({
+      allAccountsBelongToNetworkId: networkId,
       walletId,
       accounts,
       importedCredential: credentialEncrypt,
@@ -827,9 +856,11 @@ class ServiceAccount extends ServiceBase {
     });
     let address = '';
     let xpub = '';
+    let btcForkAddressEncoding: EAddressEncodings | undefined;
     const addressValidationResult = await vault.validateAddress(input);
     if (addressValidationResult.isValid) {
       address = addressValidationResult.normalizedAddress;
+      btcForkAddressEncoding = addressValidationResult.encoding;
     } else {
       const xpubValidationResult = await vault.validateXpub(input);
       if (xpubValidationResult.isValid) {
@@ -848,6 +879,28 @@ class ServiceAccount extends ServiceBase {
       createAtNetwork: networkId,
       isUrlAccount,
     };
+
+    let deriveTypeByAddressEncoding: IAccountDeriveTypes | undefined;
+    if (btcForkAddressEncoding) {
+      deriveTypeByAddressEncoding =
+        await this.backgroundApi.serviceNetwork.getDeriveTypeByAddressEncoding({
+          encoding: btcForkAddressEncoding,
+          networkId,
+        });
+      if (
+        deriveType &&
+        deriveTypeByAddressEncoding &&
+        deriveTypeByAddressEncoding !== deriveType
+      ) {
+        throw new Error('addWatchingAccount ERROR: deriveType not correct');
+      }
+    }
+
+    if (!deriveType && deriveTypeByAddressEncoding) {
+      // eslint-disable-next-line no-param-reassign
+      deriveType = deriveTypeByAddressEncoding;
+    }
+
     if (deriveType) {
       const deriveInfo =
         await this.backgroundApi.serviceNetwork.getDeriveInfoOfNetwork({
@@ -874,6 +927,7 @@ class ServiceAccount extends ServiceBase {
     }
 
     await localDb.addAccountsToWallet({
+      allAccountsBelongToNetworkId: networkId,
       walletId,
       accounts,
       accountNameBuilder: ({ nextAccountId }) =>
@@ -1059,9 +1113,59 @@ class ServiceAccount extends ServiceBase {
     });
   }
 
-  @backgroundMethod()
   async getAllAccounts() {
     return localDb.getAllAccounts();
+  }
+
+  async getAllWallets() {
+    return localDb.getAllWallets();
+  }
+
+  async getAllDevices() {
+    return localDb.getAllDevices();
+  }
+
+  @backgroundMethod()
+  async getAccountsInSameIndexedAccountId({
+    indexedAccountId,
+  }: {
+    indexedAccountId: string;
+  }) {
+    return localDb.getAccountsInSameIndexedAccountId({ indexedAccountId });
+  }
+
+  async getDbAccountIdFromIndexedAccountId({
+    indexedAccountId,
+    networkId,
+    deriveType,
+  }: {
+    indexedAccountId: string;
+    networkId: string;
+    deriveType: IAccountDeriveTypes;
+  }) {
+    const settings = await this.backgroundApi.serviceNetwork.getVaultSettings({
+      networkId,
+    });
+    const deriveInfo =
+      await this.backgroundApi.serviceNetwork.getDeriveInfoOfNetwork({
+        networkId,
+        deriveType,
+      });
+    const { idSuffix, template } = deriveInfo;
+
+    const { index, walletId } = accountUtils.parseIndexedAccountId({
+      indexedAccountId,
+    });
+
+    const realDBAccountId = accountUtils.buildHDAccountId({
+      walletId,
+      networkImpl: settings.impl,
+      index,
+      template, // from networkId
+      idSuffix,
+      isUtxo: settings.isUtxo,
+    });
+    return realDBAccountId;
   }
 
   @backgroundMethod()
@@ -1076,29 +1180,12 @@ class ServiceAccount extends ServiceBase {
   }): Promise<{
     accounts: INetworkAccount[];
   }> {
-    const settings = await this.backgroundApi.serviceNetwork.getVaultSettings({
-      networkId,
-    });
-    const deriveInfo =
-      await this.backgroundApi.serviceNetwork.getDeriveInfoOfNetwork({
-        networkId,
-        deriveType,
-      });
-    const { idSuffix, template } = deriveInfo;
-
     const accounts = await Promise.all(
       indexedAccountIds.map(async (indexedAccountId) => {
-        const { index, walletId } = accountUtils.parseIndexedAccountId({
+        const realDBAccountId = await this.getDbAccountIdFromIndexedAccountId({
           indexedAccountId,
-        });
-
-        const realDBAccountId = accountUtils.buildHDAccountId({
-          walletId,
-          networkImpl: settings.impl,
-          index,
-          template, // from networkId
-          idSuffix,
-          isUtxo: settings.isUtxo,
+          networkId,
+          deriveType,
         });
         return this.getAccount({ accountId: realDBAccountId, networkId });
       }),
@@ -1199,6 +1286,7 @@ class ServiceAccount extends ServiceBase {
         },
         skipDeviceCancel,
         hideCheckingDeviceLoading,
+        debugMethodName: 'createHWHiddenWallet.getPassphraseState',
       },
     );
   }
@@ -1214,7 +1302,7 @@ class ServiceAccount extends ServiceBase {
 
   @backgroundMethod()
   @toastIfError()
-  async createHWWallet(params: IDBCreateHWWalletParamsBase) {
+  async createHWWallet(params: IDBCreateHwWalletParamsBase) {
     // createHWWallet
     return this.backgroundApi.serviceHardwareUI.withHardwareProcessing(
       () => this.createHWWalletBase(params),
@@ -1224,17 +1312,23 @@ class ServiceAccount extends ServiceBase {
         },
         skipDeviceCancel: params.skipDeviceCancel,
         hideCheckingDeviceLoading: params.hideCheckingDeviceLoading,
+        debugMethodName: 'createHWWalletBase',
       },
     );
   }
 
   @backgroundMethod()
-  async createHWWalletBase(params: IDBCreateHWWalletParams) {
+  async restoreTempCreatedWallet({ walletId }: { walletId: string }) {
+    await localDb.restoreTempCreatedWallet({ walletId });
+  }
+
+  @backgroundMethod()
+  async createHWWalletBase(params: IDBCreateHwWalletParams) {
     const { features, passphraseState } = params;
     if (!features) {
       throw new Error('createHWWalletBase ERROR: features is required');
     }
-    const result = await localDb.createHWWallet({
+    const result = await localDb.createHwWallet({
       ...params,
       passphraseState: passphraseState || '',
     });
@@ -1246,9 +1340,11 @@ class ServiceAccount extends ServiceBase {
   async createHDWallet({
     name,
     mnemonic,
+    walletHashBuilder,
   }: {
     mnemonic: string;
     name?: string;
+    walletHashBuilder?: (options: { realMnemonic: string }) => string;
   }) {
     const { servicePassword } = this.backgroundApi;
     const { password } = await servicePassword.promptPasswordVerify({
@@ -1258,6 +1354,11 @@ class ServiceAccount extends ServiceBase {
     ensureSensitiveTextEncoded(mnemonic); // TODO also add check for imported account
 
     const realMnemonic = await this.validateMnemonic(mnemonic);
+
+    let walletHash: string | undefined;
+    if (walletHashBuilder) {
+      walletHash = walletHashBuilder({ realMnemonic });
+    }
 
     let rs: IBip39RevealableSeedEncryptHex | undefined;
     try {
@@ -1269,7 +1370,7 @@ class ServiceAccount extends ServiceBase {
       throw new InvalidMnemonic();
     }
 
-    return this.createHDWalletWithRs({ rs, password, name });
+    return this.createHDWalletWithRs({ rs, password, name, walletHash });
   }
 
   @backgroundMethod()
@@ -1278,13 +1379,35 @@ class ServiceAccount extends ServiceBase {
     password,
     avatarInfo,
     name,
+    walletHash,
   }: {
     rs: string;
     password: string;
     avatarInfo?: IAvatarInfo;
     name?: string;
-  }) {
+    walletHash?: string;
+  }): Promise<{ wallet: IDBWallet; indexedAccount?: IDBIndexedAccount }> {
+    if (platformEnv.isWebDappMode) {
+      throw new Error('createHDWallet ERROR: Not supported in Dapp mode');
+    }
     ensureSensitiveTextEncoded(password);
+
+    if (walletHash) {
+      // TODO performance issue
+      const { wallets } = await this.getAllWallets();
+      const existsSameHashWallet = wallets.find(
+        (item) => walletHash && item.hash && item.hash === walletHash,
+      );
+      if (existsSameHashWallet) {
+        // localDb.buildCreateHDAndHWWalletResult({
+        //   walletId: existsSameHashWallet.id,
+        //   addedHdAccountIndex:
+        // })
+        // DO NOT throw error, just return the exists wallet, so v4 migration can continue
+        // throw new Error('Wallet with the same mnemonic hash already exists');
+        return { wallet: existsSameHashWallet };
+      }
+    }
 
     const result = await localDb.createHDWallet({
       password,
@@ -1292,6 +1415,7 @@ class ServiceAccount extends ServiceBase {
       backuped: false,
       avatar: avatarInfo ?? randomAvatar(),
       name,
+      walletHash,
     });
 
     await timerUtils.wait(100);
@@ -1313,13 +1437,16 @@ class ServiceAccount extends ServiceBase {
   async setWalletTempStatus({
     walletId,
     isTemp,
+    hideImmediately,
   }: {
     walletId: IDBWalletId;
     isTemp: boolean;
+    hideImmediately?: boolean;
   }) {
     const result = await localDb.setWalletTempStatus({
       walletId,
       isTemp,
+      hideImmediately,
     });
     appEventBus.emit(EAppEventBusNames.WalletUpdate, undefined);
     return result;
@@ -1458,17 +1585,33 @@ class ServiceAccount extends ServiceBase {
   }
 
   @backgroundMethod()
-  async canAutoCreateAddressInSilentMode({ walletId }: { walletId: string }) {
+  async canAutoCreateAddressInSilentMode({
+    walletId,
+    networkId,
+    deriveType,
+  }: {
+    walletId: string;
+    networkId: string;
+    deriveType: IAccountDeriveTypes;
+  }) {
     if (accountUtils.isHdWallet({ walletId })) {
       const pwd = await this.backgroundApi.servicePassword.getCachedPassword();
       if (pwd) {
-        return true;
+        const map =
+          await this.backgroundApi.serviceNetwork.getDeriveInfoMapOfNetwork({
+            networkId,
+          });
+        const deriveInfo = map?.[deriveType as 'default'];
+        if (deriveInfo) {
+          return true;
+        }
       }
     }
     return false;
   }
 
   @backgroundMethod()
+  @toastIfError()
   async verifyHWAccountAddresses(params: {
     walletId: string;
     networkId: string;
@@ -1522,6 +1665,8 @@ class ServiceAccount extends ServiceBase {
       },
       {
         deviceParams,
+        skipDeviceCancelAtFirst: true,
+        debugMethodName: 'verifyHWAccountAddresses.prepareAccounts',
       },
     );
   }

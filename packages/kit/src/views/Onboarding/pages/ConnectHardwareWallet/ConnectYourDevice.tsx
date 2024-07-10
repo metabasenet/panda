@@ -38,7 +38,6 @@ import { ListItem } from '@onekeyhq/kit/src/components/ListItem';
 import useAppNavigation from '@onekeyhq/kit/src/hooks/useAppNavigation';
 import { useHelpLink } from '@onekeyhq/kit/src/hooks/useHelpLink';
 import { useAccountSelectorActions } from '@onekeyhq/kit/src/states/jotai/contexts/accountSelector';
-import uiDeviceUtils from '@onekeyhq/kit/src/utils/uiDeviceUtils';
 import { HARDWARE_BRIDGE_DOWNLOAD_URL } from '@onekeyhq/shared/src/config/appConfig';
 import {
   BleLocationServiceError,
@@ -59,6 +58,7 @@ import {
   EAppEventBusNames,
   appEventBus,
 } from '@onekeyhq/shared/src/eventBus/appEventBus';
+import bleManagerInstance from '@onekeyhq/shared/src/hardware/bleManager';
 import { checkBLEPermissions } from '@onekeyhq/shared/src/hardware/blePermissions';
 import { ETranslations } from '@onekeyhq/shared/src/locale';
 import platformEnv from '@onekeyhq/shared/src/platformEnv';
@@ -122,26 +122,6 @@ function DeviceListItem({ item }: { item: IConnectYourDeviceItem }) {
   );
 }
 
-function ConnectByQrCodeComingSoon() {
-  const intl = useIntl();
-
-  return (
-    <Stack flex={1} alignItems="center" justifyContent="center">
-      <SizableText
-        textAlign="center"
-        color="$textSubdued"
-        maxWidth="$80"
-        pb="$5"
-      >
-        {intl.formatMessage({
-          id: ETranslations.coming_soon,
-        })}
-      </SizableText>
-    </Stack>
-  );
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function ConnectByQrCode() {
   const {
     start: startScan,
@@ -194,6 +174,49 @@ function ConnectByQrCode() {
   );
 }
 
+function ConnectByQrCodeComingSoon() {
+  const intl = useIntl();
+  if (process.env.NODE_ENV !== 'production') {
+    return <ConnectByQrCode />;
+  }
+
+  return (
+    <Stack flex={1} alignItems="center" justifyContent="center">
+      <SizableText
+        textAlign="center"
+        color="$textSubdued"
+        maxWidth="$80"
+        pb="$5"
+      >
+        {intl.formatMessage({
+          id: ETranslations.coming_soon,
+        })}
+      </SizableText>
+    </Stack>
+  );
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function BridgeNotInstalledDialogContent(props: { error: NeedOneKeyBridge }) {
+  const intl = useIntl();
+
+  return (
+    <Stack>
+      <Dialog.RichDescription
+        linkList={{
+          url: {
+            url: 'https://help.onekey.so/hc/articles/360004279036',
+          },
+        }}
+      >
+        {intl.formatMessage({
+          id: ETranslations.onboarding_install_onekey_bridge_help_text,
+        })}
+      </Dialog.RichDescription>
+    </Stack>
+  );
+}
+
 enum EConnectionStatus {
   init = 'init',
   searching = 'searching',
@@ -237,6 +260,7 @@ function ConnectByUSBOrBLE({
             skipDeviceCancel: true, // createHWWalletWithHidden: skip device cancel as create may call device multiple times
             features,
             isFirmwareVerified,
+            defaultIsTemp: true,
           }),
         ]);
       } catch (error) {
@@ -675,9 +699,7 @@ function ConnectByUSBOrBLE({
                 id: ETranslations.onboarding_install_onekey_bridge,
               }),
               // error.message i18n should set NeedOneKeyBridge.defaultKey...
-              description:
-                error.message ||
-                'OneKey Bridge facilitates seamless communication between OneKey and your browser for a better experience.',
+              renderContent: <BridgeNotInstalledDialogContent error={error} />,
               onConfirmText: intl.formatMessage({
                 id: ETranslations.global_download_and_install,
               }),
@@ -702,9 +724,9 @@ function ConnectByUSBOrBLE({
 
   const checkBLEState = useCallback(async () => {
     // hack missing getBleManager.
-    await uiDeviceUtils.getBleManager();
+    await bleManagerInstance.getBleManager();
     await timerUtils.wait(100);
-    const bleManager = await uiDeviceUtils.getBleManager();
+    const bleManager = await bleManagerInstance.getBleManager();
     const checkState = await bleManager?.checkState();
     return checkState === 'on';
   }, []);

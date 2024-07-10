@@ -15,6 +15,11 @@ type ITokenListProps = {
   onPress?: (network: IFiatCryptoToken) => void;
 };
 
+const keyExtractor = (item: unknown) => {
+  const key = (item as IFiatCryptoToken).address;
+  return key || 'main';
+};
+
 export const TokenList: FC<ITokenListProps> = ({ items, onPress }) => {
   const [text, setText] = useState('');
   const onChangeText = useCallback((value: string) => {
@@ -49,11 +54,11 @@ export const TokenList: FC<ITokenListProps> = ({ items, onPress }) => {
       </Stack>
       <Stack flex={1}>
         <ListView
-          estimatedItemSize={48}
+          pb="$2"
+          estimatedItemSize={60}
           data={data}
           renderItem={({ item }) => (
             <ListItem
-              h={48}
               renderAvatar={<Token size="md" tokenImageUri={item.icon} />}
               title={item.symbol.toUpperCase()}
               subtitle={item.name}
@@ -61,7 +66,7 @@ export const TokenList: FC<ITokenListProps> = ({ items, onPress }) => {
             >
               {item.balanceParsed || item.fiatValue ? (
                 <ListItem.Text
-                  align="right"
+                  alignItems="flex-end"
                   primary={item.balanceParsed}
                   secondary={
                     item.fiatValue
@@ -72,6 +77,7 @@ export const TokenList: FC<ITokenListProps> = ({ items, onPress }) => {
               ) : null}
             </ListItem>
           )}
+          keyExtractor={keyExtractor}
           ListHeaderComponent={<Stack h="$2" />}
           ListFooterComponent={<Stack h="$2" />}
           ListEmptyComponent={

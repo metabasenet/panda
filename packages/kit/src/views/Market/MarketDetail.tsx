@@ -104,22 +104,28 @@ function TokenDetailHeader({
       {gtMd ? (
         <MarketDetailOverview token={token} onContentSizeChange={() => {}} />
       ) : (
-        <XStack pt="$3" flex={1} ai="center" space="$2" flexWrap="wrap">
+        <XStack
+          flex={1}
+          ai="center"
+          alignContent="stretch"
+          flexWrap="wrap"
+          space="$5"
+        >
           <TextCell
             title={intl.formatMessage({ id: ETranslations.market_24h_vol_usd })}
           >
-            {volume24h}
+            {volume24h || '-'}
           </TextCell>
           <TextCell
             title={intl.formatMessage({ id: ETranslations.global_market_cap })}
             rank={marketCapRank}
           >
-            {marketCap}
+            {marketCap || '-'}
           </TextCell>
           <TextCell
             title={intl.formatMessage({ id: ETranslations.global_fdv })}
           >
-            {fdv}
+            {fdv || '-'}
           </TextCell>
         </XStack>
       )}
@@ -210,12 +216,12 @@ function MarketDetail({
   const renderHeaderRight = useCallback(
     () => (
       <XStack space="$6" ai="center">
-        {platformEnv.isNative ? null : (
+        {!platformEnv.isExtensionUiPopup && !platformEnv.isNative ? (
           <OpenInAppButton
             buildDeepLinkUrl={buildDeepLinkUrl}
             buildFullUrl={buildFullUrl}
           />
-        )}
+        ) : null}
         <HeaderIconButton
           icon="ShareOutline"
           onPress={async () => {
@@ -262,7 +268,7 @@ function MarketDetail({
     return (
       <YStack px="$5">
         {gtMd ? (
-          <YStack space="$12" width={336}>
+          <YStack space="$12" width={392}>
             <SkeletonHeader />
             <YStack space="$3">
               <Skeleton w={252} h="$3" />
@@ -325,7 +331,7 @@ function MarketDetail({
         {gtMd ? (
           <YStack flex={1}>
             <XStack flex={1} pt="$5">
-              <ScrollView minWidth={336} maxWidth={336}>
+              <ScrollView minWidth={392} maxWidth={392}>
                 {tokenDetailHeader}
               </ScrollView>
               <YStack flex={1}>

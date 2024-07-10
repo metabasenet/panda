@@ -11,7 +11,7 @@ import {
   decodeSensitiveText,
   encodeSensitiveText,
 } from '@onekeyhq/core/src/secret';
-import type { ISignedTxPro, IUnsignedTxPro } from '@onekeyhq/core/src/types';
+import type { IUnsignedTxPro } from '@onekeyhq/core/src/types';
 import { OneKeyInternalError } from '@onekeyhq/shared/src/errors';
 import { memoizee } from '@onekeyhq/shared/src/utils/cacheUtils';
 import timerUtils from '@onekeyhq/shared/src/utils/timerUtils';
@@ -184,10 +184,6 @@ export default class Vault extends VaultBase {
       | IEncodedTxAlgo
       | IEncodedTxGroupAlgo;
     const accountAddress = await this.getAccountAddress();
-    const nativeToken = await this.backgroundApi.serviceToken.getNativeToken({
-      networkId: this.networkId,
-      accountAddress,
-    });
     const actions: IDecodedTxAction[] = [];
     const notes: string[] = [];
     let sender = '';
@@ -226,7 +222,6 @@ export default class Vault extends VaultBase {
       status: EDecodedTxStatus.Pending,
       networkId: this.networkId,
       accountId: this.accountId,
-      totalFeeInNative: txFee.shiftedBy(-nativeToken.decimals).toFixed(),
       extraInfo: {
         note: trim(notes.join(' ')),
         groupId,
@@ -238,11 +233,6 @@ export default class Vault extends VaultBase {
   }
 
   async _decodeAlgoTx(encodedTx: IEncodedTxAlgo) {
-    const accountAddress = await this.getAccountAddress();
-    const nativeToken = await this.backgroundApi.serviceToken.getNativeToken({
-      networkId: this.networkId,
-      accountAddress,
-    });
     let action: IDecodedTxAction = { type: EDecodedTxActionType.UNKNOWN };
     const nativeTx = sdkAlgo.decodeObj(
       Buffer.from(encodedTx, 'base64'),
@@ -250,26 +240,33 @@ export default class Vault extends VaultBase {
     const sender = sdkAlgo.encodeAddress(nativeTx.snd);
 
     if (nativeTx.type === sdkAlgo.TransactionType.pay) {
-      const amount = nativeTx.amt?.toString() || '0';
-      const to = sdkAlgo.encodeAddress(nativeTx.rcv!);
-      const transfer: IDecodedTxTransferInfo = {
-        from: sender,
-        to,
-        tokenIdOnNetwork: nativeToken.address,
-        icon: nativeToken.logoURI ?? '',
-        name: nativeToken.name,
-        symbol: nativeToken.symbol,
-        amount: new BigNumber(amount)
-          .shiftedBy(-nativeToken.decimals)
-          .toFixed(),
-        isNFT: false,
-        isNative: true,
-      };
-      action = await this.buildTxTransferAssetAction({
-        from: sender,
-        to,
-        transfers: [transfer],
+      const nativeToken = await this.backgroundApi.serviceToken.getNativeToken({
+        networkId: this.networkId,
+        accountId: this.accountId,
       });
+
+      if (nativeToken) {
+        const amount = nativeTx.amt?.toString() || '0';
+        const to = sdkAlgo.encodeAddress(nativeTx.rcv!);
+        const transfer: IDecodedTxTransferInfo = {
+          from: sender,
+          to,
+          tokenIdOnNetwork: nativeToken.address,
+          icon: nativeToken.logoURI ?? '',
+          name: nativeToken.name,
+          symbol: nativeToken.symbol,
+          amount: new BigNumber(amount)
+            .shiftedBy(-nativeToken.decimals)
+            .toFixed(),
+          isNFT: false,
+          isNative: true,
+        };
+        action = await this.buildTxTransferAssetAction({
+          from: sender,
+          to,
+          transfers: [transfer],
+        });
+      }
     }
 
     if (nativeTx.type === sdkAlgo.TransactionType.axfer) {
@@ -277,7 +274,7 @@ export default class Vault extends VaultBase {
       const token = await this.backgroundApi.serviceToken.getToken({
         networkId: this.networkId,
         tokenIdOnNetwork: nativeTx.xaid!.toString(),
-        accountAddress,
+        accountId: this.accountId,
       });
       let amount = new BigNumber(nativeTx.aamt?.toString() ?? 0).toFixed();
       if (token) {
@@ -303,7 +300,7 @@ export default class Vault extends VaultBase {
             const tokenDetails = (
               await this.backgroundApi.serviceToken.fetchTokensDetails({
                 networkId: this.networkId,
-                accountAddress,
+                accountId: this.accountId,
                 contractList: [token.address],
               })
             )[0];

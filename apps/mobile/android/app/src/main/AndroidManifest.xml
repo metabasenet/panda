@@ -48,14 +48,14 @@
         <action android:name="android.intent.action.VIEW"/>
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
-        <data android:scheme="panda-wallet"/>
-        <data android:scheme="io.panda.app.wallet"/>
+        <data android:scheme="onekey-wallet"/>
+        <data android:scheme="so.onekey.app.wallet"/>
       </intent-filter>
     </activity>
     <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" android:exported="false"/>
       <provider
-          android:name="io.panda.app.wallet.PandaFileProvider"
-          android:authorities="${applicationId}.pandafile"
+          android:name="so.onekey.app.wallet.OnekeyFileProvider"
+          android:authorities="${applicationId}.onekeyfile"
           android:exported="false"
           android:grantUriPermissions="true">
           <meta-data

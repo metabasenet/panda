@@ -1,4 +1,4 @@
-import type { IUnsignedTxPro } from '@onekeyhq/core/src/types';
+import type { IEncodedTx, IUnsignedTxPro } from '@onekeyhq/core/src/types';
 import type {
   ITransferInfo,
   ITransferPayload,
@@ -7,18 +7,20 @@ import type { IDappSourceInfo } from '@onekeyhq/shared/types';
 import type { IAccountNFT } from '@onekeyhq/shared/types/nft';
 import type { IToken } from '@onekeyhq/shared/types/token';
 
+import type { IAccountHistoryTx } from '../../types/history';
 import type {
   ILNURLAuthServiceResponse,
   ILNURLPayServiceResponse,
   ILNURLWithdrawServiceResponse,
 } from '../../types/lightning';
-import type { ISendTxOnSuccessData } from '../../types/tx';
+import type { EReplaceTxType, ISendTxOnSuccessData } from '../../types/tx';
 
 export enum EModalSendRoutes {
   SendDataInput = 'SendDataInput',
   SendConfirmFromDApp = 'SendConfirmFromDApp',
   SendConfirm = 'SendConfirm',
   SendFeedback = 'SendFeedback',
+  SendReplaceTx = 'SendReplaceTx',
 
   // Lightning Network
   LnurlPayRequest = 'LnurlPayRequest',
@@ -33,9 +35,12 @@ export type IModalSendParamList = {
     accountId: string;
     isNFT: boolean;
     nfts?: IAccountNFT[];
-    token?: IToken;
+    token?: IToken | null;
     address?: string;
     amount?: string;
+    onSuccess?: (txs: ISendTxOnSuccessData[]) => void;
+    onFail?: (error: Error) => void;
+    onCancel?: () => void;
   };
   [EModalSendRoutes.SendConfirm]: {
     networkId: string;
@@ -50,6 +55,14 @@ export type IModalSendParamList = {
     transferPayload?: ITransferPayload;
   };
   [EModalSendRoutes.SendConfirmFromDApp]: undefined;
+  [EModalSendRoutes.SendReplaceTx]: {
+    networkId: string;
+    accountId: string;
+    replaceType: EReplaceTxType;
+    replaceEncodedTx: IEncodedTx;
+    historyTx: IAccountHistoryTx;
+    onSuccess?: (data: ISendTxOnSuccessData[]) => void;
+  };
 
   // Lightning Network
   [EModalSendRoutes.LnurlPayRequest]: {

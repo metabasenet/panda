@@ -26,9 +26,8 @@ export type ITokenFiat = {
 export type IAccountToken = { $key: string } & IToken;
 
 export type IFetchAccountTokensParams = {
+  accountId: string;
   networkId: string;
-  accountAddress: string;
-  xpub?: string;
   cursor?: string;
   limit?: number;
   hideSmallBalanceTokens?: boolean;
@@ -54,10 +53,9 @@ export type IFetchAccountTokensResp = {
 };
 
 export type IFetchTokenDetailParams = {
+  accountId: string;
   networkId: string;
-  xpub?: string;
   contractList: string[];
-  accountAddress?: string;
   withFrozenBalance?: boolean;
   withCheckInscription?: boolean;
 };

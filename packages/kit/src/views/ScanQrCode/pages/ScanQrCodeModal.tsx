@@ -12,6 +12,7 @@ import {
   SizableText,
   Stack,
   TextArea,
+  Toast,
   XStack,
   YStack,
 } from '@onekeyhq/components';
@@ -186,13 +187,25 @@ export default function ScanQrCodeModal() {
     });
 
     if (!result.canceled) {
-      const data = await scanFromURLAsync(result.assets[0].uri);
-      if (data) {
+      const uri = result.assets[0].uri;
+      let data: string | null = null;
+      try {
+        data = await scanFromURLAsync(uri);
+      } catch {
+        data = null;
+      }
+      if (data && data.length > 0) {
         isPickedImage.current = true;
         await callback(data);
+      } else {
+        Toast.error({
+          title: intl.formatMessage({
+            id: ETranslations.scan_no_recognizable_qr_code_found,
+          }),
+        });
       }
     }
-  }, [callback]);
+  }, [callback, intl]);
 
   const onCameraScanned = useCallback(
     async (value: string) => {

@@ -14,6 +14,7 @@ import {
   TextArea,
   XStack,
   useForm,
+  useMedia,
 } from '@onekeyhq/components';
 import backgroundApiProxy from '@onekeyhq/kit/src/background/instance/backgroundApiProxy';
 import { AccountSelectorProviderMirror } from '@onekeyhq/kit/src/components/AccountSelector';
@@ -59,6 +60,7 @@ import type { RouteProp } from '@react-navigation/core';
 
 function SendDataInputContainer() {
   const intl = useIntl();
+  const media = useMedia();
 
   const [isUseFiat, setIsUseFiat] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -82,6 +84,9 @@ function SendDataInputContainer() {
     nfts,
     address,
     amount: sendAmount = '',
+    onSuccess,
+    onFail,
+    onCancel,
   } = route.params;
   const nft = nfts?.[0];
   const [tokenInfo, setTokenInfo] = useState(token);
@@ -131,6 +136,7 @@ function SendDataInputContainer() {
         });
       if (isNFT && nft) {
         nftResp = await serviceNFT.fetchNFTDetails({
+          accountId,
           networkId,
           accountAddress,
           nfts: [
@@ -152,11 +158,7 @@ function SendDataInputContainer() {
           checkInscriptionProtectionEnabled && settings.inscriptionProtection;
         tokenResp = await serviceToken.fetchTokensDetails({
           networkId,
-          accountAddress,
-          xpub: await backgroundApiProxy.serviceAccount.getAccountXpub({
-            accountId,
-            networkId,
-          }),
+          accountId,
           contractList: [tokenInfo.address],
           withFrozenBalance: true,
           withCheckInscription,
@@ -198,6 +200,16 @@ function SendDataInputContainer() {
       settings.inscriptionProtection,
     ],
     { watchLoading: true, alwaysSetState: true },
+  );
+
+  const { result: addressBookEnabledNetworkIds } = usePromiseResult(
+    async () => {
+      const networks =
+        await backgroundApiProxy.serviceNetwork.getAddressBookEnabledNetworks();
+      return networks.map((o) => o.id);
+    },
+    [],
+    { initResult: [] },
   );
 
   if (tokenDetails && isNil(tokenDetails?.balanceParsed)) {
@@ -359,9 +371,13 @@ function SendDataInputContainer() {
       await sendConfirm.navigationToSendConfirm({
         transfersInfo,
         sameModal: true,
+        onSuccess,
+        onFail,
+        onCancel,
         transferPayload: {
           amountToSend: realAmount,
           isMaxSend,
+          isNFT,
         },
       });
       setIsSubmitting(false);
@@ -393,12 +409,16 @@ function SendDataInputContainer() {
     linkedAmount.originalAmount,
     nftAmount,
     nftDetails,
+    onCancel,
+    onFail,
+    onSuccess,
     sendConfirm,
     tokenDetails,
   ]);
   const handleValidateTokenAmount = useCallback(
     async (value: string) => {
       const amountBN = new BigNumber(value ?? 0);
+
       let isInsufficientBalance = false;
       let isLessThanMinTransferAmount = false;
       if (isUseFiat) {
@@ -462,17 +482,31 @@ function SendDataInputContainer() {
         return (e as Error).message;
       }
 
+      if (
+        !isNFT &&
+        tokenDetails?.info.isNative &&
+        amountBN.isZero() &&
+        !vaultSettings?.transferZeroNativeTokenEnabled
+      ) {
+        return intl.formatMessage({
+          id: ETranslations.send_cannot_send_amount_zero,
+        });
+      }
+
       return true;
     },
     [
+      isNFT,
+      tokenDetails?.info.isNative,
+      tokenDetails?.fiatValue,
+      tokenDetails?.price,
+      tokenDetails?.balanceParsed,
+      vaultSettings?.transferZeroNativeTokenEnabled,
+      vaultSettings?.minTransferAmount,
       isUseFiat,
       intl,
       tokenSymbol,
       tokenMinAmount,
-      vaultSettings?.minTransferAmount,
-      tokenDetails?.fiatValue,
-      tokenDetails?.price,
-      tokenDetails?.balanceParsed,
       form,
       accountId,
       networkId,
@@ -505,12 +539,15 @@ function SendDataInputContainer() {
     displayAmountFormItem,
   ]);
 
-  const maxAmount = useMemo(() => {
-    if (isUseFiat) {
-      return tokenDetails?.fiatValue ?? '0';
-    }
-    return tokenDetails?.balanceParsed ?? '0';
-  }, [isUseFiat, tokenDetails?.balanceParsed, tokenDetails?.fiatValue]);
+  const maxBalance = useMemo(
+    () => tokenDetails?.balanceParsed ?? '0',
+    [tokenDetails?.balanceParsed],
+  );
+
+  const maxBalanceFiat = useMemo(
+    () => tokenDetails?.fiatValue ?? '0',
+    [tokenDetails?.fiatValue],
+  );
 
   const renderTokenDataInputForm = useCallback(
     () => (
@@ -547,9 +584,9 @@ function SendDataInputContainer() {
           enableMaxAmount
           balanceProps={{
             loading: isLoadingAssets,
-            value: maxAmount,
+            value: maxBalance,
             onPress: () => {
-              form.setValue('amount', maxAmount);
+              form.setValue('amount', isUseFiat ? maxBalanceFiat : maxBalance);
               void form.trigger('amount');
               setIsMaxSend(true);
             },
@@ -562,6 +599,14 @@ function SendDataInputContainer() {
           }}
           inputProps={{
             placeholder: '0',
+            ...(isUseFiat && {
+              leftAddOnProps: {
+                label: currencySymbol,
+                pr: '$0',
+                pl: '$3.5',
+                mr: '$-2',
+              },
+            }),
           }}
           tokenSelectorTriggerProps={{
             selectedTokenImageUri: isNFT
@@ -601,7 +646,8 @@ function SendDataInputContainer() {
       isSelectTokenDisabled,
       isUseFiat,
       linkedAmount.amount,
-      maxAmount,
+      maxBalance,
+      maxBalanceFiat,
       network?.logoURI,
       networkId,
       nft?.metadata?.image,
@@ -710,7 +756,6 @@ function SendDataInputContainer() {
 
   const renderPaymentIdForm = useCallback(() => {
     if (!displayPaymentIdForm) return null;
-
     return (
       <>
         <XStack pt="$5" />
@@ -731,16 +776,22 @@ function SendDataInputContainer() {
                 !hexUtils.isHexString(hexUtils.addHexPrefix(value)) ||
                 hexUtils.stripHexPrefix(value).length !== 64
               ) {
-                return 'Payment ID must be a 64 char hex string';
+                return intl.formatMessage({
+                  id: ETranslations.form_payment_id_error_text,
+                });
               }
             },
           }}
         >
-          <TextArea numberOfLines={2} size="large" placeholder="Payment ID" />
+          <TextArea
+            numberOfLines={2}
+            size={media.gtMd ? 'medium' : 'large'}
+            placeholder="Payment ID"
+          />
         </Form.Field>
       </>
     );
-  }, [displayPaymentIdForm, intl]);
+  }, [displayPaymentIdForm, intl, media.gtMd]);
 
   const renderDataInput = useCallback(() => {
     if (isNFT) {
@@ -764,6 +815,12 @@ function SendDataInputContainer() {
     renderMemoForm,
     renderPaymentIdForm,
   ]);
+
+  const addressInputAccountSelectorArgs = useMemo<{ num: number } | undefined>(
+    () =>
+      addressBookEnabledNetworkIds.includes(networkId) ? { num: 0 } : undefined,
+    [addressBookEnabledNetworkIds, networkId],
+  );
 
   return (
     <Page scrollEnabled>
@@ -804,8 +861,19 @@ function SendDataInputContainer() {
                       flex={1}
                       primary={nft?.metadata?.name}
                       secondary={
-                        <SizableText size="$bodyMd" color="$textSubdued">
-                          {tokenInfo?.name}
+                        <SizableText
+                          size="$bodyMd"
+                          color="$textSubdued"
+                          style={{ wordBreak: 'break-all' }}
+                        >
+                          {!isNil(nft?.itemId)
+                            ? `${intl.formatMessage({
+                                id: ETranslations.nft_token_id,
+                              })}: ${accountUtils.shortenAddress({
+                                address: nft.itemId,
+                                leadingLength: 6,
+                              })}`
+                            : ''}
                         </SizableText>
                       }
                     />
@@ -840,8 +908,8 @@ function SendDataInputContainer() {
                 enableWalletName
                 enableVerifySendFundToSelf
                 enableAddressInteractionStatus
-                contacts
-                accountSelector={{ num: 0 }}
+                contacts={addressBookEnabledNetworkIds.includes(networkId)}
+                accountSelector={addressInputAccountSelectorArgs}
               />
             </Form.Field>
             {renderDataInput()}

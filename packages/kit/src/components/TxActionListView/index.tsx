@@ -2,7 +2,8 @@ import type { ComponentProps } from 'react';
 
 import { getDisplayedActions } from '@onekeyhq/shared/src/utils/txActionUtils';
 import { ETxActionComponentType } from '@onekeyhq/shared/types';
-import type { IDecodedTx } from '@onekeyhq/shared/types/tx';
+import type { ISwapTxInfo } from '@onekeyhq/shared/types/swap/types';
+import type { EReplaceTxType, IDecodedTx } from '@onekeyhq/shared/types/tx';
 
 import { getTxActionMeta } from '../../utils/getTxActionMeta';
 
@@ -16,6 +17,8 @@ type IProps = {
   tableLayout?: boolean;
   componentProps?: ComponentProps<typeof ListItem>;
   isSendNativeToken?: boolean;
+  replaceType?: EReplaceTxType;
+  swapInfo?: ISwapTxInfo;
 };
 
 function TxActionsListView(props: IProps) {
@@ -27,6 +30,8 @@ function TxActionsListView(props: IProps) {
     isSendNativeToken,
     showIcon,
     tableLayout,
+    replaceType,
+    swapInfo,
   } = props;
   const actions = getDisplayedActions({ decodedTx });
   const action = actions[0];
@@ -48,6 +53,8 @@ function TxActionsListView(props: IProps) {
       showIcon={showIcon}
       nativeTokenTransferAmountToUpdate={nativeTokenTransferAmountToUpdate}
       isSendNativeToken={isSendNativeToken}
+      replaceType={replaceType}
+      swapInfo={swapInfo}
     />
   );
 }

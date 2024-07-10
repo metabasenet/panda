@@ -13,12 +13,15 @@ import {
   getBgSensitiveTextEncodeKey,
   revealEntropyToMnemonic,
 } from '@onekeyhq/core/src/secret';
+import backgroundApiProxy from '@onekeyhq/kit/src/background/instance/backgroundApiProxy';
 import {
   backgroundClass,
   backgroundMethod,
 } from '@onekeyhq/shared/src/background/backgroundDecorators';
 import biologyAuth from '@onekeyhq/shared/src/biologyAuth';
-import * as OneKeyError from '@onekeyhq/shared/src/errors';
+import * as OneKeyErrors from '@onekeyhq/shared/src/errors';
+import { ETranslations } from '@onekeyhq/shared/src/locale';
+import { appLocale } from '@onekeyhq/shared/src/locale/appLocale';
 import platformEnv from '@onekeyhq/shared/src/platformEnv';
 import accountUtils from '@onekeyhq/shared/src/utils/accountUtils';
 import timerUtils from '@onekeyhq/shared/src/utils/timerUtils';
@@ -108,6 +111,26 @@ export default class ServicePassword extends ServiceBase {
   }
 
   @backgroundMethod()
+  async encryptByInstanceId(input: string): Promise<string> {
+    const instanceId = await this.backgroundApi.serviceSetting.getInstanceId();
+    const output = encodeSensitiveText({
+      text: input,
+      key: instanceId,
+    });
+    return Promise.resolve(output);
+  }
+
+  @backgroundMethod()
+  async decryptByInstanceId(input: string): Promise<string> {
+    const instanceId = await this.backgroundApi.serviceSetting.getInstanceId();
+    const output = decodeSensitiveText({
+      encodedText: input,
+      key: instanceId,
+    });
+    return Promise.resolve(output);
+  }
+
+  @backgroundMethod()
   async decodeSensitiveText({
     encodedText,
   }: {
@@ -145,7 +168,8 @@ export default class ServicePassword extends ServiceBase {
     const now = Date.now();
     if (
       !this.cachedPassword ||
-      now - this.cachedPasswordActivityTimeStep > this.cachedPasswordTTL
+      now - this.cachedPasswordActivityTimeStep > this.cachedPasswordTTL ||
+      now < this.cachedPasswordActivityTimeStep
     ) {
       await this.clearCachedPassword();
       return undefined;
@@ -206,7 +230,7 @@ export default class ServicePassword extends ServiceBase {
     }
     const authRes = await biologyAuthUtils.biologyAuthenticate();
     if (!authRes.success) {
-      throw new OneKeyError.BiologyAuthFailed();
+      throw new OneKeyErrors.BiologyAuthFailed();
     }
     try {
       const pwd = await biologyAuthUtils.getPassword();
@@ -214,7 +238,7 @@ export default class ServicePassword extends ServiceBase {
       return pwd;
     } catch (e) {
       await this.setBiologyAuthEnable(false);
-      throw new OneKeyError.BiologyAuthFailed();
+      throw new OneKeyErrors.BiologyAuthFailed();
     }
   }
 
@@ -226,13 +250,18 @@ export default class ServicePassword extends ServiceBase {
     if (enable && !skipAuth) {
       const authRes = await biologyAuth.biologyAuthenticate();
       if (!authRes.success) {
-        throw new OneKeyError.BiologyAuthFailed();
+        throw new OneKeyErrors.BiologyAuthFailed();
+      }
+      const catchPassword = await this.getCachedPassword();
+      if (catchPassword) {
+        await this.saveBiologyAuthPassword(catchPassword);
+      } else {
+        throw new Error(
+          'no catch password please unlock the application again or modify the password.',
+        );
       }
     }
-    await settingsPersistAtom.set((v) => ({
-      ...v,
-      isBiologyAuthSwitchOn: enable,
-    }));
+    await backgroundApiProxy.serviceSetting.setBiologyAuthSwitchOn(enable);
   }
 
   // validatePassword --------------------------------
@@ -241,7 +270,7 @@ export default class ServicePassword extends ServiceBase {
     const realPassword = decodePassword({ password });
     // **** length matched
     if (realPassword.length < 8 || realPassword.length > 128) {
-      throw new OneKeyError.PasswordStrengthValidationFailed();
+      throw new OneKeyErrors.PasswordStrengthValidationFailed();
     }
     // **** other rules ....
   }
@@ -253,7 +282,7 @@ export default class ServicePassword extends ServiceBase {
     const realPassword = decodePassword({ password });
     const realNewPassword = decodePassword({ password: newPassword });
     if (realPassword === realNewPassword) {
-      throw new OneKeyError.PasswordUpdateSameFailed();
+      throw new OneKeyErrors.PasswordUpdateSameFailed();
     }
   }
 
@@ -335,7 +364,13 @@ export default class ServicePassword extends ServiceBase {
       await this.saveBiologyAuthPassword(newPassword);
       await this.setCachedPassword(newPassword);
       await this.setPasswordSetStatus(true);
+      // update v5 db password
       await localDb.updatePassword({ oldPassword, newPassword });
+      // update v4 db password
+      await this.backgroundApi.serviceV4Migration.updateV4Password({
+        oldPassword,
+        newPassword,
+      });
       await this.backgroundApi.serviceAddressBook.finishUpdateHash();
       return newPassword;
     } catch (e) {
@@ -371,7 +406,7 @@ export default class ServicePassword extends ServiceBase {
     const v4migrationData = await v4migrationAtom.get();
     if (v4migrationData?.isProcessing) {
       const v4migrationPassword =
-        await this.backgroundApi.serviceV4Migration.getMigrationPassword();
+        await this.backgroundApi.serviceV4Migration.getMigrationPasswordV5();
       if (v4migrationPassword) {
         return {
           password: v4migrationPassword,
@@ -386,7 +421,7 @@ export default class ServicePassword extends ServiceBase {
       this.backgroundApi.bridgeExtBg &&
       !checkExtUIOpen(this.backgroundApi.bridgeExtBg)
     ) {
-      throw new OneKeyError.OneKeyInternalError();
+      throw new OneKeyErrors.OneKeyInternalError();
     }
 
     const needReenterPassword = await this.isAlwaysReenterPassword(reason);
@@ -471,7 +506,11 @@ export default class ServicePassword extends ServiceBase {
       passwordPromptPromiseTriggerData: params,
     }));
     this.passwordPromptTimeout = setTimeout(() => {
-      void this.rejectPasswordPromptDialog(params.idNumber);
+      void this.rejectPasswordPromptDialog(params.idNumber, {
+        message: appLocale.intl.formatMessage({
+          id: ETranslations.global_close,
+        }),
+      });
     }, this.passwordPromptTTL);
   }
 
@@ -494,8 +533,11 @@ export default class ServicePassword extends ServiceBase {
   @backgroundMethod()
   async rejectPasswordPromptDialog(
     promiseId: number,
-    error?: { message: string },
+    errorInfo: { message: string },
   ) {
+    const error = new OneKeyErrors.OneKeyError({
+      message: errorInfo.message,
+    });
     this.clearPasswordPromptTimeout();
     void this.backgroundApi.servicePromise.rejectCallback({
       id: promiseId,
@@ -516,16 +558,12 @@ export default class ServicePassword extends ServiceBase {
 
   @backgroundMethod()
   async lockApp() {
-    const isRunning = await firmwareUpdateWorkflowRunningAtom.get();
-    if (isRunning) {
+    const isFirmwareUpdateRunning =
+      await firmwareUpdateWorkflowRunningAtom.get();
+    if (isFirmwareUpdateRunning) {
       return;
     }
-
-    const v4migrationData = await v4migrationAtom.get();
-    if (
-      v4migrationData?.isProcessing ||
-      v4migrationData?.isMigrationModalOpen
-    ) {
+    if (await this.backgroundApi.serviceV4Migration.isAtMigrationPage()) {
       return;
     }
 
@@ -589,7 +627,8 @@ export default class ServicePassword extends ServiceBase {
     if (
       !result ||
       !this.securitySession ||
-      now - this.securitySession.startAt > this.securitySession.timeout
+      now - this.securitySession.startAt > this.securitySession.timeout ||
+      now < this.securitySession.startAt
       // return result immediately if result is false or last visit is timeout/ not exist
     ) {
       return result;

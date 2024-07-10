@@ -29,17 +29,19 @@ import { addressIsEnsFormat } from '@onekeyhq/shared/src/utils/uriUtils';
 import type { INetworkAccount } from '@onekeyhq/shared/types/account';
 import type {
   IAddressValidation,
+  IFetchAccountDetailsResp,
   IGeneralInputValidation,
   INetworkAccountAddressDetail,
   IPrivateKeyValidation,
   IXprvtValidation,
   IXpubValidation,
 } from '@onekeyhq/shared/types/address';
-import type { IEstimateFeeParams } from '@onekeyhq/shared/types/fee';
-import { IFeeInfoUnit } from '@onekeyhq/shared/types/fee';
+import type {
+  IEstimateFeeParams,
+  IFeeInfoUnit,
+} from '@onekeyhq/shared/types/fee';
 import type {
   IAccountHistoryTx,
-  IFetchAccountHistoryParams,
   IOnChainHistoryTx,
   IOnChainHistoryTxApprove,
   IOnChainHistoryTxNFT,
@@ -48,7 +50,11 @@ import type {
 } from '@onekeyhq/shared/types/history';
 import { EOnChainHistoryTxType } from '@onekeyhq/shared/types/history';
 import type { IResolveNameResp } from '@onekeyhq/shared/types/name';
+import type { ESendPreCheckTimingEnum } from '@onekeyhq/shared/types/send';
+import type { ISwapTxInfo } from '@onekeyhq/shared/types/swap/types';
+import type { IFetchTokenDetailItem } from '@onekeyhq/shared/types/token';
 import type {
+  EReplaceTxType,
   IDecodedTx,
   IDecodedTxAction,
   IDecodedTxActionAssetTransfer,
@@ -78,6 +84,7 @@ import type {
   IBuildUnsignedTxParams,
   IGetPrivateKeyFromImportedParams,
   IGetPrivateKeyFromImportedResult,
+  INativeAmountInfo,
   ISignTransactionParams,
   IUpdateUnsignedTxParams,
   IValidateGeneralInputParams,
@@ -314,7 +321,12 @@ export abstract class VaultBase extends VaultBaseChainOnly {
     return null;
   }
 
-  async precheckUnsignedTx(params: { unsignedTx: IUnsignedTxPro }) {
+  async precheckUnsignedTx(params: {
+    unsignedTx: IUnsignedTxPro;
+    precheckTiming: ESendPreCheckTimingEnum;
+    nativeAmountInfo?: INativeAmountInfo;
+    feeInfo?: IFeeInfoUnit;
+  }) {
     return Promise.resolve(true);
   }
 
@@ -489,10 +501,9 @@ export abstract class VaultBase extends VaultBaseChainOnly {
       functionCall: {
         from: tx.from,
         to: tx.to,
-        functionName: tx.type,
+        functionName: tx.label,
         functionHash: tx.functionCode,
         args: tx.params,
-        icon: network.logoURI,
       },
     };
   }
@@ -508,7 +519,7 @@ export abstract class VaultBase extends VaultBaseChainOnly {
       unknownAction: {
         from: tx.from,
         to: tx.to,
-        icon: network.logoURI,
+        label: tx.label,
       },
     };
   }
@@ -598,7 +609,8 @@ export abstract class VaultBase extends VaultBaseChainOnly {
       type: EDecodedTxActionType.TOKEN_APPROVE,
       tokenApprove: {
         from: tx.from,
-        to: tokenApprove.spender,
+        to: tx.to,
+        spender: tokenApprove.spender,
         icon,
         name,
         symbol,
@@ -616,8 +628,25 @@ export abstract class VaultBase extends VaultBaseChainOnly {
     from: string;
     to: string;
     transfers: IDecodedTxTransferInfo[];
+    data?: string;
+    application?: {
+      name: string;
+      icon: string;
+    };
+    isInternalSwap?: boolean;
+    swapReceivedAddress?: string;
+    swapReceivedNetworkId?: string;
   }): Promise<IDecodedTxAction> {
-    const { from, to, transfers } = params;
+    const {
+      from,
+      to,
+      transfers,
+      data,
+      application,
+      isInternalSwap,
+      swapReceivedAddress,
+      swapReceivedNetworkId,
+    } = params;
     const [accountAddress, network] = await Promise.all([
       this.getAccountAddress(),
       this.getNetwork(),
@@ -630,6 +659,10 @@ export abstract class VaultBase extends VaultBaseChainOnly {
       to,
       sends: [],
       receives: [],
+      application,
+      isInternalSwap,
+      swapReceivedAddress,
+      swapReceivedNetworkId,
     };
 
     transfers.forEach((transfer) => {
@@ -661,8 +694,57 @@ export abstract class VaultBase extends VaultBaseChainOnly {
 
     return {
       type: EDecodedTxActionType.ASSET_TRANSFER,
+      data,
       assetTransfer,
     };
+  }
+
+  async buildInternalSwapAction(params: {
+    swapInfo: ISwapTxInfo;
+    swapData?: string;
+    swapToAddress?: string;
+  }) {
+    const { swapData, swapInfo, swapToAddress } = params;
+    const swapSendToken = swapInfo.sender.token;
+    const swapReceiveToken = swapInfo.receiver.token;
+    const providerInfo = swapInfo.swapBuildResData.result.info;
+    const action = await this.buildTxTransferAssetAction({
+      from: swapInfo.accountAddress,
+      to: swapToAddress ?? '',
+      data: swapData,
+      application: {
+        name: providerInfo.providerName,
+        icon: providerInfo.providerLogo ?? '',
+      },
+      isInternalSwap: true,
+      swapReceivedAddress: swapInfo.receivingAddress,
+      swapReceivedNetworkId: swapInfo.receiver.token.networkId,
+      transfers: [
+        {
+          from: swapInfo.accountAddress,
+          to: '',
+          tokenIdOnNetwork: swapSendToken.contractAddress,
+          icon: swapSendToken.logoURI ?? '',
+          name: swapSendToken.name ?? '',
+          symbol: swapSendToken.symbol,
+          amount: swapInfo.sender.amount,
+          isNFT: false,
+          isNative: swapSendToken.isNative,
+        },
+        {
+          from: '',
+          to: swapInfo.receivingAddress,
+          tokenIdOnNetwork: swapReceiveToken.contractAddress,
+          icon: swapReceiveToken.logoURI ?? '',
+          name: swapReceiveToken.name ?? '',
+          symbol: swapReceiveToken.symbol,
+          amount: swapInfo.receiver.amount,
+          isNFT: false,
+          isNative: swapReceiveToken.isNative,
+        },
+      ],
+    });
+    return action;
   }
 
   // DO NOT override this method
@@ -770,5 +852,39 @@ export abstract class VaultBase extends VaultBaseChainOnly {
 
   async getAccountXpub(): Promise<string | undefined> {
     return ((await this.getAccount()) as IDBUtxoAccount).xpub;
+  }
+
+  async fillTokensDetails({
+    tokensDetails,
+  }: {
+    tokensDetails: IFetchTokenDetailItem[];
+  }) {
+    return Promise.resolve(tokensDetails);
+  }
+
+  async fillAccountDetails({
+    accountDetails,
+  }: {
+    accountDetails: IFetchAccountDetailsResp;
+  }) {
+    return Promise.resolve(accountDetails);
+  }
+
+  async isEarliestLocalPendingTx({
+    encodedTx,
+  }: {
+    encodedTx: IEncodedTx;
+  }): Promise<boolean> {
+    return true;
+  }
+
+  async buildReplaceEncodedTx({
+    decodedTx,
+    replaceType,
+  }: {
+    decodedTx: IDecodedTx;
+    replaceType: EReplaceTxType;
+  }) {
+    return Promise.resolve(decodedTx.encodedTx);
   }
 }

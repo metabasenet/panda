@@ -38,6 +38,7 @@ const settings: IVaultSettings = {
   feeUTXORequired: false,
   editFeeEnabled: false,
   replaceTxEnabled: false,
+  estimatedFeePollingInterval: 600,
 
   withPaymentId: true,
 
@@ -46,6 +47,10 @@ const settings: IVaultSettings = {
   minTransferAmount: '0.000000001',
 
   withoutBroadcastTxId: true,
+
+  hasFrozenBalance: true,
+
+  hideTxUtxoListWhenPending: true,
 
   accountDeriveInfo,
   networkInfo: {

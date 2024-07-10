@@ -15,10 +15,15 @@ import { PendingQueueTooLong } from '@onekeyhq/shared/src/errors';
 import accountUtils from '@onekeyhq/shared/src/utils/accountUtils';
 import { getValidUnsignedMessage } from '@onekeyhq/shared/src/utils/messageUtils';
 import { EServiceEndpointEnum } from '@onekeyhq/shared/types/endpoint';
+import type {
+  IFeeInfoUnit,
+  ISendSelectedFeeInfo,
+} from '@onekeyhq/shared/types/fee';
+import type { ESendPreCheckTimingEnum } from '@onekeyhq/shared/types/send';
 import { EReasonForNeedPassword } from '@onekeyhq/shared/types/setting';
 import type { IFetchTokenDetailItem } from '@onekeyhq/shared/types/token';
-import { IToken } from '@onekeyhq/shared/types/token';
 import type {
+  EReplaceTxType,
   IDecodedTx,
   ISendTxBaseParams,
   ISendTxOnSuccessData,
@@ -33,6 +38,8 @@ import type {
   IBroadcastTransactionParams,
   IBuildDecodedTxParams,
   IBuildUnsignedTxParams,
+  INativeAmountInfo,
+  IPreCheckFeeInfoParams,
   ISignTransactionParamsBase,
   IUpdateUnsignedTxParams,
 } from '../vaults/types';
@@ -47,10 +54,12 @@ class ServiceSend extends ServiceBase {
   async buildDecodedTx(
     params: ISendTxBaseParams & IBuildDecodedTxParams,
   ): Promise<IDecodedTx> {
-    const { networkId, accountId, unsignedTx, feeInfo } = params;
+    const { networkId, accountId, unsignedTx, feeInfo, transferPayload } =
+      params;
     const vault = await vaultFactory.getVault({ networkId, accountId });
     const decodedTx = await vault.buildDecodedTx({
       unsignedTx,
+      transferPayload,
     });
 
     if (feeInfo) {
@@ -105,6 +114,18 @@ class ServiceSend extends ServiceBase {
   }
 
   @backgroundMethod()
+  public async buildReplaceEncodedTx(params: {
+    accountId: string;
+    networkId: string;
+    decodedTx: IDecodedTx;
+    replaceType: EReplaceTxType;
+  }) {
+    const { networkId, accountId, ...rest } = params;
+    const vault = await vaultFactory.getVault({ networkId, accountId });
+    return vault.buildReplaceEncodedTx({ ...rest });
+  }
+
+  @backgroundMethod()
   public async broadcastTransaction(params: IBroadcastTransactionParams) {
     const { networkId, signedTx, accountAddress, signature } = params;
     const client = await this.getClient(EServiceEndpointEnum.Wallet);
@@ -118,6 +139,21 @@ class ServiceSend extends ServiceBase {
     });
 
     return resp.data.data.result;
+  }
+
+  @backgroundMethod()
+  public async preCheckIsFeeInfoOverflow(params: IPreCheckFeeInfoParams) {
+    try {
+      const client = await this.getClient(EServiceEndpointEnum.Wallet);
+      const resp = await client.post<{
+        data: { success: boolean };
+      }>('/wallet/v1/account/pre-send-transaction', params);
+
+      return !resp.data.data.success;
+    } catch {
+      // pre-check failed, return true to show fee info alert by default
+      return true;
+    }
   }
 
   @backgroundMethod()
@@ -154,7 +190,7 @@ class ServiceSend extends ServiceBase {
           console.log('signTx@vault.signTransaction', signedTx);
           return signedTx;
         },
-        { deviceParams },
+        { deviceParams, debugMethodName: 'serviceSend.signTransaction' },
       );
 
     console.log('signTx@serviceSend.signTransaction', tx);
@@ -203,6 +239,7 @@ class ServiceSend extends ServiceBase {
         accountId,
       });
       const { txid } = await vault.broadcastTransaction({
+        accountId,
         networkId,
         accountAddress,
         signedTx,
@@ -221,19 +258,17 @@ class ServiceSend extends ServiceBase {
 
   @backgroundMethod()
   @toastIfError()
-  public async batchSignAndSendTransaction(
-    params: ISendTxBaseParams & IBatchSignTransactionParamsBase,
-  ) {
-    const {
-      networkId,
-      accountId,
-      unsignedTxs,
-      feeInfo: sendSelectedFeeInfo,
-      nativeAmountInfo,
-      signOnly,
-      sourceInfo,
-    } = params;
-
+  public async updateUnSignedTxBeforeSend({
+    accountId,
+    networkId,
+    feeInfo: sendSelectedFeeInfo,
+    nativeAmountInfo,
+    unsignedTxs,
+  }: ISendTxBaseParams & {
+    unsignedTxs: IUnsignedTxPro[];
+    feeInfo?: ISendSelectedFeeInfo;
+    nativeAmountInfo?: INativeAmountInfo;
+  }) {
     const newUnsignedTxs = [];
     for (let i = 0, len = unsignedTxs.length; i < len; i += 1) {
       const unsignedTx = unsignedTxs[i];
@@ -247,10 +282,28 @@ class ServiceSend extends ServiceBase {
 
       newUnsignedTxs.push(newUnsignedTx);
     }
+    return newUnsignedTxs;
+  }
+
+  @backgroundMethod()
+  @toastIfError()
+  public async batchSignAndSendTransaction(
+    params: ISendTxBaseParams & IBatchSignTransactionParamsBase,
+  ) {
+    const {
+      networkId,
+      accountId,
+      unsignedTxs,
+      signOnly,
+      sourceInfo,
+      feeInfo: sendSelectedFeeInfo,
+      replaceTxInfo,
+      transferPayload,
+    } = params;
 
     const result: ISendTxOnSuccessData[] = [];
-    for (let i = 0, len = newUnsignedTxs.length; i < len; i += 1) {
-      const unsignedTx = newUnsignedTxs[i];
+    for (let i = 0, len = unsignedTxs.length; i < len; i += 1) {
+      const unsignedTx = unsignedTxs[i];
       const signedTx = signOnly
         ? await this.signTransaction({
             unsignedTx,
@@ -269,6 +322,7 @@ class ServiceSend extends ServiceBase {
         accountId,
         unsignedTx,
         feeInfo: sendSelectedFeeInfo,
+        transferPayload,
       });
 
       const data = {
@@ -278,12 +332,10 @@ class ServiceSend extends ServiceBase {
 
       result.push(data);
 
-      if (!signOnly) {
-        await this.backgroundApi.serviceSignature.addItemFromSendProcess(
-          data,
-          sourceInfo,
-        );
-      }
+      await this.backgroundApi.serviceSignature.addItemFromSendProcess(
+        data,
+        sourceInfo,
+      );
       if (signedTx && !signOnly) {
         await this.backgroundApi.serviceHistory.saveSendConfirmHistoryTxs({
           networkId,
@@ -292,6 +344,7 @@ class ServiceSend extends ServiceBase {
             signedTx,
             decodedTx,
           },
+          replaceTxInfo,
         });
       }
     }
@@ -312,7 +365,7 @@ class ServiceSend extends ServiceBase {
     const { nonce: onChainNextNonce } =
       await this.backgroundApi.serviceAccountProfile.fetchAccountDetails({
         networkId,
-        accountAddress,
+        accountId,
         withNonce: true,
       });
     if (isNil(onChainNextNonce)) {
@@ -466,7 +519,7 @@ class ServiceSend extends ServiceBase {
           });
           return _signedMessage;
         },
-        { deviceParams },
+        { deviceParams, debugMethodName: 'serviceSend.signMessage' },
       );
 
     return signedMessage;
@@ -518,6 +571,9 @@ class ServiceSend extends ServiceBase {
     networkId: string;
     accountId: string;
     unsignedTxs: IUnsignedTxPro[];
+    precheckTiming: ESendPreCheckTimingEnum;
+    nativeAmountInfo?: INativeAmountInfo;
+    feeInfo?: IFeeInfoUnit;
   }) {
     const vault = await vaultFactory.getVault({
       networkId: params.networkId,
@@ -526,6 +582,9 @@ class ServiceSend extends ServiceBase {
     for (const unsignedTx of params.unsignedTxs) {
       await vault.precheckUnsignedTx({
         unsignedTx,
+        precheckTiming: params.precheckTiming,
+        nativeAmountInfo: params.nativeAmountInfo,
+        feeInfo: params.feeInfo,
       });
     }
   }

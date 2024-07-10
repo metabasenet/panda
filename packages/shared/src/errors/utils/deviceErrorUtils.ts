@@ -80,6 +80,8 @@ export function convertDeviceError(
       return new HardwareErrors.DeviceNotSame({ payload });
     case HardwareErrorCode.DeviceNotFound:
       return new HardwareErrors.DeviceNotFound({ payload });
+    case HardwareErrorCode.DeviceInitializeFailed:
+      return new HardwareErrors.DeviceInitializeFailed({ payload });
     case HardwareErrorCode.DeviceUnexpectedBootloaderMode:
       return new HardwareErrors.NotInBootLoaderMode({ payload });
     case HardwareErrorCode.DeviceDetectInBootloaderMode:
@@ -150,6 +152,8 @@ export function convertDeviceError(
     case HardwareErrorCode.DeviceNotOpenedPassphrase:
       return new HardwareErrors.DeviceNotOpenedPassphrase({ payload });
     case HardwareErrorCode.PinCancelled:
+      return new HardwareErrors.PinCancelled({ payload });
+    case HardwareErrorCode.UnexpectPassphrase:
     case HardwareErrorCode.ActionCancelled:
       return new HardwareErrors.UserCancel({ payload });
     case HardwareErrorCode.BridgeNotInstalled:
@@ -233,4 +237,19 @@ export function isHardwareErrorByCode({
     isHardwareError &&
     (isCodeMatch(error?.code) || isCodeMatch(error?.payload?.code))
   );
+}
+
+export function isHardwareInterruptErrorByCode({
+  error,
+}: {
+  error: IOneKeyError | undefined;
+}) {
+  return isHardwareErrorByCode({
+    error,
+    code: [
+      HardwareErrorCode.NewFirmwareForceUpdate,
+      HardwareErrorCode.BridgeNotInstalled,
+      HardwareErrorCode.BridgeTimeoutError,
+    ],
+  });
 }

@@ -52,7 +52,7 @@ function WalletActionSend() {
     if (vaultSettings?.isSingleToken) {
       const nativeToken = await backgroundApiProxy.serviceToken.getNativeToken({
         networkId: network.id,
-        accountAddress: account.address,
+        accountId: account.id,
       });
       navigation.pushModal(EModalRoutes.SendModal, {
         screen: EModalSendRoutes.SendDataInput,
@@ -136,23 +136,17 @@ function WalletActionSwap({ networkId }: { networkId?: string }) {
 
 function WalletActions({ ...rest }: IXStackProps) {
   const {
-    activeAccount: { network, account, wallet, deriveInfo, deriveType },
+    activeAccount: { network, account },
   } = useActiveAccount({ num: 0 });
 
   return (
     <RawActions {...rest}>
       <ReviewControl>
-        <WalletActionBuy networkId={network?.id} accountId={account?.id} />
+        <WalletActionBuy />
       </ReviewControl>
       <WalletActionSwap networkId={network?.id} />
       <WalletActionSend />
-      <WalletActionReceive
-        accountId={account?.id}
-        networkId={network?.id}
-        walletId={wallet?.id}
-        deriveInfo={deriveInfo}
-        deriveType={deriveType}
-      />
+      <WalletActionReceive />
       <WalletActionMore />
     </RawActions>
   );

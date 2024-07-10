@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useRoute } from '@react-navigation/core';
 import { useIntl } from 'react-intl';
@@ -22,7 +22,14 @@ import {
   useClipboard,
 } from '@onekeyhq/components';
 import { HeaderIconButton } from '@onekeyhq/components/src/layouts/Navigation/Header';
-import uiDeviceUtils from '@onekeyhq/kit/src/utils/uiDeviceUtils';
+import {
+  EHardwareUiStateAction,
+  useHardwareUiStateAtom,
+} from '@onekeyhq/kit-bg/src/states/jotai/atoms';
+import {
+  EAppEventBusNames,
+  appEventBus,
+} from '@onekeyhq/shared/src/eventBus/appEventBus';
 import { ETranslations } from '@onekeyhq/shared/src/locale';
 import type {
   EModalReceiveRoutes,
@@ -57,7 +64,7 @@ function ReceiveToken() {
       })
     : deriveInfo?.label ?? '';
 
-  const { account, network, wallet } = useAccountData({
+  const { account, network, wallet, vaultSettings } = useAccountData({
     accountId,
     networkId,
     walletId,
@@ -66,6 +73,8 @@ function ReceiveToken() {
   const [addressState, setAddressState] = useState<EAddressState>(
     EAddressState.Unverified,
   );
+
+  const [hardwareUiState] = useHardwareUiStateAtom();
 
   const { copyText } = useClipboard();
 
@@ -77,15 +86,53 @@ function ReceiveToken() {
       walletId,
     });
 
-  const isShowAddress =
-    !isDeviceWallet ||
-    addressState === EAddressState.ForceShow ||
-    addressState === EAddressState.Verified;
+  const shouldShowAddress = useMemo(() => {
+    if (!isDeviceWallet) {
+      return true;
+    }
 
-  const isShowQRCode =
-    !isDeviceWallet ||
-    addressState === EAddressState.ForceShow ||
-    addressState === EAddressState.Verified;
+    if (
+      addressState === EAddressState.ForceShow ||
+      addressState === EAddressState.Verified
+    ) {
+      return true;
+    }
+
+    if (
+      addressState === EAddressState.Verifying &&
+      hardwareUiState?.action === EHardwareUiStateAction.REQUEST_BUTTON
+    ) {
+      return true;
+    }
+
+    return false;
+  }, [addressState, hardwareUiState?.action, isDeviceWallet]);
+
+  const shouldHighLightAddress = useMemo(() => {
+    if (
+      addressState === EAddressState.Verifying &&
+      hardwareUiState?.action === EHardwareUiStateAction.REQUEST_BUTTON
+    ) {
+      return true;
+    }
+  }, [addressState, hardwareUiState?.action]);
+
+  const isShowQRCode = useMemo(() => {
+    if (!isDeviceWallet) {
+      return true;
+    }
+
+    if (
+      addressState === EAddressState.ForceShow ||
+      addressState === EAddressState.Verified
+    ) {
+      return true;
+    }
+
+    return false;
+  }, [addressState, isDeviceWallet]);
+
+  const isVerifying = addressState === EAddressState.Verifying;
 
   const handleVerifyOnDevicePress = useCallback(async () => {
     setAddressState(EAddressState.Verifying);
@@ -115,8 +162,9 @@ function ReceiveToken() {
         isSameAddress ? EAddressState.Verified : EAddressState.Unverified,
       );
     } catch (e: any) {
-      uiDeviceUtils.showErrorToast(e);
       setAddressState(EAddressState.Unverified);
+      // verifyHWAccountAddresses handler error toast
+      throw e;
     }
   }, [
     account?.address,
@@ -126,6 +174,20 @@ function ReceiveToken() {
     networkId,
     walletId,
   ]);
+
+  useEffect(() => {
+    const callback = () => setAddressState(EAddressState.Unverified);
+    appEventBus.on(
+      EAppEventBusNames.CloseHardwareUiStateDialogManually,
+      callback,
+    );
+    return () => {
+      appEventBus.off(
+        EAppEventBusNames.CloseHardwareUiStateDialogManually,
+        callback,
+      );
+    };
+  }, []);
 
   const headerRight = () => {
     const isForceShowAction = addressState !== EAddressState.ForceShow;
@@ -156,6 +218,58 @@ function ReceiveToken() {
     );
   };
 
+  const renderCopyAddressButton = useCallback(() => {
+    if (isDeviceWallet) {
+      if (
+        addressState === EAddressState.Verified ||
+        addressState === EAddressState.ForceShow ||
+        isVerifying
+      ) {
+        return (
+          <Button
+            mt="$5"
+            icon="Copy1Outline"
+            disabled={isVerifying}
+            loading={isVerifying}
+            onPress={() => copyText(account?.address ?? '')}
+          >
+            {intl.formatMessage({
+              id: ETranslations.global_copy_address,
+            })}
+          </Button>
+        );
+      }
+
+      return (
+        <Button mt="$5" variant="primary" onPress={handleVerifyOnDevicePress}>
+          {intl.formatMessage({
+            id: ETranslations.global_verify_on_device,
+          })}
+        </Button>
+      );
+    }
+
+    return (
+      <Button
+        mt="$5"
+        icon="Copy1Outline"
+        onPress={() => copyText(account?.address ?? '')}
+      >
+        {intl.formatMessage({
+          id: ETranslations.global_copy_address,
+        })}
+      </Button>
+    );
+  }, [
+    account?.address,
+    addressState,
+    copyText,
+    handleVerifyOnDevicePress,
+    intl,
+    isDeviceWallet,
+    isVerifying,
+  ]);
+
   const renderReceiveToken = useCallback(() => {
     if (!account || !network || !wallet) return null;
 
@@ -164,7 +278,9 @@ function ReceiveToken() {
         <Stack mb="$5">
           <XStack space="$2" alignItems="center" justifyContent="center">
             <Heading size="$headingMd">{network.name}</Heading>
-            {addressType ? <Badge>{addressType}</Badge> : null}
+            {vaultSettings?.showAddressType && addressType ? (
+              <Badge>{addressType}</Badge>
+            ) : null}
           </XStack>
           <SizableText
             mt="$1"
@@ -226,7 +342,7 @@ function ReceiveToken() {
         </Stack>
         <ConfirmHighlighter
           maxWidth="$96"
-          highlight={addressState === EAddressState.Verifying}
+          highlight={shouldHighLightAddress}
           mt="$5"
           px="$3"
           borderRadius="$3"
@@ -242,7 +358,7 @@ function ReceiveToken() {
             {account.address}
           </SizableText>
 
-          {!isShowAddress ? (
+          {!shouldShowAddress ? (
             <BlurView
               // Setting both inner and outer borderRadius is for the compatibility of Web and Native styles.
               borderRadius="$3"
@@ -261,7 +377,7 @@ function ReceiveToken() {
             />
           ) : null}
         </ConfirmHighlighter>
-        {isShowAddress && addressState === EAddressState.ForceShow ? (
+        {shouldShowAddress && addressState === EAddressState.ForceShow ? (
           <XStack mt="$1" justifyContent="center" alignItems="center">
             <Icon name="InfoCircleOutline" size="$4" color="$iconCritical" />
             <SizableText size="$bodyMd" color="$textCritical" pl="$1.5">
@@ -271,42 +387,22 @@ function ReceiveToken() {
             </SizableText>
           </XStack>
         ) : null}
-        {isDeviceWallet &&
-        (addressState === EAddressState.Unverified ||
-          addressState === EAddressState.Verifying) ? (
-          <Button mt="$5" variant="primary" onPress={handleVerifyOnDevicePress}>
-            {intl.formatMessage({
-              id: ETranslations.global_verify_on_device,
-            })}
-          </Button>
-        ) : (
-          <Button
-            mt="$5"
-            icon="Copy1Outline"
-            onPress={() => copyText(account.address)}
-          >
-            {intl.formatMessage({
-              id: ETranslations.global_copy_address,
-            })}
-          </Button>
-        )}
+        {renderCopyAddressButton()}
       </>
     );
   }, [
     account,
-    addressState,
-    addressType,
-    copyText,
-    handleVerifyOnDevicePress,
-    intl,
-    isDeviceWallet,
-    isShowAddress,
-    isShowQRCode,
     network,
     wallet,
+    vaultSettings?.showAddressType,
+    addressType,
+    intl,
+    isShowQRCode,
+    shouldHighLightAddress,
+    shouldShowAddress,
+    addressState,
+    renderCopyAddressButton,
   ]);
-
-  useEffect(() => {}, [account?.indexedAccountId]);
 
   return (
     <Page>

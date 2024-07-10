@@ -46,6 +46,10 @@ export enum EAppEventBusNames {
   SwitchMarketHomeTab = 'SwitchMarketHomeTab',
   ClearLocalHistoryPendingTxs = 'ClearLocalHistoryPendingTxs',
   TxFeeInfoChanged = 'TxFeeInfoChanged',
+  SendConfirmContainerMounted = 'SendConfirmContainerMounted',
+  CloseHardwareUiStateDialogManually = 'CloseHardwareUiStateDialogManually',
+  HistoryTxStatusChanged = 'HistoryTxStatusChanged',
+  EstimateTxFeeRetry = 'estimateTxFeeRetry',
   // AccountNameChanged = 'AccountNameChanged',
   // CurrencyChanged = 'CurrencyChanged',
   // BackupRequired = 'BackupRequired',
@@ -93,6 +97,7 @@ export interface IAppEventBusPayload {
     title: string;
     message?: string;
     duration?: number;
+    errorCode?: number;
   };
   [EAppEventBusNames.ShowQrcode]: {
     title?: string;
@@ -122,6 +127,10 @@ export interface IAppEventBusPayload {
   [EAppEventBusNames.TxFeeInfoChanged]: {
     feeSelectorItems: IFeeSelectorItem[];
   };
+  [EAppEventBusNames.SendConfirmContainerMounted]: undefined;
+  [EAppEventBusNames.CloseHardwareUiStateDialogManually]: undefined;
+  [EAppEventBusNames.HistoryTxStatusChanged]: undefined;
+  [EAppEventBusNames.EstimateTxFeeRetry]: undefined;
 }
 
 export enum EEventBusBroadcastMethodNames {

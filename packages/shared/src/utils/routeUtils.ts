@@ -58,7 +58,11 @@ export const buildAllowList = (screens: IScreenPathConfig) => {
       const screen = screenConfig[screenName];
       if (platformEnv.isDev) {
         if (!screen) {
-          throw new Error(`screen ${screenName} not found`);
+          try {
+            throw new Error(`screen ${screenName} not found`);
+          } catch (error) {
+            console.error(error);
+          }
         }
       }
       if (!screen) {
@@ -137,9 +141,6 @@ export const buildAllowList = (screens: IScreenPathConfig) => {
 
   if (platformEnv.isDev) {
     Object.values(EGalleryRoutes).forEach((pageName) => {
-      console.log(
-        pagePath`${ERootRoutes.Main}${ETabRoutes.Developer}${pageName}`,
-      );
       rules[pagePath`${ERootRoutes.Main}${ETabRoutes.Developer}${pageName}`] = {
         showUrl: true,
         showParams: true,

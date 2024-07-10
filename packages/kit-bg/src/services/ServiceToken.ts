@@ -18,7 +18,6 @@ import type {
   IFetchTokenDetailParams,
   IToken,
   ITokenData,
-  ITokenFiat,
 } from '@onekeyhq/shared/types/token';
 
 import { vaultFactory } from '../vaults/factory';
@@ -46,7 +45,7 @@ class ServiceToken extends ServiceBase {
   public async fetchAccountTokens(
     params: IFetchAccountTokensParams & { mergeTokens?: boolean },
   ): Promise<IFetchAccountTokensResp> {
-    const { mergeTokens, flag, ...rest } = params;
+    const { mergeTokens, flag, accountId, ...rest } = params;
     const { networkId, contractList = [] } = rest;
     if (
       [getNetworkIdsMap().eth, getNetworkIdsMap().sepolia].includes(networkId)
@@ -56,21 +55,34 @@ class ServiceToken extends ServiceBase {
         networkId === getNetworkIdsMap().eth ? EthereumMatic : SepoliaMatic;
       rest.contractList = ['', maticAddress, ...contractList];
     }
-    const vault = await vaultFactory.getChainOnlyVault({
-      networkId: rest.networkId,
-    });
-    const { normalizedAddress } = await vault.validateAddress(
-      rest.accountAddress,
-    );
-    rest.accountAddress = normalizedAddress;
+
+    const [xpub, accountAddress] = await Promise.all([
+      this.backgroundApi.serviceAccount.getAccountXpub({
+        accountId,
+        networkId,
+      }),
+      this.backgroundApi.serviceAccount.getAccountAddressForApi({
+        accountId,
+        networkId,
+      }),
+    ]);
+
     const client = await this.getClient(EServiceEndpointEnum.Wallet);
     const controller = new AbortController();
     this._fetchAccountTokensController = controller;
     const resp = await client.post<{ data: IFetchAccountTokensResp }>(
       `/wallet/v1/account/token/list?flag=${flag || ''}`,
-      rest,
+      {
+        ...rest,
+        accountAddress,
+        xpub,
+      },
       {
         signal: controller.signal,
+        headers:
+          await this.backgroundApi.serviceAccountProfile._getWalletTypeHeader({
+            accountId,
+          }),
       },
     );
     this._fetchAccountTokensController = null;
@@ -93,13 +105,52 @@ class ServiceToken extends ServiceBase {
   public async fetchTokensDetails(
     params: IFetchTokenDetailParams,
   ): Promise<IFetchTokenDetailItem[]> {
+    const {
+      accountId,
+      networkId,
+      contractList,
+      withCheckInscription,
+      withFrozenBalance,
+    } = params;
+
+    const [accountAddress, xpub] = await Promise.all([
+      this.backgroundApi.serviceAccount.getAccountAddressForApi({
+        accountId,
+        networkId,
+      }),
+      this.backgroundApi.serviceAccount.getAccountXpub({
+        accountId,
+        networkId,
+      }),
+    ]);
+
     const client = await this.getClient(EServiceEndpointEnum.Wallet);
     const resp = await client.post<{ data: IFetchTokenDetailItem[] }>(
       '/wallet/v1/account/token/search',
-      params,
+      {
+        networkId,
+        accountAddress,
+        xpub,
+        contractList,
+        withCheckInscription,
+        withFrozenBalance,
+      },
+      {
+        headers:
+          await this.backgroundApi.serviceAccountProfile._getWalletTypeHeader({
+            accountId,
+          }),
+      },
     );
 
-    return resp.data.data;
+    const vault = await vaultFactory.getVault({
+      accountId,
+      networkId,
+    });
+
+    return vault.fillTokensDetails({
+      tokensDetails: resp.data.data,
+    });
   }
 
   @backgroundMethod()
@@ -137,12 +188,12 @@ class ServiceToken extends ServiceBase {
 
   @backgroundMethod()
   public async getNativeToken({
+    accountId,
     networkId,
-    accountAddress,
     tokenIdOnNetwork,
   }: {
     networkId: string;
-    accountAddress?: string;
+    accountId: string;
     tokenIdOnNetwork?: string;
   }) {
     let tokenAddress = tokenIdOnNetwork;
@@ -151,19 +202,19 @@ class ServiceToken extends ServiceBase {
     }
 
     return this.getToken({
+      accountId,
       networkId,
       tokenIdOnNetwork: tokenAddress ?? '',
-      accountAddress,
     });
   }
 
   @backgroundMethod()
   public async getToken(params: {
+    accountId: string;
     networkId: string;
     tokenIdOnNetwork: string;
-    accountAddress?: string;
   }) {
-    const { networkId, tokenIdOnNetwork, accountAddress } = params;
+    const { accountId, networkId, tokenIdOnNetwork } = params;
 
     const localToken = await this.backgroundApi.simpleDb.localTokens.getToken({
       networkId,
@@ -174,8 +225,8 @@ class ServiceToken extends ServiceBase {
 
     try {
       const tokensDetails = await this.fetchTokensDetails({
+        accountId,
         networkId,
-        accountAddress,
         contractList: [tokenIdOnNetwork],
       });
 
@@ -191,7 +242,7 @@ class ServiceToken extends ServiceBase {
       console.log('fetchTokensDetails ERROR:', error);
     }
 
-    throw new Error('getToken ERROR: token not found.');
+    return null;
   }
 
   @backgroundMethod()

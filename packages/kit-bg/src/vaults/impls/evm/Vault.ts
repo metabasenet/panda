@@ -1,7 +1,6 @@
-import { IEndExpectation } from '@aivenio/tsc-output-parser';
 import { defaultAbiCoder } from '@ethersproject/abi';
 import BigNumber from 'bignumber.js';
-import { isEmpty, isNil } from 'lodash';
+import { isEmpty, isNil, isNumber } from 'lodash';
 
 import { validateEvmAddress } from '@onekeyhq/core/src/chains/evm/sdkEvm';
 import {
@@ -12,7 +11,7 @@ import type { IEncodedTxEvm } from '@onekeyhq/core/src/chains/evm/types';
 import coreChainApi from '@onekeyhq/core/src/instance/coreChainApi';
 import type { IUnsignedTxPro } from '@onekeyhq/core/src/types';
 import { getNetworkIdsMap } from '@onekeyhq/shared/src/config/networkIds';
-import { OneKeyInternalError } from '@onekeyhq/shared/src/errors';
+import { OneKeyError, OneKeyInternalError } from '@onekeyhq/shared/src/errors';
 import chainValueUtils from '@onekeyhq/shared/src/utils/chainValueUtils';
 import numberUtils, {
   toBigIntHex,
@@ -38,6 +37,7 @@ import type {
 import {
   EDecodedTxActionType,
   EDecodedTxStatus,
+  EReplaceTxType,
 } from '@onekeyhq/shared/types/tx';
 
 import { VaultBase } from '../../base/VaultBase';
@@ -217,9 +217,10 @@ export default class Vault extends VaultBase {
     let extraNativeTransferAction: IDecodedTxAction | undefined;
 
     if (swapInfo) {
-      action = await this._buildTxActionFromSwap({
-        encodedTx,
+      action = await this.buildInternalSwapAction({
         swapInfo,
+        swapData: encodedTx.data,
+        swapToAddress: encodedTx.to,
       });
     } else {
       if (encodedTx.value) {
@@ -575,6 +576,8 @@ export default class Vault extends VaultBase {
       encodedTxWithFee.gasPrice = toBigIntHex(
         new BigNumber(feeInfo.gas.gasPrice).shiftedBy(feeDecimals),
       );
+      delete encodedTxWithFee.maxFeePerGas;
+      delete encodedTxWithFee.maxPriorityFeePerGas;
     }
     return Promise.resolve(encodedTxWithFee);
   }
@@ -669,12 +672,11 @@ export default class Vault extends VaultBase {
     txDesc: ethers.utils.TransactionDescription;
   }) {
     const { encodedTx, txDesc } = params;
-    const accountAddress = await this.getAccountAddress();
 
     const token = await this.backgroundApi.serviceToken.getToken({
+      accountId: this.accountId,
       networkId: this.networkId,
       tokenIdOnNetwork: encodedTx.to,
-      accountAddress,
     });
 
     if (!token) return;
@@ -742,7 +744,7 @@ export default class Vault extends VaultBase {
 
     const action = await this.buildTxTransferAssetAction({
       from: encodedTx.from,
-      to: encodedTx.to,
+      to: recipient,
       transfers: [transfer],
     });
 
@@ -764,7 +766,8 @@ export default class Vault extends VaultBase {
       type: EDecodedTxActionType.TOKEN_APPROVE,
       tokenApprove: {
         from: encodedTx.from ?? accountAddress,
-        to: spender,
+        to: encodedTx.to,
+        spender,
         amount,
         icon: token.logoURI ?? '',
         name: token.name,
@@ -777,40 +780,14 @@ export default class Vault extends VaultBase {
     return action;
   }
 
-  async _buildTxActionFromSwap(params: {
-    encodedTx: IEncodedTxEvm;
-    swapInfo: ISwapTxInfo;
-  }) {
-    const { encodedTx, swapInfo } = params;
-    const swapSendToken = swapInfo.sender.token;
-    const action = await this.buildTxTransferAssetAction({
-      from: swapInfo.accountAddress,
-      to: encodedTx.to,
-      transfers: [
-        {
-          from: swapInfo.accountAddress,
-          to: encodedTx.to,
-          tokenIdOnNetwork: swapSendToken.contractAddress,
-          icon: swapSendToken.logoURI ?? '',
-          name: swapSendToken.name ?? '',
-          symbol: swapSendToken.symbol,
-          amount: swapInfo.sender.amount,
-          isNFT: false,
-          isNative: swapSendToken.isNative,
-        },
-      ],
-    });
-    return action;
-  }
-
   async _buildTxTransferNativeTokenAction(params: {
     encodedTx: IEncodedTxEvm;
   }) {
     const { encodedTx } = params;
     const accountAddress = await this.getAccountAddress();
     const nativeToken = await this.backgroundApi.serviceToken.getToken({
+      accountId: this.accountId,
       networkId: this.networkId,
-      accountAddress,
       tokenIdOnNetwork: '',
     });
 
@@ -856,6 +833,7 @@ export default class Vault extends VaultBase {
       txDesc?.args.map((arg) => String(arg)) || [];
 
     const nft = await this.backgroundApi.serviceNFT.getNFT({
+      accountId: this.accountId,
       networkId: this.networkId,
       collectionAddress: encodedTx.to,
       nftId,
@@ -884,7 +862,7 @@ export default class Vault extends VaultBase {
 
     return this.buildTxTransferAssetAction({
       from: encodedTx.from ?? accountAddress,
-      to: encodedTx.to,
+      to,
       transfers: [transfer],
     });
   }
@@ -932,5 +910,96 @@ export default class Vault extends VaultBase {
         value: transferValue,
       },
     });
+  }
+
+  override async isEarliestLocalPendingTx({
+    encodedTx,
+  }: {
+    encodedTx: IEncodedTxEvm;
+  }): Promise<boolean> {
+    const accountAddress = await this.getAccountAddress();
+    const minPendingTxNonce =
+      await this.backgroundApi.serviceHistory.getLocalHistoryMinPendingNonce({
+        networkId: this.networkId,
+        accountAddress,
+      });
+
+    return new BigNumber(encodedTx.nonce ?? 0).isEqualTo(
+      minPendingTxNonce ?? 0,
+    );
+  }
+
+  override async buildReplaceEncodedTx({
+    decodedTx,
+    replaceType,
+  }: {
+    decodedTx: IDecodedTx;
+    replaceType: EReplaceTxType;
+  }) {
+    let encodedTxOrigin: IEncodedTxEvm | undefined;
+    const { encodedTxEncrypted, nonce } = decodedTx;
+    const encodedTx = decodedTx.encodedTx as IEncodedTxEvm;
+    if (encodedTxEncrypted) {
+      try {
+        encodedTxOrigin = JSON.parse(
+          await this.backgroundApi.servicePassword.decryptByInstanceId(
+            encodedTxEncrypted,
+          ),
+        );
+      } catch (error) {
+        console.error(error);
+        encodedTxOrigin = {
+          from: '-',
+          to: '-',
+          value: '-',
+          data: '-',
+        };
+      }
+    }
+
+    if (isNil(nonce) || !isNumber(nonce) || nonce < 0) {
+      throw new OneKeyError('speedUpOrCancelTx ERROR: nonce is missing!');
+    }
+
+    // set only fields of IEncodedTxEvm
+    const encodedTxEvm: IEncodedTxEvm = {
+      from: encodedTx.from,
+      to: encodedTx.to,
+      value: encodedTx.value,
+      data: encodedTx.data,
+      // must be number, 0x string will send new tx
+      nonce,
+
+      // keep origin fee info
+      gas: encodedTx.gas,
+      gasLimit: encodedTx.gasLimit,
+      gasPrice: encodedTx.gasPrice,
+      maxFeePerGas: encodedTx.maxFeePerGas,
+      maxPriorityFeePerGas: encodedTx.maxPriorityFeePerGas,
+    };
+
+    if (replaceType === EReplaceTxType.Cancel) {
+      encodedTxEvm.to = encodedTxEvm.from;
+      encodedTxEvm.value = '0x0';
+      encodedTxEvm.data = '0x';
+    }
+    if (replaceType === EReplaceTxType.SpeedUp) {
+      if (
+        encodedTxOrigin &&
+        (encodedTxOrigin.from !== encodedTxEvm.from ||
+          encodedTxOrigin.to !== encodedTxEvm.to ||
+          encodedTxOrigin.value !== encodedTxEvm.value ||
+          encodedTxOrigin.data !== encodedTxEvm.data ||
+          !new BigNumber(encodedTxEvm.nonce || '0').eq(
+            encodedTxOrigin.nonce || '0',
+          ))
+      ) {
+        throw new OneKeyError(
+          'Speedup failed. History transaction data not matched',
+        );
+      }
+    }
+
+    return encodedTxEvm;
   }
 }

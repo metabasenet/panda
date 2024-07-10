@@ -4,18 +4,18 @@ import { useIntl } from 'react-intl';
 
 import { Page, SizableText, Stack, XStack } from '@onekeyhq/components';
 import backgroundApiProxy from '@onekeyhq/kit/src/background/instance/backgroundApiProxy';
-import { AccountSelectorProviderMirror } from '@onekeyhq/kit/src/components/AccountSelector';
 import { DeriveTypeSelectorTriggerStandAlone } from '@onekeyhq/kit/src/components/AccountSelector/DeriveTypeSelectorTrigger';
 import { ListItem } from '@onekeyhq/kit/src/components/ListItem';
 import { usePromiseResult } from '@onekeyhq/kit/src/hooks/usePromiseResult';
 import { ETranslations } from '@onekeyhq/shared/src/locale';
-import { EAccountSelectorSceneName } from '@onekeyhq/shared/types';
 
 type IAccountDerivationListItemProps = {
   title: string;
   icon?: string;
   networkId: string;
 };
+
+const offset = { mainAxis: -4, crossAxis: -10 };
 
 const AccountDerivationListItem: FC<IAccountDerivationListItemProps> = ({
   title,
@@ -24,10 +24,14 @@ const AccountDerivationListItem: FC<IAccountDerivationListItemProps> = ({
 }) => (
   <DeriveTypeSelectorTriggerStandAlone
     networkId={networkId}
-    miniMode
     placement="bottom-end"
+    offset={offset}
     renderTrigger={({ label }) => (
-      <ListItem title={title} avatarProps={{ src: icon }}>
+      <ListItem
+        userSelect="none"
+        title={title}
+        avatarProps={{ src: icon, size: '$8' }}
+      >
         <XStack>
           <SizableText mr="$3">{label}</SizableText>
           <ListItem.DrillIn name="ChevronDownSmallSolid" />
@@ -39,7 +43,7 @@ const AccountDerivationListItem: FC<IAccountDerivationListItemProps> = ({
 
 const AccountDerivation = () => {
   const {
-    result: { enabledNum, availableNetworksMap, items },
+    result: { items },
     isLoading,
   } = usePromiseResult(
     () => backgroundApiProxy.serviceSetting.getAccountDerivationConfig(),
@@ -65,26 +69,16 @@ const AccountDerivation = () => {
         </SizableText>
       </Stack>
       {!isLoading ? (
-        <AccountSelectorProviderMirror
-          enabledNum={enabledNum}
-          config={{
-            // TODO remove
-            sceneName: EAccountSelectorSceneName.settings,
-            sceneUrl: '',
-          }}
-          availableNetworksMap={availableNetworksMap}
-        >
-          <Stack>
-            {items.map((o) => (
-              <AccountDerivationListItem
-                key={o.icon}
-                title={o.title}
-                icon={o.icon}
-                networkId={o.defaultNetworkId}
-              />
-            ))}
-          </Stack>
-        </AccountSelectorProviderMirror>
+        <Stack>
+          {items.map((o) => (
+            <AccountDerivationListItem
+              key={o.icon}
+              title={o.title}
+              icon={o.icon}
+              networkId={o.defaultNetworkId}
+            />
+          ))}
+        </Stack>
       ) : null}
     </Page>
   );

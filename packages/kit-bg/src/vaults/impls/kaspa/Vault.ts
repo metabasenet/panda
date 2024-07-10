@@ -35,8 +35,11 @@ import type {
   IXprvtValidation,
   IXpubValidation,
 } from '@onekeyhq/shared/types/address';
-import { EOnChainHistoryTxType } from '@onekeyhq/shared/types/history';
-import { EDecodedTxStatus, type IDecodedTx } from '@onekeyhq/shared/types/tx';
+import {
+  EDecodedTxActionType,
+  EDecodedTxStatus,
+} from '@onekeyhq/shared/types/tx';
+import type { IDecodedTx, IDecodedTxAction } from '@onekeyhq/shared/types/tx';
 
 import { VaultBase } from '../../base/VaultBase';
 
@@ -142,41 +145,10 @@ export default class Vault extends VaultBase {
     const account = await this.getAccount();
 
     const nativeToken = await this.backgroundApi.serviceToken.getToken({
+      accountId: this.accountId,
       networkId: this.networkId,
       tokenIdOnNetwork: '',
-      accountAddress: account.address,
     });
-
-    if (!nativeToken) {
-      throw new OneKeyInternalError('Native token not found');
-    }
-
-    const sends = [];
-    for (const output of outputs) {
-      sends.push({
-        from: account.address,
-        to: output.address,
-        isNative: true,
-        tokenIdOnNetwork: '',
-        name: nativeToken.name,
-        icon: nativeToken.logoURI ?? '',
-        amount: new BigNumber(output.value)
-          .shiftedBy(-network.decimals)
-          .toFixed(),
-        amountValue: output.value,
-        symbol: network.symbol,
-      });
-    }
-
-    // const utxoFrom = inputs.map((input) => ({
-    //   address: input.address.toString(),
-    //   balance: new BigNumber(input.satoshis.toString())
-    //     .shiftedBy(-network.decimals)
-    //     .toFixed(),
-    //   balanceValue: input.satoshis?.toString() ?? '0',
-    //   symbol: network.symbol,
-    //   isMine: true,
-    // }));
 
     const utxoTo = outputs.map((output) => ({
       address: output.address,
@@ -188,22 +160,50 @@ export default class Vault extends VaultBase {
       isMine: false, // output.address === dbAccount.address,
     }));
 
-    const transfer = {
-      from: account.address,
-      to: utxoTo[0].address,
-      amount: new BigNumber(utxoTo[0].balance).toFixed(),
-      tokenIdOnNetwork: nativeToken.address,
-      icon: nativeToken.logoURI ?? '',
-      name: nativeToken.name,
-      symbol: nativeToken.symbol,
-      isNFT: false,
-      isNative: true,
+    let action: IDecodedTxAction = {
+      type: EDecodedTxActionType.UNKNOWN,
+      unknownAction: {
+        from: account.address,
+        to: utxoTo[0].address,
+      },
     };
-    const action = await this.buildTxTransferAssetAction({
-      from: account.address,
-      to: utxoTo[0].address,
-      transfers: [transfer],
-    });
+
+    if (nativeToken) {
+      const sends = [];
+      for (const output of outputs) {
+        sends.push({
+          from: account.address,
+          to: output.address,
+          isNative: true,
+          tokenIdOnNetwork: '',
+          name: nativeToken.name,
+          icon: nativeToken.logoURI ?? '',
+          amount: new BigNumber(output.value)
+            .shiftedBy(-network.decimals)
+            .toFixed(),
+          amountValue: output.value,
+          symbol: network.symbol,
+        });
+      }
+
+      const transfer = {
+        from: account.address,
+        to: utxoTo[0].address,
+        amount: new BigNumber(utxoTo[0].balance).toFixed(),
+        tokenIdOnNetwork: nativeToken.address,
+        icon: nativeToken.logoURI ?? '',
+        name: nativeToken.name,
+        symbol: nativeToken.symbol,
+        isNFT: false,
+        isNative: true,
+      };
+      action = await this.buildTxTransferAssetAction({
+        from: account.address,
+        to: utxoTo[0].address,
+        transfers: [transfer],
+      });
+    }
+
     return {
       txid: '',
       owner: account.address,
@@ -340,12 +340,11 @@ export default class Vault extends VaultBase {
 
   _collectUTXOsInfoByApi = memoizee(
     async (params: { address: string }): Promise<IKaspaUnspentOutputInfo[]> => {
-      const { address } = params;
       try {
         const { utxoList: utxos } =
           await this.backgroundApi.serviceAccountProfile.fetchAccountDetails({
             networkId: this.networkId,
-            accountAddress: address,
+            accountId: this.accountId,
             withUTXOList: true,
           });
         if (!utxos || isEmpty(utxos)) {

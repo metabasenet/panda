@@ -116,16 +116,6 @@ const SwapProviderListItem = ({
 
   const leftMainLabel = useMemo(() => {
     if (disabled) {
-      if (providerResult?.errorMessage === 'Token not supported') {
-        return intl.formatMessage({
-          id: ETranslations.provider_token_not_supported,
-        });
-      }
-      if (providerResult?.errorMessage === 'Insufficient input amount') {
-        return intl.formatMessage({
-          id: ETranslations.provider_amount_required,
-        });
-      }
       return (
         providerResult?.errorMessage ||
         intl.formatMessage({
@@ -221,14 +211,14 @@ const SwapProviderListItem = ({
     const routesData = providerResult.routesData;
     if (providerResult.info.provider === 'swap_swft') {
       return (
-        <SizableText size="$bodySm" color="$textSubdued">
+        <SizableText size="$bodySm" color="$textSubdued" mt="$3.5">
           {intl.formatMessage({ id: ETranslations.provider_route_swft })}
         </SizableText>
       );
     }
     if (!routesData?.[0]?.subRoutes?.[0]?.length) {
       return (
-        <SizableText size="$bodySm" color="$textSubdued">
+        <SizableText size="$bodySm" color="$textSubdued" mt="$3.5">
           {intl.formatMessage({
             id: ETranslations.provider_route_no_information,
           })}

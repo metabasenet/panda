@@ -351,7 +351,7 @@ export function AddressInput(props: IAddressInputProps) {
       clearErrors(name);
       onChange?.({
         raw: queryResult.input,
-        resolved: queryResult.resolveAddress ?? queryResult.input,
+        resolved: queryResult.resolveAddress ?? queryResult.input?.trim(),
         pending: false,
       });
     } else {
@@ -407,6 +407,7 @@ export function AddressInput(props: IAddressInputProps) {
             <SelectorPlugin
               onChange={onChangeText}
               networkId={networkId}
+              accountId={accountId}
               num={accountSelector?.num}
               currentAddress={inputText}
               onBeforeAccountSelectorOpen={
@@ -428,6 +429,7 @@ export function AddressInput(props: IAddressInputProps) {
       queryResult,
       setResolveAddress,
       networkId,
+      accountId,
       rest.testID,
       onRefresh,
       inputText,

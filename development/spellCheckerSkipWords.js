@@ -19,6 +19,7 @@ module.exports = [
   'impls',
   'txids',
   'ord',
+  'exe',
   'Merkle',
   'cond',
   'dont',
@@ -32,6 +33,7 @@ module.exports = [
   'derivetype',
   'xfp',
   'Markt',
+  'splitter',
   'lottie',
   'sys',
   'usb',
@@ -730,4 +732,5 @@ module.exports = [
   'sepolia',
   'watchlist',
   'usdt',
+  'babylon',
 ];

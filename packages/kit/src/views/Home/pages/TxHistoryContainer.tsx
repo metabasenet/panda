@@ -50,6 +50,24 @@ function TxHistoryListContainer(props: ITabPageProps) {
   const handleHistoryItemPress = useCallback(
     async (history: IAccountHistoryTx) => {
       if (!account || !network) return;
+
+      if (
+        history.decodedTx.status === EDecodedTxStatus.Pending &&
+        history.isLocalCreated
+      ) {
+        const localTx =
+          await backgroundApiProxy.serviceHistory.getLocalHistoryTxById({
+            accountId: account.id,
+            networkId: network.id,
+            historyId: history.id,
+          });
+
+        // tx has been replaced by another tx
+        if (!localTx || localTx.replacedNextId) {
+          return;
+        }
+      }
+
       navigation.pushModal(EModalRoutes.MainModal, {
         screen: EModalAssetDetailRoutes.HistoryDetails,
         params: {
@@ -74,22 +92,9 @@ function TxHistoryListContainer(props: ITabPageProps) {
   const { run } = usePromiseResult(
     async () => {
       if (!account || !network) return;
-      const [xpub, vaultSettings] = await Promise.all([
-        backgroundApiProxy.serviceAccount.getAccountXpub({
-          accountId: account.id,
-          networkId: network.id,
-        }),
-        backgroundApiProxy.serviceNetwork.getVaultSettings({
-          networkId: network.id,
-        }),
-      ]);
       const r = await backgroundApiProxy.serviceHistory.fetchAccountHistory({
         accountId: account.id,
         networkId: network.id,
-        accountAddress: account.address,
-        xpub,
-        onChainHistoryDisabled: vaultSettings.onChainHistoryDisabled,
-        saveConfirmedTxsEnabled: vaultSettings.saveConfirmedTxsEnabled,
       });
       setHistoryState({
         initialized: true,
@@ -123,16 +128,29 @@ function TxHistoryListContainer(props: ITabPageProps) {
   }, [isHeaderRefreshing, run]);
 
   useEffect(() => {
-    const callback = () => {
+    const clearCallback = () =>
       setHistoryData((prev) =>
         prev.filter((tx) => tx.decodedTx.status !== EDecodedTxStatus.Pending),
       );
-    };
-    appEventBus.on(EAppEventBusNames.ClearLocalHistoryPendingTxs, callback);
+    appEventBus.on(
+      EAppEventBusNames.ClearLocalHistoryPendingTxs,
+      clearCallback,
+    );
     return () => {
-      appEventBus.off(EAppEventBusNames.ClearLocalHistoryPendingTxs, callback);
+      appEventBus.off(
+        EAppEventBusNames.ClearLocalHistoryPendingTxs,
+        clearCallback,
+      );
     };
-  }, []);
+  }, [run]);
+
+  useEffect(() => {
+    const reloadCallback = () => run({ alwaysSetState: true });
+    appEventBus.on(EAppEventBusNames.HistoryTxStatusChanged, reloadCallback);
+    return () => {
+      appEventBus.off(EAppEventBusNames.HistoryTxStatusChanged, reloadCallback);
+    };
+  }, [run]);
 
   return (
     <TxHistoryListView

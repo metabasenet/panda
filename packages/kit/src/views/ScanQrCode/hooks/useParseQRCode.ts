@@ -104,7 +104,7 @@ const useParseQRCode = () => {
               const nativeToken =
                 await backgroundApiProxy.serviceToken.getNativeToken({
                   networkId: network.id,
-                  accountAddress: account.address,
+                  accountId: account.id,
                 });
               navigation.pushModal(EModalRoutes.SendModal, {
                 screen: EModalSendRoutes.SendDataInput,
@@ -162,6 +162,8 @@ const useParseQRCode = () => {
               break;
             }
             content = animationFullData;
+            showCopyDialog(content);
+          } else {
             showCopyDialog(content);
           }
         }

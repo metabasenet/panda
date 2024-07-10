@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js';
 import { useIntl } from 'react-intl';
 
 import { NumberSizeableText } from '@onekeyhq/components';
@@ -22,7 +23,8 @@ function getTxActionTokenApproveInfo(props: ITxActionProps) {
   const approveAmount = tokenApprove?.amount ?? '';
   const approveName = tokenApprove?.name ?? '';
   const approveSymbol = tokenApprove?.symbol ?? '';
-  const approveSpender = tokenApprove?.to ?? '';
+  const approveSpender = tokenApprove?.spender ?? '';
+  const approveInteractWith = tokenApprove?.to ?? '';
   const approveOwner = tokenApprove?.from ?? '';
   const approveIsMax = tokenApprove?.isInfiniteAmount ?? false;
 
@@ -35,11 +37,13 @@ function getTxActionTokenApproveInfo(props: ITxActionProps) {
     approveSpender,
     approveOwner,
     approveIsMax,
+    approveInteractWith,
   };
 }
 
 function TxActionTokenApproveListView(props: ITxActionProps) {
-  const { tableLayout, decodedTx, componentProps, showIcon } = props;
+  const { tableLayout, decodedTx, componentProps, showIcon, replaceType } =
+    props;
   const intl = useIntl();
   const { txFee, txFeeFiatValue, txFeeSymbol, hideFeeInfo } =
     useFeeInfoInDecodedTx({
@@ -53,18 +57,35 @@ function TxActionTokenApproveListView(props: ITxActionProps) {
     approveName,
     approveSymbol,
     approveIsMax,
+    approveLabel,
   } = getTxActionTokenApproveInfo(props);
 
-  const title = intl.formatMessage({ id: ETranslations.global_approve });
+  let title = approveLabel;
   const avatar: ITxActionCommonListViewProps['avatar'] = {
     src: approveIcon,
-    fallbackIcon: 'ImageMountainSolid',
   };
   const description = {
     children: accountUtils.shortenAddress({
       address: approveSpender,
     }),
   };
+
+  if (!title) {
+    if (new BigNumber(approveAmount).eq(0)) {
+      title = intl.formatMessage(
+        {
+          id: ETranslations.global_revoke_approve,
+        },
+        {
+          symbol: approveSymbol,
+        },
+      );
+    } else {
+      title = intl.formatMessage({
+        id: ETranslations.global_approve,
+      });
+    }
+  }
 
   const changeDescription = (
     <NumberSizeableText
@@ -98,6 +119,8 @@ function TxActionTokenApproveListView(props: ITxActionProps) {
       timestamp={decodedTx.updatedAt ?? decodedTx.createdAt}
       showIcon={showIcon}
       hideFeeInfo={hideFeeInfo}
+      replaceType={replaceType}
+      status={decodedTx.status}
       {...componentProps}
     />
   );
@@ -114,24 +137,38 @@ function TxActionTokenApproveDetailView(props: ITxActionProps) {
     approveAmount,
     approveSymbol,
     approveIsMax,
+    approveInteractWith,
   } = getTxActionTokenApproveInfo(props);
 
-  const content =
-    approveLabel ||
-    intl.formatMessage(
-      { id: ETranslations.form__approve_str },
-      {
-        amount: approveIsMax
-          ? intl.formatMessage({
-              id: ETranslations.swap_page_provider_approve_amount_un_limit,
-            })
-          : approveAmount,
-        symbol: approveSymbol,
-      },
-    );
+  let content = approveLabel;
+  if (!content) {
+    if (new BigNumber(approveAmount).eq(0)) {
+      content = intl.formatMessage(
+        {
+          id: ETranslations.global_revoke_approve,
+        },
+        {
+          symbol: approveSymbol,
+        },
+      );
+    } else {
+      content = intl.formatMessage(
+        { id: ETranslations.form__approve_str },
+        {
+          amount: approveIsMax
+            ? intl.formatMessage({
+                id: ETranslations.swap_page_provider_approve_amount_un_limit,
+              })
+            : approveAmount,
+          symbol: approveSymbol,
+        },
+      );
+    }
+  }
 
   return (
     <TxActionCommonDetailView
+      networkId={decodedTx.networkId}
       overview={{
         title: intl.formatMessage({ id: ETranslations.content__amount }),
         content,
@@ -140,7 +177,11 @@ function TxActionTokenApproveDetailView(props: ITxActionProps) {
         },
       }}
       target={{
-        content: decodedTx.to ?? approveSpender,
+        title: intl.formatMessage({ id: ETranslations.interact_with_contract }),
+        content: approveInteractWith,
+      }}
+      applyFor={{
+        content: approveSpender,
       }}
       source={{
         content: approveOwner,

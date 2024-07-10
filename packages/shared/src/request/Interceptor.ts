@@ -48,6 +48,8 @@ export async function checkRequestIsOneKeyDomain({
   return isOneKeyDomain;
 }
 
+export const HEADER_REQUEST_ID_KEY = normalizeHeaderKey('X-Onekey-Request-ID');
+
 export async function getRequestHeaders() {
   const settings = await settingsPersistAtom.get();
 
@@ -69,9 +71,10 @@ export async function getRequestHeaders() {
 
   const requestId = generateUUID();
   return {
-    [normalizeHeaderKey('X-Onekey-Request-ID')]: requestId,
+    [HEADER_REQUEST_ID_KEY]: requestId,
     [normalizeHeaderKey('X-Amzn-Trace-Id')]: requestId,
     [normalizeHeaderKey('X-Onekey-Request-Currency')]: settings.currencyInfo.id,
+    [normalizeHeaderKey('X-Onekey-Instance-Id')]: settings.instanceId,
     [normalizeHeaderKey('X-Onekey-Request-Locale')]: locale.toLowerCase(),
     [normalizeHeaderKey('X-Onekey-Request-Theme')]: theme,
     [normalizeHeaderKey('X-Onekey-Request-Platform')]: headerPlatform,

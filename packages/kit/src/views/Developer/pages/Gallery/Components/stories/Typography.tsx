@@ -89,19 +89,18 @@ const TypographyGallery = () => (
         title: 'Rich Text',
         element: (
           <YStack space="$2">
-            <RichSizeableText
-              linkList={{ a: { url: 'https://app.onekey.so' } }}
-            >
+            <RichSizeableText linkList={{ a: { url: 'https://1key.so' } }}>
               {'Hello<a> OneKey </a>World'}
             </RichSizeableText>
             <RichSizeableText
               linkList={{
-                url0: { url: 'https://app.onekey.so', color: 'orange' },
+                url0: { url: 'https://1key.so', color: 'orange' },
                 url1: {
                   url: 'https://google.com',
                   color: 'pink',
                 },
                 url2: {
+                  url: undefined,
                   color: 'green',
                   size: '$heading4xl',
                   onPress: () => {

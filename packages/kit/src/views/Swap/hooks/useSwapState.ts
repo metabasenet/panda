@@ -16,6 +16,7 @@ import {
   ESwapDirectionType,
 } from '@onekeyhq/shared/types/swap/types';
 
+import { useDebounce } from '../../../hooks/useDebounce';
 import {
   useSwapActions,
   useSwapAlertsAtom,
@@ -101,11 +102,39 @@ export function useSwapActionState() {
   const hasError = alerts.some(
     (item) => item.alertLevel === ESwapAlertLevel.ERROR,
   );
+  const quoteResultNoMatch = useMemo(
+    () =>
+      (quoteCurrentSelect &&
+        (quoteCurrentSelect.fromTokenInfo.networkId !== fromToken?.networkId ||
+          quoteCurrentSelect.toTokenInfo.networkId !== toToken?.networkId ||
+          quoteCurrentSelect.fromTokenInfo.contractAddress !==
+            fromToken?.contractAddress ||
+          quoteCurrentSelect.toTokenInfo.contractAddress !==
+            toToken?.contractAddress)) ||
+      (quoteCurrentSelect?.allowanceResult &&
+        quoteCurrentSelect.allowanceResult.amount !== fromTokenAmount),
+    [
+      fromToken?.contractAddress,
+      fromToken?.networkId,
+      fromTokenAmount,
+      quoteCurrentSelect,
+      toToken?.contractAddress,
+      toToken?.networkId,
+    ],
+  );
+  const quoteResultNoMatchDebounce = useDebounce(quoteResultNoMatch, 100);
   const actionInfo = useMemo(() => {
     const infoRes = {
       disable: !(!hasError && !!quoteCurrentSelect),
       label: intl.formatMessage({ id: ETranslations.swap_page_swap_button }),
     };
+    if (
+      !swapFromAddressInfo.address ||
+      !swapToAddressInfo.address ||
+      quoteCurrentSelect?.fromAmount !== fromTokenAmount
+    ) {
+      infoRes.disable = true;
+    }
     if (quoteLoading) {
       infoRes.label = intl.formatMessage({
         id: ETranslations.swap_page_button_fetching_quotes,
@@ -185,7 +214,7 @@ export function useSwapActionState() {
         });
         infoRes.disable = true;
       }
-      if (isRefreshQuote && !quoteLoading) {
+      if (isRefreshQuote || quoteResultNoMatchDebounce) {
         infoRes.label = intl.formatMessage({
           id: ETranslations.swap_page_button_refresh_quotes,
         });
@@ -202,6 +231,7 @@ export function useSwapActionState() {
     isRefreshQuote,
     quoteCurrentSelect,
     quoteLoading,
+    quoteResultNoMatchDebounce,
     selectedFromTokenBalance,
     swapFromAddressInfo.address,
     swapQuoteApproveAllowanceUnLimit,
@@ -219,7 +249,8 @@ export function useSwapActionState() {
     shoutResetApprove:
       !!quoteCurrentSelect?.allowanceResult?.shouldResetApprove,
     isWrapped: !!quoteCurrentSelect?.isWrapped,
-    isRefreshQuote: isRefreshQuote && !quoteLoading,
+    isRefreshQuote:
+      (isRefreshQuote || quoteResultNoMatchDebounce) && !quoteLoading,
   };
   return stepState;
 }

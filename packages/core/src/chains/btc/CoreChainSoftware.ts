@@ -11,11 +11,19 @@ import bitcoinMessage from 'bitcoinjs-message';
 import bs58check from 'bs58check';
 import { encode as VaruintBitCoinEncode } from 'varuint-bitcoin';
 
+import { presetNetworksMap } from '@onekeyhq/shared/src/config/presetNetworks';
 import { IMPL_TBTC } from '@onekeyhq/shared/src/engine/engineConsts';
-import { OneKeyInternalError } from '@onekeyhq/shared/src/errors';
+import {
+  AddressNotSupportSignMethodError,
+  OneKeyInternalError,
+} from '@onekeyhq/shared/src/errors';
 import { checkIsDefined } from '@onekeyhq/shared/src/utils/assertUtils';
 import bufferUtils from '@onekeyhq/shared/src/utils/bufferUtils';
 import type { IServerNetwork } from '@onekeyhq/shared/types';
+import type {
+  IXprvtValidation,
+  IXpubValidation,
+} from '@onekeyhq/shared/types/address';
 import { EMessageTypesBtc } from '@onekeyhq/shared/types/message';
 
 import { CoreChainApiBase } from '../../base/CoreChainApiBase';
@@ -28,26 +36,7 @@ import {
   secp256k1,
   verify,
 } from '../../secret';
-import {
-  EAddressEncodings,
-  ECoreApiExportedSecretKeyType,
-  type ICoreApiGetAddressItem,
-  type ICoreApiGetAddressQueryImportedBtc,
-  type ICoreApiGetAddressQueryPublicKey,
-  type ICoreApiGetAddressesQueryHdBtc,
-  type ICoreApiGetAddressesResult,
-  type ICoreApiGetExportedSecretKey,
-  type ICoreApiPrivateKeysMap,
-  type ICoreApiSignAccount,
-  type ICoreApiSignBasePayload,
-  type ICoreApiSignMsgPayload,
-  type ICoreApiSignTxPayload,
-  type ICurveName,
-  type IEncodedTx,
-  type ISignedTxPro,
-  type ITxInputToSign,
-  type IUnsignedMessageBtc,
-} from '../../types';
+import { EAddressEncodings, ECoreApiExportedSecretKeyType } from '../../types';
 import { slicePathTemplate } from '../../utils';
 
 import {
@@ -58,8 +47,12 @@ import {
   getBtcForkNetwork,
   getBtcXpubFromXprvt,
   getInputsToSignFromPsbt,
+  getPublicKeyFromXpub,
   initBitcoinEcc,
   tweakSigner,
+  validateBtcAddress,
+  validateBtcXprvt,
+  validateBtcXpub,
 } from './sdkBtc';
 import { buildPsbt } from './sdkBtc/providerUtils';
 
@@ -67,6 +60,26 @@ import type { IGetAddressFromXpubResult } from './sdkBtc';
 import type { IBtcForkNetwork, IEncodedTxBtc } from './types';
 import type { ISigner } from '../../base/ChainSigner';
 import type { IBip32ExtendedKey, IBip32KeyDeriver } from '../../secret';
+import type {
+  ICoreApiGetAddressItem,
+  ICoreApiGetAddressQueryImportedBtc,
+  ICoreApiGetAddressQueryPublicKey,
+  ICoreApiGetAddressesQueryHdBtc,
+  ICoreApiGetAddressesResult,
+  ICoreApiGetExportedSecretKey,
+  ICoreApiPrivateKeysMap,
+  ICoreApiSignAccount,
+  ICoreApiSignBasePayload,
+  ICoreApiSignMsgPayload,
+  ICoreApiSignTxPayload,
+  ICoreApiValidateXprvtParams,
+  ICoreApiValidateXpubParams,
+  ICurveName,
+  IEncodedTx,
+  ISignedTxPro,
+  ITxInputToSign,
+  IUnsignedMessageBtc,
+} from '../../types';
 import type { PsbtInput } from 'bip174/src/lib/interfaces';
 import type { Signer, networks } from 'bitcoinjs-lib';
 
@@ -92,9 +105,69 @@ const bip0322Hash = (message: string) => {
 const encodeVarString = (buffer: Buffer) =>
   Buffer.concat([VaruintBitCoinEncode(buffer.byteLength), buffer]);
 
-export default class CoreChainSoftware extends CoreChainApiBase {
+export default class CoreChainSoftwareBtc extends CoreChainApiBase {
   async getCoinName({ network }: { network: IServerNetwork }) {
     return Promise.resolve(network.isTestnet ? 'TEST' : 'BTC');
+  }
+
+  async getXpubRegex({
+    btcForkNetwork,
+  }: {
+    btcForkNetwork: IBtcForkNetwork;
+  }): Promise<string> {
+    if (btcForkNetwork.networkChainCode === presetNetworksMap.btc.code) {
+      return '^[xyz]pub';
+    }
+    if (
+      btcForkNetwork.networkChainCode === presetNetworksMap.tbtc.code ||
+      btcForkNetwork.networkChainCode === presetNetworksMap.sbtc.code
+    ) {
+      return '^[tuv]pub';
+    }
+    // Other fork chains do not verify the regular expression
+    return '';
+  }
+
+  async getXprvtRegex({
+    btcForkNetwork,
+  }: {
+    btcForkNetwork: IBtcForkNetwork;
+  }): Promise<string> {
+    if (btcForkNetwork.networkChainCode === presetNetworksMap.btc.code) {
+      return '^[xyz]prv';
+    }
+    if (
+      btcForkNetwork.networkChainCode === presetNetworksMap.tbtc.code ||
+      btcForkNetwork.networkChainCode === presetNetworksMap.sbtc.code
+    ) {
+      return '^[tuv]prv';
+    }
+    // Other fork chains do not verify the regular expression
+    return '';
+  }
+
+  override async validateXprvt(
+    params: ICoreApiValidateXprvtParams,
+  ): Promise<IXprvtValidation> {
+    const { xprvt, btcForkNetwork } = params;
+    return Promise.resolve(
+      validateBtcXprvt({
+        xprvt,
+        regex: await this.getXprvtRegex({ btcForkNetwork }),
+      }),
+    );
+  }
+
+  override async validateXpub(
+    params: ICoreApiValidateXpubParams,
+  ): Promise<IXpubValidation> {
+    const { xpub, btcForkNetwork } = params;
+    return Promise.resolve(
+      validateBtcXpub({
+        xpub,
+        regex: await this.getXpubRegex({ btcForkNetwork }),
+      }),
+    );
   }
 
   protected decodeAddress(address: string): string {
@@ -458,6 +531,24 @@ export default class CoreChainSoftware extends CoreChainApiBase {
     psbtNetwork: networks.Network;
   }) {
     initBitcoinEcc();
+
+    const addressInfo = validateBtcAddress({
+      address: account.address,
+      network: psbtNetwork,
+    });
+
+    if (!addressInfo.isValid) {
+      throw new Error('Invalid address');
+    }
+
+    const supportedTypes = [EAddressEncodings.P2WPKH, EAddressEncodings.P2TR];
+    if (
+      !addressInfo.encoding ||
+      (addressInfo.encoding && !supportedTypes.includes(addressInfo.encoding))
+    ) {
+      throw new AddressNotSupportSignMethodError();
+    }
+
     const outputScript = BitcoinJsAddress.toOutputScript(
       account.address,
       psbtNetwork,
@@ -543,7 +634,7 @@ export default class CoreChainSoftware extends CoreChainApiBase {
         signer,
         input: psbt.data.inputs[input.index],
       });
-      psbt.signInput(input.index, bitcoinSigner, input.sighashTypes);
+      await psbt.signInputAsync(input.index, bitcoinSigner, input.sighashTypes);
     }
     return {
       encodedTx,
@@ -582,9 +673,14 @@ export default class CoreChainSoftware extends CoreChainApiBase {
     } = query;
     const network = getBtcForkNetwork(networkInfo.networkChainCode);
 
-    const { xpub, pubKey } = getBtcXpubFromXprvt({
+    const { xpub } = getBtcXpubFromXprvt({
       privateKeyRaw, // hex privateKey
       network,
+    });
+    const pubKey = getPublicKeyFromXpub({
+      xpub,
+      network,
+      relPath: '0/0',
     });
 
     const usedAddressEncoding = addressEncoding;

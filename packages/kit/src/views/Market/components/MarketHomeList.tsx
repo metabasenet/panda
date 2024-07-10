@@ -35,7 +35,6 @@ import {
   YStack,
   useMedia,
   usePopoverContext,
-  useThemeValue,
 } from '@onekeyhq/components';
 import backgroundApiProxy from '@onekeyhq/kit/src/background/instance/backgroundApiProxy';
 import { useSettingsPersistAtom } from '@onekeyhq/kit-bg/src/states/jotai/atoms';
@@ -164,18 +163,27 @@ const useBuildTableRowConfig = (showMoreAction = false, tabIndex = 0) => {
   return useMemo(() => {
     const tableRowConfig: ITableColumnConfig = {
       'serialNumber': (item) => (
-        <SizableText size="$bodyMd" color="$textSubdued">
-          {item.serialNumber || '-'}
+        <SizableText size="$bodyMd" color="$textSubdued" selectable={false}>
+          {item.serialNumber ?? '-'}
         </SizableText>
       ),
-      'name': (item) => (
+      'symbol': (item) => (
         <XStack space="$3" ai="center">
           <MarketTokenIcon uri={item.image} size="$8" />
-          <YStack width="$20">
-            <SizableText size="$bodyLgMedium">
+          <YStack width="$24">
+            <SizableText
+              size="$bodyLgMedium"
+              numberOfLines={1}
+              selectable={false}
+            >
               {item.symbol.toUpperCase()}
             </SizableText>
-            <SizableText size="$bodySm" color="$textSubdued" numberOfLines={1}>
+            <SizableText
+              size="$bodySm"
+              color="$textSubdued"
+              numberOfLines={1}
+              selectable={false}
+            >
               {item.name}
             </SizableText>
           </YStack>
@@ -213,6 +221,7 @@ const useBuildTableRowConfig = (showMoreAction = false, tabIndex = 0) => {
       ),
       'price': (item) => (
         <NumberSizeableText
+          selectable={false}
           size="$bodyMd"
           formatter="price"
           formatterOptions={{ currency }}
@@ -237,20 +246,22 @@ const useBuildTableRowConfig = (showMoreAction = false, tabIndex = 0) => {
       ),
       'totalVolume': (item) => (
         <NumberSizeableText
+          selectable={false}
           size="$bodyMd"
           formatter="marketCap"
           formatterOptions={{ currency }}
         >
-          {item.totalVolume}
+          {item.totalVolume || '-'}
         </NumberSizeableText>
       ),
       'marketCap': (item) => (
         <NumberSizeableText
+          selectable={false}
           size="$bodyMd"
           formatter="marketCap"
           formatterOptions={{ currency }}
         >
-          {item.marketCap}
+          {item.marketCap || '-'}
         </NumberSizeableText>
       ),
       'sparkline': (item) => (
@@ -275,15 +286,18 @@ const useBuildTableRowConfig = (showMoreAction = false, tabIndex = 0) => {
         </View>
       ),
       'actions': (item) => (
-        <XStack>
-          <MarketStar
-            coingeckoId={item.coingeckoId}
-            width={44}
-            mx={0}
-            tabIndex={tabIndex}
-          />
+        <XStack flex={1}>
+          <Stack flex={1} ai="center">
+            <MarketStar
+              key={item.coingeckoId}
+              coingeckoId={item.coingeckoId}
+              tabIndex={tabIndex}
+            />
+          </Stack>
           {showMoreAction ? (
-            <MarketMore coingeckoId={item.coingeckoId} width={44} />
+            <Stack flex={1} ai="center">
+              <MarketMore coingeckoId={item.coingeckoId} />
+            </Stack>
           ) : null}
         </XStack>
       ),
@@ -320,7 +334,7 @@ function TableRow({
 }) {
   const {
     serialNumber,
-    name,
+    symbol,
     price,
     priceChangePercentage1H,
     priceChangePercentage24H,
@@ -364,10 +378,12 @@ function TableRow({
   return (
     <XStack
       space="$3"
-      px="$5"
+      px="$3"
+      mx="$2"
       py={py}
       minHeight={minHeight}
       onPress={handlePress}
+      borderRadius="$3"
       {...(showListItemPressStyle && listItemPressStyle)}
     >
       <Column
@@ -382,7 +398,7 @@ function TableRow({
         {isLoading ? <Skeleton w="$4" h="$3" /> : serialNumber?.(item)}
       </Column>
       <Column
-        name="name"
+        name="symbol"
         alignLeft
         width={140}
         sortType={sortType?.columnName}
@@ -399,7 +415,7 @@ function TableRow({
             </YStack>
           </XStack>
         ) : (
-          name?.(item)
+          symbol?.(item)
         )}
       </Column>
       <Column
@@ -606,7 +622,7 @@ function TableMdSkeletonRow() {
   );
 }
 
-function ListEmptyComponent() {
+function ListEmptyComponent({ showMoreAction }: { showMoreAction: boolean }) {
   const { gtMd } = useMedia();
   if (platformEnv.isNativeAndroid) {
     return null;
@@ -617,7 +633,7 @@ function ListEmptyComponent() {
         <TableRow
           key={i}
           isLoading
-          showMoreAction
+          showMoreAction={showMoreAction}
           tableConfig={{}}
           minHeight={52}
         />
@@ -704,7 +720,7 @@ function BasicMarketHomeList({
   const tableHeaderConfig = useMemo(
     () => ({
       'serialNumber': () => '#',
-      'name': () => intl.formatMessage({ id: ETranslations.global_name }),
+      'symbol': () => intl.formatMessage({ id: ETranslations.global_name }),
       'price': () => intl.formatMessage({ id: ETranslations.global_price }),
       'priceChangePercentage1H': () =>
         intl.formatMessage({ id: ETranslations.market_one_hour_percentage }),
@@ -857,18 +873,24 @@ function BasicMarketHomeList({
             height={60}
             justifyContent="space-between"
             userSelect="none"
+            space="$2"
             {...listItemPressStyle}
             {...(platformEnv.isNative ? pressEvents : undefined)}
           >
             <XStack space="$3" ai="center">
               <MarketTokenIcon uri={item.image} size="$10" />
               <YStack>
-                <SizableText size="$bodyLgMedium">
+                <SizableText size="$bodyLgMedium" selectable={false}>
                   {item.symbol.toUpperCase()}
                 </SizableText>
-                <SizableText size="$bodySm" color="$textSubdued">
+                <SizableText
+                  size="$bodySm"
+                  color="$textSubdued"
+                  selectable={false}
+                >
                   {`VOL `}
                   <NumberSizeableText
+                    selectable={false}
                     size="$bodySm"
                     formatter="marketCap"
                     color="$textSubdued"
@@ -881,6 +903,7 @@ function BasicMarketHomeList({
             </XStack>
             <XStack ai="center" space="$5" flexShrink={1}>
               <NumberSizeableText
+                selectable={false}
                 flexShrink={1}
                 numberOfLines={1}
                 size="$bodyLgMedium"
@@ -903,6 +926,7 @@ function BasicMarketHomeList({
                   borderRadius="$2"
                 >
                   <NumberSizeableText
+                    selectable={false}
                     size="$bodyMdMedium"
                     color="white"
                     formatter="priceChange"
@@ -1088,18 +1112,22 @@ function BasicMarketHomeList({
         </YStack>
       )}
 
-      <YStack flex={1} $gtMd={{ py: '$3' }}>
+      <YStack flex={1} $gtMd={{ pt: '$3' }}>
         {gtMd ? HeaderColumns : undefined}
         <ListView
           ref={listViewRef}
           stickyHeaderHiddenOnScroll
           estimatedItemSize={60}
+          // @ts-ignore
+          estimatedListSize={{ width: 370, height: 525 }}
           onScroll={handleScroll}
           scrollEventThrottle={100}
           data={sortedListData as unknown as IMarketToken[]}
           renderItem={gtMd ? renderItem : renderMdItem}
           ListFooterComponent={gtMd ? <Stack height={60} /> : undefined}
-          ListEmptyComponent={<ListEmptyComponent />}
+          ListEmptyComponent={
+            <ListEmptyComponent showMoreAction={showMoreAction} />
+          }
           extraData={gtMd ? undefined : mdColumnKeys}
         />
         {isShowBackToTopButton ? (
@@ -1111,6 +1139,7 @@ function BasicMarketHomeList({
             right={gtMd ? '$8' : '$4'}
           >
             <IconButton
+              title=""
               borderWidth={StyleSheet.hairlineWidth}
               borderColor="$transparent"
               iconColor="$icon"

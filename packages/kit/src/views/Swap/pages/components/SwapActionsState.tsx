@@ -84,7 +84,10 @@ const SwapActionsState = ({
 
   const onActionHandler = useCallback(() => {
     if (swapActionState.isRefreshQuote) {
-      void quoteAction(swapFromAddressInfo.address);
+      void quoteAction(
+        swapFromAddressInfo?.address,
+        swapFromAddressInfo?.accountInfo?.account?.id,
+      );
     } else {
       cleanQuoteInterval();
       if (swapActionState.isApprove) {
@@ -107,13 +110,20 @@ const SwapActionsState = ({
     swapActionState.isApprove,
     swapActionState.isRefreshQuote,
     swapActionState.isWrapped,
-    swapFromAddressInfo.address,
+    swapFromAddressInfo?.accountInfo?.account?.id,
+    swapFromAddressInfo?.address,
   ]);
 
   const approveStepComponent = useMemo(
     () =>
       swapActionState.isApprove && !quoteLoading ? (
-        <XStack pb="$5" space="$1">
+        <XStack
+          pb="$5"
+          space="$1"
+          {...(pageType === EPageType.modal && !md
+            ? { justifyContent: 'flex-end' }
+            : {})}
+        >
           <Popover
             title="Approve"
             placement="top-start"
@@ -159,7 +169,14 @@ const SwapActionsState = ({
           </SizableText>
         </XStack>
       ) : null,
-    [fromToken?.symbol, intl, quoteLoading, swapActionState.isApprove],
+    [
+      fromToken?.symbol,
+      intl,
+      md,
+      pageType,
+      quoteLoading,
+      swapActionState.isApprove,
+    ],
   );
 
   const actionComponent = useMemo(

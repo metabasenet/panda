@@ -8,6 +8,7 @@ import {
   throwMethodNotFound,
 } from '@onekeyhq/shared/src/background/backgroundUtils';
 import { globalErrorHandler } from '@onekeyhq/shared/src/errors/globalErrorHandler';
+import { EOneKeyErrorClassNames } from '@onekeyhq/shared/src/errors/types/errorTypes';
 import {
   EAppEventBusNames,
   EEventBusBroadcastMethodNames,
@@ -64,9 +65,15 @@ export class BackgroundApiProxyBase
       },
     );
     globalErrorHandler.addListener((error) => {
+      if (
+        error?.className === EOneKeyErrorClassNames.OneKeyErrorScanQrCodeCancel
+      ) {
+        return;
+      }
       // TODO log error to file if developer mode on
       if (error && error?.autoToast) {
         appEventBus.emit(EAppEventBusNames.ShowToast, {
+          errorCode: error.code,
           method: 'error',
           title: error?.message ?? 'Error',
           message: error?.requestId,

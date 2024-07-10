@@ -2,7 +2,13 @@ import type { ComponentProps } from 'react';
 
 import type { IKeyOfIcons } from '@onekeyhq/components';
 import type { ETxActionComponentType } from '@onekeyhq/shared/types';
-import type { IDecodedTx, IDecodedTxAction } from '@onekeyhq/shared/types/tx';
+import type { ISwapTxInfo } from '@onekeyhq/shared/types/swap/types';
+import type {
+  EDecodedTxStatus,
+  EReplaceTxType,
+  IDecodedTx,
+  IDecodedTxAction,
+} from '@onekeyhq/shared/types/tx';
 
 import type { ListItem } from '../ListItem';
 
@@ -14,6 +20,8 @@ export type ITxActionProps = {
   isSendNativeToken?: boolean;
   nativeTokenTransferAmountToUpdate?: string;
   showIcon?: boolean;
+  replaceType?: EReplaceTxType;
+  swapInfo?: ISwapTxInfo;
 };
 
 export type ITxActionComponents = {
@@ -32,6 +40,7 @@ export type ITxActionCommonListViewProps = {
     fallbackIcon?: IKeyOfIcons;
   };
   title: string;
+  status: EDecodedTxStatus;
   fee?: string;
   feeFiatValue?: string;
   feeSymbol?: string;
@@ -43,13 +52,14 @@ export type ITxActionCommonListViewProps = {
   change?: React.ReactNode;
   changeDescription?: React.ReactNode;
   timestamp?: number;
-  pending?: boolean;
   tableLayout?: boolean;
   showIcon?: boolean;
   hideFeeInfo?: boolean;
+  replaceType?: EReplaceTxType;
 };
 
 export type ITxActionCommonDetailViewProps = {
+  networkId: string;
   overview: {
     avatar?: {
       isNFT?: boolean;
@@ -68,6 +78,14 @@ export type ITxActionCommonDetailViewProps = {
     };
   };
   source?: {
+    title?: string;
+    content: string;
+    description?: {
+      content?: React.ReactNode;
+      icon?: IKeyOfIcons;
+    };
+  };
+  applyFor?: {
     title?: string;
     content: string;
     description?: {

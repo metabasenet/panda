@@ -5,7 +5,9 @@ import { StyleSheet } from 'react-native';
 
 import {
   Empty,
+  Icon,
   IconButton,
+  Image,
   NumberSizeableText,
   SectionList,
   SizableText,
@@ -14,7 +16,6 @@ import {
   YStack,
 } from '@onekeyhq/components';
 import backgroundApiProxy from '@onekeyhq/kit/src/background/instance/backgroundApiProxy';
-import { ListItem } from '@onekeyhq/kit/src/components/ListItem';
 import { NetworkAvatar } from '@onekeyhq/kit/src/components/NetworkAvatar';
 import { Token } from '@onekeyhq/kit/src/components/Token';
 import { openUrl } from '@onekeyhq/kit/src/utils/openUrl';
@@ -22,7 +23,10 @@ import { useEarnLabelFn } from '@onekeyhq/kit/src/views/Staking/hooks/useLabelFn
 import { ETranslations } from '@onekeyhq/shared/src/locale';
 import utils from '@onekeyhq/shared/src/utils/accountUtils';
 import { formatTime } from '@onekeyhq/shared/src/utils/dateUtils';
-import { buildTransactionDetailsUrl } from '@onekeyhq/shared/src/utils/uriUtils';
+import {
+  buildExplorerAddressUrl,
+  buildTransactionDetailsUrl,
+} from '@onekeyhq/shared/src/utils/uriUtils';
 import { ETransactionType } from '@onekeyhq/shared/types/signatureRecord';
 import type {
   IApproveTransactionData,
@@ -203,6 +207,36 @@ const EarnLidoTransactionItem = ({ data }: { data: IEarnTransactionData }) => {
   );
 };
 
+const ContractInteractionTransactionItem = () => {
+  const intl = useIntl();
+  return (
+    <XStack justifyContent="space-between" w="100%" alignItems="center">
+      <XStack alignItems="center">
+        <Image
+          borderRadius="$full"
+          overflow="hidden"
+          width={40}
+          height={40}
+          mr="$3"
+        >
+          <Image.Fallback
+            alignItems="center"
+            justifyContent="center"
+            bg="$gray5"
+          >
+            <Icon size={40} name="GlobusOutline" color="$iconSubdued" />
+          </Image.Fallback>
+        </Image>
+        <SizableText size="$bodyLgMedium">
+          {intl.formatMessage({
+            id: ETranslations.transaction__contract_interaction,
+          })}
+        </SizableText>
+      </XStack>
+    </XStack>
+  );
+};
+
 const TransactionData = ({ data }: { data: ISignedTransaction['data'] }) => {
   if (data.type === ETransactionType.SEND) {
     return <SendTransactionItem data={data} />;
@@ -216,54 +250,76 @@ const TransactionData = ({ data }: { data: ISignedTransaction['data'] }) => {
   if (data.type === ETransactionType.EARN) {
     return <EarnLidoTransactionItem data={data} />;
   }
+  if (data.type === ETransactionType.CONTRACT_INTERACTION) {
+    return <ContractInteractionTransactionItem />;
+  }
   return null;
 };
 
 const TransactionItem = ({ item }: { item: ISignedTransaction }) => {
   const network = item.network;
+  const vaultSettings = item.vaultSettings;
+  const intl = useIntl();
   const onPress = useCallback(() => {
-    openUrl(
-      buildTransactionDetailsUrl({
-        network,
-        txid: item.hash,
-      }),
-    );
-  }, [item.hash, network]);
+    if (item.hash) {
+      openUrl(
+        buildTransactionDetailsUrl({
+          network,
+          txid: item.hash,
+        }),
+      );
+    } else {
+      openUrl(buildExplorerAddressUrl({ network, address: item.address }));
+    }
+  }, [item, network]);
   return (
-    <YStack
-      borderWidth={StyleSheet.hairlineWidth}
-      mx="$5"
-      borderRadius="$3"
-      borderColor="$borderSubdued"
-      overflow="hidden"
-      mb="$3"
-    >
-      <XStack justifyContent="space-between" pt="$3" px="$3" pb="$1">
-        <SizableText size="$bodyMd">
-          {formatTime(new Date(item.createdAt), { hideSeconds: true })}
-          {' • '}
-          {item.title}
-        </SizableText>
-        <IconButton
-          variant="tertiary"
-          icon="OpenOutline"
-          size="small"
-          onPress={onPress}
-        />
-      </XStack>
-      <XStack p="$3">
-        <TransactionData data={item.data} />
-      </XStack>
-      <XStack p="$3" backgroundColor="$bgSubdued" alignItems="center">
-        <Stack mr="$2">
-          <NetworkAvatar size={16} networkId={item.networkId} />
-        </Stack>
-        <SizableText color="$textSubdued">
-          {item.network.name} •{' '}
-          {utils.shortenAddress({ address: item.address })}
-        </SizableText>
-      </XStack>
-    </YStack>
+    <Stack px="$5" pb="$3">
+      <YStack
+        borderWidth={StyleSheet.hairlineWidth}
+        borderRadius="$3"
+        borderColor="$borderSubdued"
+        overflow="hidden"
+      >
+        <XStack justifyContent="space-between" pt="$3" px="$3" pb="$1">
+          <SizableText size="$bodyMd">
+            {formatTime(new Date(item.createdAt), { hideSeconds: true })}
+            {' • '}
+            {item.title}
+          </SizableText>
+          {!vaultSettings.hideBlockExplorer ? (
+            <IconButton
+              variant="tertiary"
+              title={
+                item.hash
+                  ? intl.formatMessage({
+                      id: ETranslations.settings_view_transaction_in_explorer,
+                    })
+                  : intl.formatMessage({
+                      id: ETranslations.settings_view_address_in_explorer,
+                    })
+              }
+              icon={item.hash ? 'OpenOutline' : 'GlobusOutline'}
+              size="small"
+              onPress={onPress}
+            />
+          ) : null}
+        </XStack>
+        <XStack p="$3">
+          <XStack h={44} width="100%" alignItems="center">
+            <TransactionData data={item.data} />
+          </XStack>
+        </XStack>
+        <XStack p="$3" backgroundColor="$bgSubdued" alignItems="center">
+          <Stack mr="$2">
+            <NetworkAvatar size={16} networkId={item.networkId} />
+          </Stack>
+          <SizableText color="$textSubdued" size="$bodySmMedium">
+            {item.network.name} •{' '}
+            {utils.shortenAddress({ address: item.address })}
+          </SizableText>
+        </XStack>
+      </YStack>
+    </Stack>
   );
 };
 
@@ -287,6 +343,11 @@ const ListEmptyComponent = () => {
   );
 };
 
+const keyExtractor = (item: unknown) => {
+  const hash = (item as ISignedTransaction)?.hash;
+  return hash;
+};
+
 export const Transactions = () => {
   const { sections, onEndReached } = useGetSignatureSections(async (params) =>
     backgroundApiProxy.serviceSignature.getSignedTransactions(params),
@@ -295,7 +356,7 @@ export const Transactions = () => {
   return (
     <SectionList
       sections={sections}
-      estimatedItemSize="$36"
+      estimatedItemSize={158}
       ItemSeparatorComponent={null}
       SectionSeparatorComponent={null}
       renderSectionHeader={({ section }) => (
@@ -303,6 +364,7 @@ export const Transactions = () => {
           title={(section as ISectionListData).title}
         />
       )}
+      keyExtractor={keyExtractor}
       renderItem={({ item }) => <TransactionItem item={item} />}
       ListEmptyComponent={ListEmptyComponent}
       onEndReached={onEndReached}

@@ -16,6 +16,7 @@ import {
   YStack,
   useMedia,
 } from '@onekeyhq/components';
+import { useSettingsPersistAtom } from '@onekeyhq/kit-bg/src/states/jotai/atoms';
 import { ETranslations } from '@onekeyhq/shared/src/locale';
 import platformEnv from '@onekeyhq/shared/src/platformEnv';
 import type { IMarketResponsePool } from '@onekeyhq/shared/types/market';
@@ -131,7 +132,7 @@ function HeaderRow({
     [onSortTypeChange, sortType?.columnName, sortType?.order, useSortFunc],
   );
   return (
-    <XStack py="$2.5" px="$5">
+    <XStack py="$2.5" px="$5" $gtMd={{ pr: 0 }}>
       <HeaderColumn
         name="dexDataName"
         jc="flex-start"
@@ -142,7 +143,7 @@ function HeaderRow({
       >
         {intl.formatMessage({ id: ETranslations.global_pair })}
       </HeaderColumn>
-      {gtMd ? (
+      {gtXl ? (
         <HeaderColumn
           name="price"
           jc="flex-end"
@@ -184,7 +185,7 @@ function HeaderRow({
       >
         {intl.formatMessage({ id: ETranslations.global_liquidity })}
       </HeaderColumn>
-      <View flex={1}>
+      <View pl="$3" ai="center" jc="center" $gtMd={{ pl: '$7', pr: '$1' }}>
         <View w="$4" h="$4" />
       </View>
     </XStack>
@@ -201,7 +202,7 @@ function NetworkIdSelect({
   onChange: (selectedIndex: number) => void;
 }) {
   return (
-    <XStack space="$2" px="$5" py="$2">
+    <XStack space="$2" px="$5" $gtMd={{ pr: 0 }} py="$2">
       {options.map((networkId, index) => (
         <Stack
           key={networkId}
@@ -223,6 +224,8 @@ export function MarketDetailPools({
   // eslint-disable-next-line react/prop-types
   onContentSizeChange,
 }: ITabPageProps & { pools: IMarketResponsePool[] }) {
+  const [settings] = useSettingsPersistAtom();
+  const currency = settings.currencyInfo.symbol;
   const intl = useIntl();
   const { gtMd, gtXl } = useMedia();
   const oneKeyNetworkIds = useMemo(
@@ -285,6 +288,7 @@ export function MarketDetailPools({
           return (
             <XStack
               px="$5"
+              $gtMd={{ pr: 0 }}
               py="$2"
               borderRadius="$3"
               {...listItemPressStyle}
@@ -301,10 +305,15 @@ export function MarketDetailPools({
                 <XStack space="$2.5" ai="center">
                   <MarketPoolIcon uri={dexLogoUrl} />
                   <YStack flexShrink={1}>
-                    <SizableText size="$bodyMdMedium" numberOfLines={1}>
+                    <SizableText
+                      size="$bodyMdMedium"
+                      numberOfLines={1}
+                      selectable={false}
+                    >
                       {attributes.name}
                     </SizableText>
                     <SizableText
+                      selectable={false}
                       size="$bodySm"
                       color="$textSubdued"
                       numberOfLines={1}
@@ -315,12 +324,13 @@ export function MarketDetailPools({
                 </XStack>
               </ItemColumn>
 
-              {gtMd ? (
+              {gtXl ? (
                 <ItemColumn>
                   <NumberSizeableText
+                    selectable={false}
                     size="$bodyMd"
                     formatter="price"
-                    formatterOptions={{ currency: '$' }}
+                    formatterOptions={{ currency }}
                     textAlign="right"
                   >
                     {price}
@@ -330,6 +340,7 @@ export function MarketDetailPools({
               {gtXl ? (
                 <ItemColumn>
                   <NumberSizeableText
+                    selectable={false}
                     size="$bodyMd"
                     formatter="marketCap"
                     textAlign="right"
@@ -340,6 +351,7 @@ export function MarketDetailPools({
               ) : null}
               <ItemColumn>
                 <NumberSizeableText
+                  selectable={false}
                   size="$bodyMd"
                   formatter="marketCap"
                   textAlign="right"
@@ -349,6 +361,7 @@ export function MarketDetailPools({
               </ItemColumn>
               <ItemColumn>
                 <NumberSizeableText
+                  selectable={false}
                   size="$bodyMd"
                   formatter="marketCap"
                   textAlign="right"
@@ -356,7 +369,12 @@ export function MarketDetailPools({
                   {reserveInUsd}
                 </NumberSizeableText>
               </ItemColumn>
-              <View jc="center" ai="center" flex={1}>
+              <View
+                pl="$3"
+                ai="center"
+                jc="center"
+                $gtMd={{ pl: '$7', pr: '$1' }}
+              >
                 <Icon name="ChevronRightSmallOutline" size="$4" />
               </View>
             </XStack>

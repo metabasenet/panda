@@ -7,8 +7,6 @@ import {
   getBtcXpubFromXprvt,
   getBtcXpubSupportedAddressEncodings,
   validateBtcAddress,
-  validateBtcXprvt,
-  validateBtcXpub,
 } from '@onekeyhq/core/src/chains/btc/sdkBtc';
 import type {
   IBtcInput,
@@ -16,6 +14,7 @@ import type {
   IEncodedTxBtc,
   IOutputsForCoinSelect,
 } from '@onekeyhq/core/src/chains/btc/types';
+import coreChainApi from '@onekeyhq/core/src/instance/coreChainApi';
 import {
   decodeSensitiveText,
   encodeSensitiveText,
@@ -50,7 +49,6 @@ import type {
   IXpubValidation,
 } from '@onekeyhq/shared/types/address';
 import type { IFeeInfoUnit } from '@onekeyhq/shared/types/fee';
-import { EOnChainHistoryTxType } from '@onekeyhq/shared/types/history';
 import type { IDecodedTx, IDecodedTxAction } from '@onekeyhq/shared/types/tx';
 import {
   EDecodedTxActionType,
@@ -82,6 +80,8 @@ import type {
 
 // btc vault
 export default class VaultBtc extends VaultBase {
+  override coreApi = coreChainApi.btc.hd;
+
   override async buildAccountAddressDetail(
     params: IBuildAccountAddressDetailParams,
   ): Promise<INetworkAccountAddressDetail> {
@@ -113,16 +113,10 @@ export default class VaultBtc extends VaultBase {
     const network = await this.getNetwork();
     const account = await this.getAccount();
     const nativeToken = await this.backgroundApi.serviceToken.getToken({
+      accountId: this.accountId,
       networkId: this.networkId,
       tokenIdOnNetwork: '',
-      accountAddress: account.address,
     });
-
-    if (!nativeToken) {
-      throw new OneKeyInternalError('Native token not found');
-    }
-
-    let actions: IDecodedTxAction[] = [];
 
     const utxoFrom = inputs.map((input) => ({
       address: input.address,
@@ -159,15 +153,31 @@ export default class VaultBtc extends VaultBase {
     let sendNativeTokenAmountBN = new BigNumber(0);
     let sendNativeTokenAmountValueBN = new BigNumber(0);
 
+    let actions: IDecodedTxAction[] = [
+      {
+        type: EDecodedTxActionType.UNKNOWN,
+        unknownAction: {
+          from: account.address,
+          to: utxoTo[0].address,
+        },
+      },
+    ];
+
     if (swapInfo) {
       const swapSendToken = swapInfo.sender.token;
+      const swapReceiveToken = swapInfo.receiver.token;
+      const providerInfo = swapInfo.swapBuildResData.result.info;
       const action = await this.buildTxTransferAssetAction({
         from: swapInfo.accountAddress,
         to: utxoTo[0].address,
+        application: {
+          name: providerInfo.providerName,
+          icon: providerInfo.providerLogo ?? '',
+        },
         transfers: [
           {
             from: swapInfo.accountAddress,
-            to: utxoTo[0].address,
+            to: '',
             tokenIdOnNetwork: swapSendToken.contractAddress,
             icon: swapSendToken.logoURI ?? '',
             name: swapSendToken.name ?? '',
@@ -176,7 +186,21 @@ export default class VaultBtc extends VaultBase {
             isNFT: false,
             isNative: swapSendToken.isNative,
           },
+          {
+            from: '',
+            to: swapInfo.receivingAddress,
+            tokenIdOnNetwork: swapReceiveToken.contractAddress,
+            icon: swapReceiveToken.logoURI ?? '',
+            name: swapReceiveToken.name ?? '',
+            symbol: swapReceiveToken.symbol,
+            amount: swapInfo.receiver.amount,
+            isNFT: false,
+            isNative: swapReceiveToken.isNative,
+          },
         ],
+        isInternalSwap: true,
+        swapReceivedAddress: swapInfo.receivingAddress,
+        swapReceivedNetworkId: swapInfo.receiver.token.networkId,
       });
       if (swapSendToken.isNative) {
         sendNativeTokenAmountBN = new BigNumber(swapInfo.sender.amount);
@@ -189,7 +213,7 @@ export default class VaultBtc extends VaultBase {
         action.assetTransfer.utxoTo = originalUtxoTo;
       }
       actions = [action];
-    } else {
+    } else if (nativeToken) {
       actions = [
         {
           type: EDecodedTxActionType.ASSET_TRANSFER,
@@ -359,11 +383,15 @@ export default class VaultBtc extends VaultBase {
   }
 
   override async validateXpub(xpub: string): Promise<IXpubValidation> {
-    return Promise.resolve(validateBtcXpub({ xpub }));
+    const btcForkNetwork = await this.getBtcForkNetwork();
+    return Promise.resolve(this.coreApi.validateXpub({ xpub, btcForkNetwork }));
   }
 
   override async validateXprvt(xprvt: string): Promise<IXprvtValidation> {
-    return Promise.resolve(validateBtcXprvt({ xprvt }));
+    const btcForkNetwork = await this.getBtcForkNetwork();
+    return Promise.resolve(
+      this.coreApi.validateXprvt({ xprvt, btcForkNetwork }),
+    );
   }
 
   override async validateAddress(address: string) {
@@ -380,35 +408,45 @@ export default class VaultBtc extends VaultBase {
       params,
     );
 
-    // build deriveItems
-    let xpub = '';
-    if (result.xpubResult?.isValid) {
-      // xpub from input
-      xpub = input;
-    }
-    const network = await this.getBtcForkNetwork();
-    if (!xpub && result.xprvtResult?.isValid) {
-      // xpub from xprvt(input)
-      ({ xpub } = getBtcXpubFromXprvt({
-        network,
-        privateKeyRaw: convertBtcXprvtToHex({ xprvt: input }),
-      }));
-    }
-    if (xpub) {
-      // encoding list from xpub
-      const { supportEncodings } = getBtcXpubSupportedAddressEncodings({
-        xpub,
-        network,
-      });
+    if (result.addressResult?.isValid && result.addressResult?.encoding) {
+      const settings = await this.getVaultSettings();
+      const items = Object.values(settings.accountDeriveInfo);
+      result.deriveInfoItems = items.filter(
+        (item) =>
+          item.addressEncoding &&
+          result.addressResult?.encoding === item.addressEncoding,
+      );
+    } else {
+      // build deriveItems
+      let xpub = '';
+      if (result.xpubResult?.isValid) {
+        // xpub from input
+        xpub = input;
+      }
+      const network = await this.getBtcForkNetwork();
+      if (!xpub && result.xprvtResult?.isValid) {
+        // xpub from xprvt(input)
+        ({ xpub } = getBtcXpubFromXprvt({
+          network,
+          privateKeyRaw: convertBtcXprvtToHex({ xprvt: input }),
+        }));
+      }
+      if (xpub) {
+        // encoding list from xpub
+        const { supportEncodings } = getBtcXpubSupportedAddressEncodings({
+          xpub,
+          network,
+        });
 
-      if (supportEncodings && supportEncodings.length) {
-        const settings = await this.getVaultSettings();
-        const items = Object.values(settings.accountDeriveInfo);
-        result.deriveInfoItems = items.filter(
-          (item) =>
-            item.addressEncoding &&
-            supportEncodings.includes(item.addressEncoding),
-        );
+        if (supportEncodings && supportEncodings.length) {
+          const settings = await this.getVaultSettings();
+          const items = Object.values(settings.accountDeriveInfo);
+          result.deriveInfoItems = items.filter(
+            (item) =>
+              item.addressEncoding &&
+              supportEncodings.includes(item.addressEncoding),
+          );
+        }
       }
     }
 
@@ -582,7 +620,11 @@ export default class VaultBtc extends VaultBase {
         .shiftedBy(-network.decimals);
 
       if (allUtxoAmount.lt(amount)) {
-        throw new InsufficientBalance();
+        throw new InsufficientBalance({
+          info: {
+            symbol: network.symbol,
+          },
+        });
       }
 
       const max = allUtxoAmount.lte(amount);
@@ -683,6 +725,7 @@ export default class VaultBtc extends VaultBase {
     async () => {
       try {
         const feeInfo = await this.backgroundApi.serviceGas.estimateFee({
+          accountId: this.accountId,
           networkId: this.networkId,
           accountAddress: await this.getAccountAddress(),
         });
@@ -791,8 +834,7 @@ export default class VaultBtc extends VaultBase {
         const { utxoList, frozenUtxoList } =
           await this.backgroundApi.serviceAccountProfile.fetchAccountDetails({
             networkId: this.networkId,
-            accountAddress: await this.getAccountAddress(),
-            xpub: await this.getAccountXpub(),
+            accountId: this.accountId,
             withUTXOList: true,
             withFrozenBalance: true,
             withCheckInscription,

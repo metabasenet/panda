@@ -3,6 +3,7 @@ import { useState } from 'react';
 import BigNumber from 'bignumber.js';
 
 import { Icon, Image, SizableText, Stack, Video } from '@onekeyhq/components';
+import { SHOW_NFT_AMOUNT_MAX } from '@onekeyhq/shared/src/consts/walletConsts';
 import { ENFTType, type IAccountNFT } from '@onekeyhq/shared/types/nft';
 
 type IProps = {
@@ -12,7 +13,7 @@ type IProps = {
 
 function NFTListItem(props: IProps) {
   const { nft, onPress } = props;
-  const [isVideo, setIsVideo] = useState<boolean>(true);
+  const [isVideo, setIsVideo] = useState<boolean>(!!nft.metadata?.image);
 
   return (
     <Stack
@@ -60,6 +61,8 @@ function NFTListItem(props: IProps) {
                 style={{
                   width: '100%',
                   height: '100%',
+                  position: 'absolute',
+                  zIndex: 1,
                 }}
                 autoPlay={false}
               />
@@ -87,7 +90,10 @@ function NFTListItem(props: IProps) {
               borderColor="$bgApp"
             >
               <SizableText size="$bodyMdMedium" color="$textInverse">
-                x{nft.amount}
+                x
+                {new BigNumber(nft.amount).gt(SHOW_NFT_AMOUNT_MAX)
+                  ? `${SHOW_NFT_AMOUNT_MAX}+`
+                  : nft.amount}
               </SizableText>
             </Stack>
           ) : null}

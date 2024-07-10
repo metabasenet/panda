@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect } from 'react';
+import { memo, useCallback, useEffect, useMemo } from 'react';
 
 import { CanceledError } from 'axios';
 
@@ -9,6 +9,7 @@ import {
   useTabIsRefreshingFocused,
 } from '@onekeyhq/components';
 import backgroundApiProxy from '@onekeyhq/kit/src/background/instance/backgroundApiProxy';
+import { WALLET_TYPE_WATCHING } from '@onekeyhq/shared/src/consts/dbConsts';
 import {
   POLLING_DEBOUNCE_INTERVAL,
   POLLING_INTERVAL_FOR_TOKEN,
@@ -78,24 +79,15 @@ function TokenListContainer({
         if (!account || !network) return;
 
         await backgroundApiProxy.serviceToken.abortFetchAccountTokens();
-        const accountAddress =
-          await backgroundApiProxy.serviceAccount.getAccountAddressForApi({
-            accountId: account.id,
-            networkId: network.id,
-          });
         const blockedTokens =
           await backgroundApiProxy.serviceToken.getBlockedTokens({
             networkId: network.id,
           });
         const r = await backgroundApiProxy.serviceToken.fetchAccountTokens({
+          accountId: account.id,
           mergeTokens: true,
           networkId: network.id,
-          accountAddress,
           flag: 'home-token-list',
-          xpub: await backgroundApiProxy.serviceAccount.getAccountXpub({
-            accountId: account.id,
-            networkId: network.id,
-          }),
           blockedTokens: Object.keys(blockedTokens),
         });
 
@@ -212,6 +204,13 @@ function TokenListContainer({
     [account, deriveInfo, deriveType, navigation, network, wallet],
   );
 
+  const isBuyAndReceiveEnabled = useMemo(
+    () =>
+      !vaultSettings?.disabledSendAction &&
+      wallet?.type !== WALLET_TYPE_WATCHING,
+    [vaultSettings?.disabledSendAction, wallet?.type],
+  );
+
   return (
     <>
       {showWalletActions ? (
@@ -228,7 +227,7 @@ function TokenListContainer({
         withHeader
         withFooter
         withPrice
-        withBuyAndReceive={!vaultSettings?.disabledSendAction}
+        withBuyAndReceive={isBuyAndReceiveEnabled}
         isBuyTokenSupported={isSupported}
         onBuyToken={handleOnBuy}
         onReceiveToken={handleOnReceive}
@@ -251,7 +250,7 @@ const TokenListContainerWithProvider = memo((props: ITabPageProps) => {
   });
   return isUrlAccount ? (
     <UrlAccountHomeTokenListProviderMirror>
-      <TokenListContainer {...props} />
+      <TokenListContainer showWalletActions {...props} />
     </UrlAccountHomeTokenListProviderMirror>
   ) : (
     <HomeTokenListProviderMirror>

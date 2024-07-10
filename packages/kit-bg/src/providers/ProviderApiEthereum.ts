@@ -30,7 +30,7 @@ import type {
 
 export type ISwitchEthereumChainParameter = {
   chainId: string;
-  networkId?: string;
+  // networkId?: string; // not use?
 };
 
 function prefixTxValueToHex(value: string) {
@@ -124,6 +124,7 @@ class ProviderApiEthereum extends ProviderApiBase {
         return accounts;
       }
       await this.backgroundApi.serviceDApp.openConnectionModal(request);
+      void this._getConnectedNetworkName(request);
       return this.eth_accounts(request);
     });
   }
@@ -180,6 +181,7 @@ class ProviderApiEthereum extends ProviderApiBase {
       };
     });
 
+    void this._getConnectedNetworkName(request);
     return result;
   }
 
@@ -203,7 +205,9 @@ class ProviderApiEthereum extends ProviderApiBase {
       request,
     );
     if (!isNil(networks?.[0]?.chainId)) {
-      return hexUtils.hexlify(Number(networks?.[0]?.chainId));
+      return hexUtils.hexlify(Number(networks?.[0]?.chainId), {
+        removeZeros: true,
+      });
     }
 
     return this._getNetworkMockInfo().chainId;
@@ -504,6 +508,11 @@ class ProviderApiEthereum extends ProviderApiBase {
     await this._switchEthereumChainMemo(request, params);
 
     this.notifyNetworkChangedToDappSite(request.origin ?? '');
+    setTimeout(() => {
+      void this.backgroundApi.serviceDApp.notifyDAppChainChanged(
+        request.origin ?? '',
+      );
+    }, 500);
     // Metamask return null
     return null;
   }
@@ -553,11 +562,10 @@ class ProviderApiEthereum extends ProviderApiBase {
     address: string;
   }) => {
     try {
-      const status =
-        await this.backgroundApi.serviceAccountProfile.validateAddress({
-          networkId,
-          address,
-        });
+      const status = await this.backgroundApi.serviceValidator.validateAddress({
+        networkId,
+        address,
+      });
       return status === 'valid';
     } catch {
       return false;

@@ -1,5 +1,5 @@
 import type { ComponentProps, FC } from 'react';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 
 import type { Input } from '@onekeyhq/components';
 import { Icon, SizableText, Stack } from '@onekeyhq/components';
@@ -14,7 +14,7 @@ type IChainSelectorInputProps = Pick<
   ComponentProps<typeof Input>,
   'value' | 'disabled' | 'error' | 'editable' | 'size'
 > & {
-  excludedNetworkIds?: string[];
+  networkIds?: string[];
   testID?: string;
   onChange?: (value: string) => void;
   title?: string;
@@ -28,25 +28,35 @@ export const ChainSelectorInput: FC<IChainSelectorInputProps> = ({
   size,
   onChange,
   title,
-  excludedNetworkIds,
+  networkIds,
   ...rest
 }) => {
-  const { result } = usePromiseResult(
+  const { result: selectorNetworks } = usePromiseResult(
     async () => {
       const { networks } =
         await backgroundApiProxy.serviceNetwork.getAllNetworks();
-      if (excludedNetworkIds && excludedNetworkIds.length > 0) {
-        return networks.filter((o) => !excludedNetworkIds.includes(o.id));
+      if (networkIds && networkIds.length > 0) {
+        return networks.filter((o) => networkIds.includes(o.id));
       }
       return networks;
     },
-    [excludedNetworkIds],
+    [networkIds],
     { initResult: [] },
   );
+
   const current = useMemo(() => {
-    const item = result.find((o) => o.id === value);
-    return item || result[0];
-  }, [result, value]);
+    const item = selectorNetworks.find((o) => o.id === value);
+    return item;
+  }, [selectorNetworks, value]);
+
+  useEffect(() => {
+    if (selectorNetworks.length && !current) {
+      const fallbackValue = selectorNetworks?.[0]?.id;
+      if (fallbackValue) {
+        onChange?.(fallbackValue);
+      }
+    }
+  }, [selectorNetworks, current, onChange]);
 
   const sharedStyles = getSharedInputStyles({
     disabled,
@@ -60,11 +70,11 @@ export const ChainSelectorInput: FC<IChainSelectorInputProps> = ({
   const onPress = useCallback(() => {
     openChainSelector({
       title,
-      networkIds: result.map((o) => o.id),
-      defaultNetworkId: current.id,
+      networkIds: selectorNetworks.map((o) => o.id),
+      defaultNetworkId: current?.id,
       onSelect: (network) => onChange?.(network.id),
     });
-  }, [openChainSelector, current, onChange, title, result]);
+  }, [openChainSelector, current, onChange, title, selectorNetworks]);
   return (
     <Stack
       userSelect="none"

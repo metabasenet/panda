@@ -1,4 +1,6 @@
-import { useCallback, useState } from 'react';
+/* eslint-disable react/no-unstable-nested-components */
+import type { ForwardedRef } from 'react';
+import { forwardRef, useCallback, useEffect, useState } from 'react';
 
 import { useIsFocused } from '@react-navigation/core';
 
@@ -7,9 +9,11 @@ import {
   Button,
   Checkbox,
   Dialog,
+  DialogContainer,
   Form,
   Input,
   ScrollView,
+  Select,
   SizableText,
   Stack,
   Toast,
@@ -18,6 +22,10 @@ import {
   useDialogInstance,
   useForm,
 } from '@onekeyhq/components';
+import type {
+  IDialogContainerProps,
+  IDialogInstance,
+} from '@onekeyhq/components/src/composite/Dialog/type';
 import useAppNavigation from '@onekeyhq/kit/src/hooks/useAppNavigation';
 import {
   EGalleryRoutes,
@@ -467,9 +475,8 @@ const DialogGallery = () => (
       {
         title: 'Dialog Form',
         element: (
-          <YStack>
+          <YStack space="$4">
             <Button
-              mt="$4"
               onPress={() =>
                 Dialog.confirm({
                   title: 'Password',
@@ -503,6 +510,57 @@ const DialogGallery = () => (
               }
             >
               Open Dialog Form
+            </Button>
+            <Button
+              onPress={() =>
+                Dialog.confirm({
+                  title: 'Password',
+                  description: 'input password',
+                  renderContent: (
+                    <Dialog.Form
+                      formProps={{
+                        defaultValues: { a: '1234567' },
+                      }}
+                    >
+                      <Dialog.FormField
+                        name="a"
+                        rules={{
+                          maxLength: { value: 6, message: 'maxLength is 6' },
+                        }}
+                      >
+                        <Select
+                          title="Demo Title"
+                          placeholder="select"
+                          items={[
+                            { label: 'Banana0', value: 'Banana' },
+                            {
+                              label: 'Apple1',
+                              value: 'Apple',
+                            },
+
+                            {
+                              label: 'Pear2',
+                              value: 'Pear',
+                            },
+
+                            {
+                              label: 'Blackberry3',
+                              value: 'Blackberry',
+                            },
+                          ]}
+                        />
+                      </Dialog.FormField>
+                    </Dialog.Form>
+                  ),
+                  onConfirm: (dialogInstance) => {
+                    alert(
+                      JSON.stringify(dialogInstance.getForm()?.getValues()),
+                    );
+                  },
+                })
+              }
+            >
+              Open Dialog Form with Select
             </Button>
           </YStack>
         ),
@@ -730,6 +788,48 @@ const DialogGallery = () => (
               }}
             >
               closeFlag
+            </Button>
+          </YStack>
+        ),
+      },
+      {
+        title: 'showExit',
+        element: (
+          <YStack>
+            <Button
+              onPress={() => {
+                const Container = (
+                  props: IDialogContainerProps,
+                  ref: ForwardedRef<IDialogInstance>,
+                ) => {
+                  const [showExitButton, setIsShowExitButton] = useState(false);
+                  useEffect(() => {
+                    setTimeout(() => {
+                      setIsShowExitButton(true);
+                    }, 5000);
+                  }, []);
+                  return (
+                    <DialogContainer
+                      title="title"
+                      ref={ref}
+                      showExitButton={showExitButton}
+                      renderContent={<SizableText>content</SizableText>}
+                      onClose={async (data) => console.log(data)}
+                    />
+                  );
+                };
+                const ForwardedContainer = forwardRef(Container);
+                Dialog.show({
+                  dialogContainer: ({ ref }: { ref: any }) => (
+                    <ForwardedContainer
+                      ref={ref}
+                      onClose={async (extra) => console.log(extra)}
+                    />
+                  ),
+                });
+              }}
+            >
+              showExitButton
             </Button>
           </YStack>
         ),

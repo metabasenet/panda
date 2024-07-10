@@ -188,11 +188,13 @@ function buildImportedAccountId({
   pub,
   xpub,
   addressEncoding,
+  address,
 }: {
   coinType: string;
   pub?: string;
   xpub?: string;
   addressEncoding?: EAddressEncodings | undefined;
+  address?: string;
 }) {
   const publicKey = xpub || pub;
   if (!publicKey) {
@@ -201,6 +203,9 @@ function buildImportedAccountId({
   let id = `${WALLET_TYPE_IMPORTED}--${coinType}--${publicKey}`;
   if (addressEncoding) {
     id += `--${addressEncoding}`;
+  }
+  if (address) {
+    id += `--${address}`;
   }
   return id;
 }
@@ -213,6 +218,11 @@ function isExternalAccount({ accountId }: { accountId: string }) {
 function isWatchingAccount({ accountId }: { accountId: string }) {
   const walletId = getWalletIdFromAccountId({ accountId });
   return isWatchingWallet({ walletId });
+}
+
+function isImportedAccount({ accountId }: { accountId: string }) {
+  const walletId = getWalletIdFromAccountId({ accountId });
+  return isImportedWallet({ walletId });
 }
 
 function buildPathFromTemplate({
@@ -350,7 +360,7 @@ function buildLocalHistoryId(params: {
   xpub?: string;
 }) {
   const { networkId, txid, accountAddress, xpub } = params;
-  const historyId = `${networkId}_${txid}_${xpub ?? accountAddress}`;
+  const historyId = `${networkId}_${txid}_${xpub || accountAddress}`;
   return historyId;
 }
 
@@ -686,6 +696,7 @@ export default {
   isQrAccount,
   isExternalAccount,
   isWatchingAccount,
+  isImportedAccount,
   parseAccountId,
   parseIndexedAccountId,
   shortenAddress,

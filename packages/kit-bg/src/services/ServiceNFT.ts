@@ -1,6 +1,6 @@
 import qs from 'querystring';
 
-import { isNil, omitBy } from 'lodash';
+import { isArray, isNil, isObject, omitBy } from 'lodash';
 
 import {
   backgroundClass,
@@ -9,11 +9,12 @@ import {
 import { memoizee } from '@onekeyhq/shared/src/utils/cacheUtils';
 import timerUtils from '@onekeyhq/shared/src/utils/timerUtils';
 import { EServiceEndpointEnum } from '@onekeyhq/shared/types/endpoint';
-import type {
-  IFetchAccountNFTsParams,
-  IFetchAccountNFTsResp,
-  IFetchNFTDetailsParams,
-  IFetchNFTDetailsResp,
+import {
+  ETraitsDisplayType,
+  type IFetchAccountNFTsParams,
+  type IFetchAccountNFTsResp,
+  type IFetchNFTDetailsParams,
+  type IFetchNFTDetailsResp,
 } from '@onekeyhq/shared/types/nft';
 
 import ServiceBase from './ServiceBase';
@@ -24,19 +25,39 @@ class ServiceNFT extends ServiceBase {
     super({ backgroundApi });
   }
 
+  _fetchAccountNFTsController: AbortController | null = null;
+
+  @backgroundMethod()
+  public async abortFetchAccountNFTs() {
+    if (this._fetchAccountNFTsController) {
+      this._fetchAccountNFTsController.abort();
+      this._fetchAccountNFTsController = null;
+    }
+  }
+
   @backgroundMethod()
   public async fetchAccountNFTs(params: IFetchAccountNFTsParams) {
+    const { accountId, ...rest } = params;
     const client = await this.getClient(EServiceEndpointEnum.Wallet);
+    const controller = new AbortController();
+    this._fetchAccountNFTsController = controller;
     const resp = await client.get<{
       data: IFetchAccountNFTsResp;
-    }>(`/wallet/v1/account/nft/list?${qs.stringify(omitBy(params, isNil))}`);
+    }>(`/wallet/v1/account/nft/list?${qs.stringify(omitBy(rest, isNil))}`, {
+      signal: controller.signal,
+      headers:
+        await this.backgroundApi.serviceAccountProfile._getWalletTypeHeader({
+          accountId: params.accountId,
+        }),
+    });
+    this._fetchAccountNFTsController = null;
     return resp.data.data;
   }
 
   @backgroundMethod()
   public async fetchNFTDetails(params: IFetchNFTDetailsParams) {
     const client = await this.getClient(EServiceEndpointEnum.Wallet);
-    const { nfts, ...rest } = params;
+    const { nfts, accountId, ...rest } = params;
     const resp = await client.post<IFetchNFTDetailsResp>(
       '/wallet/v1/account/nft/detail',
       {
@@ -47,18 +68,39 @@ class ServiceNFT extends ServiceBase {
             : `${nft.collectionAddress}:${nft.itemId}`,
         ),
       },
+      {
+        headers:
+          await this.backgroundApi.serviceAccountProfile._getWalletTypeHeader({
+            accountId,
+          }),
+      },
     );
     const result = resp.data.data;
 
     return result.map((nft) => {
       if (nft.metadata?.attributes) {
-        nft.metadata.attributes = nft.metadata.attributes
-          .filter((attr) => !!attr)
-          .map((attr) => ({
-            ...attr,
-            traitType: attr.trait_type,
-            displayType: attr.display_type,
-          }));
+        if (isArray(nft.metadata?.attributes)) {
+          nft.metadata.attributes = nft.metadata.attributes
+            .filter((attr) => !!attr)
+            .map((attr) => ({
+              ...attr,
+              traitType: attr.trait_type,
+              displayType: attr.display_type,
+            }));
+        } else if (isObject(nft.metadata?.attributes)) {
+          nft.metadata.attributes = Object.keys(nft.metadata.attributes).map(
+            (key) => ({
+              traitType: key,
+              trait_type: key,
+              value:
+                (nft.metadata?.attributes?.[
+                  key as unknown as number
+                ] as unknown as string) || '',
+              displayType: ETraitsDisplayType.String,
+              display_type: ETraitsDisplayType.String,
+            }),
+          );
+        }
       }
       return nft;
     });
@@ -66,6 +108,7 @@ class ServiceNFT extends ServiceBase {
 
   @backgroundMethod()
   public async getNFT(params: {
+    accountId: string;
     networkId: string;
     nftId: string;
     collectionAddress: string;
@@ -82,17 +125,20 @@ class ServiceNFT extends ServiceBase {
 
   _getNFTMemo = memoizee(
     async ({
+      accountId,
       networkId,
       nftId,
       collectionAddress,
       accountAddress,
     }: {
+      accountId: string;
       networkId: string;
       nftId: string;
       collectionAddress: string;
       accountAddress: string;
     }) => {
       const nftDetails = await this.fetchNFTDetails({
+        accountId,
         networkId,
         nfts: [{ collectionAddress, itemId: nftId }],
         accountAddress,

@@ -20,9 +20,8 @@ export type IAddressValidation = {
 };
 
 export type IFetchAccountDetailsParams = {
+  accountId: string;
   networkId: string;
-  accountAddress: string;
-  xpub?: string;
   cardanoPubKey?: string;
   withUTXOList?: boolean;
   withNetWorth?: boolean;
@@ -92,15 +91,21 @@ export type INetworkAccountAddressDetail = {
   allowEmptyAddress: boolean; // allow empty address, like lightning network
 };
 
+export enum EServerInteractedStatus {
+  FALSE = '0',
+  TRUE = '1',
+  UNKNOWN = '2',
+}
+
 export type IAddressInteractionStatus =
   | 'interacted'
   | 'not-interacted'
   | 'unknown';
 
+export type IAddressValidateBaseStatus = 'valid' | 'invalid' | 'unknown';
+
 export type IAddressValidateStatus =
-  | 'valid'
-  | 'invalid'
-  | 'unknown'
+  | IAddressValidateBaseStatus
   | 'prohibit-send-to-self';
 
 export type IQueryCheckAddressArgs = {

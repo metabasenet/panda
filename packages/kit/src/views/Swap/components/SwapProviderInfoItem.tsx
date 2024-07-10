@@ -46,7 +46,7 @@ const SwapProviderInfoItem = ({
   const rateContent = useMemo(() => {
     if (!rateIsExit || !fromToken || !toToken)
       return (
-        <SizableText>
+        <SizableText size="$bodyMdMedium">
           {intl.formatMessage({
             id: ETranslations.swap_page_provider_provider_insufficient_liquidity,
           })}
@@ -70,7 +70,7 @@ const SwapProviderInfoItem = ({
   }, [fromToken, intl, md, rate, rateIsExit, toToken]);
   return (
     <XStack justifyContent="space-between" alignItems="center">
-      <SizableText size="$bodyMd" color="$textSubdued">
+      <SizableText size="$bodyMd" color="$textSubdued" userSelect="none">
         {intl.formatMessage({ id: ETranslations.swap_page_provider_provider })}
       </SizableText>
 

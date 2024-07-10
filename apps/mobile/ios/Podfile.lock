@@ -1068,7 +1068,7 @@ PODS:
     - React-Core
   - react-native-slider (4.4.3):
     - React-Core
-  - react-native-tab-page-view (1.0.4):
+  - react-native-tab-page-view (1.0.5):
     - React
   - react-native-tcp-socket (6.0.6):
     - CocoaAsyncSocket
@@ -1802,12 +1802,12 @@ SPEC CHECKSUMS:
   react-native-restart: 7595693413fe3ca15893702f2c8306c62a708162
   react-native-safe-area-context: 7aa8e6d9d0f3100a820efb1a98af68aa747f9284
   react-native-slider: 1cdd6ba29675df21f30544253bf7351d3c2d68c4
-  react-native-tab-page-view: 62da73b71f8cb952eb06ee5a1e6390601a7ded1b
+  react-native-tab-page-view: f51a8899ee03805b8959cdf739e03f1e6e9fb54e
   react-native-tcp-socket: e724380c910c2e704816ec817ed28f1342246ff7
   react-native-video: dc3118548cf8864a83f57df4345cf6c692402e8f
   react-native-view-shot: 4475fde003fe8a210053d1f98fb9e06c1d834e1c
   react-native-webview: ec68fd94daa0e47c58c087e6bbebccd4497b5c4e
-  react-native-webview-cleaner: b29823d97ec294f14f14202fb6d0469c30f9b6bc
+  react-native-webview-cleaner: 93c8c73a302c90fcd83a227438b2a53bdb47f7cc
   React-nativeconfig: 754233aac2a769578f828093b672b399355582e6
   React-NativeModulesApple: a03b2da2b8e127d5f5ee29c683e0deba7a9e1575
   React-perflogger: 68ec84e2f858a3e35009aef8866b55893e5e0a1f

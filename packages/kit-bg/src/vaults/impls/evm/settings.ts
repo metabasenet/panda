@@ -48,7 +48,7 @@ const accountDeriveInfo: IAccountDeriveInfoMapEvm = {
   // },
   ledgerLive: {
     // category: `44'/${COINTYPE_ETH}'`,
-    namePrefix: 'Ledger Live',
+    namePrefix: 'EVM Ledger Live',
     label: 'Ledger Live',
     idSuffix: 'LedgerLive', // hd-1--m/44'/60'/0'/0/0--LedgerLive
     template: `m/44'/${COINTYPE_ETH}'/${INDEX_PLACEHOLDER}'/0/0`,
@@ -67,6 +67,8 @@ const settings: IVaultSettings = {
   externalAccountEnabled: true,
   watchingAccountEnabled: true,
 
+  dappInteractionEnabled: true,
+
   defaultFeePresetIndex: 1,
 
   isUtxo: false,
@@ -77,6 +79,9 @@ const settings: IVaultSettings = {
   editFeeEnabled: true,
   replaceTxEnabled: true,
   withL1BaseFee: true,
+  transferZeroNativeTokenEnabled: true,
+  gasLimitValidationEnabled: true,
+  estimatedFeePollingInterval: 6,
 
   accountDeriveInfo,
   networkInfo: {

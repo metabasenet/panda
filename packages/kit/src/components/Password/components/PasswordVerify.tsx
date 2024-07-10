@@ -75,7 +75,7 @@ const PasswordVerify = ({
       });
     } else {
       actions.push({
-        iconName: secureEntry ? 'EyeOffOutline' : 'EyeOutline',
+        iconName: secureEntry ? 'EyeOutline' : 'EyeOffOutline',
         onPress: () => {
           setSecureEntry(!secureEntry);
         },
@@ -154,7 +154,7 @@ const PasswordVerify = ({
         }}
       >
         <Input
-          autoFocus
+          autoFocus={!isEnable}
           selectTextOnFocus
           size="large"
           editable={status.value !== EPasswordVerifyStatus.VERIFYING}

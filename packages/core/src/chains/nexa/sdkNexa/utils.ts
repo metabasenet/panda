@@ -5,7 +5,7 @@ import {
   ENexaAddressType,
   ENexaOpcode,
   bufferToScripChunk,
-  decode,
+  decodeAddress,
   decodeScriptBufferToScriptChunks,
   encode,
   getScriptBufferFromScriptTemplateOut,
@@ -21,6 +21,8 @@ import {
   writeUInt8,
 } from '@onekeyhq/core/src/chains/nexa/sdkNexa/sdk';
 import { InvalidAddress } from '@onekeyhq/shared/src/errors';
+import { ETranslations } from '@onekeyhq/shared/src/locale';
+import { appLocale } from '@onekeyhq/shared/src/locale/appLocale';
 import { checkIsDefined } from '@onekeyhq/shared/src/utils/assertUtils';
 
 import { hash160, sha256 } from '../../../secret';
@@ -36,7 +38,7 @@ import type {
 
 export function verifyNexaAddress(address: string) {
   try {
-    decode(address);
+    decodeAddress(address);
     return {
       isValid: true,
       normalizedAddress: address,
@@ -302,7 +304,13 @@ function buildSignatures(encodedTx: IEncodedTxNexa, dbAccountAddress: string) {
   if (available.lt(new BN(0))) {
     console.error(inputAmount.toString(), fee.toString());
     throw new Error(
-      `Available balance cannot be less than 0, inputAmount: ${inputAmount.toString()}, dust: ${fee.toString()}`,
+      appLocale.intl.formatMessage(
+        { id: ETranslations.feedback_account_balance_not_equal_to_utxos },
+        {
+          amount: inputAmount.toString(),
+          dust: fee.toString(),
+        },
+      ),
     );
   }
 

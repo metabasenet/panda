@@ -191,7 +191,11 @@ export default class Vault extends VaultBase {
         return transaction;
       } catch (e) {
         if (typeof e === 'string' && e.endsWith('balance is not sufficient.')) {
-          throw new InsufficientBalance();
+          throw new InsufficientBalance({
+            info: {
+              symbol: tokenInfo.symbol,
+            },
+          });
         } else if (typeof e === 'string') {
           throw new Error(e);
         } else {
@@ -264,8 +268,8 @@ export default class Vault extends VaultBase {
 
     const accountAddress = await this.getAccountAddress();
     const nativeToken = await this.backgroundApi.serviceToken.getToken({
+      accountId: this.accountId,
       networkId: this.networkId,
-      accountAddress,
       tokenIdOnNetwork: '',
     });
 
@@ -318,9 +322,9 @@ export default class Vault extends VaultBase {
       const tokenAddress = TronWeb.address.fromHex(contractAddressHex);
 
       const token = await this.backgroundApi.serviceToken.getToken({
+        accountId: this.accountId,
         networkId: this.networkId,
         tokenIdOnNetwork: tokenAddress,
-        accountAddress,
       });
 
       if (!token) return;
@@ -350,7 +354,7 @@ export default class Vault extends VaultBase {
 
         action = await this.buildTxTransferAssetAction({
           from: fromAddress,
-          to: tokenAddress,
+          to: TronWeb.address.fromHex(toAddressHex),
           transfers: [transfer],
         });
       }
@@ -366,7 +370,8 @@ export default class Vault extends VaultBase {
           type: EDecodedTxActionType.TOKEN_APPROVE,
           tokenApprove: {
             from: fromAddress,
-            to: TronWeb.address.fromHex(spenderAddressHex),
+            to: tokenAddress,
+            spender: TronWeb.address.fromHex(spenderAddressHex),
             amount: amountBN.shiftedBy(-token.decimals).toFixed(),
             icon: token.logoURI ?? '',
             name: token.name,
@@ -469,7 +474,11 @@ export default class Vault extends VaultBase {
         address,
       });
     }
-    return Promise.reject(new InvalidAddress());
+    return Promise.resolve({
+      isValid: false,
+      normalizedAddress: '',
+      displayAddress: '',
+    });
   }
 
   override validateXpub(xpub: string): Promise<IXpubValidation> {
